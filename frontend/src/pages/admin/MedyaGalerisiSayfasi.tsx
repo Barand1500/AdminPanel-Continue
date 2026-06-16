@@ -4,6 +4,7 @@ import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import {
   adminMedyaOlustur,
   adminMedyaSil,
+  adminMedyaTopluSil,
   adminMedyaYukle,
   adminMedyalariGetir,
   type AdminMedya,
@@ -12,7 +13,7 @@ import {
 export function MedyaGalerisiSayfasi() {
   const [medyalar, setMedyalar] = useState<AdminMedya[]>([]);
   const [urlForm, setUrlForm] = useState({ ad: '', url: '' });
-  const [seciliId, setSeciliId] = useState<string | null>(null);
+  const [seciliIds, setSeciliIds] = useState<string[]>([]);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [islemYapiliyor, setIslemYapiliyor] = useState(false);
   const [hata, setHata] = useState('');
@@ -48,27 +49,36 @@ export function MedyaGalerisiSayfasi() {
     } finally {
       setIslemYapiliyor(false);
     }
-  }, [urlForm]);
+  }, [urlForm, yukle]);
 
   const sil = useCallback(async () => {
-    if (!seciliId || !confirm('Bu medyayı silmek istediğinize emin misiniz?')) return;
+    if (seciliIds.length === 0) return;
+    const mesaj =
+      seciliIds.length === 1
+        ? 'Bu medyayı silmek istediğinize emin misiniz?'
+        : `${seciliIds.length} medyayı silmek istediğinize emin misiniz?`;
+    if (!confirm(mesaj)) return;
     setIslemYapiliyor(true);
     try {
-      await adminMedyaSil(seciliId);
-      setSeciliId(null);
+      if (seciliIds.length === 1) {
+        await adminMedyaSil(seciliIds[0]);
+      } else {
+        await adminMedyaTopluSil(seciliIds);
+      }
+      setSeciliIds([]);
       await yukle();
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Silme başarısız');
     } finally {
       setIslemYapiliyor(false);
     }
-  }, [seciliId]);
+  }, [seciliIds, yukle]);
 
   useModulAksiyonlari(
     { kaydet: urlEkle, sil },
     {
       kaydet: !islemYapiliyor && Boolean(urlForm.ad.trim() && urlForm.url.trim()),
-      sil: !!seciliId && !islemYapiliyor,
+      sil: seciliIds.length > 0 && !islemYapiliyor,
     }
   );
 
@@ -108,7 +118,17 @@ export function MedyaGalerisiSayfasi() {
         {yukleniyor ? (
           <p className="text-sm text-slate-400">Yükleniyor...</p>
         ) : (
-          <MedyaGrid medyalar={medyalar} seciliId={seciliId} onSec={setSeciliId} />
+          <MedyaGrid
+            medyalar={medyalar}
+            seciliIds={seciliIds}
+            onSecToggle={(id) =>
+              setSeciliIds((onceki) =>
+                onceki.includes(id) ? onceki.filter((x) => x !== id) : [...onceki, id]
+              )
+            }
+            onHepsiniSec={() => setSeciliIds(medyalar.map((m) => m.id))}
+            onSecimiTemizle={() => setSeciliIds([])}
+          />
         )}
       </div>
     </div>

@@ -11,7 +11,7 @@ import {
   sayfaGuncelleSchema,
   sayfaOlusturSchema,
 } from '../../Application/DTOs/SayfaDto.js';
-import { medyaOlusturSchema } from '../../Application/DTOs/MedyaDto.js';
+import { medyaOlusturSchema, medyaTopluSilSchema } from '../../Application/DTOs/MedyaDto.js';
 import {
   seoGenelGuncelleSchema,
   seoSayfaGuncelleSchema,
@@ -23,6 +23,7 @@ import { AuthController, authMiddleware } from '../controllers/AuthController.js
 import { BlogController } from '../controllers/BlogController.js';
 import { DashboardController } from '../controllers/DashboardController.js';
 import { FormController } from '../controllers/FormController.js';
+import { BildirimController } from '../controllers/BildirimController.js';
 import { MedyaController } from '../controllers/MedyaController.js';
 import { SayfaController } from '../controllers/SayfaController.js';
 import { SeoController } from '../controllers/SeoController.js';
@@ -51,6 +52,7 @@ const seoController = new SeoController();
 const dashboardController = new DashboardController();
 const blogController = new BlogController();
 const formController = new FormController();
+const bildirimController = new BildirimController();
 const logController = new LogController();
 const yedeklemeController = new YedeklemeController();
 const sistemAyarlariController = new SistemAyarlariController();
@@ -71,9 +73,13 @@ router.patch('/auth/tercihler', authMiddleware, validateBySchema(tercihlerGuncel
 
 router.get('/dashboard', authMiddleware, (req, res) => dashboardController.ozet(req, res));
 
+router.get('/bildirimler', authMiddleware, (req, res) => bildirimController.listele(req, res));
+router.patch('/bildirimler/tumu-okundu', authMiddleware, (req, res) => bildirimController.tumunuOkundu(req, res));
+
 router.get('/widgetlar', authMiddleware, (req, res) => widgetController.listele(req, res));
 router.post('/widgetlar', authMiddleware, validateBySchema(widgetOlusturSchema), (req, res) => widgetController.olustur(req, res));
 router.put('/widgetlar/:id', authMiddleware, validateBySchema(widgetGuncelleSchema), (req, res) => widgetController.guncelle(req, res));
+router.delete('/widgetlar/:id', authMiddleware, (req, res) => widgetController.sil(req, res));
 
 router.get('/site-ayarlari', authMiddleware, (req, res) => siteAyarlariController.getir(req, res));
 router.put('/site-ayarlari', authMiddleware, validateBySchema(siteAyarlariGuncelleSchema), (req, res) => siteAyarlariController.guncelle(req, res));
@@ -110,6 +116,9 @@ router.get('/medya', authMiddleware, (req, res) => medyaController.listele(req, 
 router.post('/medya', authMiddleware, validateBySchema(medyaOlusturSchema), (req, res) => medyaController.olustur(req, res));
 router.post('/medya/yukle', authMiddleware, medyaYukle.single('dosya'), (req, res) => medyaController.yukle(req, res));
 router.delete('/medya/:id', authMiddleware, (req, res) => medyaController.sil(req, res));
+router.delete('/medya', authMiddleware, validateBySchema(medyaTopluSilSchema), (req, res) =>
+  medyaController.topluSil(req, res)
+);
 
 router.get('/seo', authMiddleware, (req, res) => seoController.ozet(req, res));
 router.put('/seo/genel', authMiddleware, validateBySchema(seoGenelGuncelleSchema), (req, res) => seoController.genelGuncelle(req, res));

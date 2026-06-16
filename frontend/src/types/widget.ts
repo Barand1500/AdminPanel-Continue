@@ -15,6 +15,11 @@ export const YENI_WIDGET_TIPLERI = [
   'BLOG_KARUSEL',
   'LINK_KARTLARI',
   'GORSEL_GRID_BLOK',
+  'GORSEL_ETIKET_KARTLARI',
+  'EKIP_KARUSEL',
+  'SAYAC_BLOK',
+  'YORUM_KARUSEL',
+  'FIYATLANDIRMA',
 ] as const;
 
 export const AKTIF_WIDGET_TIPLERI = [
@@ -63,6 +68,9 @@ export const WIDGET_GORUNUM_GORSEL_TIPLERI = new Set([
   'HERO_BANNER',
   'BLOG_KARUSEL',
   'GORSEL_GRID_BLOK',
+  'GORSEL_ETIKET_KARTLARI',
+  'EKIP_KARUSEL',
+  'YORUM_KARUSEL',
 ]);
 
 export const WIDGET_GORUNUM_GRID_TIPLERI = new Set([
@@ -72,7 +80,12 @@ export const WIDGET_GORUNUM_GRID_TIPLERI = new Set([
   'KATEGORI',
   'REFERANSLAR',
   'GORSEL_GRID_BLOK',
+  'GORSEL_ETIKET_KARTLARI',
   'BLOG_KARUSEL',
+  'EKIP_KARUSEL',
+  'SAYAC_BLOK',
+  'YORUM_KARUSEL',
+  'FIYATLANDIRMA',
 ]);
 
 export const WIDGET_GORUNUM_METIN_TIPLERI = new Set([
@@ -131,6 +144,7 @@ export interface WidgetKartOgesi {
   aciklama: string;
   ikon: string;
   link: string;
+  butonMetni?: string;
   gorselUrl?: string;
 }
 
@@ -162,6 +176,58 @@ export interface WidgetGorselGridKart {
   link: string;
 }
 
+export interface WidgetEtiketKarti {
+  id: string;
+  etiket: string;
+  gorselUrl: string;
+  link: string;
+}
+
+export interface WidgetEkipUyesi {
+  id: string;
+  ad: string;
+  unvan: string;
+  gorselUrl: string;
+  aciklama?: string;
+}
+
+export interface WidgetSayac {
+  id: string;
+  deger: number;
+  sonEk: string;
+  etiket: string;
+}
+
+export interface WidgetYorum {
+  id: string;
+  metin: string;
+  ad: string;
+  firma: string;
+  gorselUrl?: string;
+}
+
+export interface WidgetFiyatOzellik {
+  metin: string;
+  dahil: boolean;
+}
+
+export interface WidgetFiyatPaketi {
+  id: string;
+  ad: string;
+  fiyat: string;
+  aciklama: string;
+  ozellikler: WidgetFiyatOzellik[];
+  butonMetni: string;
+  butonLink: string;
+  oneCikan: boolean;
+}
+
+export interface WidgetIkonKart {
+  id: string;
+  ikon: string;
+  metin: string;
+}
+
 export interface WidgetConfig {
   yerlesim?: WidgetYerlesim;
   gorunum?: WidgetGorunumAyarlari;
@@ -183,6 +249,12 @@ export interface WidgetConfig {
   solAciklama?: string;
   filtreler?: string[];
   gridKartlar?: WidgetGorselGridKart[];
+  etiketKartlar?: WidgetEtiketKarti[];
+  uyeler?: WidgetEkipUyesi[];
+  sayaclar?: WidgetSayac[];
+  yorumlar?: WidgetYorum[];
+  paketler?: WidgetFiyatPaketi[];
+  ikonKartlar?: WidgetIkonKart[];
   haritaUrl?: string;
   haritaLat?: string;
   haritaLng?: string;
@@ -236,7 +308,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     case 'BASLIK_METIN':
       return { yerlesim, gorunum: { ...gorunum, icerikDuzeni: 'ust' }, ek, metin: '' };
     case 'BASLIK_METIN_GORSEL':
-      return { yerlesim, gorunum: { ...gorunum, icerikDuzeni: 'sol' }, ek, metin: '' };
+      return { yerlesim, gorunum: { ...gorunum, icerikDuzeni: 'sol' }, ek, metin: '', ikonKartlar: [] };
     case 'SLIDER':
     case 'HERO_BANNER':
       return { yerlesim: { bolge: 'slider_alti' }, gorunum, ek, slides: [] };
@@ -280,6 +352,16 @@ export function varsayilanConfig(tip: string): WidgetConfig {
       return { yerlesim: { bolge: 'footer_ustu' }, gorunum, ek, popupGecikme: 3, popupTetikleyici: 'sayfa_yukle' };
     case 'KATEGORI':
       return { yerlesim, gorunum, ek, kategoriler: [] };
+    case 'GORSEL_ETIKET_KARTLARI':
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3 }, ek, etiketKartlar: [] };
+    case 'EKIP_KARUSEL':
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4 }, ek, uyeler: [], otomatikKaydir: true };
+    case 'SAYAC_BLOK':
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4 }, ek, sayaclar: [] };
+    case 'YORUM_KARUSEL':
+      return { yerlesim, gorunum, ek, yorumlar: [], otomatikKaydir: true };
+    case 'FIYATLANDIRMA':
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3 }, ek, paketler: [] };
     default:
       return { yerlesim, gorunum, ek };
   }

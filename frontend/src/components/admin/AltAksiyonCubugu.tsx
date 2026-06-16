@@ -2,6 +2,8 @@ import type { AksiyonButonu } from '@/types/admin';
 import { GorevCubuguTray } from './GorevCubuguTray';
 import { SaatTakvimWidget } from './SaatTakvimWidget';
 import { modulRehberBul } from '@/data/adminModulRehberleri';
+import { BildirimPaneli, useBildirimSayaci } from './BildirimPaneli';
+import { useState } from 'react';
 
 interface AltAksiyonCubuguProps {
   aksiyonlar: AksiyonButonu[];
@@ -25,6 +27,8 @@ export function AltAksiyonCubugu({
   onRehberAc,
 }: AltAksiyonCubuguProps) {
   const rehber = modulRehberBul(focusModulId);
+  const [panelAcik, setPanelAcik] = useState(false);
+  const { okunmamisSayi, yenile } = useBildirimSayaci();
 
   return (
     <footer className="ap-footer ap-gorev-cubugu flex h-12 shrink-0 items-center gap-2 border-t px-3">
@@ -68,12 +72,22 @@ export function AltAksiyonCubugu({
         )}
         <button
           type="button"
-          className="ap-tray-bildirim-btn"
+          className="ap-tray-bildirim-btn relative"
           title="Bildirimler"
           aria-label="Bildirimler"
+          onClick={() => {
+            setPanelAcik((o) => !o);
+            void yenile();
+          }}
         >
           🔔
+          {okunmamisSayi > 0 && (
+            <span className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+              {okunmamisSayi > 9 ? '9+' : okunmamisSayi}
+            </span>
+          )}
         </button>
+        <BildirimPaneli acik={panelAcik} onKapat={() => setPanelAcik(false)} />
         <SaatTakvimWidget />
       </div>
     </footer>

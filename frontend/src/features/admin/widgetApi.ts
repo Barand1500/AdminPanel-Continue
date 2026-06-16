@@ -99,3 +99,12 @@ export async function widgetGuncelle(id: string, form: WidgetFormDegeri): Promis
   if (!yanit.ok) throw new Error(veri.mesaj ?? 'Widget guncellenemedi');
   return veri.widget as AdminWidget;
 }
+
+export async function widgetSil(id: string): Promise<void> {
+  const yanit = await fetch(`${API_URL}/admin/widgetlar/${id}`, {
+    method: 'DELETE',
+    headers: authHeaders(),
+  });
+  const veri = await yanit.json();
+  if (!yanit.ok) throw new Error(veri.mesaj ?? 'Widget silinemedi');
+}

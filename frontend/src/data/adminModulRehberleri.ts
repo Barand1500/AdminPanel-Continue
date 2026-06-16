@@ -143,8 +143,14 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
         aciklama: 'Sıra numarası küçük olan widget önce görünür. Aktif/pasif anahtarı ile gizleyebilirsiniz.',
         renk: 'mavi',
       },
+      {
+        ikon: '🗂️',
+        baslik: 'Widget Kategorileri',
+        aciklama: 'Yeni widget eklerken tipler kategorilere ayrılır: Slider, Görsel+Metin, Kart, Karusel, Resimli, İstatistik, İletişim.',
+        renk: 'turuncu',
+      },
     ],
-    ipucu: 'Başlık+Metin, Galeri, Blog Karuseli ve Link Kartları gibi tipler için İçerik sekmesi tip özel alanlar sunar.',
+    ipucu: 'Safir tarzı site için: Metin+Görsel (hakkımızda), Hizmet Kartları, Görsel Etiket Kartları, Ekip Karuseli, Sayaç, Yorum ve Fiyatlandırma widgetlarını kullanın.',
   },
 
   'menu-yonetimi': {

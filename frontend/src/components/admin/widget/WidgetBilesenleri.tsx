@@ -20,18 +20,24 @@ import {
   tipDegistir,
   tipEtiketi,
   tipIkon,
+  tipKategoriEtiketi,
   tipOlusturulabilirMi,
   varsayilanWidgetForm,
+  widgetTipleriKategoriyeGore,
+  WIDGET_TIP_KATEGORILERI,
 } from './widgetRegistry';
 import { yerlesimEtiketi, yerlesimOku } from '@/utils/widgetYerlesim';
 
 export {
   WIDGET_TIPLERI,
+  WIDGET_TIP_KATEGORILERI,
   GIZLI_WIDGET_TIPLERI,
   tipEtiketi,
   tipIkon,
+  tipKategoriEtiketi,
   varsayilanWidgetForm,
   tipOlusturulabilirMi,
+  widgetTipleriKategoriyeGore,
 };
 
 export function widgettenForma(widget: AdminWidget): WidgetFormDegeri {
@@ -116,7 +122,7 @@ export function WidgetListesiPanel({ widgetlar, seciliId, tipFiltre, onSec }: Wi
                     <div className="min-w-0 flex-1">
                       <p className="ap-liste-oge-baslik truncate">{w.ad}</p>
                       <p className="ap-liste-oge-alt">
-                        {tipEtiketi(w.tip)} · {yerlesimEtiketi(yerlesimOku(w))} · Sıra {w.sira}
+                        {tipEtiketi(w.tip)} · {tipKategoriEtiketi(w.tip)} · {yerlesimEtiketi(yerlesimOku(w))} · Sıra {w.sira}
                       </p>
                       <div className="ap-liste-oge-etiketler">
                         {w.aktif ? (
@@ -183,7 +189,7 @@ export function WidgetEditorPanel({
   const seciliTipMeta = WIDGET_TIPLERI.find((t) => t.id === form.tip);
   const IcerikPanel = ICERIK_PANEL_MAP[form.tip];
 
-  const pickerTipleri = WIDGET_TIPLERI.filter((t) => !varsayilanTip || t.id === varsayilanTip);
+  const kategoriliTipler = widgetTipleriKategoriyeGore(varsayilanTip);
 
   return (
     <div className="ap-editor-panel">
@@ -219,22 +225,32 @@ export function WidgetEditorPanel({
         {sekme === 'genel' && (
           <>
             {yeniMod && (
-              <AdminFormBolumu baslik="Widget Tipi" aciklama="Oluşturmak istediğiniz bileşen tipini seçin">
-                <div className="ap-widget-tip-grid">
-                  {pickerTipleri.map((tip) => (
-                    <button
-                      key={tip.id}
-                      type="button"
-                      onClick={() => {
-                        onChange(tipDegistir(form, tip.id));
-                        onTipSecildi?.(tip.id);
-                      }}
-                      className={`ap-widget-tip-kart ${form.tip === tip.id ? 'ap-widget-tip-kart-secili' : ''}`}
-                    >
-                      <span className="ap-widget-tip-ikon">{tip.ikon}</span>
-                      <span className="ap-widget-tip-ad">{tip.etiket}</span>
-                      <span className="ap-widget-tip-aciklama">{tip.aciklama}</span>
-                    </button>
+              <AdminFormBolumu baslik="Widget Tipi" aciklama="İçerik türüne göre gruplandırılmış bileşenler — slider, kart, karusel, resimli vb.">
+                <div className="space-y-4">
+                  {kategoriliTipler.map(({ kategori, tipler }) => (
+                    <div key={kategori.id}>
+                      <div className="ap-widget-kategori-baslik">
+                        <span className="ap-widget-kategori-etiket">{kategori.etiket}</span>
+                        <span className="ap-widget-kategori-aciklama">{kategori.aciklama}</span>
+                      </div>
+                      <div className="ap-widget-tip-grid mt-2">
+                        {tipler.map((tip) => (
+                          <button
+                            key={tip.id}
+                            type="button"
+                            onClick={() => {
+                              onChange(tipDegistir(form, tip.id));
+                              onTipSecildi?.(tip.id);
+                            }}
+                            className={`ap-widget-tip-kart ${form.tip === tip.id ? 'ap-widget-tip-kart-secili' : ''}`}
+                          >
+                            <span className="ap-widget-tip-ikon">{tip.ikon}</span>
+                            <span className="ap-widget-tip-ad">{tip.etiket}</span>
+                            <span className="ap-widget-tip-aciklama">{tip.aciklama}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               </AdminFormBolumu>
@@ -260,12 +276,19 @@ export function WidgetEditorPanel({
                         onTipSecildi?.(e.target.value);
                       }}
                     >
-                      {WIDGET_TIPLERI.map((t) => (
-                        <option key={t.id} value={t.id}>{t.etiket}</option>
+                      {widgetTipleriKategoriyeGore().map(({ kategori, tipler }) => (
+                        <optgroup key={kategori.id} label={kategori.etiket}>
+                          {tipler.map((t) => (
+                            <option key={t.id} value={t.id}>{t.etiket}</option>
+                          ))}
+                        </optgroup>
                       ))}
                     </select>
                   ) : (
                     <p className="text-sm text-amber-400">{tipEtiketi(form.tip)} (eski tip — yalnızca düzenlenebilir)</p>
+                  )}
+                  {tipOlusturulabilirMi(form.tip) && (
+                    <p className="ap-muted mt-1 text-xs">Kategori: {tipKategoriEtiketi(form.tip)}</p>
                   )}
                 </FormAlani>
               )}

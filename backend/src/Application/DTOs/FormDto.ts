@@ -69,3 +69,9 @@ export const formGuncelleSchema = formOlusturSchema.partial();
 
 export type FormOlusturDto = z.infer<typeof formOlusturSchema>;
 export type FormGuncelleDto = z.infer<typeof formGuncelleSchema>;
+
+export const formGonderSchema = z.object({
+  veri: z.record(z.string(), z.unknown()).refine((v) => Object.keys(v).length > 0, 'Form verisi bos olamaz'),
+});
+
+export type FormGonderDto = z.infer<typeof formGonderSchema>;

@@ -48,6 +48,14 @@ export async function adminMedyaSil(id: string): Promise<void> {
   await adminJsonFetch(`/medya/${id}`, { method: 'DELETE', headers: adminHeaders() });
 }
 
+export async function adminMedyaTopluSil(ids: string[]): Promise<void> {
+  await adminJsonFetch(`/medya`, {
+    method: 'DELETE',
+    headers: adminHeaders(),
+    body: JSON.stringify({ ids }),
+  });
+}
+
 export function medyaTamUrl(url: string): string {
   if (url.startsWith('http') || url.startsWith('data:')) return url;
   const apiBase = (import.meta.env.VITE_API_URL ?? '/api').replace(/\/api$/, '');

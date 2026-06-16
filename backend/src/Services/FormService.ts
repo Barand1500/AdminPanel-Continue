@@ -1,7 +1,9 @@
-import type { FormGuncelleDto, FormOlusturDto } from '../Application/DTOs/FormDto.js';
+import type { FormGuncelleDto, FormGonderDto, FormOlusturDto } from '../Application/DTOs/FormDto.js';
 import { FormRepository } from '../Infrastructure/repositories/FormRepository.js';
+import { SiteRepository } from '../Infrastructure/repositories/SiteRepository.js';
 
 const formRepo = new FormRepository();
+const siteRepo = new SiteRepository();
 
 function slugOlustur(ad: string) {
   return ad
@@ -72,5 +74,22 @@ export class FormService {
     const form = await formRepo.findByIdAndSiteId(formId, siteId);
     if (!form) throw new Error('Form bulunamadi');
     await formRepo.gonderimSil(gonderimId, formId);
+  }
+
+  async publicGonder(siteSlug: string, formSlug: string, dto: FormGonderDto) {
+    const site = await siteRepo.findBySlug(siteSlug);
+    if (!site) throw new Error('Site bulunamadi');
+
+    const form = await formRepo.findBySlugAndSiteId(formSlug, site.id);
+    if (!form) throw new Error('Form bulunamadi');
+
+    const veri = dto.veri;
+    const doluAlan = Object.values(veri).some((v) => {
+      if (v === null || v === undefined) return false;
+      return String(v).trim().length > 0;
+    });
+    if (!doluAlan) throw new Error('En az bir alan doldurulmali');
+
+    return formRepo.gonderimOlustur(form.id, veri as never);
   }
 }

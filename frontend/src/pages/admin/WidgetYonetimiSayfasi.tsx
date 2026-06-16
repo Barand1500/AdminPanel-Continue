@@ -12,7 +12,7 @@ import {
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
-import { widgetGuncelle, widgetOlustur, widgetlariGetir } from '@/features/admin/widgetApi';
+import { widgetGuncelle, widgetOlustur, widgetSil, widgetlariGetir } from '@/features/admin/widgetApi';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
 
@@ -83,16 +83,34 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
     }
   }, []);
 
+  const silHandler = useCallback(async () => {
+    if (!seciliId || !confirm('Bu widgetı silmek istediğinize emin misiniz?')) return;
+    setKaydediliyor(true);
+    setHata('');
+    try {
+      await widgetSil(seciliId);
+      setWidgetlar((onceki) => onceki.filter((w) => w.id !== seciliId));
+      setSeciliId(null);
+      setForm(varsayilanWidgetForm(varsayilanTip ?? 'SLIDER'));
+      setBasari('Widget silindi.');
+    } catch (err) {
+      setHata(err instanceof Error ? err.message : 'Silme başarısız');
+    } finally {
+      setKaydediliyor(false);
+    }
+  }, [seciliId, varsayilanTip]);
+
   useModulAksiyonlari(
     {
       kaydet: kaydetFooter,
       ekle: yeniBaslat,
+      sil: silHandler,
       onizle: () => setOnizlemeAcik(true),
     },
     {
       kaydet: !kaydediliyor && kaydetHazirMi(form),
       ekle: true,
-      sil: false,
+      sil: !!seciliId && !kaydediliyor,
       onizle: onizlemeHazir && !kaydediliyor,
     }
   );

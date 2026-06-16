@@ -44,4 +44,8 @@ export class WidgetRepository {
       data,
     });
   }
+
+  async deleteForSite(id: number, siteId: number) {
+    return prisma.widget.deleteMany({ where: { id, siteId } });
+  }
 }

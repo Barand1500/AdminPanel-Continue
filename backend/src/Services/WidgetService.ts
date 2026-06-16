@@ -66,4 +66,10 @@ export class WidgetService {
       configJson: dto.configJson as never,
     });
   }
+
+  async sil(siteId: number, widgetId: number) {
+    const mevcut = await widgetRepo.findByIdAndSiteId(widgetId, siteId);
+    if (!mevcut) throw new Error('Widget bulunamadi');
+    await widgetRepo.deleteForSite(widgetId, siteId);
+  }
 }

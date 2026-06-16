@@ -59,4 +59,16 @@ export class MedyaController {
       return res.status(status).json({ mesaj });
     }
   }
+
+  async topluSil(req: Request, res: Response) {
+    try {
+      const siteId = cozulenSiteId(req);
+      if (!siteId) return res.status(400).json({ mesaj: 'Site secimi gerekli' });
+      await service.topluSil(siteId, req.body);
+      return res.json({ mesaj: 'Medya(lar) silindi' });
+    } catch (err) {
+      const mesaj = err instanceof Error ? err.message : 'Medya(lar) silinemedi';
+      return res.status(400).json({ mesaj });
+    }
+  }
 }

@@ -828,6 +828,28 @@ html:has(.admin-panel[data-tema='acik']) body {
 }
 
 /* Widget yonetimi */
+.ap-widget-kategori-baslik {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding-bottom: 0.25rem;
+  border-bottom: 1px solid var(--ap-border);
+}
+
+.ap-widget-kategori-etiket {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ap-accent);
+}
+
+.ap-widget-kategori-aciklama {
+  font-size: 0.7rem;
+  color: var(--ap-muted-fg);
+}
+
 .ap-widget-tip-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));

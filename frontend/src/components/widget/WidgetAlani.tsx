@@ -8,6 +8,11 @@ import { BaslikMetinGorselWidget } from './BaslikMetinGorselWidget';
 import { BlogKaruselWidget } from './BlogKaruselWidget';
 import { LinkKartlariWidget } from './LinkKartlariWidget';
 import { GorselGridBlokWidget } from './GorselGridBlokWidget';
+import { GorselEtiketKartlariWidget } from './GorselEtiketKartlariWidget';
+import { EkipKaruselWidget } from './EkipKaruselWidget';
+import { SayacBlokWidget } from './SayacBlokWidget';
+import { YorumKaruselWidget } from './YorumKaruselWidget';
+import { FiyatlandirmaWidget } from './FiyatlandirmaWidget';
 import { GaleriWidget } from './GaleriWidget';
 import { SssWidget } from './SssWidget';
 import { PopupWidget } from './PopupWidget';
@@ -36,6 +41,16 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
         return <LinkKartlariWidget widget={widget} />;
       case 'GORSEL_GRID_BLOK':
         return <GorselGridBlokWidget widget={widget} />;
+      case 'GORSEL_ETIKET_KARTLARI':
+        return <GorselEtiketKartlariWidget widget={widget} />;
+      case 'EKIP_KARUSEL':
+        return <EkipKaruselWidget widget={widget} />;
+      case 'SAYAC_BLOK':
+        return <SayacBlokWidget widget={widget} />;
+      case 'YORUM_KARUSEL':
+        return <YorumKaruselWidget widget={widget} />;
+      case 'FIYATLANDIRMA':
+        return <FiyatlandirmaWidget widget={widget} />;
       case 'GALERI':
         return <GaleriWidget widget={widget} />;
       case 'SSS':

@@ -6,4 +6,9 @@ export const medyaOlusturSchema = z.object({
   tip: z.string().default('GORSEL'),
 });
 
+export const medyaTopluSilSchema = z.object({
+  ids: z.array(z.coerce.number()).min(1),
+});
+
 export type MedyaOlusturDto = z.infer<typeof medyaOlusturSchema>;
+export type MedyaTopluSilDto = z.infer<typeof medyaTopluSilSchema>;

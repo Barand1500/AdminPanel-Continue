@@ -1,6 +1,7 @@
 import { FormEvent, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { SitePublicData } from '@/types/site';
+import { publicFormGonder } from '@/features/site/formApi';
 
 function TelefonInput({
   label,
@@ -53,10 +54,25 @@ export function IletisimSayfasi() {
   const [telefon, setTelefon] = useState('');
   const [mesaj, setMesaj] = useState('');
   const [gonderildi, setGonderildi] = useState(false);
+  const [gonderiliyor, setGonderiliyor] = useState(false);
+  const [hata, setHata] = useState('');
 
-  function formGonder(e: FormEvent) {
+  async function formGonder(e: FormEvent) {
     e.preventDefault();
-    setGonderildi(true);
+    setGonderiliyor(true);
+    setHata('');
+    try {
+      await publicFormGonder('iletisim', { adSoyad, email, telefon, mesaj });
+      setGonderildi(true);
+      setAdSoyad('');
+      setEmail('');
+      setTelefon('');
+      setMesaj('');
+    } catch (err) {
+      setHata(err instanceof Error ? err.message : 'Gönderim başarısız');
+    } finally {
+      setGonderiliyor(false);
+    }
   }
 
   return (
@@ -165,9 +181,13 @@ export function IletisimSayfasi() {
                 onChange={setMesaj}
               />
 
-              <button type="submit" className="phone-gonder-btn">
-                Gönder ✈️
+              <button type="submit" className="phone-gonder-btn" disabled={gonderiliyor}>
+                {gonderiliyor ? 'Gönderiliyor...' : 'Gönder ✈️'}
               </button>
+
+              {hata && (
+                <p className="mt-3 rounded-xl bg-red-50 px-3 py-2 text-center text-xs text-red-700">{hata}</p>
+              )}
 
               {gonderildi && (
                 <p className="mt-3 rounded-xl bg-green-50 px-3 py-2 text-center text-xs text-green-700">

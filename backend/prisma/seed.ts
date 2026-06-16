@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, WidgetTipi } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
@@ -321,6 +321,165 @@ async function main() {
         siteId: site.id,
       },
     });
+  }
+
+  const mevcutWidgetSayisi = await prisma.widget.count({ where: { siteId: site.id } });
+  if (mevcutWidgetSayisi === 0) {
+    const demoWidgetlar = [
+      {
+        ad: 'Hakkımızda Bloğu',
+        tip: WidgetTipi.BASLIK_METIN_GORSEL,
+        sira: 10,
+        baslik: '20 Yıldır Sektörün Lideriyiz',
+        altBaslik: 'HAKKIMIZDA',
+        gorselUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800',
+        butonMetni: 'Tanıtım Videomuz',
+        butonLink: '#',
+        configJson: {
+          yerlesim: { bolge: 'urunler_ustu' },
+          metin: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sektörde uzun yıllardır güvenilir hizmet sunuyoruz.',
+          ikonKartlar: [
+            { id: 'ik1', ikon: '🛡️', metin: '%100 Müşteri Memnuniyeti' },
+            { id: 'ik2', ikon: '❤️', metin: 'Kaliteli ve Güvenilir Hizmet' },
+            { id: 'ik3', ikon: '👍', metin: 'Sektörün Tek Lideri' },
+            { id: 'ik4', ikon: '💬', metin: 'Whatsapp Desteği' },
+          ],
+          gorunum: { icerikDuzeni: 'sol', kolonSayisi: 2 },
+        },
+      },
+      {
+        ad: 'Hizmet Kartları',
+        tip: WidgetTipi.HIZMET_KARTLARI,
+        sira: 20,
+        baslik: 'Sizlere Neler Sunuyoruz?',
+        altBaslik: 'İLKELERİMİZ',
+        aciklama: 'Profesyonel ekibimizle kurumsal ihtiyaçlarınıza özel çözümler sunuyoruz.',
+        configJson: {
+          yerlesim: { bolge: 'urunler_alti' },
+          kartlar: [
+            { id: 'hk1', ikon: 'users', baslik: 'Profesyonel Çalışma Ekibi', aciklama: 'Deneyimli kadromuzla projelerinizi güvenle yönetiyoruz.', link: '/hizmetler', butonMetni: 'Detayları Gör' },
+            { id: 'hk2', ikon: 'monitor', baslik: 'Satış Öncesi Danışmanlık', aciklama: 'İhtiyaç analizi ve doğru çözüm önerileri.', link: '/hizmetler', butonMetni: 'Detayları Gör' },
+            { id: 'hk3', ikon: 'headset', baslik: 'Satış Sonrası Düzenli Destek', aciklama: 'Kesintisiz teknik destek ve bakım hizmeti.', link: '/iletisim', butonMetni: 'Detayları Gör' },
+            { id: 'hk4', ikon: 'wrench', baslik: 'Güvenilir ve Kaliteli Hizmet', aciklama: 'Standartlara uygun, sürdürülebilir çözümler.', link: '/hakkimizda', butonMetni: 'Detayları Gör' },
+          ],
+          gorunum: { kolonSayisi: 4 },
+        },
+      },
+      {
+        ad: 'Ürün Grupları',
+        tip: WidgetTipi.GORSEL_ETIKET_KARTLARI,
+        sira: 30,
+        baslik: 'Servis ve Ürün Gruplarımız',
+        configJson: {
+          yerlesim: { bolge: 'urunler_alti' },
+          etiketKartlar: [
+            { id: 'eg1', etiket: 'Örnek Ürün Grubu - 1', gorselUrl: 'https://images.unsplash.com/photo-1497366216548-37526070297c?w=600', link: '/hizmetler' },
+            { id: 'eg2', etiket: 'Örnek Ürün Grubu - 2', gorselUrl: 'https://images.unsplash.com/photo-1497366754035-f200968a6e72?w=600', link: '/hizmetler' },
+            { id: 'eg3', etiket: 'Örnek Ürün Grubu - 3', gorselUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=600', link: '/hizmetler' },
+          ],
+          gorunum: { kolonSayisi: 3 },
+        },
+      },
+      {
+        ad: 'İstatistik Sayaçları',
+        tip: WidgetTipi.SAYAC_BLOK,
+        sira: 40,
+        baslik: 'Bugüne Kadar Neler Yaptık?',
+        altBaslik: 'SAYILARLA BİZ',
+        arkaPlanRenk: '#f8fafc',
+        configJson: {
+          yerlesim: { bolge: 'urunler_alti' },
+          sayaclar: [
+            { id: 's1', deger: 250, sonEk: '+', etiket: 'PROJE' },
+            { id: 's2', deger: 45, sonEk: '', etiket: 'DİJİTAL ÜRÜN' },
+            { id: 's3', deger: 18, sonEk: '+', etiket: 'HİZMET ÇEŞİDİ' },
+            { id: 's4', deger: 1200, sonEk: '+', etiket: 'YARDIM TALEBİ' },
+          ],
+          gorunum: { kolonSayisi: 4 },
+        },
+      },
+      {
+        ad: 'Ekip Karuseli',
+        tip: WidgetTipi.EKIP_KARUSEL,
+        sira: 50,
+        baslik: 'Yetenekli Ekibimizle Tanışın!',
+        altBaslik: 'ÇALIŞANLARIMIZ',
+        configJson: {
+          yerlesim: { bolge: 'urunler_alti' },
+          uyeler: [
+            { id: 'e1', ad: 'Barış Akova', unvan: 'İnsan Kaynakları', gorselUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400' },
+            { id: 'e2', ad: 'Recep Kurtça', unvan: 'ARGE', gorselUrl: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400' },
+            { id: 'e3', ad: 'Erdalcan Karaoğlu', unvan: 'Halkla İlişkiler', gorselUrl: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400' },
+            { id: 'e4', ad: 'Erkan Sabri Uğuz', unvan: 'Muhasebe', gorselUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400' },
+          ],
+          otomatikKaydir: true,
+        },
+      },
+      {
+        ad: 'Müşteri Yorumları',
+        tip: WidgetTipi.YORUM_KARUSEL,
+        sira: 60,
+        baslik: 'Müşterilerimizin Görüşleri',
+        altBaslik: 'YORUMLAR',
+        configJson: {
+          yerlesim: { bolge: 'urunler_alti' },
+          yorumlar: [
+            { id: 'y1', metin: 'Profesyonel ekip, hızlı teslimat. Kurumsal sitemizi zamanında yayına aldılar.', ad: 'Hayrettin Elalmış', firma: 'Seda Makina' },
+            { id: 'y2', metin: 'Danışmanlık sürecinde her aşamada yanımızda oldular. Kesinlikle tavsiye ederim.', ad: 'Hüseyin Fidan', firma: 'Fidan Danışmanlık' },
+            { id: 'y3', metin: 'Modern tasarım ve kolay yönetim paneli sayesinde içeriklerimizi rahatça güncelliyoruz.', ad: 'Selma Güroğlu', firma: 'Hakimiyet Hukuk Bürosu' },
+          ],
+        },
+      },
+      {
+        ad: 'Fiyatlandırma Paketleri',
+        tip: WidgetTipi.FIYATLANDIRMA,
+        sira: 70,
+        baslik: 'Fiyatlandırma Listemiz',
+        altBaslik: 'PAKETLER',
+        configJson: {
+          yerlesim: { bolge: 'footer_ustu' },
+          paketler: [
+            {
+              id: 'p1', ad: 'Giriş Paketi', fiyat: '499 ₺', aciklama: 'Başlangıç için en uygun',
+              ozellikler: [{ metin: 'Temel kurumsal sayfalar', dahil: true }, { metin: 'E-posta desteği', dahil: true }, { metin: 'Özel modül', dahil: false }],
+              butonMetni: 'Satın Al', butonLink: '/iletisim', oneCikan: false,
+            },
+            {
+              id: 'p2', ad: 'Standart Paket', fiyat: '899 ₺', aciklama: 'Küçük işletmeler için ideal',
+              ozellikler: [{ metin: 'Tüm giriş özellikleri', dahil: true }, { metin: 'Blog modülü', dahil: true }, { metin: 'Form yönetimi', dahil: true }],
+              butonMetni: 'Satın Al', butonLink: '/iletisim', oneCikan: true,
+            },
+            {
+              id: 'p3', ad: 'Premium Paket', fiyat: '1.299 ₺', aciklama: 'En gelişmiş paketimiz',
+              ozellikler: [{ metin: 'Tüm standart özellikler', dahil: true }, { metin: 'Özel widget seti', dahil: true }, { metin: 'Öncelikli destek', dahil: true }],
+              butonMetni: 'Satın Al', butonLink: '/iletisim', oneCikan: false,
+            },
+          ],
+          gorunum: { kolonSayisi: 3 },
+        },
+      },
+    ];
+
+    for (const w of demoWidgetlar) {
+      await prisma.widget.create({
+        data: {
+          siteId: site.id,
+          ad: w.ad,
+          tip: w.tip,
+          sira: w.sira,
+          aktif: true,
+          baslik: w.baslik ?? null,
+          altBaslik: w.altBaslik ?? null,
+          aciklama: w.aciklama ?? null,
+          gorselUrl: w.gorselUrl ?? null,
+          butonMetni: w.butonMetni ?? null,
+          butonLink: w.butonLink ?? null,
+          arkaPlanRenk: w.arkaPlanRenk ?? null,
+          configJson: w.configJson,
+        },
+      });
+    }
+    console.log(`${demoWidgetlar.length} demo widget olusturuldu.`);
   }
 
   console.log('Seed tamamlandı.');

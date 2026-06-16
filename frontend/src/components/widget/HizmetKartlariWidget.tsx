@@ -6,6 +6,10 @@ const ikonHaritasi: Record<string, string> = {
   globe: '🌐',
   settings: '⚙️',
   search: '🔍',
+  users: '👥',
+  monitor: '🖥️',
+  headset: '🎧',
+  wrench: '🔧',
 };
 
 interface HizmetKartlariWidgetProps {
@@ -20,18 +24,32 @@ export function HizmetKartlariWidget({ widget }: HizmetKartlariWidgetProps) {
   return (
     <WidgetKabuk widget={widget}>
       <div className="mx-auto max-w-2xl text-center">
-        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold`} style={{ color: cfg.gorunum?.baslikRengi }}>{widget.baslik}</h2>}
-        {widget.aciklama && <p className="mt-3 text-slate-600" style={{ color: cfg.gorunum?.metinRengi }}>{widget.aciklama}</p>}
+        {widget.altBaslik && (
+          <p className="text-sm font-semibold uppercase tracking-wide text-primary">{widget.altBaslik}</p>
+        )}
+        {widget.baslik && (
+          <h2 className={`${baslikSinifi(cfg)} font-bold`} style={{ color: cfg.gorunum?.baslikRengi }}>
+            {widget.baslik}
+          </h2>
+        )}
+        {widget.aciklama && (
+          <p className="mt-3 text-slate-600" style={{ color: cfg.gorunum?.metinRengi }}>
+            {widget.aciklama}
+          </p>
+        )}
       </div>
       <div className="mt-10 grid gap-6" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
         {kartlar.map((kart) => (
-          <article key={kart.id} className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-            <span className="text-3xl">{ikonHaritasi[kart.ikon] ?? (kart.ikon || '📦')}</span>
+          <article key={kart.id} className="flex flex-col rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm">
+            <span className="text-4xl text-primary">{ikonHaritasi[kart.ikon] ?? (kart.ikon || '📦')}</span>
             <h3 className="mt-4 text-lg font-semibold text-slate-900">{kart.baslik}</h3>
-            <p className="mt-2 text-sm leading-relaxed text-slate-600">{kart.aciklama}</p>
+            <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{kart.aciklama}</p>
             {kart.link && (
-              <a href={kart.link} className="mt-3 inline-block text-sm font-medium text-primary hover:underline">
-                Detay →
+              <a
+                href={kart.link}
+                className="mt-5 inline-block rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
+              >
+                {kart.butonMetni || 'Detayları Gör'} →
               </a>
             )}
           </article>

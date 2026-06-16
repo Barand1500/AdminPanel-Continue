@@ -57,4 +57,17 @@ export class WidgetController {
       return res.status(status).json({ mesaj });
     }
   }
+
+  async sil(req: Request, res: Response) {
+    try {
+      const siteId = cozulenSiteId(req);
+      if (!siteId) return res.status(400).json({ mesaj: 'Site secimi gerekli' });
+      await widgetService.sil(siteId, paramId(req.params.id));
+      return res.json({ mesaj: 'Widget silindi' });
+    } catch (err) {
+      const mesaj = err instanceof Error ? err.message : 'Widget silinemedi';
+      const status = mesaj === 'Widget bulunamadi' ? 404 : 400;
+      return res.status(status).json({ mesaj });
+    }
+  }
 }
