@@ -3212,6 +3212,39 @@ html:has(.admin-panel[data-tema='acik']) body {
   padding: 1.25rem;
 }
 
+.ap-sistem-bakim-aktif-banner {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  border-radius: 0.75rem;
+  border: 1px solid color-mix(in srgb, #f97316 45%, var(--ap-border));
+  background: color-mix(in srgb, #f97316 12%, var(--ap-input-bg));
+  padding: 0.9rem 1rem;
+}
+
+.bakim-ekrani-grid {
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+
+.bakim-ekrani-nabiz {
+  animation: bakim-nabiz 1.4s ease-in-out infinite;
+}
+
+@keyframes bakim-nabiz {
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(0.85);
+  }
+}
+
 .ap-sistem-bakim-onizleme-kart {
   border-radius: 0.75rem;
   border: 1px solid #e2e8f0;

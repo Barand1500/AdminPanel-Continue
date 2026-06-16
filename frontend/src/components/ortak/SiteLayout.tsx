@@ -10,21 +10,14 @@ import { useSiteTemaUygula } from '@/hooks/useSiteTemaUygula';
 import { headerAyarlariBirlestir } from '@/types/header';
 import { headerMenuOlustur } from '@/utils/menuYardimci';
 import { varsayilanSayfa404 } from '@/types/sistemAyarlari';
-import type { SiteAyarlari } from '@/types/site';
-import type { SistemAyarlariJson } from '@/types/sistemAyarlari';
-
-function sistemCoz(ayarlar: SiteAyarlari | null): SistemAyarlariJson | null {
-  const json = (ayarlar as { sistemAyarlariJson?: unknown } | null)?.sistemAyarlariJson;
-  if (!json || typeof json !== 'object') return null;
-  return json as SistemAyarlariJson;
-}
+import { bakimModuAktifMi, sistemAyarlariCoz } from '@/utils/sistemAyarlariYardimci';
 
 function SiteLayoutIcerik() {
   const { veri, yukleniyor } = useSiteVerisi();
   const { site } = veri;
   const headerAyarlari = headerAyarlariBirlestir(site.ayarlar);
   const menuOgeleri = headerMenuOlustur(veri.sayfalar, headerAyarlari, site.ayarlar);
-  const sistem = sistemCoz(site.ayarlar);
+  const sistem = sistemAyarlariCoz(site.ayarlar);
   const matches = useMatches() as { handle?: { is404?: boolean } }[];
   const is404 = matches.some((m) => m.handle?.is404);
   const menuTipi = { ...varsayilanSayfa404, ...sistem?.sayfa404 }.menuTipi;
@@ -45,7 +38,7 @@ function SiteLayoutIcerik() {
     );
   }
 
-  if (sistem?.bakimModu) {
+  if (bakimModuAktifMi(site.ayarlar)) {
     return <BakimEkrani siteAdi={site.ad} ayarlar={site.ayarlar} />;
   }
 

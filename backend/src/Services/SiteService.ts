@@ -1,13 +1,33 @@
 import { config } from '../config/env.js';
 import { SayfaRepository } from '../Infrastructure/repositories/SayfaRepository.js';
 import { SiteRepository } from '../Infrastructure/repositories/SiteRepository.js';
+import { SistemAyariRepository } from '../Infrastructure/repositories/SistemAyariRepository.js';
 import { WidgetRepository } from '../Infrastructure/repositories/WidgetRepository.js';
 import { BlogRepository } from '../Infrastructure/repositories/BlogRepository.js';
+import {
+  sistemAyariSatirdanJson,
+  sistemAyarlariJsonCozKayit,
+  varsayilanSistemAyarlari,
+} from '../Infrastructure/utils/sistemAyariMapper.js';
 
 const siteRepo = new SiteRepository();
 const sayfaRepo = new SayfaRepository();
 const widgetRepo = new WidgetRepository();
 const blogRepo = new BlogRepository();
+const sistemAyariRepo = new SistemAyariRepository();
+
+function publicSistemAyarlari(
+  siteAyarlari: { sistemAyarlariJson?: unknown } | null | undefined,
+  sistemSatiri: Record<string, unknown> | null | undefined
+) {
+  if (sistemSatiri) {
+    return sistemAyariSatirdanJson(sistemSatiri);
+  }
+  if (siteAyarlari?.sistemAyarlariJson && typeof siteAyarlari.sistemAyarlariJson === 'object') {
+    return sistemAyarlariJsonCozKayit(siteAyarlari.sistemAyarlariJson as Record<string, unknown>);
+  }
+  return { ...varsayilanSistemAyarlari };
+}
 
 export class SiteService {
   async getSitePublicData(siteSlug?: string) {
@@ -18,18 +38,29 @@ export class SiteService {
       return null;
     }
 
-    const [sayfalar, widgetlar, bloglar] = await Promise.all([
+    const [sayfalar, widgetlar, bloglar, sistemSatiri] = await Promise.all([
       sayfaRepo.findBySiteId(site.id),
       widgetRepo.findBySiteId(site.id),
       blogRepo.findPublicBySiteId(site.id),
+      sistemAyariRepo.findBySiteId(site.id),
     ]);
+
+    const sistemAyarlariJson = publicSistemAyarlari(
+      site.siteAyarlari,
+      sistemSatiri as Record<string, unknown> | null | undefined
+    );
 
     return {
       site: {
         id: site.id,
         ad: site.ad,
         slug: site.slug,
-        ayarlar: site.siteAyarlari,
+        ayarlar: site.siteAyarlari
+          ? {
+              ...site.siteAyarlari,
+              sistemAyarlariJson,
+            }
+          : { sistemAyarlariJson },
       },
       sayfalar,
       widgetlar,

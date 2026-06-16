@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
+import { BakimEkrani } from '@/components/ortak/BakimEkrani';
 import { AdminPanelKarti } from '@/components/admin/ortak/AdminBilesenleri';
 import { DurumAnahtari } from './SistemSekmeCubugu';
 import type { SistemAyarlariForm } from '@/types/sistemAyarlari';
@@ -243,12 +244,42 @@ export function SistemGenelSekme({
 export function SistemBakimSekme({
   form,
   onChange,
+  siteAdi = 'Site',
 }: {
   form: SistemAyarlariForm;
   onChange: (f: SistemAyarlariForm) => void;
+  siteAdi?: string;
 }) {
+  const onizlemeAyarlar = {
+    anaRenk: '#7c3aed',
+    ikincilRenk: '#a78bfa',
+    logoUrl: null,
+    slogan: null,
+    email: null,
+    telefon: null,
+    sistemAyarlariJson: {
+      bakimModu: true,
+      bakimBaslik: form.bakimBaslik,
+      bakimMesaji: form.bakimMesaji,
+      bakimGorselUrl: form.bakimGorselUrl,
+      bakimTahminiSure: form.bakimTahminiSure,
+    },
+  };
+
   return (
     <div className="space-y-5">
+      {form.bakimModu && (
+        <div className="ap-sistem-bakim-aktif-banner">
+          <span className="bakim-ekrani-nabiz inline-block h-2.5 w-2.5 rounded-full bg-orange-400" />
+          <div>
+            <p className="text-sm font-semibold text-orange-200">Bakım modu şu an aktif</p>
+            <p className="text-xs text-orange-100/80">
+              Ziyaretçiler siteye girdiğinde aşağıdaki bakım ekranını görür. Admin paneli etkilenmez.
+            </p>
+          </div>
+        </div>
+      )}
+
       <DurumAnahtari
         etiket="Bakım Modu"
         aciklama="Açıkken ziyaretçilere özel bakım ekranı gösterilir"
@@ -258,59 +289,73 @@ export function SistemBakimSekme({
         ikon="🔧"
       />
 
-      {form.bakimModu && (
-        <div className="ap-sistem-bakim-detay">
-          <div className="grid gap-5 lg:grid-cols-2">
-            <div className="space-y-4">
-              <FormAlani etiket="Bakım Başlığı">
-                <input
-                  className={formInputSinifi}
-                  value={form.bakimBaslik}
-                  onChange={(e) => onChange({ ...form, bakimBaslik: e.target.value })}
-                />
-              </FormAlani>
-              <FormAlani etiket="Bakım Mesajı">
-                <textarea
-                  className={formInputSinifi}
-                  rows={4}
-                  value={form.bakimMesaji}
-                  onChange={(e) => onChange({ ...form, bakimMesaji: e.target.value })}
-                />
-              </FormAlani>
-              <FormAlani etiket="Tahmini Süre" aciklama="Örn. 2 saat, yarın 10:00">
-                <input
-                  className={formInputSinifi}
-                  placeholder="Yaklaşık 1 saat"
-                  value={form.bakimTahminiSure}
-                  onChange={(e) => onChange({ ...form, bakimTahminiSure: e.target.value })}
-                />
-              </FormAlani>
-            </div>
-            <div>
-              <GorselAlan
-                etiket="Bakım Görseli"
-                aciklama="Logo veya illüstrasyon — bakım ekranında gösterilir"
-                deger={form.bakimGorselUrl}
-                onChange={(url) => onChange({ ...form, bakimGorselUrl: url })}
-                onizlemeSinifi="h-32 w-full max-w-xs rounded-xl object-contain bg-[var(--ap-input-bg)] border border-[var(--ap-border)] p-4"
+      <div className="ap-sistem-bakim-detay space-y-5">
+        <div className="grid gap-5 xl:grid-cols-2">
+          <div className="space-y-4">
+            <FormAlani etiket="Bakım Başlığı">
+              <input
+                className={formInputSinifi}
+                value={form.bakimBaslik}
+                onChange={(e) => onChange({ ...form, bakimBaslik: e.target.value })}
+                placeholder="Örn. Kısa süreli bakım çalışması"
               />
-              <div className="ap-sistem-bakim-onizleme mt-4">
-                <p className="ap-muted mb-2 text-[10px] uppercase tracking-wide">Önizleme</p>
-                <div className="ap-sistem-bakim-onizleme-kart">
-                  {form.bakimGorselUrl && (
-                    <img src={form.bakimGorselUrl} alt="" className="mx-auto mb-3 h-16 object-contain" />
-                  )}
-                  <h4 className="text-center text-sm font-bold text-slate-800">{form.bakimBaslik}</h4>
-                  <p className="mt-1 text-center text-xs text-slate-500">{form.bakimMesaji}</p>
-                  {form.bakimTahminiSure && (
-                    <p className="mt-2 text-center text-[10px] text-orange-600">⏱ {form.bakimTahminiSure}</p>
-                  )}
-                </div>
-              </div>
-            </div>
+            </FormAlani>
+            <FormAlani etiket="Bakım Mesajı">
+              <textarea
+                className={formInputSinifi}
+                rows={5}
+                value={form.bakimMesaji}
+                onChange={(e) => onChange({ ...form, bakimMesaji: e.target.value })}
+                placeholder="Ziyaretçilere gösterilecek açıklama metni"
+              />
+            </FormAlani>
+            <FormAlani etiket="Tahmini Süre" aciklama="Örn. 2 saat, yarın 10:00">
+              <input
+                className={formInputSinifi}
+                placeholder="Yaklaşık 1 saat"
+                value={form.bakimTahminiSure}
+                onChange={(e) => onChange({ ...form, bakimTahminiSure: e.target.value })}
+              />
+            </FormAlani>
+            <GorselAlan
+              etiket="Bakım Görseli"
+              aciklama="Logo veya illüstrasyon — bakım ekranında gösterilir"
+              deger={form.bakimGorselUrl}
+              onChange={(url) => onChange({ ...form, bakimGorselUrl: url })}
+              onizlemeSinifi="h-32 w-full max-w-xs rounded-xl object-contain bg-[var(--ap-input-bg)] border border-[var(--ap-border)] p-4"
+            />
+            <FormAlani
+              etiket="IP Beyaz Liste"
+              aciklama="Bu IP adresleri bakım ekranını görmez (her satıra bir IP)"
+            >
+              <textarea
+                className={formInputSinifi}
+                rows={3}
+                value={form.bakimIpBeyazListe.join('\n')}
+                onChange={(e) =>
+                  onChange({
+                    ...form,
+                    bakimIpBeyazListe: e.target.value
+                      .split('\n')
+                      .map((s) => s.trim())
+                      .filter(Boolean),
+                  })
+                }
+                placeholder="192.168.1.1"
+              />
+            </FormAlani>
           </div>
+
+          <AdminPanelKarti
+            baslik="Canlı Önizleme"
+            altBaslik={`${siteAdi} — ziyaretçilerin göreceği ekran`}
+          >
+            <div className="overflow-hidden rounded-xl border border-[var(--ap-border)]">
+              <BakimEkrani siteAdi={siteAdi} ayarlar={onizlemeAyarlar} onizleme />
+            </div>
+          </AdminPanelKarti>
         </div>
-      )}
+      </div>
     </div>
   );
 }

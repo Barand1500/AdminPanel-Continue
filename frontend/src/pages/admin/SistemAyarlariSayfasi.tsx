@@ -21,6 +21,7 @@ import {
 import { adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
 import { sistemAyarlariGetir, sistemAyarlariGuncelle } from '@/features/admin/sistemAyarlariApi';
 import { bosSistemForm, sistemdenForm, type SistemAyarlariForm, type SistemSekmeId } from '@/types/sistemAyarlari';
+import { siteVerisiGuncellendiYayinla } from '@/utils/siteVerisiOlaylari';
 
 export function SistemAyarlariSayfasi() {
   const { dilAyarla, cevirileriAyarla } = usePanelDil();
@@ -49,6 +50,7 @@ export function SistemAyarlariSayfasi() {
       setForm(yeniForm);
       dilAyarla(yeniForm.panelDili);
       cevirileriAyarla(yeniForm.panelCeviriler);
+      siteVerisiGuncellendiYayinla();
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Kayıt başarısız');
     } finally {
@@ -101,7 +103,7 @@ export function SistemAyarlariSayfasi() {
               altBaslik={SEKME_ALT[sekme]}
             >
               {sekme === 'genel' && <SistemGenelSekme form={form} onChange={setForm} />}
-              {sekme === 'bakim' && <SistemBakimSekme form={form} onChange={setForm} />}
+              {sekme === 'bakim' && <SistemBakimSekme form={form} onChange={setForm} siteAdi={siteAdi} />}
               {sekme === 'sayfa404' && <Sistem404Sekme form={form} sayfalar={sayfalar} onChange={setForm} />}
               {sekme === 'dil' && <PanelDilSekme form={form} onChange={setForm} />}
               {sekme === 'guvenlik' && <SistemGuvenlikSekme form={form} onChange={setForm} />}
