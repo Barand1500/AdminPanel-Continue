@@ -8,9 +8,10 @@ interface FooterOnizlemeProps {
   siteAdi: string;
   ayarlar?: SiteAyarlari | null;
   footer: FooterAyarlari;
+  buyuk?: boolean;
 }
 
-export function FooterOnizleme({ siteAdi, ayarlar, footer }: FooterOnizlemeProps) {
+export function FooterOnizleme({ siteAdi, ayarlar, footer, buyuk = false }: FooterOnizlemeProps) {
   const onizlemeAyarlar: SiteAyarlari = {
     ...(ayarlar ?? {}),
     footerAyarlariJson: footer,
@@ -25,10 +26,12 @@ export function FooterOnizleme({ siteAdi, ayarlar, footer }: FooterOnizlemeProps
   } as CSSProperties;
 
   return (
-    <div className="xl:sticky xl:top-4">
+    <div className={buyuk ? '' : 'xl:sticky xl:top-4'}>
       <AdminPanelKarti baslik="Önizleme" altBaslik="Footer düzeni ve içerik canlı yansır">
         <div
-          className="site-public ap-scroll max-h-[75vh] overflow-y-auto overflow-x-hidden rounded-xl border border-[var(--ap-border)]"
+          className={`site-public ap-scroll overflow-x-hidden rounded-xl border border-[var(--ap-border)] ${
+            buyuk ? 'max-h-[min(70vh,720px)] overflow-y-auto' : 'max-h-[75vh] overflow-y-auto'
+          }`}
           style={onizlemeStili}
         >
           <SiteFooter siteAdi={siteAdi} ayarlar={onizlemeAyarlar} />

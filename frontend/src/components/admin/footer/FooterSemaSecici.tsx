@@ -57,8 +57,8 @@ interface FooterSemaSeciciProps {
 
 export function FooterSemaSecici({ footer, onDegistir }: FooterSemaSeciciProps) {
   return (
-    <div className="space-y-4">
-      <div className="grid gap-3 sm:grid-cols-2">
+    <div className="space-y-5">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
         {SEMALAR.map((sema) => {
           const secili = footer.sema === sema;
           const etiket = FOOTER_SEMA_ETIKET[sema];

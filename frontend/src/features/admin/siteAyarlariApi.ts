@@ -33,16 +33,16 @@ export interface SiteAyarlariYanit {
   } | null;
 }
 
-const URL_PLATFORMLARI = ['facebook', 'instagram', 'twitter', 'youtube', 'linkedin'];
-
 function sosyalMedyaPayload(sosyal: Record<string, string>): Record<string, string> {
   const json: Record<string, string> = {};
   for (const [anahtar, deger] of Object.entries(sosyal)) {
     const temiz = deger.trim();
-    if (!temiz) continue;
-    if (anahtar.endsWith('_icon')) {
-      json[anahtar] = temiz;
-    } else if (URL_PLATFORMLARI.includes(anahtar)) {
+    if (!temiz && anahtar !== '__sira__') continue;
+    if (anahtar.endsWith('_icon') || anahtar.endsWith('_ad') || anahtar === '__sira__') {
+      json[anahtar] = deger;
+      continue;
+    }
+    if (temiz) {
       json[anahtar] = temiz;
     }
   }

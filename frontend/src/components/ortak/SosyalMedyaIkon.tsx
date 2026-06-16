@@ -9,7 +9,12 @@ import {
 } from '@/data/sosyalMedyaIkonlari';
 
 export function sosyalMedyaLinkleri(sosyal: Record<string, string>) {
-  return sosyalKayittanOgeler(sosyal).map((oge) => [oge.id, oge.url] as [string, string]);
+  return sosyalKayittanOgeler(sosyal)
+    .filter((oge) => oge.url.trim().length > 0)
+    .map((oge) => {
+      const anahtar = oge.platformId === 'ozel' ? oge.id : oge.platformId;
+      return [anahtar, oge.url.trim()] as [string, string];
+    });
 }
 
 export function SosyalMedyaIkonGoster({

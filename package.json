@@ -15,7 +15,8 @@
     "postpull": "npm install && npm run db:push && npm run db:generate",
     "deploy": "node deploy.js",
     "deploy:init": "node deploy.js init",
-    "db:seed": "npm run db:seed --workspace=backend"
+    "db:seed": "npm run db:seed --workspace=backend",
+    "db:temizle": "npm run db:temizle --workspace=backend"
   },
   "workspaces": [
     "frontend",

@@ -1,12 +1,14 @@
-import { useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { formInputSinifi } from './FormAlani';
 import {
   IKON_VARYANTLARI,
   SOSYAL_PLATFORMLAR,
   SosyalIkonSvg,
+  platformAra,
   platformUrlTanima,
   sosyalKayittanOgeler,
   sosyalOgelerdenKayit,
+  varsayilanPlatformUrl,
   type SosyalIkonVaryant,
   type SosyalMedyaOgesi,
   type SosyalPlatformBilgi,
@@ -34,6 +36,7 @@ function PlatformKarti({
   const ad = platform?.ad ?? oge.ad;
   const renk = platform?.renk ?? '#64748b';
   const seciliVaryant = oge.ozelLogoUrl ? null : (oge.ikonVaryant as SosyalIkonVaryant);
+  const gosterilecekPlatform = platform?.id ?? oge.platformId;
 
   const ozelYukle = async (dosya: File) => {
     setYukleniyor(true);
@@ -47,29 +50,35 @@ function PlatformKarti({
 
   return (
     <div className="ap-sosyal-kart">
-      <div className="ap-sosyal-kart-baslik flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="ap-sosyal-kart-onizleme" style={{ color: renk }}>
+      <div className="ap-sosyal-kart-baslik flex items-center justify-between gap-3">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="ap-sosyal-kart-onizleme shrink-0" style={{ color: renk }}>
             {oge.ozelLogoUrl ? (
               <img src={oge.ozelLogoUrl} alt="" className="h-9 w-9 rounded-lg object-contain" />
             ) : platform ? (
-              <SosyalIkonSvg platform={platform.id} varyant={seciliVaryant ?? 'solid'} className="h-9 w-9" />
+              <SosyalIkonSvg platform={platform.id} varyant={seciliVaryant ?? 'brand'} className="h-9 w-9" />
             ) : (
-              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-dashed border-[var(--ap-border)] text-xs">?</span>
+              <span className="flex h-9 w-9 items-center justify-center rounded-lg border border-dashed border-[var(--ap-border)] text-sm font-bold">
+                {oge.ad.charAt(0).toUpperCase()}
+              </span>
             )}
           </div>
-          <div>
-            <p className="ap-heading text-sm font-semibold">{ad}</p>
+          <div className="min-w-0">
+            <p className="ap-heading truncate text-sm font-semibold">{ad}</p>
             <p className="ap-muted text-xs">{platform ? 'Hazır platform' : 'Özel sosyal medya'}</p>
           </div>
         </div>
-        <button type="button" onClick={onSil} className="text-xs text-red-400 hover:underline">
+        <button
+          type="button"
+          onClick={onSil}
+          className="shrink-0 rounded-lg border border-red-500/30 px-2.5 py-1 text-xs font-medium text-red-400 transition hover:bg-red-500/10"
+        >
           Kaldır
         </button>
       </div>
 
       {!platform && (
-        <div className="mt-2">
+        <div className="mt-3">
           <label className="ap-muted mb-1 block text-xs">Görünen ad</label>
           <input
             className={formInputSinifi}
@@ -90,7 +99,11 @@ function PlatformKarti({
               className={`ap-sosyal-ikon-btn ${seciliVaryant === v.id ? 'ap-sosyal-ikon-btn-secili' : ''}`}
               title={v.ad}
             >
-              {platform && <SosyalIkonSvg platform={platform.id} varyant={v.id} className="h-7 w-7" />}
+              {platform ? (
+                <SosyalIkonSvg platform={gosterilecekPlatform} varyant={v.id} className="h-7 w-7" />
+              ) : (
+                <span className="flex h-7 w-7 items-center justify-center text-xs font-bold">{v.ad.charAt(0)}</span>
+              )}
               <span className="text-[10px] text-[var(--ap-text-muted)]">{v.ad}</span>
             </button>
           ))}
@@ -124,6 +137,17 @@ function PlatformKarti({
           onChange={(e) => {
             const url = e.target.value;
             const taninan = platformUrlTanima(url);
+            if (taninan && oge.platformId === 'ozel') {
+              onGuncelle({
+                ...oge,
+                id: taninan.id,
+                platformId: taninan.id,
+                ad: taninan.ad,
+                url,
+                ikonVaryant: 'brand',
+              });
+              return;
+            }
             onGuncelle({
               ...oge,
               url,
@@ -139,9 +163,136 @@ function PlatformKarti({
   );
 }
 
+function PlatformEkleKutusu({
+  mevcutPlatformIdleri,
+  onPlatformEkle,
+  onOzelEkle,
+}: {
+  mevcutPlatformIdleri: string[];
+  onPlatformEkle: (platform: SosyalPlatformBilgi) => void;
+  onOzelEkle: (ad: string) => void;
+}) {
+  const [metin, setMetin] = useState('');
+  const [ozelMod, setOzelMod] = useState(false);
+  const [odakta, setOdakta] = useState(false);
+  const kutuRef = useRef<HTMLDivElement>(null);
+
+  const sonuclar = useMemo(() => platformAra(metin, mevcutPlatformIdleri), [metin, mevcutPlatformIdleri]);
+
+  useEffect(() => {
+    const disariTikla = (e: MouseEvent) => {
+      if (kutuRef.current && !kutuRef.current.contains(e.target as Node)) {
+        setOdakta(false);
+      }
+    };
+    document.addEventListener('mousedown', disariTikla);
+    return () => document.removeEventListener('mousedown', disariTikla);
+  }, []);
+
+  const ozelKaydet = () => {
+    const ad = metin.trim();
+    if (!ad) return;
+    onOzelEkle(ad);
+    setMetin('');
+    setOzelMod(false);
+    setOdakta(false);
+  };
+
+  return (
+    <div ref={kutuRef} className="ap-sosyal-kart ap-sosyal-ekle-kutu">
+      <div className="ap-sosyal-kart-baslik flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <p className="ap-heading text-sm font-semibold">
+            {ozelMod ? 'Yeni özel sosyal medya' : 'Platform ekle'}
+          </p>
+          <p className="ap-muted text-xs">
+            {ozelMod
+              ? 'Görünen adı yazın ve Enter ile ekleyin'
+              : 'TikTok, LinkedIn gibi yazın — listeden seçin'}
+          </p>
+        </div>
+        <button
+          type="button"
+          onClick={() => {
+            setOzelMod((v) => !v);
+            setMetin('');
+            setOdakta(true);
+          }}
+          className="ap-link-btn rounded-lg px-3 py-1.5 text-sm"
+        >
+          {ozelMod ? 'Hazır platform ara' : '+ Yeni sosyal medya'}
+        </button>
+      </div>
+
+      <div className="relative mt-3">
+        <input
+          type="text"
+          value={metin}
+          onChange={(e) => setMetin(e.target.value)}
+          onFocus={() => setOdakta(true)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') {
+              e.preventDefault();
+              if (ozelMod) {
+                ozelKaydet();
+              } else if (sonuclar[0]) {
+                onPlatformEkle(sonuclar[0]);
+                setMetin('');
+                setOdakta(false);
+              }
+            }
+          }}
+          className={formInputSinifi}
+          placeholder={ozelMod ? 'Örn. Pinterest İş Hesabı' : 'Platform ara: tiktok, instagram, linkedin...'}
+        />
+
+        {odakta && !ozelMod && metin.trim() && sonuclar.length > 0 && (
+          <div className="ap-sosyal-arama-listesi">
+            {sonuclar.slice(0, 8).map((platform) => (
+              <button
+                key={platform.id}
+                type="button"
+                onClick={() => {
+                  onPlatformEkle(platform);
+                  setMetin('');
+                  setOdakta(false);
+                }}
+                className="ap-sosyal-arama-oge"
+              >
+                <SosyalIkonSvg platform={platform.id} varyant="brand" className="h-8 w-8 shrink-0" />
+                <div className="min-w-0 text-left">
+                  <p className="ap-heading truncate text-sm font-medium">{platform.ad}</p>
+                  <p className="ap-muted truncate text-xs">{varsayilanPlatformUrl(platform)}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        )}
+
+        {odakta && !ozelMod && metin.trim() && sonuclar.length === 0 && (
+          <div className="ap-sosyal-arama-listesi p-3">
+            <p className="ap-muted text-xs">Sonuç bulunamadı. Özel eklemek için &quot;Yeni sosyal medya&quot; kullanın.</p>
+          </div>
+        )}
+      </div>
+
+      {ozelMod && (
+        <div className="mt-3 flex justify-end">
+          <button type="button" onClick={ozelKaydet} className="ap-btn ap-btn-birincil text-sm" disabled={!metin.trim()}>
+            Ekle
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 export function SosyalMedyaAlani({ sosyal, onGuncelle }: SosyalMedyaAlaniProps) {
-  const [arama, setArama] = useState('');
   const ogeler = useMemo(() => sosyalKayittanOgeler(sosyal), [sosyal]);
+
+  const guncelleOgeler = (liste: SosyalMedyaOgesi[]) => {
+    onGuncelle(sosyalOgelerdenKayit(liste));
+  };
 
   const eklePlatform = (platform: SosyalPlatformBilgi) => {
     if (ogeler.some((o) => o.platformId === platform.id)) return;
@@ -149,81 +300,64 @@ export function SosyalMedyaAlani({ sosyal, onGuncelle }: SosyalMedyaAlaniProps) 
       id: platform.id,
       platformId: platform.id,
       ad: platform.ad,
-      url: '',
-      ikonVaryant: 'solid',
+      url: varsayilanPlatformUrl(platform),
+      ikonVaryant: 'brand',
     };
-    onGuncelle(sosyalOgelerdenKayit([...ogeler, yeni]));
-    setArama('');
+    guncelleOgeler([...ogeler, yeni]);
   };
 
-  const ozelEkle = () => {
+  const ozelEkle = (ad: string) => {
     const id = `ozel-${Date.now()}`;
     const yeni: SosyalMedyaOgesi = {
       id,
       platformId: 'ozel',
-      ad: 'Özel Platform',
+      ad,
       url: '',
       ikonVaryant: 'minimal',
     };
-    onGuncelle(sosyalOgelerdenKayit([...ogeler, yeni]));
+    guncelleOgeler([...ogeler, yeni]);
   };
-
-  const filtreli = SOSYAL_PLATFORMLAR.filter(
-    (p) =>
-      !ogeler.some((o) => o.platformId === p.id) &&
-      (arama ? p.ad.toLowerCase().includes(arama.toLowerCase()) : true)
-  );
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap gap-2">
-        <input
-          type="search"
-          value={arama}
-          onChange={(e) => setArama(e.target.value)}
-          placeholder="Platform ara (LinkedIn, TikTok...)"
-          className={`${formInputSinifi} max-w-xs`}
-        />
-        <button type="button" onClick={ozelEkle} className="ap-link-btn rounded-lg px-3 py-1.5 text-sm">
-          + Yeni sosyal medya
-        </button>
-      </div>
+      <PlatformEkleKutusu
+        mevcutPlatformIdleri={ogeler.filter((o) => o.platformId !== 'ozel').map((o) => o.platformId)}
+        onPlatformEkle={eklePlatform}
+        onOzelEkle={ozelEkle}
+      />
 
-      {arama && filtreli.length > 0 && (
-        <div className="flex flex-wrap gap-2 rounded-lg border border-[var(--ap-border)] p-2">
-          {filtreli.slice(0, 8).map((p) => (
-            <button
-              key={p.id}
-              type="button"
-              onClick={() => eklePlatform(p)}
-              className="rounded-lg border border-[var(--ap-border)] px-3 py-1 text-xs hover:bg-[var(--ap-hover)]"
-            >
-              {p.ad}
-            </button>
-          ))}
+      {ogeler.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-[var(--ap-border)] px-4 py-8 text-center">
+          <p className="ap-muted text-sm">Henüz sosyal medya eklenmedi.</p>
+          <p className="ap-muted mt-1 text-xs">Yukarıdan platform arayıp ekleyebilirsiniz.</p>
+        </div>
+      ) : (
+        <div className="space-y-4">
+          {ogeler.map((oge) => {
+            const platform =
+              oge.platformId !== 'ozel'
+                ? SOSYAL_PLATFORMLAR.find((p) => p.id === oge.platformId) ?? null
+                : null;
+            return (
+              <PlatformKarti
+                key={oge.id}
+                oge={oge}
+                platform={platform}
+                onGuncelle={(guncel) => {
+                  const liste = ogeler.map((x) => (x.id === oge.id ? guncel : x));
+                  if (guncel.platformId !== 'ozel' && guncel.id !== oge.id) {
+                    const filtreli = ogeler.filter((x) => x.id !== oge.id);
+                    guncelleOgeler([...filtreli, guncel]);
+                    return;
+                  }
+                  guncelleOgeler(liste);
+                }}
+                onSil={() => guncelleOgeler(ogeler.filter((x) => x.id !== oge.id))}
+              />
+            );
+          })}
         </div>
       )}
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        {ogeler.map((oge) => {
-          const platform =
-            oge.platformId !== 'ozel'
-              ? SOSYAL_PLATFORMLAR.find((p) => p.id === oge.platformId) ?? null
-              : null;
-          return (
-            <PlatformKarti
-              key={oge.id}
-              oge={oge}
-              platform={platform}
-              onGuncelle={(guncel) => {
-                const liste = ogeler.map((x) => (x.id === oge.id ? guncel : x));
-                onGuncelle(sosyalOgelerdenKayit(liste));
-              }}
-              onSil={() => onGuncelle(sosyalOgelerdenKayit(ogeler.filter((x) => x.id !== oge.id)))}
-            />
-          );
-        })}
-      </div>
     </div>
   );
 }

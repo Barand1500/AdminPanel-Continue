@@ -12,7 +12,8 @@
     "db:reset": "prisma db push --force-reset && npm run db:seed",
     "db:generate": "prisma generate",
     "postinstall": "prisma generate",
-    "db:seed": "tsx prisma/seed.ts",
+    "db:seed": "npx tsx prisma/seed.ts",
+    "db:temizle": "node prisma/veritabani-temizle.cjs",
     "db:setup": "npm run db:push && npm run db:seed",
     "db:studio": "prisma studio"
   },
@@ -27,7 +28,7 @@
     "zod": "^3.25.67"
   },
   "prisma": {
-    "seed": "tsx prisma/seed.ts"
+    "seed": "npx tsx prisma/seed.ts"
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",
