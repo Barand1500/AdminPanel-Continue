@@ -1,0 +1,184 @@
+export type KurTipi = 'doviz_alis' | 'doviz_satis' | 'efektif_alis' | 'efektif_satis';
+
+export const KATEGORI_ACILIS_MODLARI = ['dropdown', 'sidebar', 'liste'] as const;
+export type KategoriAcilisModu = (typeof KATEGORI_ACILIS_MODLARI)[number];
+
+export const KATEGORI_ACILIS_ETIKET: Record<KategoriAcilisModu, string> = {
+  dropdown: 'Dropdown (mega menü)',
+  sidebar: 'Yan panel (sidebar)',
+  liste: 'Liste (kompakt)',
+};
+
+export function kategoriAcilisModuNormalize(mod?: string | null): KategoriAcilisModu {
+  if (mod === 'sidebar' || mod === 'liste') return mod;
+  return 'dropdown';
+}
+
+export interface IkonSecimi {
+  tip: 'preset' | 'custom';
+  presetId?: string;
+  customUrl?: string;
+}
+
+export interface ParaBirimiKaydi {
+  id: string;
+  ad: string;
+  kod: string;
+  sembol: string;
+  kaynak: 'manuel' | 'tcmb';
+  kurTipi?: KurTipi;
+  manuelKur?: number;
+  guncelKur?: number;
+  sira: number;
+  sabit?: boolean;
+}
+
+export interface TemaIkonlari {
+  gunduz: IkonSecimi;
+  gece: IkonSecimi;
+}
+
+export interface UstMenuOgesi {
+  id: string;
+  ad: string;
+  link: string;
+  yeniSekme: boolean;
+  sira: number;
+  sayfaId?: string;
+}
+
+export interface HeaderAyarlari {
+  slogan?: string | null;
+  logoUrl?: string | null;
+  ustBant?: {
+    telefonGoster: boolean;
+    emailGoster: boolean;
+    kurlarGoster: boolean;
+  };
+  kurlar?: ParaBirimiKaydi[];
+  ikonlar?: {
+    tema: TemaIkonlari;
+    hesap: IkonSecimi;
+  };
+  kategori?: {
+    acilisModu: KategoriAcilisModu;
+    baslikMetni: string;
+  };
+  arama?: {
+    placeholder: string;
+    stil: 'yuvarlak' | 'kare' | 'minimal';
+    ikon: IkonSecimi;
+  };
+  sonKurGuncelleme?: string | null;
+  ustMenu?: UstMenuOgesi[];
+}
+
+export const VARSAYILAN_IKON = (presetId: string): IkonSecimi => ({
+  tip: 'preset',
+  presetId,
+});
+
+function legacyPresetCevir(pid: string, hedef: 'gunduz' | 'gece'): string {
+  if (hedef === 'gunduz') {
+    if (pid === 'tema-gunes' || pid.startsWith('gunduz-')) return pid.startsWith('gunduz-') ? pid : 'gunduz-gunes';
+    if (pid === 'tema-bulut') return 'gunduz-bulut';
+    return 'gunduz-gunes';
+  }
+  if (pid === 'tema-ay' || pid.startsWith('gece-')) return pid.startsWith('gece-') ? pid : 'gece-ay';
+  if (pid === 'tema-bulut') return 'gece-bulut-ay';
+  return 'gece-ay';
+}
+
+export function temaIkonlariBirlestir(tema?: TemaIkonlari | IkonSecimi | null): TemaIkonlari {
+  if (tema && typeof tema === 'object' && 'gunduz' in tema && 'gece' in tema) {
+    return {
+      gunduz: tema.gunduz ?? VARSAYILAN_IKON('gunduz-gunes'),
+      gece: tema.gece ?? VARSAYILAN_IKON('gece-ay'),
+    };
+  }
+  const legacy = tema as IkonSecimi | undefined;
+  if (legacy?.tip === 'custom' && legacy.customUrl) {
+    return {
+      gunduz: VARSAYILAN_IKON('gunduz-gunes'),
+      gece: VARSAYILAN_IKON('gece-ay'),
+    };
+  }
+  const pid = legacy?.presetId ?? '';
+  return {
+    gunduz: VARSAYILAN_IKON(legacyPresetCevir(pid, 'gunduz')),
+    gece: VARSAYILAN_IKON(legacyPresetCevir(pid, 'gece')),
+  };
+}
+
+export function varsayilanHeaderAyarlari(
+  mevcut?: Partial<HeaderAyarlari> | null,
+  legacy?: { logoUrl?: string | null; slogan?: string | null }
+): HeaderAyarlari {
+  return {
+    slogan:
+      mevcut?.slogan ??
+      legacy?.slogan ??
+      'Teknolojinin en güzel hali — güvenli, hızlı ve uygun fiyatlı.',
+    logoUrl: mevcut?.logoUrl ?? legacy?.logoUrl ?? null,
+    ustBant: mevcut?.ustBant ?? {
+      telefonGoster: true,
+      emailGoster: true,
+      kurlarGoster: true,
+    },
+    kurlar: mevcut?.kurlar ?? [
+      {
+        id: 'try',
+        ad: 'Türk Lirası',
+        kod: 'TRY',
+        sembol: '₺',
+        kaynak: 'manuel',
+        manuelKur: 1,
+        sira: 0,
+        sabit: true,
+      },
+      {
+        id: 'usd',
+        ad: 'Dolar',
+        kod: 'USD',
+        sembol: '$',
+        kaynak: 'tcmb',
+        kurTipi: 'doviz_satis',
+        sira: 1,
+      },
+      {
+        id: 'eur',
+        ad: 'Euro',
+        kod: 'EUR',
+        sembol: '€',
+        kaynak: 'tcmb',
+        kurTipi: 'doviz_satis',
+        sira: 2,
+      },
+    ],
+    ikonlar: {
+      tema: temaIkonlariBirlestir(mevcut?.ikonlar?.tema),
+      hesap: mevcut?.ikonlar?.hesap ?? VARSAYILAN_IKON('hesap-varsayilan'),
+    },
+    kategori: {
+      acilisModu: kategoriAcilisModuNormalize(mevcut?.kategori?.acilisModu),
+      baslikMetni: mevcut?.kategori?.baslikMetni ?? 'Tüm Kategoriler',
+    },
+    arama: mevcut?.arama ?? {
+      placeholder: 'Ürün Ara...',
+      stil: 'yuvarlak',
+      ikon: VARSAYILAN_IKON('arama-varsayilan'),
+    },
+    sonKurGuncelleme: mevcut?.sonKurGuncelleme ?? null,
+    ustMenu: mevcut?.ustMenu ?? [],
+  };
+}
+
+export function headerAyarlariBirlestir(
+  ayarlar?: { headerAyarlariJson?: HeaderAyarlari | null; logoUrl?: string | null; slogan?: string | null } | null
+): HeaderAyarlari {
+  const json = ayarlar?.headerAyarlariJson;
+  return varsayilanHeaderAyarlari(json ?? undefined, {
+    logoUrl: json?.logoUrl ?? ayarlar?.logoUrl,
+    slogan: json?.slogan ?? ayarlar?.slogan,
+  });
+}

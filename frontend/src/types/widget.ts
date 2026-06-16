@@ -1,0 +1,329 @@
+import type { CSSProperties } from 'react';
+import type { WidgetFormDegeri } from '@/types/admin';
+import type { Widget } from '@/types/site';
+
+export const DEPRECATED_WIDGET_TIPLERI = [
+  'HEADER',
+  'NAVBAR',
+  'FOOTER',
+  'URUN_LISTELEME',
+] as const;
+
+export const YENI_WIDGET_TIPLERI = [
+  'BASLIK_METIN',
+  'BASLIK_METIN_GORSEL',
+  'BLOG_KARUSEL',
+  'LINK_KARTLARI',
+  'GORSEL_GRID_BLOK',
+] as const;
+
+export const AKTIF_WIDGET_TIPLERI = [
+  'SLIDER',
+  'HERO_BANNER',
+  'HIZMET_KARTLARI',
+  'KATEGORI',
+  'REFERANSLAR',
+  'SSS',
+  'GALERI',
+  'HARITA',
+  'ILETISIM_FORMU',
+  'POPUP',
+  ...YENI_WIDGET_TIPLERI,
+] as const;
+
+export type AktifWidgetTipi = (typeof AKTIF_WIDGET_TIPLERI)[number];
+
+export type Hizalama = 'sol' | 'orta' | 'sag';
+export type IcerikDuzeni = 'ust' | 'alt' | 'sol' | 'sag';
+export type GaleriDuzeni = 'yan_yana' | 'alt_alta' | 'grid';
+export type GorselBoyutu = 'kucuk' | 'orta' | 'buyuk' | 'tam';
+export type GorselKirpma = 'kapla' | 'sigdir' | 'orijinal';
+export type PaddingBoyutu = 'dar' | 'normal' | 'genis';
+export type BaslikBoyutu = 'sm' | 'md' | 'lg' | 'xl';
+export type GirisAnimasyonu = 'yok' | 'fade' | 'slide';
+
+export type WidgetYerlesimBolge =
+  | 'header_alti'
+  | 'slider_alti'
+  | 'urunler_ustu'
+  | 'urunler_alti'
+  | 'footer_ustu';
+
+export interface WidgetYerlesim {
+  bolge: WidgetYerlesimBolge;
+  /** Başka bir widget’a göre ince konum */
+  hedefWidgetId?: string;
+  konum?: 'once' | 'sonra';
+}
+
+export const WIDGET_GORUNUM_GORSEL_TIPLERI = new Set([
+  'BASLIK_METIN_GORSEL',
+  'GALERI',
+  'SLIDER',
+  'HERO_BANNER',
+  'BLOG_KARUSEL',
+  'GORSEL_GRID_BLOK',
+]);
+
+export const WIDGET_GORUNUM_GRID_TIPLERI = new Set([
+  'HIZMET_KARTLARI',
+  'LINK_KARTLARI',
+  'GALERI',
+  'KATEGORI',
+  'REFERANSLAR',
+  'GORSEL_GRID_BLOK',
+  'BLOG_KARUSEL',
+]);
+
+export const WIDGET_GORUNUM_METIN_TIPLERI = new Set([
+  'BASLIK_METIN',
+  'BASLIK_METIN_GORSEL',
+  'SSS',
+  'ILETISIM_FORMU',
+  'HIZMET_KARTLARI',
+  'POPUP',
+]);
+
+export interface WidgetGorunumAyarlari {
+  font?: string;
+  baslikBoyutu?: BaslikBoyutu;
+  baslikRengi?: string;
+  metinRengi?: string;
+  gorselBoyutu?: GorselBoyutu;
+  gorselKirpma?: GorselKirpma;
+  borderRadius?: number;
+  gorselGolge?: boolean;
+  kolonSayisi?: number;
+  kartAraligi?: 'dar' | 'normal' | 'genis';
+  padding?: PaddingBoyutu;
+  hizalama?: Hizalama;
+  icerikDuzeni?: IcerikDuzeni;
+  noktaRengi?: string;
+  ctaStil?: 'dolu' | 'cerceve' | 'hayalet';
+}
+
+export interface WidgetEkAyarlar {
+  ozelSinif?: string;
+  bolumId?: string;
+  girisAnimasyonu?: GirisAnimasyonu;
+}
+
+export interface WidgetSlide {
+  id: string;
+  gorselUrl: string;
+  baslik: string;
+  altBaslik: string;
+  butonMetni: string;
+  butonLink: string;
+  aktif: boolean;
+}
+
+export interface WidgetGaleriOgesi {
+  id: string;
+  gorselUrl: string;
+  baslik: string;
+  link: string;
+}
+
+export interface WidgetKartOgesi {
+  id: string;
+  baslik: string;
+  aciklama: string;
+  ikon: string;
+  link: string;
+  gorselUrl?: string;
+}
+
+export interface WidgetSssOgesi {
+  id: string;
+  soru: string;
+  cevap: string;
+}
+
+export interface WidgetLinkOgesi {
+  id: string;
+  metin: string;
+  ikon: string;
+  link: string;
+}
+
+export interface WidgetBlogKart {
+  id: string;
+  baslik: string;
+  gorselUrl: string;
+  link: string;
+  butonMetni: string;
+}
+
+export interface WidgetGorselGridKart {
+  id: string;
+  etiket: string;
+  gorselUrl: string;
+  link: string;
+}
+
+export interface WidgetConfig {
+  yerlesim?: WidgetYerlesim;
+  gorunum?: WidgetGorunumAyarlari;
+  ek?: WidgetEkAyarlar;
+  slides?: WidgetSlide[];
+  kartlar?: WidgetKartOgesi[];
+  galeri?: WidgetGaleriOgesi[];
+  galeriDuzeni?: GaleriDuzeni;
+  sorular?: WidgetSssOgesi[];
+  referanslar?: string[];
+  linkler?: WidgetLinkOgesi[];
+  blogKartlari?: WidgetBlogKart[];
+  blogKaynagi?: 'manuel' | 'otomatik';
+  blogAdet?: number;
+  otomatikKaydir?: boolean;
+  tumunuGorLink?: string;
+  tumunuGorMetin?: string;
+  solBaslik?: string;
+  solAciklama?: string;
+  filtreler?: string[];
+  gridKartlar?: WidgetGorselGridKart[];
+  haritaUrl?: string;
+  haritaLat?: string;
+  haritaLng?: string;
+  haritaZoom?: number;
+  popupGecikme?: number;
+  popupTetikleyici?: 'sayfa_yukle' | 'cikis';
+  formSlug?: string;
+  metin?: string;
+  kategoriler?: WidgetLinkOgesi[];
+}
+
+export function uid() {
+  return `w_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`;
+}
+
+export function configOku(form: WidgetFormDegeri): WidgetConfig {
+  try {
+    const parsed = JSON.parse(form.configJsonMetin || '{}') as WidgetConfig;
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+export function configYaz(form: WidgetFormDegeri, config: WidgetConfig): WidgetFormDegeri {
+  return { ...form, configJsonMetin: JSON.stringify(config, null, 2) };
+}
+
+export function configGuncelle(
+  form: WidgetFormDegeri,
+  guncelle: (cfg: WidgetConfig) => WidgetConfig
+): WidgetFormDegeri {
+  return configYaz(form, guncelle(configOku(form)));
+}
+
+export function varsayilanConfig(tip: string): WidgetConfig {
+  const gorunum: WidgetGorunumAyarlari = {
+    padding: 'normal',
+    hizalama: 'sol',
+    kolonSayisi: 3,
+    kartAraligi: 'normal',
+    gorselBoyutu: 'orta',
+    gorselKirpma: 'kapla',
+    borderRadius: 12,
+    baslikBoyutu: 'lg',
+  };
+  const ek: WidgetEkAyarlar = { girisAnimasyonu: 'yok' };
+  const yerlesim: WidgetYerlesim = { bolge: 'urunler_alti' };
+
+  switch (tip) {
+    case 'BASLIK_METIN':
+      return { yerlesim, gorunum: { ...gorunum, icerikDuzeni: 'ust' }, ek, metin: '' };
+    case 'BASLIK_METIN_GORSEL':
+      return { yerlesim, gorunum: { ...gorunum, icerikDuzeni: 'sol' }, ek, metin: '' };
+    case 'SLIDER':
+    case 'HERO_BANNER':
+      return { yerlesim: { bolge: 'slider_alti' }, gorunum, ek, slides: [] };
+    case 'HIZMET_KARTLARI':
+      return { yerlesim, gorunum, ek, kartlar: [] };
+    case 'GALERI':
+      return { yerlesim, gorunum, ek, galeri: [], galeriDuzeni: 'grid' };
+    case 'SSS':
+      return { yerlesim, gorunum, ek, sorular: [] };
+    case 'REFERANSLAR':
+      return { yerlesim, gorunum, ek, referanslar: [] };
+    case 'BLOG_KARUSEL':
+      return {
+        yerlesim,
+        gorunum,
+        ek,
+        blogKartlari: [],
+        blogKaynagi: 'manuel',
+        blogAdet: 3,
+        otomatikKaydir: false,
+        tumunuGorMetin: 'Tümünü Gör',
+        tumunuGorLink: '/blog',
+      };
+    case 'LINK_KARTLARI':
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 5 }, ek, linkler: [] };
+    case 'GORSEL_GRID_BLOK':
+      return {
+        yerlesim,
+        gorunum: { ...gorunum, kolonSayisi: 4 },
+        ek,
+        solBaslik: '',
+        solAciklama: '',
+        filtreler: [],
+        gridKartlar: [],
+      };
+    case 'HARITA':
+      return { yerlesim: { bolge: 'footer_ustu' }, gorunum, ek, haritaZoom: 14 };
+    case 'ILETISIM_FORMU':
+      return { yerlesim: { bolge: 'footer_ustu' }, gorunum, ek };
+    case 'POPUP':
+      return { yerlesim: { bolge: 'footer_ustu' }, gorunum, ek, popupGecikme: 3, popupTetikleyici: 'sayfa_yukle' };
+    case 'KATEGORI':
+      return { yerlesim, gorunum, ek, kategoriler: [] };
+    default:
+      return { yerlesim, gorunum, ek };
+  }
+}
+
+export function formToWidgetOnizleme(form: WidgetFormDegeri, id = 'onizleme'): Widget {
+  let configJson: Record<string, unknown> | null = null;
+  try {
+    configJson = JSON.parse(form.configJsonMetin || '{}') as Record<string, unknown>;
+  } catch {
+    configJson = {};
+  }
+  return {
+    id,
+    ad: form.ad || 'Önizleme',
+    tip: form.tip,
+    sira: form.sira,
+    aktif: true,
+    baslik: form.baslik || null,
+    altBaslik: form.altBaslik || null,
+    aciklama: form.aciklama || null,
+    gorselUrl: form.gorselUrl || null,
+    butonMetni: form.butonMetni || null,
+    butonLink: form.butonLink || null,
+    arkaPlanRenk: form.arkaPlanRenk || null,
+    yaziRenk: form.yaziRenk || null,
+    mobilGoster: form.mobilGoster,
+    masaustuGoster: form.masaustuGoster,
+    configJson,
+  };
+}
+
+export function widgetGorunumStili(
+  widget: Widget & { arkaPlanRenk?: string | null; yaziRenk?: string | null },
+  cfg: WidgetConfig
+): CSSProperties {
+  const g = cfg.gorunum ?? {};
+  const paddingMap = { dar: '2rem 0', normal: '4rem 0', genis: '6rem 0' };
+  return {
+    backgroundColor: widget.arkaPlanRenk || undefined,
+    color: widget.yaziRenk || g.metinRengi || undefined,
+    padding: paddingMap[g.padding ?? 'normal'],
+    fontFamily: g.font || undefined,
+    ['--widget-baslik-renk' as string]: g.baslikRengi || widget.yaziRenk || undefined,
+    ['--widget-kolon' as string]: String(g.kolonSayisi ?? 3),
+  };
+}

@@ -1,0 +1,363 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ─── Temel ───────────────────────────────────────────────────────────────────
+
+model Site {
+  id         Int      @id @default(autoincrement())
+  ad         String
+  slug       String   @unique
+  domain     String?
+  aktif      Boolean  @default(true)
+  olusturma  DateTime @default(now())
+  guncelleme DateTime @updatedAt
+
+  kullanicilar       Kullanici[]
+  roller             Rol[]
+  sayfalar           Sayfa[]
+  widgetlar          Widget[]
+  siteAyarlari       SiteAyarlari?
+  medyalar           Medya[]
+  blogYazilari       BlogYazisi[]
+  formTanimlari      FormTanimi[]
+  kisayolAyarlari    KisayolAyari[]
+  sekmeAyarlari      SekmeAyari[]
+  sistemAyari        SistemAyari?
+  adminLoglari       AdminLog[]
+  yedekKayitlari     YedekKaydi[]
+
+  @@map("siteler")
+}
+
+model Rol {
+  id          Int      @id @default(autoincrement())
+  siteId      Int
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  kod         String
+  baslik      String
+  aciklama    String?  @db.Text
+  yetkilerJson Json    @default("[]")
+  sistemRolu  Boolean  @default(false)
+  sira        Int      @default(0)
+  olusturma   DateTime @default(now())
+  guncelleme  DateTime @updatedAt
+
+  kullanicilar Kullanici[]
+
+  @@unique([siteId, kod])
+  @@index([siteId, sira])
+  @@map("roller")
+}
+
+model Kullanici {
+  id            Int      @id @default(autoincrement())
+  siteId        Int?
+  site          Site?    @relation(fields: [siteId], references: [id], onDelete: SetNull)
+  rolId         Int?
+  rolKaydi      Rol?     @relation(fields: [rolId], references: [id], onDelete: SetNull)
+  email         String   @unique
+  sifreHash     String
+  ad            String
+  rol           String   @default("MUSTERI_ADMIN")
+  aktif         Boolean  @default(true)
+  tercihlerJson Json?
+  olusturma     DateTime @default(now())
+  guncelleme    DateTime @updatedAt
+
+  adminLoglari AdminLog[]
+
+  @@index([siteId, rol])
+  @@map("kullanicilar")
+}
+
+model SiteAyarlari {
+  id                 Int     @id @default(autoincrement())
+  siteId             Int     @unique
+  site               Site    @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  logoUrl            String?
+  faviconUrl         String?
+  anaRenk            String  @default("#7c3aed")
+  ikincilRenk        String  @default("#a78bfa")
+  slogan             String?
+  font               String  @default("Inter")
+  telefon            String?
+  email              String?
+  adres              String?
+  whatsapp           String?
+  telifYazisi        String?
+  sosyalMedyaJson    Json?
+  seoBaslik          String?
+  seoAciklama        String?
+  seoAnahtar         String?
+  ogGorselUrl        String?
+  sistemAyarlariJson Json?
+  headerAyarlariJson Json?
+  heroJson           Json?
+  footerAyarlariJson Json?
+  blogAyarlariJson   Json?
+  rolTanimlariJson   Json?
+
+  @@map("site_ayarlari")
+}
+
+// ─── İçerik ──────────────────────────────────────────────────────────────────
+
+model Sayfa {
+  id           Int      @id @default(autoincrement())
+  siteId       Int
+  site         Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  baslik       String
+  slug         String
+  icerik       String   @db.Text
+  kapakGorsel  String?
+  seoTitle     String?
+  seoDesc      String?
+  yayinda      Boolean  @default(false)
+  menudeGoster Boolean  @default(true)
+  sira         Int      @default(0)
+  olusturma    DateTime @default(now())
+  guncelleme   DateTime @updatedAt
+
+  widgetlar                    Widget[]
+  onerilenOlduguSistemAyarlari SistemAyari[] @relation("SistemAyariOneriSayfa")
+
+  @@unique([siteId, slug])
+  @@index([siteId, yayinda, sira])
+  @@map("sayfalar")
+}
+
+model Widget {
+  id             Int        @id @default(autoincrement())
+  siteId         Int
+  site           Site       @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  sayfaId        Int?
+  sayfa          Sayfa?     @relation(fields: [sayfaId], references: [id], onDelete: SetNull)
+  ad             String
+  tip            WidgetTipi
+  sira           Int        @default(0)
+  aktif          Boolean    @default(true)
+  baslik         String?
+  altBaslik      String?
+  aciklama       String?    @db.Text
+  gorselUrl      String?
+  butonMetni     String?
+  butonLink      String?
+  arkaPlanRenk   String?
+  yaziRenk       String?
+  mobilGoster    Boolean    @default(true)
+  masaustuGoster Boolean    @default(true)
+  configJson     Json?
+  olusturma      DateTime   @default(now())
+  guncelleme     DateTime   @updatedAt
+
+  @@index([siteId, aktif, sira])
+  @@map("widgetlar")
+}
+
+enum WidgetTipi {
+  HEADER
+  NAVBAR
+  SLIDER
+  HERO_BANNER
+  HIZMET_KARTLARI
+  REFERANSLAR
+  SSS
+  GALERI
+  HARITA
+  ILETISIM_FORMU
+  POPUP
+  FOOTER
+  BASLIK_METIN
+  BASLIK_METIN_GORSEL
+  BLOG_KARUSEL
+  LINK_KARTLARI
+  GORSEL_GRID_BLOK
+}
+
+model Medya {
+  id        Int      @id @default(autoincrement())
+  siteId    Int
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  ad        String
+  url       String
+  tip       String   @default("GORSEL")
+  boyut     Int?
+  olusturma DateTime @default(now())
+
+  @@index([siteId, olusturma])
+  @@map("medyalar")
+}
+
+model BlogYazisi {
+  id          Int      @id @default(autoincrement())
+  siteId      Int
+  site        Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  baslik      String
+  slug        String
+  ozet        String?  @db.Text
+  icerik      String   @db.Text
+  kapakGorsel String?
+  yazar       String?
+  kategori    String?
+  yayinda     Boolean  @default(false)
+  oneCikan    Boolean  @default(false)
+  seoTitle    String?
+  seoDesc     String?
+  olusturma   DateTime @default(now())
+  guncelleme  DateTime @updatedAt
+
+  @@unique([siteId, slug])
+  @@index([siteId, yayinda])
+  @@map("blog_yazilari")
+}
+
+model FormTanimi {
+  id            Int            @id @default(autoincrement())
+  siteId        Int
+  site          Site           @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  ad            String
+  slug          String
+  aciklama      String?        @db.Text
+  alanlarJson   Json           @default("[]")
+  ayarlarJson   Json?
+  aktif         Boolean        @default(true)
+  bildirimEmail String?
+  olusturma     DateTime       @default(now())
+  guncelleme    DateTime       @updatedAt
+  gonderimler   FormGonderim[]
+
+  @@unique([siteId, slug])
+  @@map("form_tanimlari")
+}
+
+model FormGonderim {
+  id        Int        @id @default(autoincrement())
+  formId    Int
+  form      FormTanimi @relation(fields: [formId], references: [id], onDelete: Cascade)
+  veriJson  Json
+  okundu    Boolean    @default(false)
+  olusturma DateTime   @default(now())
+
+  @@index([formId, okundu])
+  @@map("form_gonderimler")
+}
+
+// ─── Sistem ──────────────────────────────────────────────────────────────────
+
+model SistemAyari {
+  id                     Int      @id @default(autoincrement())
+  siteId                 Int      @unique
+  site                   Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  bakimModu              Boolean  @default(false)
+  bakimBaslik            String   @default("Bakim Calismasi")
+  bakimMesaji            String   @default("Site gecici olarak bakimda. Lutfen daha sonra tekrar deneyin.")
+  bakimGorselUrl         String?
+  bakimTahminiSure       String?
+  bakimIpBeyazListeJson  Json?
+  logSaklamaGun          Int      @default(90)
+  panelDili              String   @default("tr")
+  panelCevirilerJson     Json?
+  sayfa404Baslik         String   @default("Sayfa Bulunamadi")
+  sayfa404Mesaj          String   @default("Aradiginiz sayfa tasinmis, silinmis veya hic var olmamis olabilir.")
+  sayfa404GorselUrl      String?
+  sayfa404MenuTipi       String   @default("ust")
+  sayfa404AnaSayfaButonu Boolean  @default(true)
+  sayfa404OneriSayfaId   Int?
+  sayfa404OneriSayfa     Sayfa?   @relation("SistemAyariOneriSayfa", fields: [sayfa404OneriSayfaId], references: [id], onDelete: SetNull)
+  otomatikYedekleme      Boolean  @default(false)
+  otomatikYedeklemeGun   Int      @default(7)
+  guvenlikBasliklari     Boolean  @default(true)
+  robotsEngelle          Boolean  @default(false)
+  ekAyarlarJson          Json?
+  olusturma              DateTime @default(now())
+  guncelleme             DateTime @updatedAt
+
+  @@index([siteId, bakimModu])
+  @@map("sistem_ayarlari")
+}
+
+model KisayolAyari {
+  id              Int          @id @default(autoincrement())
+  siteId          Int
+  site            Site         @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  ad              String
+  kod             String
+  tusKombinasyonu String
+  deger           String?
+  aciklama        String?      @db.Text
+  kategori        String?
+  sira            Int          @default(0)
+  aktif           Boolean      @default(true)
+  ekAyarlarJson   Json?
+  sekmeAyarlari   SekmeAyari[]
+  olusturma       DateTime     @default(now())
+  guncelleme      DateTime     @updatedAt
+
+  @@unique([siteId, kod])
+  @@index([siteId, aktif, sira])
+  @@map("kisayol_ayarlari")
+}
+
+model SekmeAyari {
+  id            Int           @id @default(autoincrement())
+  siteId        Int
+  site          Site          @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  kisayolId     Int?
+  kisayol       KisayolAyari? @relation(fields: [kisayolId], references: [id], onDelete: SetNull)
+  ad            String
+  kod           String
+  tip           String        @default("sayfa")
+  yol           String
+  ikon          String?
+  aciklama      String?       @db.Text
+  kategori      String?
+  hedef         String?       @default("_self")
+  sira          Int           @default(0)
+  aktif         Boolean       @default(true)
+  sabit         Boolean       @default(false)
+  ekAyarlarJson Json?
+  olusturma     DateTime      @default(now())
+  guncelleme    DateTime      @updatedAt
+
+  @@unique([siteId, kod])
+  @@index([siteId, aktif, sira])
+  @@map("sekme_ayarlari")
+}
+
+model AdminLog {
+  id             Int       @id @default(autoincrement())
+  siteId         Int
+  site           Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  kullaniciId    Int?
+  kullanici      Kullanici? @relation(fields: [kullaniciId], references: [id], onDelete: SetNull)
+  kullaniciAd    String
+  kullaniciEmail String
+  islem          String
+  modulId        String?
+  aksiyonId      String?
+  olusturma      DateTime  @default(now())
+
+  @@index([siteId, olusturma])
+  @@map("admin_loglari")
+}
+
+model YedekKaydi {
+  id             Int      @id @default(autoincrement())
+  siteId         Int
+  site           Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  kullaniciId    Int?
+  kullaniciAd    String
+  kullaniciEmail String
+  dosyaAdi       String
+  tip            String
+  olusturma      DateTime @default(now())
+
+  @@index([siteId, olusturma])
+  @@map("yedek_kayitlari")
+}

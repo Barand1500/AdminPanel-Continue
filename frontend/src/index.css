@@ -1,0 +1,363 @@
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #7c3aed;
+  --color-primary-dark: #6d28d9;
+  --color-primary-light: #a78bfa;
+  --color-accent: #f3f0ff;
+  --color-surface: #fafafa;
+  --font-sans: "Inter", system-ui, sans-serif;
+}
+
+body {
+  font-family: var(--font-sans);
+  @apply bg-surface text-slate-800 antialiased;
+}
+
+.container-site {
+  @apply mx-auto w-full max-w-7xl px-4 sm:px-6 lg:px-8;
+}
+
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark;
+}
+
+.btn-outline {
+  @apply inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-primary hover:text-primary;
+}
+.section-title {
+  @apply text-xl font-bold tracking-tight text-slate-900 sm:text-2xl;
+}
+
+.section-subtitle {
+  @apply text-sm text-slate-500 sm:text-base;
+}
+
+.footer-baslik {
+  @apply text-sm font-bold uppercase tracking-wider text-white;
+}
+
+.footer-link {
+  @apply text-slate-400 transition hover:text-primary-light;
+}
+
+.btn-footer-cta {
+  @apply inline-flex rounded-xl bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-primary-dark;
+}
+
+.btn-footer-outline {
+  @apply inline-flex rounded-xl border border-white/20 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-white/10;
+}
+
+.iletisim-kart {
+  @apply flex gap-3 rounded-xl border border-slate-100 bg-white p-4 shadow-sm;
+}
+
+.phone-cerceve {
+  @apply mx-auto w-[260px] overflow-hidden rounded-[2.75rem] border-[5px] border-slate-800 bg-slate-900 shadow-2xl shadow-slate-900/30 sm:w-[280px];
+  min-height: 560px;
+}
+
+.phone-cerceve-ust {
+  @apply relative shrink-0 bg-slate-900 pb-1;
+}
+
+.phone-cerceve-centik {
+  @apply absolute left-1/2 top-0 h-7 w-24 -translate-x-1/2 rounded-b-2xl bg-slate-800;
+}
+
+.phone-cerceve-icerik {
+  @apply flex min-h-0 flex-1 flex-col bg-white px-4 pb-3 pt-1 sm:px-5;
+}
+
+.phone-cerceve-alt {
+  @apply shrink-0 bg-slate-900 px-5 pb-4 pt-3;
+}
+
+.phone-home-bar {
+  @apply mx-auto h-1 w-24 rounded-full bg-slate-600;
+}
+
+.phone-input-grup {
+  @apply mb-3;
+}
+
+.phone-input-etiket {
+  @apply mb-1 block text-[10px] font-bold uppercase tracking-wide text-slate-400;
+}
+
+.phone-input-alan {
+  @apply w-full rounded-xl border-0 bg-slate-100 px-3 py-2.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:bg-primary/5 focus:ring-2 focus:ring-primary/30;
+}
+
+.phone-input-textarea {
+  @apply resize-none;
+}
+
+.phone-gonder-btn {
+  @apply mt-auto w-full rounded-xl bg-primary py-3 text-sm font-bold text-white transition hover:bg-primary-dark active:scale-[0.98];
+}
+
+.floating-bar {
+  @apply fixed bottom-5 right-4 z-50 flex flex-row items-center gap-2 sm:bottom-6 sm:right-6;
+}
+
+.floating-btn {
+  @apply flex h-11 w-11 items-center justify-center rounded-full text-white shadow-lg transition hover:scale-110 active:scale-95 sm:h-12 sm:w-12;
+}
+
+.floating-btn-telefon {
+  @apply bg-red-500 hover:bg-red-600;
+}
+
+.floating-btn-whatsapp {
+  @apply bg-green-500 hover:bg-green-600;
+}
+
+.floating-btn-yukari {
+  @apply bg-primary hover:bg-primary-dark;
+}
+
+.tema-toggle {
+  @apply flex h-9 w-9 items-center justify-center rounded-full text-slate-600 transition hover:bg-accent hover:text-primary;
+}
+
+.hesap-auth-kart {
+  @apply rounded-2xl border border-slate-200 bg-white p-8 shadow-sm;
+}
+
+.hesap-label {
+  @apply mb-1 block text-sm font-medium text-slate-700;
+}
+
+.hesap-input {
+  @apply w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20;
+}
+
+.hesap-form-kart {
+  @apply space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm;
+}
+
+.hesap-menu-grid {
+  @apply grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6;
+}
+
+.hesap-menu-kart {
+  @apply flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-5 text-center transition hover:border-primary/40 hover:shadow-md hover:shadow-primary/5;
+}
+
+.hesap-menu-cikis {
+  @apply cursor-pointer text-slate-600 hover:border-red-200 hover:text-red-600;
+}
+
+.site-footer {
+  @apply bg-accent text-slate-600;
+}
+
+.site-footer-baslik {
+  @apply text-sm font-bold text-primary;
+}
+
+.site-footer-link {
+  @apply text-slate-600 transition hover:text-primary;
+}
+
+.footer-icerik {
+  @apply gap-10 py-12;
+}
+
+.footer-sema-dort {
+  @apply grid lg:grid-cols-4 lg:gap-8;
+}
+
+.footer-sema-dort .footer-kolonlar {
+  @apply contents;
+}
+
+.footer-sema-uc {
+  @apply grid gap-8;
+}
+
+.footer-sema-uc .footer-kolonlar {
+  @apply grid gap-8 sm:grid-cols-2 lg:grid-cols-3;
+}
+
+.footer-sema-iki {
+  @apply grid gap-8 sm:grid-cols-2;
+}
+
+.footer-sema-iki .footer-kolonlar {
+  @apply grid gap-8;
+}
+
+.footer-sema-merkezi {
+  @apply flex flex-col items-center gap-8 text-center;
+}
+
+.footer-sema-merkezi .footer-marka ul li {
+  @apply justify-center;
+}
+
+.footer-sema-merkezi .footer-kolonlar {
+  @apply flex w-full max-w-lg flex-col items-center gap-8;
+}
+
+
+.card {
+  @apply rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md;
+}
+
+.input-admin {
+  @apply w-full rounded border border-slate-600 bg-slate-900 px-3 py-2 text-sm text-slate-100 outline-none focus:border-blue-500;
+}
+
+.input-search {
+  @apply w-full rounded-full border border-slate-200 bg-white py-3 pl-12 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20;
+}
+
+.input-search-kare {
+  @apply rounded-lg;
+}
+
+.input-search-minimal {
+  @apply rounded-none border-0 border-b border-slate-300 bg-transparent pl-12 pr-4 focus:ring-0;
+}
+
+.scrollbar-hide {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+.product-grid {
+  @apply grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6;
+}
+
+/* Gece / gündüz modu — tüm public sayfalar */
+html[data-site-tema='koyu'] body {
+  @apply bg-slate-950 text-slate-100;
+}
+
+html[data-site-tema='koyu'] .site-public {
+  @apply bg-slate-950 text-slate-100;
+}
+
+html[data-site-tema='koyu'] .site-header,
+html[data-site-tema='koyu'] .site-header-alt {
+  @apply border-slate-700 bg-slate-900;
+}
+
+html[data-site-tema='koyu'] .site-header nav a,
+html[data-site-tema='koyu'] .site-header .text-slate-700,
+html[data-site-tema='koyu'] .site-header .text-slate-600,
+html[data-site-tema='koyu'] .site-header .text-slate-900 {
+  @apply text-slate-200;
+}
+
+html[data-site-tema='koyu'] .section-title {
+  @apply text-white;
+}
+
+html[data-site-tema='koyu'] .section-subtitle {
+  @apply text-slate-400;
+}
+
+html[data-site-tema='koyu'] .card,
+html[data-site-tema='koyu'] .iletisim-kart {
+  @apply border-slate-700 bg-slate-800 text-slate-200;
+}
+
+html[data-site-tema='koyu'] .input-search {
+  @apply border-slate-600 bg-slate-800 text-slate-100 placeholder:text-slate-500;
+}
+
+html[data-site-tema='koyu'] .btn-outline {
+  @apply border-slate-600 bg-slate-800 text-slate-200 hover:border-primary;
+}
+
+html[data-site-tema='koyu'] .tema-toggle {
+  @apply text-slate-300 hover:bg-slate-800 hover:text-primary-light;
+}
+
+html[data-site-tema='koyu'] .phone-cerceve-icerik {
+  @apply bg-slate-800;
+}
+
+html[data-site-tema='koyu'] .phone-input-alan {
+  @apply bg-slate-700 text-slate-100 placeholder:text-slate-400;
+}
+
+html[data-site-tema='koyu'] .phone-input-etiket {
+  @apply text-slate-400;
+}
+
+html[data-site-tema='koyu'] .guven-serit {
+  @apply border-slate-700 bg-slate-900;
+}
+
+html[data-site-tema='koyu'] .bg-white {
+  @apply bg-slate-900;
+}
+
+html[data-site-tema='koyu'] .bg-accent {
+  @apply bg-slate-800/50;
+}
+
+html[data-site-tema='koyu'] .text-slate-900 {
+  @apply text-slate-100;
+}
+
+html[data-site-tema='koyu'] .text-slate-800 {
+  @apply text-slate-200;
+}
+
+html[data-site-tema='koyu'] .text-slate-700 {
+  @apply text-slate-300;
+}
+
+html[data-site-tema='koyu'] .text-slate-600 {
+  @apply text-slate-400;
+}
+
+html[data-site-tema='koyu'] .text-slate-500 {
+  @apply text-slate-400;
+}
+
+html[data-site-tema='koyu'] .border-slate-100,
+html[data-site-tema='koyu'] .border-slate-200 {
+  @apply border-slate-700;
+}
+
+html[data-site-tema='koyu'] .site-footer {
+  @apply bg-slate-900 text-slate-400;
+}
+
+html[data-site-tema='koyu'] .site-footer-baslik {
+  @apply text-primary-light;
+}
+
+html[data-site-tema='koyu'] .site-footer-link {
+  @apply text-slate-400 hover:text-primary-light;
+}
+
+html[data-site-tema='koyu'] .hesap-auth-kart,
+html[data-site-tema='koyu'] .hesap-form-kart,
+html[data-site-tema='koyu'] .hesap-menu-kart {
+  @apply border-slate-700 bg-slate-800;
+}
+
+html[data-site-tema='koyu'] .hesap-menu-kart span {
+  @apply text-slate-200;
+}
+
+html[data-site-tema='koyu'] .hesap-input {
+  @apply border-slate-600 bg-slate-900 text-slate-100;
+}
+
+html[data-site-tema='koyu'] .hesap-label {
+  @apply text-slate-300;
+}
+

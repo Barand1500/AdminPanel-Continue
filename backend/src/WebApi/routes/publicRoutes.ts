@@ -1,0 +1,32 @@
+import { Router } from 'express';
+import { SiteController } from '../controllers/SiteController.js';
+import { SiteAuthController, uyeAuthMiddleware } from '../controllers/SiteAuthController.js';
+import { validateBySchema } from '../middleware/dogrulama.js';
+import {
+  girisSchema,
+  kayitSchema,
+  profilGuncelleSchema,
+  sifreDegistirSchema,
+} from '../../Application/DTOs/AuthDto.js';
+
+const router = Router();
+const controller = new SiteController();
+const authController = new SiteAuthController();
+
+router.get('/health', (req, res) => controller.health(req, res));
+router.get('/site', (req, res) => controller.getPublicSite(req, res));
+router.get('/sayfalar/:slug', (req, res) => controller.getSayfa(req, res));
+router.get('/blog', (req, res) => controller.listeleBlog(req, res));
+router.get('/blog/:slug', (req, res) => controller.getBlog(req, res));
+
+router.post('/auth/kayit', validateBySchema(kayitSchema), (req, res) => authController.kayit(req, res));
+router.post('/auth/giris', validateBySchema(girisSchema), (req, res) => authController.giris(req, res));
+router.get('/auth/ben', uyeAuthMiddleware, (req, res) => authController.ben(req, res));
+router.patch('/auth/profil', uyeAuthMiddleware, validateBySchema(profilGuncelleSchema), (req, res) =>
+  authController.profilGuncelle(req, res)
+);
+router.patch('/auth/sifre', uyeAuthMiddleware, validateBySchema(sifreDegistirSchema), (req, res) =>
+  authController.sifreDegistir(req, res)
+);
+
+export default router;

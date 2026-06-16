@@ -1,0 +1,200 @@
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import {
+  varsayilanWidgetForm,
+  WidgetEditorPanel,
+  WidgetListesiPanel,
+  widgettenForma,
+} from '@/components/admin/widget/WidgetBilesenleri';
+import { WidgetOnizlemeModal } from '@/components/admin/widget/WidgetOnizlemeModal';
+import {
+  AdminModulKabuk,
+  BildirimKutusu,
+  YukleniyorDurumu,
+} from '@/components/admin/ortak/AdminBilesenleri';
+import { AdminIstatistikKarti } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
+import { widgetGuncelle, widgetOlustur, widgetlariGetir } from '@/features/admin/widgetApi';
+import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
+import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
+
+function kaydetHazirMi(form: WidgetFormDegeri) {
+  return Boolean(
+    form.tip &&
+    (form.ad.trim() || form.baslik.trim() || tipEtiketi(form.tip))
+  );
+}
+
+interface WidgetYonetimiSayfasiProps {
+  varsayilanTip?: string;
+}
+
+export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiProps) {
+  const [widgetlar, setWidgetlar] = useState<AdminWidget[]>([]);
+  const [form, setForm] = useState<WidgetFormDegeri>(varsayilanWidgetForm(varsayilanTip ?? 'SLIDER'));
+  const [yukleniyor, setYukleniyor] = useState(true);
+  const [kaydediliyor, setKaydediliyor] = useState(false);
+  const [hata, setHata] = useState('');
+  const [basari, setBasari] = useState('');
+  const [seciliId, setSeciliId] = useState<string | null>(null);
+  const [onizlemeAcik, setOnizlemeAcik] = useState(false);
+  const [onizlemeHazir, setOnizlemeHazir] = useState(false);
+  const kaydetFnRef = useRef<(() => Promise<void>) | null>(null);
+
+  const yeniMod = seciliId === null;
+
+  const istatistik = useMemo(() => ({
+    toplam: widgetlar.length,
+    aktif: widgetlar.filter((w) => w.aktif).length,
+    pasif: widgetlar.filter((w) => !w.aktif).length,
+    tipler: new Set(widgetlar.map((w) => w.tip)).size,
+  }), [widgetlar]);
+
+  async function listeYukle() {
+    setHata('');
+    setYukleniyor(true);
+    try {
+      const liste = await widgetlariGetir(varsayilanTip);
+      setWidgetlar(liste);
+    } catch (err) {
+      setHata(err instanceof Error ? err.message : 'Widget listesi alınamadı');
+    } finally {
+      setYukleniyor(false);
+    }
+  }
+
+  useEffect(() => {
+    void listeYukle();
+  }, [varsayilanTip]);
+
+  useEffect(() => {
+    setOnizlemeHazir(Boolean(form.tip && (seciliId || yeniMod)));
+  }, [form.tip, seciliId, yeniMod]);
+
+  const yeniBaslat = useCallback(() => {
+    setSeciliId(null);
+    setForm(varsayilanWidgetForm(varsayilanTip ?? 'SLIDER'));
+    setBasari('');
+    setHata('');
+    setOnizlemeHazir(true);
+  }, [varsayilanTip]);
+
+  const onKaydetTetikleyici = useCallback((fn: () => Promise<void>) => {
+    kaydetFnRef.current = fn;
+  }, []);
+
+  const kaydetFooter = useCallback(async () => {
+    setHata('');
+    try {
+      await kaydetFnRef.current?.();
+    } catch (err) {
+      setHata(err instanceof Error ? err.message : 'Kayıt başarısız');
+    }
+  }, []);
+
+  useModulAksiyonlari(
+    {
+      kaydet: kaydetFooter,
+      ekle: yeniBaslat,
+      onizle: () => setOnizlemeAcik(true),
+    },
+    {
+      kaydet: !kaydediliyor && kaydetHazirMi(form),
+      ekle: true,
+      sil: false,
+      onizle: onizlemeHazir && !kaydediliyor,
+    }
+  );
+
+  const seciliWidget = useMemo(
+    () => widgetlar.find((w) => w.id === seciliId) ?? null,
+    [widgetlar, seciliId]
+  );
+
+  async function kaydet(deger: WidgetFormDegeri, widgetId?: string) {
+    const ad = deger.ad.trim() || deger.baslik.trim() || tipEtiketi(deger.tip);
+    if (!ad) {
+      setHata('Widget adı veya içerik başlığı gerekli');
+      throw new Error('Widget adı veya içerik başlığı gerekli');
+    }
+    const kayitDegeri = deger.ad.trim() ? deger : { ...deger, ad };
+    setKaydediliyor(true);
+    setHata('');
+    try {
+      if (widgetId) {
+        const guncel = await widgetGuncelle(widgetId, kayitDegeri);
+        setWidgetlar((onceki) => onceki.map((w) => (w.id === guncel.id ? guncel : w)));
+        setBasari('Widget güncellendi.');
+      } else {
+        const yeni = await widgetOlustur(kayitDegeri);
+        setWidgetlar((onceki) => [yeni, ...onceki]);
+        setSeciliId(yeni.id);
+        setForm(widgettenForma(yeni));
+        setBasari('Yeni widget oluşturuldu.');
+      }
+    } finally {
+      setKaydediliyor(false);
+    }
+  }
+
+  function widgetSec(widget: AdminWidget) {
+    setSeciliId(widget.id);
+    setForm(widgettenForma(widget));
+    setBasari('');
+    setHata('');
+    setOnizlemeHazir(true);
+  }
+
+  const baslik = varsayilanTip === 'SLIDER'
+    ? 'Slider Yönetimi'
+    : varsayilanTip === 'HIZMET_KARTLARI'
+      ? 'Hizmet Widgetları'
+      : 'Widget Yönetimi';
+
+  const aciklama = varsayilanTip
+    ? `${baslik} — anasayfa bileşenlerini düzenleyin`
+    : 'Anasayfa ve site bölümlerini oluşturan widget bileşenlerini yönetin';
+
+  return (
+    <AdminModulKabuk baslik={baslik} aciklama={aciklama}>
+      {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
+      {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
+
+      {yukleniyor ? (
+        <YukleniyorDurumu mesaj="Widgetlar yükleniyor..." />
+      ) : (
+        <>
+          <div className="ap-stat-grid">
+            <AdminIstatistikKarti etiket="Toplam" deger={istatistik.toplam} ikon="🧩" vurgu="mavi" />
+            <AdminIstatistikKarti etiket="Aktif" deger={istatistik.aktif} ikon="✅" vurgu="yesil" />
+            <AdminIstatistikKarti etiket="Pasif" deger={istatistik.pasif} ikon="⏸️" vurgu="amber" />
+            <AdminIstatistikKarti etiket="Tip Çeşidi" deger={istatistik.tipler} ikon="📦" vurgu="gri" />
+          </div>
+
+          <div className="ap-split-layout">
+            <WidgetListesiPanel
+              widgetlar={widgetlar}
+              seciliId={seciliId}
+              tipFiltre={varsayilanTip}
+              onSec={widgetSec}
+            />
+            <WidgetEditorPanel
+              form={form}
+              seciliWidget={seciliWidget}
+              yeniMod={yeniMod}
+              kaydediliyor={kaydediliyor}
+              hata={hata}
+              varsayilanTip={varsayilanTip}
+              tumWidgetlar={widgetlar}
+              onChange={setForm}
+              onKaydet={kaydet}
+              onKaydetTetikleyici={onKaydetTetikleyici}
+              onTipSecildi={() => setOnizlemeHazir(true)}
+            />
+          </div>
+        </>
+      )}
+
+      <WidgetOnizlemeModal acik={onizlemeAcik} form={form} onKapat={() => setOnizlemeAcik(false)} />
+    </AdminModulKabuk>
+  );
+}

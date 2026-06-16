@@ -1,0 +1,2 @@
+-- AdminLog tablosu 20260613102120_admin_log migration'inda olusturuldu.
+-- Yinelenen migration; yeni kurulumlarda cakismayi onlemek icin bos birakildi.

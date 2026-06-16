@@ -1,0 +1,171 @@
+import { useCallback, useState } from 'react';
+import type { AdminModul, AdminSekme } from '@/types/admin';
+import { modulBul } from '@/data/adminMenuYapisi';
+import { sekmeAyarlariOku } from '@/utils/sekmePanelAyarlari';
+
+const VARSAYILAN_SEKMELER: AdminSekme[] = [
+  { id: 'dashboard', modulId: 'dashboard', baslik: 'Dashboard' },
+];
+
+function sekmeOnaTasi(liste: AdminSekme[], sekmeId: string): AdminSekme[] {
+  const hedef = liste.find((s) => s.id === sekmeId);
+  if (!hedef) return liste;
+  return [hedef, ...liste.filter((s) => s.id !== sekmeId)];
+}
+
+function sonrakiAktifSekme(liste: AdminSekme[], kapatilanId: string): string {
+  const idx = liste.findIndex((s) => s.id === kapatilanId);
+  if (idx < 0) return liste[0]?.id ?? 'dashboard';
+  const komşu = liste[idx + 1] ?? liste[idx - 1];
+  return komşu?.id ?? liste[0]?.id ?? 'dashboard';
+}
+
+interface SekmeDurumu {
+  sekmeler: AdminSekme[];
+  aktifSekmeId: string;
+}
+
+export function useAdminSekmeler() {
+  const [durum, setDurum] = useState<SekmeDurumu>({
+    sekmeler: VARSAYILAN_SEKMELER,
+    aktifSekmeId: 'dashboard',
+  });
+
+  const { sekmeler, aktifSekmeId } = durum;
+
+  const sekmeAc = useCallback((modul: AdminModul) => {
+    const ayarlar = sekmeAyarlariOku();
+    setDurum((onceki) => {
+      if (ayarlar.varsayilanAcilis !== 'yeni-sekme') {
+        const mevcut = onceki.sekmeler.find((s) => s.modulId === modul.id);
+        if (mevcut) {
+          return {
+            aktifSekmeId: mevcut.id,
+            sekmeler: sekmeOnaTasi(onceki.sekmeler, mevcut.id),
+          };
+        }
+      }
+      const yeni: AdminSekme = {
+        id: `${modul.id}-${Date.now()}`,
+        modulId: modul.id,
+        baslik: modul.baslik,
+      };
+      return {
+        aktifSekmeId: yeni.id,
+        sekmeler: [yeni, ...onceki.sekmeler],
+      };
+    });
+  }, []);
+
+  const sekmeKapat = useCallback((sekmeId: string) => {
+    setDurum((onceki) => {
+      if (onceki.sekmeler.length <= 1) return onceki;
+
+      const kapatilan = onceki.sekmeler.find((s) => s.id === sekmeId);
+      let yeni = onceki.sekmeler.filter((s) => s.id !== sekmeId);
+
+      if (kapatilan?.grupId) {
+        const gruptakiler = yeni.filter((s) => s.grupId === kapatilan.grupId);
+        if (gruptakiler.length === 1) {
+          yeni = yeni.map((s) =>
+            s.grupId === kapatilan.grupId ? { ...s, grupId: undefined } : s
+          );
+        }
+      }
+
+      const yeniAktif =
+        onceki.aktifSekmeId === sekmeId
+          ? sonrakiAktifSekme(onceki.sekmeler, sekmeId)
+          : onceki.aktifSekmeId;
+
+      return { sekmeler: yeni, aktifSekmeId: yeniAktif };
+    });
+  }, []);
+
+  const sekmeSec = useCallback((sekmeId: string) => {
+    setDurum((onceki) => ({
+      aktifSekmeId: sekmeId,
+      sekmeler: sekmeOnaTasi(onceki.sekmeler, sekmeId),
+    }));
+  }, []);
+
+  const sekmeTasi = useCallback((kaynakId: string, hedefId: string, mod: 'once' | 'sonra') => {
+    if (kaynakId === hedefId) return;
+
+    setDurum((onceki) => {
+      const kaynakIdx = onceki.sekmeler.findIndex((s) => s.id === kaynakId);
+      const hedefIdx = onceki.sekmeler.findIndex((s) => s.id === hedefId);
+      if (kaynakIdx < 0 || hedefIdx < 0) return onceki;
+
+      const kaynak = onceki.sekmeler[kaynakIdx];
+      const hedef = onceki.sekmeler[hedefIdx];
+
+      let liste = [...onceki.sekmeler];
+
+      // Grup içinden çıkarılıp başka alana bırakılırsa yan yana görünümü kapat
+      if (kaynak.grupId && kaynak.grupId === hedef.grupId) {
+        const grupId = kaynak.grupId;
+        liste = liste.map((s) => (s.grupId === grupId ? { ...s, grupId: undefined } : s));
+      } else if (kaynak.grupId) {
+        liste = liste.map((s) => (s.id === kaynakId ? { ...s, grupId: undefined } : s));
+      }
+
+      const guncelKaynakIdx = liste.findIndex((s) => s.id === kaynakId);
+      const [tasinan] = liste.splice(guncelKaynakIdx, 1);
+      let yeniHedefIdx = liste.findIndex((s) => s.id === hedefId);
+      if (mod === 'sonra') yeniHedefIdx += 1;
+      liste.splice(yeniHedefIdx, 0, tasinan);
+
+      return { ...onceki, sekmeler: liste };
+    });
+  }, []);
+
+  const sekmeBirlestir = useCallback((kaynakId: string, hedefId: string) => {
+    if (kaynakId === hedefId) return;
+
+    setDurum((onceki) => {
+      const kaynak = onceki.sekmeler.find((s) => s.id === kaynakId);
+      const hedef = onceki.sekmeler.find((s) => s.id === hedefId);
+      if (!kaynak || !hedef) return onceki;
+
+      const grupId = hedef.grupId ?? `grup-${Date.now()}`;
+      const guncellenmis = onceki.sekmeler.map((s) => {
+        if (s.id === kaynakId || s.id === hedefId) return { ...s, grupId };
+        return s;
+      });
+
+      const kaynakIdx = guncellenmis.findIndex((s) => s.id === kaynakId);
+      const liste = [...guncellenmis];
+      const [tasinan] = liste.splice(kaynakIdx, 1);
+      const yeniHedefIdx = liste.findIndex((s) => s.id === hedefId);
+      liste.splice(yeniHedefIdx + 1, 0, tasinan);
+
+      return { sekmeler: liste, aktifSekmeId: kaynakId };
+    });
+  }, []);
+
+  const aktifModul = modulBul(
+    sekmeler.find((s) => s.id === aktifSekmeId)?.modulId ?? 'dashboard'
+  );
+
+  const kaydedilmediIsaretle = useCallback((sekmeId: string, kirli: boolean) => {
+    setDurum((onceki) => ({
+      ...onceki,
+      sekmeler: onceki.sekmeler.map((s) =>
+        s.id === sekmeId ? { ...s, kaydedilmedi: kirli } : s
+      ),
+    }));
+  }, []);
+
+  return {
+    sekmeler,
+    aktifSekmeId,
+    aktifModul,
+    setAktifSekmeId: sekmeSec,
+    sekmeAc,
+    sekmeKapat,
+    sekmeTasi,
+    sekmeBirlestir,
+    kaydedilmediIsaretle,
+  };
+}
