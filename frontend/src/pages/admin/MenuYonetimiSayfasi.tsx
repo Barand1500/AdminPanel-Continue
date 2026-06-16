@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   MenuDuzenlemePanel,
-  menuIstatistikleri,
   MenuOnizlemePanel,
 } from '@/components/admin/menu/MenuBilesenleri';
 import { UstMenuPanel } from '@/components/admin/menu/UstMenuPanel';
@@ -11,7 +10,6 @@ import {
   BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
-import { AdminIstatistikKarti } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import { adminMenuGuncelle, adminSayfaGuncelle, adminSayfaOlustur, adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
 import { adminSiteApi } from '@/features/site/adminSiteApi';
@@ -58,8 +56,6 @@ export function MenuYonetimiSayfasi() {
   const sayfaKirli = !sayfaListesiEsit(sayfalar, kayitliSayfaRef.current);
   const ustMenuKirli = !ustMenuEsit(ustMenu, kayitliUstMenuRef.current);
   const kirli = sayfaKirli || ustMenuKirli;
-
-  const istatistik = useMemo(() => menuIstatistikleri(sayfalar), [sayfalar]);
 
   useEffect(() => {
     void (async () => {
@@ -234,13 +230,6 @@ export function MenuYonetimiSayfasi() {
         <YukleniyorDurumu mesaj="Menü verisi yükleniyor..." />
       ) : (
         <>
-          <div className="ap-stat-grid">
-            <AdminIstatistikKarti etiket="Toplam Sayfa" deger={istatistik.toplam} ikon="📄" vurgu="mavi" />
-            <AdminIstatistikKarti etiket="Üst Menü" deger={ustMenu.length} ikon="🔗" vurgu="yesil" />
-            <AdminIstatistikKarti etiket="Menüde Sayfa" deger={istatistik.menude} ikon="📋" vurgu="amber" />
-            <AdminIstatistikKarti etiket="Canlı Menü" deger={istatistik.yayindaMenude} ikon="🌐" vurgu="gri" />
-          </div>
-
           <AdminPanelKarti baslik="Üst Menü" altBaslik="Header navigasyon linkleri">
             <UstMenuPanel
               ustMenu={ustMenu}

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { FormEditorKabuk } from '@/components/admin/form/FormEditorKabuk';
 import { FormGonderimPanel } from '@/components/admin/form/FormGonderimPanel';
 import { FormListePanel } from '@/components/admin/form/FormListePanel';
@@ -8,7 +8,6 @@ import {
   BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
-import { AdminIstatistikKarti } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
   adminFormGonderimleriGetir,
   adminFormGuncelle,
@@ -32,17 +31,6 @@ export function FormYonetimiSayfasi() {
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [hata, setHata] = useState('');
   const [basari, setBasari] = useState('');
-
-  const istatistik = useMemo(
-    () => ({
-      toplam: formlar.length,
-      aktif: formlar.filter((f) => f.aktif).length,
-      pasif: formlar.filter((f) => !f.aktif).length,
-      gonderim: formlar.reduce((t, f) => t + (f._count?.gonderimler ?? 0), 0),
-      alan: formlar.reduce((t, f) => t + f.alanlarJson.length, 0),
-    }),
-    [formlar]
-  );
 
   async function yukle() {
     setYukleniyor(true);
@@ -178,13 +166,6 @@ export function FormYonetimiSayfasi() {
         <YukleniyorDurumu mesaj="Formlar yükleniyor..." />
       ) : (
         <div className="ap-form-yonetimi space-y-5">
-          <div className="ap-stat-grid">
-            <AdminIstatistikKarti etiket="Toplam Form" deger={istatistik.toplam} ikon="📝" vurgu="mavi" />
-            <AdminIstatistikKarti etiket="Yayında" deger={istatistik.aktif} ikon="✅" vurgu="yesil" />
-            <AdminIstatistikKarti etiket="Toplam Alan" deger={istatistik.alan} ikon="📋" vurgu="amber" />
-            <AdminIstatistikKarti etiket="Gönderim" deger={istatistik.gonderim} ikon="📬" vurgu="gri" />
-          </div>
-
           <div className="ap-form-layout ap-form-layout-sade">
             <FormListePanel formlar={formlar} seciliId={seciliId} onSec={formSec} />
             <div className="space-y-5">

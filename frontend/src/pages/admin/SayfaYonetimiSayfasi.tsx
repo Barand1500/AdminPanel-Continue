@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import {
   bosSayfaForm,
   SayfaEditorPanel,
@@ -10,7 +10,6 @@ import {
   BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
-import { AdminIstatistikKarti } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import {
   adminSayfaGuncelle,
@@ -30,12 +29,6 @@ export function SayfaYonetimiSayfasi() {
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [hata, setHata] = useState('');
   const [basari, setBasari] = useState('');
-  const istatistik = useMemo(() => ({
-    toplam: sayfalar.length,
-    yayinda: sayfalar.filter((s) => s.yayinda).length,
-    taslak: sayfalar.filter((s) => !s.yayinda).length,
-    menude: sayfalar.filter((s) => s.menudeGoster).length,
-  }), [sayfalar]);
 
   async function yukle() {
     setYukleniyor(true);
@@ -156,13 +149,6 @@ export function SayfaYonetimiSayfasi() {
         <YukleniyorDurumu mesaj="Sayfalar yükleniyor..." />
       ) : (
         <>
-          <div className="ap-stat-grid">
-            <AdminIstatistikKarti etiket="Toplam" deger={istatistik.toplam} ikon="📄" vurgu="mavi" />
-            <AdminIstatistikKarti etiket="Yayında" deger={istatistik.yayinda} ikon="✅" vurgu="yesil" />
-            <AdminIstatistikKarti etiket="Taslak" deger={istatistik.taslak} ikon="📝" vurgu="amber" />
-            <AdminIstatistikKarti etiket="Menüde" deger={istatistik.menude} ikon="📋" vurgu="gri" />
-          </div>
-
           <div className="ap-split-layout">
             <SayfaListesiPanel sayfalar={sayfalar} seciliId={seciliId} onSec={sayfaSec} />
             <SayfaEditorPanel

@@ -11,7 +11,6 @@ import {
   BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
-import { AdminIstatistikKarti } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import { widgetGuncelle, widgetOlustur, widgetlariGetir } from '@/features/admin/widgetApi';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
@@ -41,13 +40,6 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
   const kaydetFnRef = useRef<(() => Promise<void>) | null>(null);
 
   const yeniMod = seciliId === null;
-
-  const istatistik = useMemo(() => ({
-    toplam: widgetlar.length,
-    aktif: widgetlar.filter((w) => w.aktif).length,
-    pasif: widgetlar.filter((w) => !w.aktif).length,
-    tipler: new Set(widgetlar.map((w) => w.tip)).size,
-  }), [widgetlar]);
 
   async function listeYukle() {
     setHata('');
@@ -163,13 +155,6 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
         <YukleniyorDurumu mesaj="Widgetlar yükleniyor..." />
       ) : (
         <>
-          <div className="ap-stat-grid">
-            <AdminIstatistikKarti etiket="Toplam" deger={istatistik.toplam} ikon="🧩" vurgu="mavi" />
-            <AdminIstatistikKarti etiket="Aktif" deger={istatistik.aktif} ikon="✅" vurgu="yesil" />
-            <AdminIstatistikKarti etiket="Pasif" deger={istatistik.pasif} ikon="⏸️" vurgu="amber" />
-            <AdminIstatistikKarti etiket="Tip Çeşidi" deger={istatistik.tipler} ikon="📦" vurgu="gri" />
-          </div>
-
           <div className="ap-split-layout">
             <WidgetListesiPanel
               widgetlar={widgetlar}

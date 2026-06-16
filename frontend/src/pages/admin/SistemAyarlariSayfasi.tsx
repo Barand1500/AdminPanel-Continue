@@ -18,7 +18,6 @@ import {
   BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
-import { AdminIstatistikKarti } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
 import { sistemAyarlariGetir, sistemAyarlariGuncelle } from '@/features/admin/sistemAyarlariApi';
 import { bosSistemForm, sistemdenForm, type SistemAyarlariForm, type SistemSekmeId } from '@/types/sistemAyarlari';
@@ -88,13 +87,6 @@ export function SistemAyarlariSayfasi() {
       {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
       <div className="ap-sistem-yonetimi">
-        <div className="ap-sistem-istatistik">
-          <AdminIstatistikKarti etiket="Site" deger={form.siteAktif ? 'Yayında' : 'Kapalı'} ikon="🌐" vurgu={form.siteAktif ? 'yesil' : 'amber'} />
-          <AdminIstatistikKarti etiket="Bakım" deger={form.bakimModu ? 'Aktif' : 'Kapalı'} ikon="🔧" vurgu={form.bakimModu ? 'amber' : 'gri'} />
-          <AdminIstatistikKarti etiket="Panel Dili" deger={form.panelDili.toUpperCase()} ikon="🌐" vurgu="mavi" />
-          <AdminIstatistikKarti etiket="404 Menü" deger={form.sayfa404.menuTipi} ikon="🚫" vurgu="gri" />
-        </div>
-
         <div className="ap-sistem-layout">
           <aside className="ap-sistem-sol">
             <SistemSekmeCubugu aktif={sekme} onDegistir={setSekme} />
