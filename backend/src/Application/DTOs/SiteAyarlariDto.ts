@@ -23,6 +23,13 @@ export const siteAyarlariGuncelleSchema = z.object({
   heroJson: esnekJson,
   footerAyarlariJson: esnekJson,
   blogAyarlariJson: esnekJson,
+  temaAyarlariJson: z
+    .object({
+      gunduzSablon: z.enum(['mor', 'mavi', 'yesil', 'ozel']).optional(),
+      geceSablon: z.enum(['midnight', 'slate', 'carbon']).optional(),
+    })
+    .nullable()
+    .optional(),
 });
 
 export type SiteAyarlariGuncelleDto = z.infer<typeof siteAyarlariGuncelleSchema>;

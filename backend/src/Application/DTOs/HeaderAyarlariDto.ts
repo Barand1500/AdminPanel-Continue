@@ -30,7 +30,7 @@ export const ustMenuOgesiSchema = z.object({
 
 export const headerAyarlariSchema = z.object({
   slogan: z.string().max(300).nullable().optional(),
-  logoUrl: z.union([z.string().min(1), z.literal(''), z.null()]).optional(),
+  logoBoyutu: z.enum(['kucuk', 'orta', 'buyuk']).optional(),
   ustBant: z
     .object({
       telefonGoster: z.boolean(),

@@ -94,14 +94,22 @@ export function SiteAyarlariSayfasi() {
 
       <div className="mt-4 rounded-lg border border-dashed border-[var(--ap-border)] bg-[var(--ap-input-bg)] p-4">
         <p className="ap-muted text-xs leading-relaxed">
-          Logo, slogan, kurlar ve header görünümü için{' '}
+          Slogan, kurlar ve header görünümü için{' '}
           <strong className="text-[var(--ap-accent)]">Header Yönetimi</strong> modülünü kullanın.
+          Logo boyutu ayarları Header ve Footer Yönetimi&apos;ndedir.
         </p>
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <AdminPanelKarti baslik="Marka ve Tema" altBaslik="Favicon, renk paleti ve gece modu şablonları">
+        <AdminPanelKarti baslik="Marka ve Tema" altBaslik="Logo, favicon, renk paleti ve gece modu şablonları">
           <div className="space-y-5">
+            <GorselAlan
+              etiket="Logo"
+              aciklama="Header ve footer'da kullanılır — tek merkezi logo"
+              deger={ayarlar.logoUrl ?? ''}
+              onChange={(v) => alanGuncelle('logoUrl', v || null)}
+              onizlemeSinifi="h-14 max-w-[180px] rounded-lg object-contain bg-[var(--ap-input-bg)] border border-[var(--ap-border)] p-1"
+            />
             <GorselAlan
               etiket="Favicon"
               aciklama="Tarayıcı sekmesindeki küçük ikon"

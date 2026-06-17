@@ -90,7 +90,7 @@ async function siteVeriYukle(payload: YedekPayload) {
               seoAciklama: siteAyarlari.seoAciklama,
               seoAnahtar: siteAyarlari.seoAnahtar,
               ogGorselUrl: siteAyarlari.ogGorselUrl,
-              sistemAyarlariJson: siteAyarlari.sistemAyarlariJson ?? undefined,
+              temaAyarlariJson: siteAyarlari.temaAyarlariJson ?? undefined,
             },
           }
         : undefined,

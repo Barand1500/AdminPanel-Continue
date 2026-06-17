@@ -2,7 +2,8 @@ import { useState } from 'react';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import { useSiteYonetimiAksiyonlari } from '@/hooks/useSiteYonetimiAksiyonlari';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
-import { GorselAlan } from '@/components/form/GorselAlan';
+import { LogoBoyutSecici } from '@/components/admin/site/LogoBoyutSecici';
+import { logoBoyutuNormalize } from '@/types/logo';
 import { IkonSecici } from '@/components/admin/header/IkonSecici';
 import { ParaBirimiYonetimi } from '@/components/admin/header/ParaBirimiYonetimi';
 import { AramaStilSecici } from '@/components/admin/header/AramaStilSecici';
@@ -18,7 +19,7 @@ import {
 
 const SEKMELER = [
   { id: 'ust-bant', ad: 'Üst Bant' },
-  { id: 'logo', ad: 'Logo' },
+  { id: 'logo-gorunum', ad: 'Logo Görünümü' },
   { id: 'para', ad: 'Para Birimi' },
   { id: 'ikonlar', ad: 'İkonlar' },
   { id: 'kategori-arama', ad: 'Kategori & Arama' },
@@ -87,7 +88,7 @@ export function HeaderYonetimiFormu() {
       <div className="space-y-5">
         <ModulBaslik
           baslik="Header Yönetimi"
-          aciklama="Üst bant, logo, kurlar, ikonlar, kategori menüsü ve arama alanını yönetin. Menü linkleri Menü Yönetimi'nden düzenlenir."
+          aciklama="Üst bant, logo görünümü, kurlar, ikonlar, kategori menüsü ve arama alanını yönetin. Logo dosyası Site Ayarları'ndan yüklenir."
         />
 
         {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
@@ -144,15 +145,19 @@ export function HeaderYonetimiFormu() {
           </AdminPanelKarti>
         )}
 
-        {sekme === 'logo' && (
-          <AdminPanelKarti baslik="Logo" altBaslik="Navbar'da görünen marka görseli">
-            <GorselAlan
-              etiket="Logo"
-              aciklama="Yükle ikonuna tıklayarak PC'den seçin veya URL girin"
-              deger={headerAyarlari.logoUrl ?? ''}
-              onChange={(v) => headerGuncelleParcali({ logoUrl: v || null })}
-              onizlemeSinifi="h-14 max-w-[180px] rounded-lg object-contain bg-[var(--ap-input-bg)] border border-[var(--ap-border)] p-1"
-            />
+        {sekme === 'logo-gorunum' && (
+          <AdminPanelKarti baslik="Logo Görünümü" altBaslik="Header'daki logo boyutu">
+            <div className="space-y-4">
+              <p className="ap-muted text-xs leading-relaxed">
+                Logo dosyası <strong className="text-[var(--ap-accent)]">Site Ayarları</strong> modülünden
+                yüklenir. Buradan yalnızca header&apos;daki görünüm boyutunu ayarlayın.
+              </p>
+              <LogoBoyutSecici
+                etiket="Header logo boyutu"
+                deger={logoBoyutuNormalize(headerAyarlari.logoBoyutu)}
+                onChange={(logoBoyutu) => headerGuncelleParcali({ logoBoyutu })}
+              />
+            </div>
           </AdminPanelKarti>
         )}
 

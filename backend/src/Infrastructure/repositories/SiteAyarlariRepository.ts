@@ -35,6 +35,7 @@ export class SiteAyarlariRepository {
     const jsonAlanlar = [
       'sosyalMedyaJson', 'sistemAyarlariJson', 'headerAyarlariJson',
       'heroJson', 'footerAyarlariJson', 'blogAyarlariJson', 'rolTanimlariJson',
+      'temaAyarlariJson',
     ] as const;
 
     for (const alan of jsonAlanlar) {

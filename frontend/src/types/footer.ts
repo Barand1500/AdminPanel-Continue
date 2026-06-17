@@ -1,3 +1,5 @@
+import { logoBoyutuNormalize, VARSAYILAN_LOGO_BOYUTU, type LogoBoyutu } from './logo';
+
 export type FooterSema = 'dort-kolon' | 'uc-kolon' | 'iki-kolon' | 'merkezi';
 export type FooterLinkIkon = 'chevron' | 'ok' | 'bullet' | 'yok';
 
@@ -58,6 +60,7 @@ export interface FooterAyarlari {
   linkIkon: FooterLinkIkon;
   marka: {
     logoGoster: boolean;
+    logoBoyutu: LogoBoyutu;
     sosyalGoster: boolean;
     bankaLinki: { aktif: boolean; ad: string; link: string; ikon: string };
     iletisimIkonlari: { adres: string; email: string; telefon: string; whatsapp: string };
@@ -171,6 +174,7 @@ export function varsayilanFooterAyarlari(): FooterAyarlari {
     linkIkon: 'chevron',
     marka: {
       logoGoster: true,
+      logoBoyutu: VARSAYILAN_LOGO_BOYUTU,
       sosyalGoster: true,
       bankaLinki: { aktif: true, ad: 'Banka Hesaplarımız', link: '/iletisim', ikon: '🏦' },
       iletisimIkonlari: { adres: '📍', email: '✉️', telefon: '📞', whatsapp: '💬' },
@@ -232,6 +236,7 @@ export function footerAyarlariBirlestir(
     linkIkon: ham.linkIkon ?? varsayilan.linkIkon,
     marka: {
       logoGoster: ham.marka?.logoGoster ?? varsayilan.marka.logoGoster,
+      logoBoyutu: logoBoyutuNormalize(ham.marka?.logoBoyutu ?? varsayilan.marka.logoBoyutu),
       sosyalGoster: ham.marka?.sosyalGoster ?? varsayilan.marka.sosyalGoster,
       bankaLinki: { ...varsayilan.marka.bankaLinki, ...ham.marka?.bankaLinki },
       iletisimIkonlari: { ...varsayilan.marka.iletisimIkonlari, ...ham.marka?.iletisimIkonlari },

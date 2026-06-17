@@ -10,7 +10,9 @@ import { FooterKolonPanel } from '@/components/admin/footer/FooterKolonPanel';
 import { FooterAltBantPanel } from '@/components/admin/footer/FooterAltBantPanel';
 import { FooterOnizleme } from '@/components/admin/footer/FooterOnizleme';
 import { FooterYuzucuPanel } from '@/components/admin/footer/FooterYuzucuPanel';
+import { LogoBoyutSecici } from '@/components/admin/site/LogoBoyutSecici';
 import { EmojiIkonSecici } from '@/components/admin/footer/EmojiIkonSecici';
+import { logoBoyutuNormalize } from '@/types/logo';
 import { SosyalMedyaAlani } from '@/components/form/SosyalMedyaAlani';
 import {
   AdminPanelKarti,
@@ -132,6 +134,16 @@ export function FooterYonetimiFormu() {
                     footerGuncelle({ ...footer, marka: { ...footer.marka, logoGoster } })
                   }
                 />
+                {footer.marka.logoGoster && (
+                  <LogoBoyutSecici
+                    etiket="Footer logo boyutu"
+                    aciklama="Logo dosyası Site Ayarları'ndan yüklenir."
+                    deger={logoBoyutuNormalize(footer.marka.logoBoyutu)}
+                    onChange={(logoBoyutu) =>
+                      footerGuncelle({ ...footer, marka: { ...footer.marka, logoBoyutu } })
+                    }
+                  />
+                )}
                 <ToggleSatir
                   etiket="Sosyal medya ikonları"
                   acik={footer.marka.sosyalGoster}

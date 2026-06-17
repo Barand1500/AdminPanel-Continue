@@ -1,4 +1,3 @@
-import { Link } from 'react-router-dom';
 import type { SiteAyarlari } from '@/types/site';
 import type { ParaBirimiKaydi } from '@/types/header';
 import { headerAyarlariBirlestir } from '@/types/header';
@@ -13,6 +12,8 @@ import {
   platformIkonDegeri,
   sosyalMedyaLinkleri,
 } from '@/components/ortak/SosyalMedyaIkon';
+import { SiteMarkaAlani } from '@/components/ortak/SiteMarkaAlani';
+import { siteLogoUrl } from '@/types/logo';
 import { whatsappFormatla } from '@/utils/telefonFormat';
 
 interface SiteFooterProps {
@@ -31,41 +32,26 @@ function FooterMarka({
   siteAdi,
   ayarlar,
   footer,
-  headerLogo,
 }: {
   siteAdi: string;
   ayarlar?: SiteAyarlari | null;
   footer: ReturnType<typeof footerAyarlariBirlestir>;
-  headerLogo?: string | null;
 }) {
   const ikonlar = footer.marka.iletisimIkonlari;
   const banka = footer.marka.bankaLinki;
+  const logoUrl = siteLogoUrl(ayarlar);
 
   return (
     <div className="footer-marka">
       {footer.marka.logoGoster && (
-        <Link to="/" className="inline-flex items-center gap-2">
-          {headerLogo ? (
-            <img src={headerLogo} alt={siteAdi} className="h-10 w-auto" />
-          ) : (
-            <>
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-lg font-black text-white"
-                style={{
-                  background: `linear-gradient(135deg, ${ayarlar?.anaRenk ?? '#7c3aed'}, ${ayarlar?.ikincilRenk ?? '#a78bfa'})`,
-                }}
-              >
-                G
-              </div>
-              <div className="leading-none">
-                <span className="block text-lg font-black" style={{ color: 'var(--color-text)' }}>
-                  güzel
-                </span>
-                <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-primary">Teknoloji</span>
-              </div>
-            </>
-          )}
-        </Link>
+        <SiteMarkaAlani
+          siteAdi={siteAdi}
+          logoUrl={logoUrl}
+          logoBoyutu={footer.marka.logoBoyutu}
+          yer="footer"
+          anaRenk={ayarlar?.anaRenk}
+          ikincilRenk={ayarlar?.ikincilRenk}
+        />
       )}
 
       <ul className="mt-5 space-y-3 text-sm" style={{ color: 'var(--color-footer-text)' }}>
@@ -192,7 +178,7 @@ export function SiteFooter({ siteAdi, ayarlar }: SiteFooterProps) {
   return (
     <footer className="site-footer mt-auto">
       <div className={`container-site footer-icerik ${semaSinif}`}>
-        <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} headerLogo={header.logoUrl} />
+        <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} />
         <div className="footer-kolonlar">
           <FooterKolonlar footer={footer} />
         </div>

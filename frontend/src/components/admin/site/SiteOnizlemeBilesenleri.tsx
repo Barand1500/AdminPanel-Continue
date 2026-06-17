@@ -2,6 +2,8 @@ import { useState } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
 import type { HeaderAyarlari, ParaBirimiKaydi } from '@/types/header';
 import { headerAyarlariBirlestir } from '@/types/header';
+import { SiteMarkaAlani } from '@/components/ortak/SiteMarkaAlani';
+import { siteLogoUrl } from '@/types/logo';
 import { HeaderIkon } from '@/components/ortak/HeaderIkon';
 import { SiteFooter } from '@/components/ortak/SiteFooter';
 import { KategoriModuOnizleme } from './KategoriModuOnizleme';
@@ -33,7 +35,7 @@ export function SiteHeaderOnizleme({
   ayarlar,
   headerAyarlari: headerProp,
   iletisim,
-  menuOgeleri,
+  menuOgeleri: _menuOgeleri,
 }: SiteHeaderOnizlemeProps) {
   const header = headerProp ?? headerAyarlariBirlestir(ayarlar);
   const ustBant = header.ustBant!;
@@ -63,27 +65,16 @@ export function SiteHeaderOnizleme({
         </div>
 
         <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-3 py-2">
-          <div className="flex min-w-0 flex-1 items-center gap-2 overflow-hidden">
-            {header.logoUrl ? (
-              <img src={header.logoUrl} alt={siteAdi} className="h-7 max-w-[80px] shrink-0 object-contain" />
-            ) : (
-              <span className="shrink-0 truncate text-sm font-bold text-slate-900">{siteAdi}</span>
-            )}
-            {menuOgeleri.length > 0 && (
-              <div className="hidden min-w-0 flex-1 flex-wrap items-center gap-2 sm:flex">
-                {menuOgeleri.slice(0, 5).map((oge, i) => (
-                  <span
-                    key={`${oge.yol}-${i}`}
-                    className="truncate text-[10px] font-medium text-slate-600"
-                  >
-                    {oge.baslik}
-                  </span>
-                ))}
-                {menuOgeleri.length > 5 && (
-                  <span className="text-[10px] text-slate-400">+{menuOgeleri.length - 5}</span>
-                )}
-              </div>
-            )}
+          <div className="min-w-0 flex-1 overflow-hidden">
+            <SiteMarkaAlani
+              siteAdi={siteAdi}
+              logoUrl={siteLogoUrl(ayarlar)}
+              logoBoyutu={header.logoBoyutu}
+              yer="header"
+              anaRenk={ayarlar?.anaRenk}
+              ikincilRenk={ayarlar?.ikincilRenk}
+              className="max-w-full"
+            />
           </div>
           <div className="flex shrink-0 items-center gap-1">
             <HeaderIkon ikon={ikonlar.tema.gunduz} grup="gunduz" className="h-3.5 w-3.5" />

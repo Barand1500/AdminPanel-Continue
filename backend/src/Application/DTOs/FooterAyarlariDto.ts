@@ -56,6 +56,7 @@ export const footerAyarlariSchema = z.object({
   linkIkon: z.enum(['chevron', 'ok', 'bullet', 'yok']),
   marka: z.object({
     logoGoster: z.boolean(),
+    logoBoyutu: z.enum(['kucuk', 'orta', 'buyuk']).optional(),
     sosyalGoster: z.boolean(),
     bankaLinki: z.object({
       aktif: z.boolean(),

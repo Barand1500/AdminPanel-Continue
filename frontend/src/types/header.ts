@@ -1,3 +1,6 @@
+import type { LogoBoyutu } from './logo';
+import { logoBoyutuNormalize } from './logo';
+
 export type KurTipi = 'doviz_alis' | 'doviz_satis' | 'efektif_alis' | 'efektif_satis';
 
 export const KATEGORI_ACILIS_MODLARI = ['dropdown', 'sidebar', 'liste'] as const;
@@ -49,7 +52,9 @@ export interface UstMenuOgesi {
 
 export interface HeaderAyarlari {
   slogan?: string | null;
+  /** @deprecated Site Ayarları logoUrl kullanın */
   logoUrl?: string | null;
+  logoBoyutu?: LogoBoyutu;
   ustBant?: {
     telefonGoster: boolean;
     emailGoster: boolean;
@@ -120,6 +125,7 @@ export function varsayilanHeaderAyarlari(
       legacy?.slogan ??
       'Teknolojinin en güzel hali — güvenli, hızlı ve uygun fiyatlı.',
     logoUrl: mevcut?.logoUrl ?? legacy?.logoUrl ?? null,
+    logoBoyutu: logoBoyutuNormalize(mevcut?.logoBoyutu),
     ustBant: mevcut?.ustBant ?? {
       telefonGoster: true,
       emailGoster: true,
@@ -177,8 +183,13 @@ export function headerAyarlariBirlestir(
   ayarlar?: { headerAyarlariJson?: HeaderAyarlari | null; logoUrl?: string | null; slogan?: string | null } | null
 ): HeaderAyarlari {
   const json = ayarlar?.headerAyarlariJson;
-  return varsayilanHeaderAyarlari(json ?? undefined, {
-    logoUrl: json?.logoUrl ?? ayarlar?.logoUrl,
-    slogan: json?.slogan ?? ayarlar?.slogan,
+  const birlestirilmis = varsayilanHeaderAyarlari(json ?? undefined, {
+    logoUrl: ayarlar?.logoUrl ?? json?.logoUrl,
+    slogan: ayarlar?.slogan ?? json?.slogan,
   });
+  return {
+    ...birlestirilmis,
+    logoUrl: ayarlar?.logoUrl ?? json?.logoUrl ?? null,
+    logoBoyutu: logoBoyutuNormalize(json?.logoBoyutu ?? birlestirilmis.logoBoyutu),
+  };
 }

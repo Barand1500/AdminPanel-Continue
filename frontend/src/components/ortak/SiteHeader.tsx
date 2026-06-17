@@ -3,10 +3,12 @@ import { useState } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
 import { headerAyarlariBirlestir } from '@/types/header';
 import type { ParaBirimiKaydi } from '@/types/header';
+import { siteLogoUrl } from '@/types/logo';
 import { KategoriMenu } from './KategoriMenu';
 import { TemaToggle } from './TemaToggle';
 import { HeaderIkon } from './HeaderIkon';
 import { MenuNavLink } from './MenuNavLink';
+import { SiteMarkaAlani } from './SiteMarkaAlani';
 
 interface SiteHeaderProps {
   siteAdi: string;
@@ -37,6 +39,7 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
   const kurlar = (header.kurlar ?? []).filter((k) => k.kod !== 'TRY').sort((a, b) => a.sira - b.sira);
   const anaRenk = ayarlar?.anaRenk ?? '#7c3aed';
   const ikincilRenk = ayarlar?.ikincilRenk ?? '#a78bfa';
+  const logoUrl = siteLogoUrl(ayarlar);
 
   return (
     <>
@@ -68,30 +71,15 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
 
       <header className="site-header sticky top-0 z-40 border-b shadow-sm">
         <div className="container-site flex h-16 items-center justify-between gap-4">
-          <Link to="/" className="flex shrink-0 items-center gap-2">
-            {header.logoUrl ? (
-              <img src={header.logoUrl} alt={siteAdi} className="h-10 w-auto" />
-            ) : (
-              <>
-                <div
-                  className="flex h-10 w-10 items-center justify-center rounded-xl text-lg font-black text-white shadow-md"
-                  style={{
-                    background: `linear-gradient(135deg, ${anaRenk}, ${ikincilRenk})`,
-                  }}
-                >
-                  {siteAdi.charAt(0).toUpperCase()}
-                </div>
-                <div className="leading-none">
-                  <span className="block text-xl font-black tracking-tight" style={{ color: 'var(--color-text)' }}>
-                    {siteAdi.split(' ')[0]?.toLowerCase() ?? siteAdi}
-                  </span>
-                  <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary">
-                    {siteAdi.split(' ').slice(1).join(' ') || 'Teknoloji'}
-                  </span>
-                </div>
-              </>
-            )}
-          </Link>
+          <SiteMarkaAlani
+            siteAdi={siteAdi}
+            logoUrl={logoUrl}
+            logoBoyutu={header.logoBoyutu}
+            yer="header"
+            anaRenk={anaRenk}
+            ikincilRenk={ikincilRenk}
+            className="max-w-[min(100%,280px)] sm:max-w-xs"
+          />
 
           <nav className="hidden items-center gap-5 lg:flex">
             {menuOgeleri.map((oge, i) => (

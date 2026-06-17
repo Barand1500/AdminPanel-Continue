@@ -59,6 +59,7 @@ async function main() {
         siteId: site.id,
         anaRenk: '#7c3aed',
         ikincilRenk: '#a78bfa',
+        temaAyarlariJson: { gunduzSablon: 'mor', geceSablon: 'midnight' },
         slogan: 'Teknolojinin en güzel hali — güvenilir kurumsal çözümler.',
         telifYazisi: `© ${new Date().getFullYear()} Güzel Teknoloji. Tüm hakları saklıdır.`,
         telefon: '+90 212 000 00 00',

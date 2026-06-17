@@ -102,6 +102,7 @@ model SiteAyarlari {
   footerAyarlariJson Json?
   blogAyarlariJson   Json?
   rolTanimlariJson   Json?
+  temaAyarlariJson   Json?
 
   @@map("site_ayarlari")
 }
