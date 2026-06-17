@@ -4,6 +4,7 @@ import { SiteDilProvider } from '@/contexts/SiteDilContext';
 import { SiteHeader } from '@/components/ortak/SiteHeader';
 import { SiteFooter } from '@/components/ortak/SiteFooter';
 import { BakimEkrani } from '@/components/ortak/BakimEkrani';
+import { SiteKapaliEkrani } from '@/components/ortak/SiteKapaliEkrani';
 import { FloatingButonlar } from '@/components/eticaret/FloatingButonlar';
 import { SiteTemaProvider } from '@/contexts/SiteTemaContext';
 import { SiteAuthProvider } from '@/contexts/SiteAuthContext';
@@ -12,7 +13,7 @@ import { useSiteTemaUygula } from '@/hooks/useSiteTemaUygula';
 import { headerAyarlariBirlestir } from '@/types/header';
 import { headerMenuOlustur } from '@/utils/menuYardimci';
 import { varsayilanSayfa404 } from '@/types/sistemAyarlari';
-import { bakimModuAktifMi, sistemAyarlariCoz } from '@/utils/sistemAyarlariYardimci';
+import { bakimModuAktifMi, siteKapaliMi, sistemAyarlariCoz } from '@/utils/sistemAyarlariYardimci';
 
 function SiteLayoutIcerik() {
   const { veri, yukleniyor } = useSiteVerisi();
@@ -39,6 +40,10 @@ function SiteLayoutIcerik() {
         </div>
       </div>
     );
+  }
+
+  if (siteKapaliMi(site)) {
+    return <SiteKapaliEkrani siteAdi={site.ad} ayarlar={site.ayarlar} />;
   }
 
   if (bakimModuAktifMi(site.ayarlar)) {

@@ -64,6 +64,7 @@ html:has(.admin-panel[data-tema='acik']) body {
   background-color: var(--ap-header-bg);
   border-color: var(--ap-border);
   color: var(--ap-text);
+  overflow: hidden;
 }
 
 .admin-panel .ap-footer {
@@ -479,7 +480,42 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 /* Ust sekme kaydirma oklari */
 .ap-sekme-scroll-wrap {
+  display: flex;
   min-width: 0;
+  height: 100%;
+  flex: 1;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.ap-sekme-scroll-track {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  align-items: flex-end;
+  overflow: hidden;
+}
+
+.ap-sekme-scroll {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: 0.25rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding-left: 0.25rem;
+  padding-right: 0.25rem;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.ap-sekme-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
 }
 
 .ap-sekme-scroll-btn {
@@ -514,17 +550,26 @@ html:has(.admin-panel[data-tema='acik']) body {
   right: 0;
 }
 
-.ap-sekme-scroll-wrap .ap-scroll {
+.ap-sekme-scroll-wrap:has(.ap-sekme-arama) .ap-sekme-scroll-sag {
+  right: 0;
+}
+
+.ap-sekme-scroll-wrap .ap-sekme-scroll {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
 }
 
-.ap-sekme-scroll-wrap:has(.ap-sekme-scroll-sol) .ap-scroll {
+.ap-sekme-scroll-wrap:has(.ap-sekme-scroll-sol) .ap-sekme-scroll {
   padding-left: 1.75rem;
 }
 
-.ap-sekme-scroll-wrap:has(.ap-sekme-scroll-sag) .ap-scroll {
+.ap-sekme-scroll-wrap:has(.ap-sekme-scroll-sag) .ap-sekme-scroll-track:has(.ap-sekme-scroll-sag) .ap-sekme-scroll {
   padding-right: 1.75rem;
+}
+
+.ap-sekme-onizleme-alan {
+  min-height: 3rem;
+  overflow: hidden;
 }
 
 /* Modul kabuk ve kartlar */
@@ -560,6 +605,19 @@ html:has(.admin-panel[data-tema='acik']) body {
   padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--ap-border);
   background-color: color-mix(in srgb, var(--ap-surface-2) 40%, transparent);
+}
+
+.ap-panel-kart-baslik--aksiyonlu {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ap-site-header-onizleme .site-header {
+  position: relative;
+  top: auto;
 }
 
 .ap-panel-kart-icerik {
@@ -5611,8 +5669,15 @@ html:has(.admin-panel[data-tema='acik']) body {
 /* Sekme çubuğu arama */
 .ap-sekme-arama {
   position: relative;
+  z-index: 3;
+  flex-shrink: 0;
   align-self: flex-end;
   margin: 0 0.5rem 0.125rem;
+}
+
+.ap-sekme-arama-input-mod {
+  display: flex;
+  align-items: flex-end;
 }
 
 .ap-sekme-arama-ikon-btn {

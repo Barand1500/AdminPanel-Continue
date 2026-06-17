@@ -37,17 +37,22 @@ export function AdminPanelKarti({
   children,
   baslik,
   altBaslik,
+  ustAksiyon,
 }: {
   children: ReactNode;
   baslik?: string;
   altBaslik?: string;
+  ustAksiyon?: ReactNode;
 }) {
   return (
     <div className="ap-panel-kart">
-      {(baslik || altBaslik) && (
-        <div className="ap-panel-kart-baslik">
-          {baslik && <h2 className="ap-heading text-sm font-semibold">{baslik}</h2>}
-          {altBaslik && <p className="ap-muted text-xs">{altBaslik}</p>}
+      {(baslik || altBaslik || ustAksiyon) && (
+        <div className="ap-panel-kart-baslik ap-panel-kart-baslik--aksiyonlu">
+          <div className="min-w-0">
+            {baslik && <h2 className="ap-heading text-sm font-semibold">{baslik}</h2>}
+            {altBaslik && <p className="ap-muted text-xs">{altBaslik}</p>}
+          </div>
+          {ustAksiyon && <div className="ap-panel-kart-ust-aksiyon shrink-0">{ustAksiyon}</div>}
         </div>
       )}
       <div className="ap-panel-kart-icerik">{children}</div>

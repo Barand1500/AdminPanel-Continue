@@ -9,9 +9,9 @@ interface GuvenSeritProps {
 
 function KartSarmalayici({ kart, children }: { kart: HeroKart; children: ReactNode }) {
   const link = kart.link?.trim();
-  if (!link) return <>{children}</>;
+  const sinif = 'guven-serit-kart';
+  if (!link) return <div className={sinif}>{children}</div>;
 
-  const sinif = 'flex items-center gap-3 transition hover:opacity-90';
   if (link.startsWith('http')) {
     return (
       <a href={link} target="_blank" rel="noreferrer" className={sinif}>
@@ -35,29 +35,31 @@ export function GuvenSerit({ heroJson }: GuvenSeritProps) {
   }
 
   const kartlar = [...hero.kartlar].sort((a, b) => a.sira - b.sira);
-  const kolonSinifi =
-    kartlar.length === 1
-      ? 'grid-cols-1'
-      : kartlar.length === 2
-        ? 'grid-cols-2'
-        : kartlar.length === 3
-          ? 'grid-cols-2 sm:grid-cols-3'
-          : 'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4';
+  const listeSinifi =
+    kartlar.length >= 4
+      ? 'guven-serit-liste guven-serit-liste-dort'
+      : kartlar.length === 3
+        ? 'guven-serit-liste guven-serit-liste-uc'
+        : 'guven-serit-liste';
 
   return (
     <section className="guven-serit border-y border-primary/10 bg-white">
-      <div className={`container-site grid gap-4 py-6 ${kolonSinifi}`}>
-        {kartlar.map((o) => (
-          <KartSarmalayici key={o.id} kart={o}>
-            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-lg">
-              {o.ikon}
-            </span>
-            <div className="min-w-0">
-              <p className="truncate text-xs font-bold text-slate-900 sm:text-sm">{o.baslik}</p>
-              <p className="truncate text-[10px] text-slate-500 sm:text-xs">{o.aciklama}</p>
-            </div>
-          </KartSarmalayici>
-        ))}
+      <div className="container-site guven-serit-icerik">
+        <ul className={listeSinifi}>
+          {kartlar.map((o) => (
+            <li key={o.id}>
+              <KartSarmalayici kart={o}>
+                <span className="guven-serit-ikon" aria-hidden>
+                  {o.ikon}
+                </span>
+                <div className="guven-serit-metin min-w-0">
+                  <p className="guven-serit-baslik">{o.baslik}</p>
+                  <p className="guven-serit-aciklama">{o.aciklama}</p>
+                </div>
+              </KartSarmalayici>
+            </li>
+          ))}
+        </ul>
       </div>
     </section>
   );

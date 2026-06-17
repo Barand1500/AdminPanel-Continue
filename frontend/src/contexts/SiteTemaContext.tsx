@@ -43,6 +43,12 @@ export function SiteTemaProvider({ children }: { children: ReactNode }) {
 
 export function useSiteTema() {
   const ctx = useContext(SiteTemaContext);
-  if (!ctx) throw new Error('useSiteTema SiteTemaProvider icinde kullanilmali');
+  if (!ctx) {
+    return {
+      tema: 'acik' as SiteTema,
+      koyuMu: false,
+      temaDegistir: () => {},
+    };
+  }
   return ctx;
 }

@@ -58,6 +58,36 @@ export function SistemAyarlariSayfasi() {
     }
   }, [form, dilAyarla, cevirileriAyarla]);
 
+  const siteAktifToggle = useCallback(
+    async (aktif: boolean) => {
+      const onceki = form;
+      const guncel = { ...form, siteAktif: aktif };
+      setForm(guncel);
+
+      setKaydediliyor(true);
+      setHata('');
+      setBasari('');
+      try {
+        const veri = await sistemAyarlariGuncelle(guncel);
+        setBasari(aktif ? 'Site yayına alındı.' : 'Site kapatıldı. Ziyaretçiler erişemez.');
+        setSiteAdi(veri.site.ad);
+        setSiteSlug(veri.site.slug);
+        setSurum(veri.surum);
+        const yeniForm = sistemdenForm(veri.site, veri.sistem);
+        setForm(yeniForm);
+        dilAyarla(yeniForm.panelDili);
+        cevirileriAyarla(yeniForm.panelCeviriler);
+        siteVerisiGuncellendiYayinla();
+      } catch (err) {
+        setForm(onceki);
+        setHata(err instanceof Error ? err.message : 'Site durumu güncellenemedi');
+      } finally {
+        setKaydediliyor(false);
+      }
+    },
+    [form, dilAyarla, cevirileriAyarla]
+  );
+
   const bakimModuToggle = useCallback(async () => {
     const yeniBakim = !form.bakimModu;
     const guncel = { ...form, bakimModu: yeniBakim };
@@ -137,7 +167,14 @@ export function SistemAyarlariSayfasi() {
               baslik={SEKME_BASLIK[sekme]}
               altBaslik={SEKME_ALT[sekme]}
             >
-              {sekme === 'genel' && <SistemGenelSekme form={form} onChange={setForm} />}
+              {sekme === 'genel' && (
+                <SistemGenelSekme
+                  form={form}
+                  onChange={setForm}
+                  onSiteAktifDegis={siteAktifToggle}
+                  siteAktifKaydediliyor={kaydediliyor}
+                />
+              )}
               {sekme === 'bakim' && <SistemBakimSekme form={form} onChange={setForm} siteAdi={siteAdi} />}
               {sekme === 'sayfa404' && <Sistem404Sekme form={form} sayfalar={sayfalar} onChange={setForm} />}
               {sekme === 'dil' && <PanelDilSekme form={form} onChange={setForm} />}

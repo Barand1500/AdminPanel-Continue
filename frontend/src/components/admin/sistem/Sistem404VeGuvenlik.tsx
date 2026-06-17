@@ -25,7 +25,7 @@ export function Sistem404Sekme({
     <div className="space-y-6">
       <AdminPanelKarti baslik="404 İçeriği" altBaslik="Sayfa bulunamadığında gösterilecek metinler">
         <div className="space-y-5">
-          <div className="grid gap-5 lg:grid-cols-2">
+          <div className="grid gap-5 lg:grid-cols-2 lg:items-end">
             <FormAlani etiket="Başlık">
               <input
                 className={formInputSinifi}

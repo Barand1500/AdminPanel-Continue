@@ -1,4 +1,5 @@
 import type { CSSProperties } from 'react';
+import { Link } from 'react-router-dom';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import type { HeaderAyarlari } from '@/types/header';
 import { ustMenuOgeleriOlustur } from '@/utils/menuYardimci';
@@ -30,20 +31,18 @@ export function SiteOnizlemePaneli({ tip, siteAd, headerAyarlari, iletisim }: Si
     <AdminPanelKarti
       baslik="Canlı Önizleme"
       altBaslik="Form değişiklikleri anında yansır — Kaydet ile public site güncellenir"
-    >
-      <div className="mb-3 flex justify-end">
-        <a
-          href="/"
+      ustAksiyon={
+        <Link
+          to="/"
           target="_blank"
-          rel="noreferrer"
-          className="rounded-lg border border-[var(--ap-border)] px-3 py-1.5 text-xs font-medium text-[var(--ap-accent)] transition hover:bg-[var(--ap-hover)]"
+          className="text-xs text-blue-400 hover:underline"
         >
           Public siteyi aç →
-        </a>
-      </div>
-
+        </Link>
+      }
+    >
       <div
-        className={`rounded-lg border border-[var(--ap-border)] bg-white ${
+        className={`site-public rounded-lg border border-[var(--ap-border)] ${
           tip === 'header' ? 'overflow-hidden' : 'ap-scroll max-h-[70vh] overflow-y-auto overflow-x-hidden'
         }`}
         style={onizlemeStili}

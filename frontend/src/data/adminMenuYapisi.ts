@@ -41,6 +41,19 @@ export function modulBul(id: string): AdminModul | undefined {
   return adminModulleri.find((m) => m.id === id) ?? adminGizliModuller.find((m) => m.id === id);
 }
 
+/** /gt-admin/... yolundan modül bulur (iç linkler için) */
+export function modulYolundanBul(pathname: string): AdminModul | undefined {
+  const normalized = pathname.replace(/\/+$/, '') || '/gt-admin';
+  const tumModuller = [...adminModulleri, ...adminGizliModuller];
+  return tumModuller
+    .slice()
+    .sort((a, b) => b.yol.length - a.yol.length)
+    .find((m) => {
+      const yol = m.yol.replace(/\/+$/, '') || '/gt-admin';
+      return normalized === yol;
+    });
+}
+
 export function modulAra(terim: string): AdminModul[] {
   const q = terim.toLowerCase().trim();
   if (!q) return adminModulleri;

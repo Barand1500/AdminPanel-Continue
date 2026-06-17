@@ -1,4 +1,4 @@
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminSekmeler } from '@/hooks/useAdminSekmeler';
@@ -10,7 +10,7 @@ import { SiteAyarlariProvider } from '@/contexts/SiteAyarlariContext';
 import { AdminTemaProvider, useAdminTema } from '@/contexts/AdminTemaContext';
 import { AdminHeader } from './AdminHeader';
 import { AltAksiyonCubugu } from './AltAksiyonCubugu';
-import { modulBul } from '@/data/adminMenuYapisi';
+import { modulBul, modulYolundanBul } from '@/data/adminMenuYapisi';
 import { AdminModulIcerik } from './AdminModulIcerik';
 import { adminLogApi } from '@/features/admin/adminSistemApi';
 import { GirisSayfasi } from '@/pages/admin/GirisSayfasi';
@@ -18,7 +18,7 @@ import { ModulRehberSistemi } from '@/components/admin/ortak/ModulRehberSistemi'
 import { PanelDilKabuk } from '@/components/admin/PanelDilKabuk';
 import { sekmeAyarlariOku } from '@/utils/sekmePanelAyarlari';
 import { kisayolAyarlariOku, klavyeOlayiEslesir } from '@/utils/kisayolAyarlari';
-import type { AdminSekme } from '@/types/admin';
+import type { AdminModul, AdminSekme } from '@/types/admin';
 import '@/styles/adminTema.css';
 
 const SITE_YONETIMI_MODULLERI = new Set(['header', 'hero', 'footer']);
@@ -44,6 +44,8 @@ function AdminPanelGovde() {
 
   const { tema } = useAdminTema();
   const { focusModulId, setFocusModulId, aksiyonCalistir } = useAdminAksiyon();
+  const location = useLocation();
+  const navigate = useNavigate();
   const aksiyonlar = useAksiyonCubugu(focusModulId);
   const [sekmeAyarlari, setSekmeAyarlari] = useState(sekmeAyarlariOku);
   const [ayriPencereler, setAyriPencereler] = useState<AyriPencere[]>([]);
@@ -105,10 +107,35 @@ function AdminPanelGovde() {
     return () => window.removeEventListener('keydown', tusHandler);
   }, [aksiyonCalistir, focusModulId]);
 
+  function modulAcHandler(modul: AdminModul) {
+    sekmeAc(modul);
+    const hedef = modul.yol.replace(/\/+$/, '') || '/gt-admin';
+    const mevcut = location.pathname.replace(/\/+$/, '') || '/gt-admin';
+    if (mevcut !== hedef) navigate(hedef);
+  }
+
   function modulSecHandler(modulId: string) {
     const modul = modulBul(modulId);
-    if (modul) sekmeAc(modul);
+    if (modul) modulAcHandler(modul);
   }
+
+  function sekmeSecHandler(sekmeId: string) {
+    setAktifSekmeId(sekmeId);
+    const sekme = sekmeler.find((s) => s.id === sekmeId);
+    const modul = sekme ? modulBul(sekme.modulId) : undefined;
+    if (!modul) return;
+    const hedef = modul.yol.replace(/\/+$/, '') || '/gt-admin';
+    const mevcut = location.pathname.replace(/\/+$/, '') || '/gt-admin';
+    if (mevcut !== hedef) navigate(hedef);
+  }
+
+  useEffect(() => {
+    const modul = modulYolundanBul(location.pathname);
+    if (!modul) return;
+    const aktifModulId = sekmeler.find((s) => s.id === aktifSekmeId)?.modulId;
+    if (aktifModulId === modul.id) return;
+    sekmeAc(modul);
+  }, [location.pathname, aktifSekmeId, sekmeler, sekmeAc]);
 
   async function logKaydet(islem: string, modulId?: string, aksiyonId?: string) {
     try {
@@ -148,7 +175,7 @@ function AdminPanelGovde() {
   }
 
   function pencereDock(sekmeId: string) {
-    setAktifSekmeId(sekmeId);
+    sekmeSecHandler(sekmeId);
     pencereKapat(sekmeId);
   }
 
@@ -170,11 +197,11 @@ function AdminPanelGovde() {
       <AdminHeader
         sekmeler={sekmeler}
         aktifSekmeId={aktifSekmeId}
-        onSekmeSec={setAktifSekmeId}
+        onSekmeSec={sekmeSecHandler}
         onSekmeKapat={sekmeKapat}
         onSekmeTasi={sekmeTasi}
         onSekmeBirlestir={sekmeBirlestir}
-        onModulSec={sekmeAc}
+        onModulSec={modulAcHandler}
         onSekmeAyir={sekmeAyarlari.surukleAyirPencere ? sekmeAyir : undefined}
       />
 

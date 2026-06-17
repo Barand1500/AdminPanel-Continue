@@ -59,6 +59,7 @@ export class SiteService {
         id: site.id,
         ad: site.ad,
         slug: site.slug,
+        aktif: site.aktif,
         ayarlar: site.siteAyarlari
           ? {
               ...site.siteAyarlari,

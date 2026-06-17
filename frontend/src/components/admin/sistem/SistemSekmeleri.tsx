@@ -206,17 +206,31 @@ export function PanelDilSekme({ form, onChange }: PanelDilEditorProps) {
 export function SistemGenelSekme({
   form,
   onChange,
+  onSiteAktifDegis,
+  siteAktifKaydediliyor,
 }: {
   form: SistemAyarlariForm;
   onChange: (f: SistemAyarlariForm) => void;
+  onSiteAktifDegis?: (aktif: boolean) => void;
+  siteAktifKaydediliyor?: boolean;
 }) {
   return (
     <div className="space-y-4">
       <DurumAnahtari
         etiket="Site Aktif"
-        aciklama="Kapalıyken ziyaretçiler siteye erişemez. Admin paneli etkilenmez."
+        aciklama={
+          siteAktifKaydediliyor
+            ? 'Kaydediliyor...'
+            : 'Kapalıyken ziyaretçiler siteye erişemez. Admin paneli etkilenmez.'
+        }
         acik={form.siteAktif}
-        onChange={(v) => onChange({ ...form, siteAktif: v })}
+        onChange={(v) => {
+          if (onSiteAktifDegis) {
+            onSiteAktifDegis(v);
+            return;
+          }
+          onChange({ ...form, siteAktif: v });
+        }}
         ikon="🌐"
       />
       <FormAlani etiket="Özel Domain" aciklama="Canlı yayında kullanılacak alan adı">

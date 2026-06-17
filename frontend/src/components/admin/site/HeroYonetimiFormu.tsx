@@ -74,7 +74,13 @@ function HeroOnizleme({ hero, seciliSlide }: { hero: HeroAyarlari; seciliSlide: 
 
   const kartSayisi = hero.kartlarAktif ? hero.kartlar.length : 0;
   const kartKolon =
-    kartSayisi <= 1 ? 'grid-cols-1' : kartSayisi === 2 ? 'grid-cols-2' : kartSayisi === 3 ? 'grid-cols-3' : 'grid-cols-2';
+    kartSayisi <= 1
+      ? 'grid-cols-1 justify-items-center'
+      : kartSayisi === 2
+        ? 'grid-cols-2 justify-items-center'
+        : kartSayisi === 3
+          ? 'grid-cols-3 justify-items-center'
+          : 'grid-cols-2 sm:grid-cols-4 justify-items-center';
 
   return (
     <div className="xl:sticky xl:top-4">

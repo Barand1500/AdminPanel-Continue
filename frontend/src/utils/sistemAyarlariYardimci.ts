@@ -30,3 +30,7 @@ export function sistemAyarlariCoz(ayarlar: SiteAyarlari | null | undefined): Sis
 export function bakimModuAktifMi(ayarlar: SiteAyarlari | null | undefined) {
   return sistemAyarlariCoz(ayarlar).bakimModu === true;
 }
+
+export function siteKapaliMi(site: { aktif?: boolean } | null | undefined) {
+  return site?.aktif === false;
+}

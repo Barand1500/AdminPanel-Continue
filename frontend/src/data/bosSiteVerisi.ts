@@ -6,6 +6,7 @@ export const bosSiteVerisi: SitePublicData = {
     id: '',
     ad: 'Güzel Teknoloji',
     slug: 'demo',
+    aktif: true,
     ayarlar: {
       anaRenk: '#7c3aed',
       ikincilRenk: '#a78bfa',

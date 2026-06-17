@@ -317,53 +317,55 @@ export function UstSekmeCubugu({
   };
 
   return (
-    <div className="ap-sekme-scroll-wrap relative flex min-w-0 flex-1 items-end" style={tabCss}>
-      {solOk && (
-        <button type="button" className="ap-sekme-scroll-btn ap-sekme-scroll-sol" onClick={() => kaydir('sol')} aria-label="Sola">
-          ‹
-        </button>
-      )}
+    <div className="ap-sekme-scroll-wrap" style={tabCss}>
+      <div className="ap-sekme-scroll-track">
+        {solOk && (
+          <button type="button" className="ap-sekme-scroll-btn ap-sekme-scroll-sol" onClick={() => kaydir('sol')} aria-label="Sola">
+            ‹
+          </button>
+        )}
 
-      <div ref={scrollRef} className="ap-scroll flex min-w-0 flex-1 items-end gap-1 overflow-x-auto px-2 pb-0">
-        {ogeler.map((oge) => {
-          if (oge.tip === 'tek') {
-            return (
-              <SekmeButonu
-                key={oge.sekme.id}
-                sekme={oge.sekme}
-                aktif={oge.sekme.id === aktifSekmeId}
-                {...ortakSekmeProps}
-              />
-            );
-          }
-
-          return (
-            <div
-              key={oge.grupId}
-              className="flex shrink-0 items-end rounded-t-lg border border-b-0 border-[var(--ap-border)] bg-[var(--ap-tab-idle)] p-0.5 shadow-sm"
-            >
-              {oge.sekmeler.map((sekme) => (
+        <div ref={scrollRef} className="ap-sekme-scroll">
+          {ogeler.map((oge) => {
+            if (oge.tip === 'tek') {
+              return (
                 <SekmeButonu
-                  key={sekme.id}
-                  sekme={sekme}
-                  aktif={sekme.id === aktifSekmeId}
-                  gruplu
+                  key={oge.sekme.id}
+                  sekme={oge.sekme}
+                  aktif={oge.sekme.id === aktifSekmeId}
                   {...ortakSekmeProps}
                 />
-              ))}
-            </div>
-          );
-        })}
+              );
+            }
+
+            return (
+              <div
+                key={oge.grupId}
+                className="flex shrink-0 items-end rounded-t-lg border border-b-0 border-[var(--ap-border)] bg-[var(--ap-tab-idle)] p-0.5 shadow-sm"
+              >
+                {oge.sekmeler.map((sekme) => (
+                  <SekmeButonu
+                    key={sekme.id}
+                    sekme={sekme}
+                    aktif={sekme.id === aktifSekmeId}
+                    gruplu
+                    {...ortakSekmeProps}
+                  />
+                ))}
+              </div>
+            );
+          })}
+        </div>
+
+        {sagOk && (
+          <button type="button" className="ap-sekme-scroll-btn ap-sekme-scroll-sag" onClick={() => kaydir('sag')} aria-label="Sağa">
+            ›
+          </button>
+        )}
       </div>
 
       {ayarlar.sekmeAramaAktif && onModulSec && (
         <SekmeCubuguArama gorunum={ayarlar.sekmeAramaGorunum} onModulSec={onModulSec} />
-      )}
-
-      {sagOk && (
-        <button type="button" className="ap-sekme-scroll-btn ap-sekme-scroll-sag" onClick={() => kaydir('sag')} aria-label="Sağa">
-          ›
-        </button>
       )}
     </div>
   );

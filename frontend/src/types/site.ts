@@ -77,6 +77,7 @@ export interface SitePublicData {
     id: string;
     ad: string;
     slug: string;
+    aktif?: boolean;
     ayarlar: SiteAyarlari | null;
   };
   sayfalar: Sayfa[];
