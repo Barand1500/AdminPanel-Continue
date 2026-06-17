@@ -28,6 +28,7 @@ import {
 } from './widgetRegistry';
 import { WidgetTipSecici } from './WidgetTipSecici';
 import { yerlesimEtiketi, yerlesimOku } from '@/utils/widgetYerlesim';
+import { siraCakismasiBul } from '@/utils/widgetSiraYardimci';
 
 export {
   WIDGET_TIPLERI,
@@ -189,6 +190,10 @@ export function WidgetEditorPanel({
 
   const seciliTipMeta = WIDGET_TIPLERI.find((t) => t.id === form.tip);
   const IcerikPanel = ICERIK_PANEL_MAP[form.tip];
+  const siraCakisma = useMemo(
+    () => siraCakismasiBul(tumWidgetlar, form.sira, seciliWidget?.id),
+    [tumWidgetlar, form.sira, seciliWidget?.id]
+  );
 
   return (
     <div className="ap-editor-panel">
@@ -271,15 +276,22 @@ export function WidgetEditorPanel({
                   )}
                 </FormAlani>
               )}
-              <FormAlani etiket="Sıra" aciklama="Küçük numara önce render edilir">
+              <FormAlani etiket="Sıra" aciklama="Küçük numara önce render edilir. Yeni widgetlarda otomatik atanır.">
                 <input
                   type="number"
-                  min={0}
+                  min={1}
                   className={`${formInputSinifi} max-w-[120px]`}
                   value={form.sira}
                   onChange={(e) => onChange({ ...form, sira: Number(e.target.value) })}
                 />
               </FormAlani>
+              {siraCakisma && (
+                <div className="ap-sira-uyari" role="alert">
+                  <strong>⚠️ Sıra çakışması:</strong> Sıra <strong>{form.sira}</strong> zaten{' '}
+                  <strong>&quot;{siraCakisma.ad}&quot;</strong> ({tipEtiketi(siraCakisma.tip)}) widgetında kullanılıyor.
+                  Lütfen birinin sırasını değiştirin, aksi halde görüntüleme sırası belirsiz olur.
+                </div>
+              )}
               <AdminAnahtarDugme etiket="Aktif" acik={form.aktif} onDegistir={(v) => onChange({ ...form, aktif: v })} />
             </AdminFormBolumu>
 

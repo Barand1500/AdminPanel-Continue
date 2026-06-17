@@ -526,3 +526,79 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   min-height: 1rem;
 }
 
+/* Görsel Grid Bloğu — sol panel filtre dropdown */
+.gorsel-grid-filtre-tus {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-radius: 0.5rem;
+  border: 2px solid var(--color-primary, #0d9488);
+  background: #fff;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #1e293b;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.gorsel-grid-filtre-tus:hover {
+  box-shadow: 0 2px 8px rgba(13, 148, 136, 0.15);
+}
+
+.gorsel-grid-filtre-ok {
+  flex-shrink: 0;
+  font-size: 1rem;
+  color: var(--color-primary, #0d9488);
+  transition: transform 0.2s;
+}
+
+.gorsel-grid-filtre-ok-acik {
+  transform: rotate(180deg);
+}
+
+.gorsel-grid-filtre-liste {
+  position: absolute;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  margin: 0.375rem 0 0;
+  max-height: 16rem;
+  overflow-y: auto;
+  list-style: none;
+  border-radius: 0.5rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  padding: 0.25rem 0;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.12);
+}
+
+.gorsel-grid-filtre-oge {
+  display: block;
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 0.625rem 1rem;
+  text-align: left;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: #334155;
+  cursor: pointer;
+}
+
+.gorsel-grid-filtre-oge:hover {
+  background: #f8fafc;
+}
+
+.gorsel-grid-filtre-oge-aktif {
+  background: color-mix(in srgb, var(--color-primary, #0d9488) 10%, #fff);
+  color: var(--color-primary, #0d9488);
+}
+

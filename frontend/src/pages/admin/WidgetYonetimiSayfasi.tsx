@@ -64,11 +64,11 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
 
   const yeniBaslat = useCallback(() => {
     setSeciliId(null);
-    setForm(varsayilanWidgetForm(varsayilanTip ?? 'SLIDER'));
+    setForm(varsayilanWidgetForm(varsayilanTip ?? 'SLIDER', widgetlar));
     setBasari('');
     setHata('');
     setOnizlemeHazir(true);
-  }, [varsayilanTip]);
+  }, [varsayilanTip, widgetlar]);
 
   const onKaydetTetikleyici = useCallback((fn: () => Promise<void>) => {
     kaydetFnRef.current = fn;
@@ -89,9 +89,10 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
     setHata('');
     try {
       await widgetSil(seciliId);
-      setWidgetlar((onceki) => onceki.filter((w) => w.id !== seciliId));
+      const kalan = widgetlar.filter((w) => w.id !== seciliId);
+      setWidgetlar(kalan);
       setSeciliId(null);
-      setForm(varsayilanWidgetForm(varsayilanTip ?? 'SLIDER'));
+      setForm(varsayilanWidgetForm(varsayilanTip ?? 'SLIDER', kalan));
       setBasari('Widget silindi.');
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Silme başarısız');

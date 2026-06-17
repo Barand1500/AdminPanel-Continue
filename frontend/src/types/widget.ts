@@ -1,12 +1,14 @@
 import type { CSSProperties } from 'react';
 import type { WidgetFormDegeri } from '@/types/admin';
 import type { Widget } from '@/types/site';
+import { onizlemeMockVerisiUygula } from '@/utils/widgetOnizlemeMock';
 
 export const DEPRECATED_WIDGET_TIPLERI = [
   'HEADER',
   'NAVBAR',
   'FOOTER',
   'URUN_LISTELEME',
+  'HERO_BANNER',
 ] as const;
 
 export const YENI_WIDGET_TIPLERI = [
@@ -24,7 +26,6 @@ export const YENI_WIDGET_TIPLERI = [
 
 export const AKTIF_WIDGET_TIPLERI = [
   'SLIDER',
-  'HERO_BANNER',
   'HIZMET_KARTLARI',
   'KATEGORI',
   'REFERANSLAR',
@@ -65,7 +66,6 @@ export const WIDGET_GORUNUM_GORSEL_TIPLERI = new Set([
   'BASLIK_METIN_GORSEL',
   'GALERI',
   'SLIDER',
-  'HERO_BANNER',
   'BLOG_KARUSEL',
   'GORSEL_GRID_BLOK',
   'GORSEL_ETIKET_KARTLARI',
@@ -174,6 +174,8 @@ export interface WidgetGorselGridKart {
   etiket: string;
   gorselUrl: string;
   link: string;
+  /** Hangi filtre kategorisine ait (ilk filtre = tümü, boş = her yerde) */
+  filtreEtiketi?: string;
 }
 
 export interface WidgetEtiketKarti {
@@ -310,7 +312,6 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     case 'BASLIK_METIN_GORSEL':
       return { yerlesim, gorunum: { ...gorunum, icerikDuzeni: 'sol' }, ek, metin: '', ikonKartlar: [] };
     case 'SLIDER':
-    case 'HERO_BANNER':
       return { yerlesim: { bolge: 'slider_alti' }, gorunum, ek, slides: [] };
     case 'HIZMET_KARTLARI':
       return { yerlesim, gorunum, ek, kartlar: [] };
@@ -367,14 +368,14 @@ export function varsayilanConfig(tip: string): WidgetConfig {
   }
 }
 
-export function formToWidgetOnizleme(form: WidgetFormDegeri, id = 'onizleme'): Widget {
+export function formToWidgetOnizleme(form: WidgetFormDegeri, id = 'onizleme', mockKullan = true): Widget {
   let configJson: Record<string, unknown> | null = null;
   try {
     configJson = JSON.parse(form.configJsonMetin || '{}') as Record<string, unknown>;
   } catch {
     configJson = {};
   }
-  return {
+  const widget: Widget = {
     id,
     ad: form.ad || 'Önizleme',
     tip: form.tip,
@@ -392,6 +393,7 @@ export function formToWidgetOnizleme(form: WidgetFormDegeri, id = 'onizleme'): W
     masaustuGoster: form.masaustuGoster,
     configJson,
   };
+  return mockKullan ? onizlemeMockVerisiUygula(widget) : widget;
 }
 
 export function widgetGorunumStili(

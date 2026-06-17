@@ -4,12 +4,13 @@ import {
   varsayilanConfig,
   type AktifWidgetTipi,
 } from '@/types/widget';
-import type { WidgetFormDegeri } from '@/types/admin';
+import type { WidgetFormDegeri, AdminWidget } from '@/types/admin';
+import { sonrakiWidgetSira } from '@/utils/widgetSiraYardimci';
 import { ICERIK_PANEL_MAP } from './panels/WidgetIcerikPanelleri';
 
 /** Widget tipi seçicide kullanılan içerik kategorileri */
 export const WIDGET_TIP_KATEGORILERI = [
-  { id: 'slider', etiket: 'Slider & Banner', aciklama: 'Kayan slaytlar ve büyük hero alanları' },
+  { id: 'slider', etiket: 'Slider', aciklama: 'Kayan slaytlar ve banner alanları' },
   { id: 'resim_metin', etiket: 'Görsel + Metin', aciklama: 'Resim ve metin birlikte (hakkımızda vb.)' },
   { id: 'metin', etiket: 'Metin', aciklama: 'Sadece başlık ve paragraf blokları' },
   { id: 'kart', etiket: 'Kart', aciklama: 'İkonlu, görselli veya fiyat kart gridleri' },
@@ -24,7 +25,6 @@ export type WidgetTipKategoriId = (typeof WIDGET_TIP_KATEGORILERI)[number]['id']
 
 export const WIDGET_TIPLERI = [
   { id: 'SLIDER', etiket: 'Slider', ikon: '🎠', aciklama: 'Kayan banner slaytları', grup: 'Anasayfa', kategori: 'slider' as const },
-  { id: 'HERO_BANNER', etiket: 'Hero Banner', ikon: '🖼️', aciklama: 'Tek büyük banner', grup: 'Anasayfa', kategori: 'slider' as const },
   { id: 'BASLIK_METIN', etiket: 'Başlık + Metin', ikon: '📝', aciklama: 'Sadece başlık ve metin bloğu', grup: 'İçerik', kategori: 'metin' as const },
   { id: 'BASLIK_METIN_GORSEL', etiket: 'Metin + Görsel', ikon: '📰', aciklama: 'Başlık, metin, görsel ve ikon kartları', grup: 'İçerik', kategori: 'resim_metin' as const },
   { id: 'HIZMET_KARTLARI', etiket: 'Hizmet Kartları', ikon: '💼', aciklama: 'İkon + başlık + açıklama + CTA kartları', grup: 'İçerik', kategori: 'kart' as const },
@@ -94,12 +94,15 @@ export function widgetTipleriKategoriyeGore(tipFiltre?: string) {
   })).filter((g) => g.tipler.length > 0);
 }
 
-export function varsayilanWidgetForm(tip: AktifWidgetTipi | string = 'SLIDER'): WidgetFormDegeri {
+export function varsayilanWidgetForm(
+  tip: AktifWidgetTipi | string = 'SLIDER',
+  widgetlar: AdminWidget[] = []
+): WidgetFormDegeri {
   const safeTip = tipOlusturulabilirMi(tip) ? tip : 'SLIDER';
   return {
     ad: '',
     tip: safeTip,
-    sira: 0,
+    sira: sonrakiWidgetSira(widgetlar),
     aktif: true,
     baslik: '',
     altBaslik: '',

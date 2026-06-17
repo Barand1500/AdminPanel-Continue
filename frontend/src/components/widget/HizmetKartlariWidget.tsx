@@ -2,7 +2,7 @@ import type { Widget } from '@/types/site';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, gridStyle } from './widgetHelpers';
 
-const ikonHaritasi: Record<string, string> = {
+const eskiIkonHaritasi: Record<string, string> = {
   globe: '🌐',
   settings: '⚙️',
   search: '🔍',
@@ -11,6 +11,11 @@ const ikonHaritasi: Record<string, string> = {
   headset: '🎧',
   wrench: '🔧',
 };
+
+function ikonGoster(ikon: string): string {
+  if (!ikon.trim()) return '📦';
+  return eskiIkonHaritasi[ikon] ?? ikon;
+}
 
 interface HizmetKartlariWidgetProps {
   widget: Widget;
@@ -41,7 +46,7 @@ export function HizmetKartlariWidget({ widget }: HizmetKartlariWidgetProps) {
       <div className="mt-10 grid gap-6" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
         {kartlar.map((kart) => (
           <article key={kart.id} className="flex flex-col rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-            <span className="text-4xl text-primary">{ikonHaritasi[kart.ikon] ?? (kart.ikon || '📦')}</span>
+            <span className="text-4xl text-primary">{ikonGoster(kart.ikon)}</span>
             <h3 className="mt-4 text-lg font-semibold text-slate-900">{kart.baslik}</h3>
             <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{kart.aciklama}</p>
             {kart.link && (

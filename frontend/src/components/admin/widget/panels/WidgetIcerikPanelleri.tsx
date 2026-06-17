@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
+import { EmojiSecici } from '@/components/form/EmojiSecici';
 import { GorselAlan } from '@/components/form/GorselAlan';
 import { AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
@@ -21,6 +22,7 @@ import {
   type WidgetSssOgesi,
 } from '@/types/widget';
 import { ListeSiralayici, SecimAlani } from './WidgetPanelOrtak';
+import { FiltreEtiketYonetici } from './FiltreEtiketYonetici';
 import type { WidgetPanelProps } from './types';
 
 function MetinAlanlari({ form, onChange, gorsel = false }: WidgetPanelProps & { gorsel?: boolean }) {
@@ -176,17 +178,23 @@ export function HizmetKartlariIcerik({ form, onChange }: WidgetPanelProps) {
       <ListeSiralayici<WidgetKartOgesi>
         ogeler={kartlar}
         onDegistir={(k) => onChange(configGuncelle(form, (c) => ({ ...c, kartlar: k })))}
-        yeniEkle={() => ({ id: uid(), baslik: '', aciklama: '', ikon: 'globe', link: '' })}
+        yeniEkle={() => ({ id: uid(), baslik: '', aciklama: '', ikon: '💼', link: '' })}
         renderOge={(k, i) => (
           <div className="grid gap-2 sm:grid-cols-2">
             <input className={formInputSinifi} placeholder="Başlık" value={k.baslik} onChange={(e) => {
               const kopya = [...kartlar]; kopya[i] = { ...k, baslik: e.target.value };
               onChange(configGuncelle(form, (c) => ({ ...c, kartlar: kopya })));
             }} />
-            <input className={formInputSinifi} placeholder="İkon (globe/search/settings)" value={k.ikon} onChange={(e) => {
-              const kopya = [...kartlar]; kopya[i] = { ...k, ikon: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, kartlar: kopya })));
-            }} />
+            <FormAlani etiket="İkon">
+              <EmojiSecici
+                deger={k.ikon}
+                onChange={(emoji) => {
+                  const kopya = [...kartlar]; kopya[i] = { ...k, ikon: emoji };
+                  onChange(configGuncelle(form, (c) => ({ ...c, kartlar: kopya })));
+                }}
+                placeholder="Emoji seçin"
+              />
+            </FormAlani>
             <textarea className={`${formInputSinifi} sm:col-span-2`} placeholder="Açıklama" rows={2} value={k.aciklama} onChange={(e) => {
               const kopya = [...kartlar]; kopya[i] = { ...k, aciklama: e.target.value };
               onChange(configGuncelle(form, (c) => ({ ...c, kartlar: kopya })));
@@ -378,6 +386,9 @@ export function LinkKartlariIcerik({ form, onChange }: WidgetPanelProps) {
 export function GorselGridBlokIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const gridKartlar = cfg.gridKartlar ?? [];
+  const filtreler = cfg.filtreler ?? [];
+  const altKategoriler = filtreler.slice(1);
+
   return (
     <AdminFormBolumu baslik="Görsel Grid Bloğu">
       <FormAlani etiket="Sol panel başlık">
@@ -386,11 +397,10 @@ export function GorselGridBlokIcerik({ form, onChange }: WidgetPanelProps) {
       <FormAlani etiket="Sol panel açıklama">
         <textarea className={formInputSinifi} rows={2} value={cfg.solAciklama ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, solAciklama: e.target.value })))} />
       </FormAlani>
-      <FormAlani etiket="Filtre etiketleri (virgülle)">
-        <input
-          className={formInputSinifi}
-          value={(cfg.filtreler ?? []).join(', ')}
-          onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, filtreler: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })))}
+      <FormAlani etiket="Filtre kategorileri" aciklama="Sitede sol panelde açılır liste olarak görünür">
+        <FiltreEtiketYonetici
+          filtreler={filtreler}
+          onChange={(yeni) => onChange(configGuncelle(form, (c) => ({ ...c, filtreler: yeni })))}
         />
       </FormAlani>
       <ListeSiralayici<WidgetGorselGridKart>
@@ -407,6 +417,25 @@ export function GorselGridBlokIcerik({ form, onChange }: WidgetPanelProps) {
               const kopya = [...gridKartlar]; kopya[i] = { ...g, etiket: e.target.value };
               onChange(configGuncelle(form, (c) => ({ ...c, gridKartlar: kopya })));
             }} />
+            {altKategoriler.length > 0 && (
+              <div>
+                <label className="mb-1 block text-xs text-[var(--ap-text-muted)]">Kategori filtresi</label>
+                <select
+                  className={formInputSinifi}
+                  value={g.filtreEtiketi ?? ''}
+                  onChange={(e) => {
+                    const kopya = [...gridKartlar];
+                    kopya[i] = { ...g, filtreEtiketi: e.target.value || undefined };
+                    onChange(configGuncelle(form, (c) => ({ ...c, gridKartlar: kopya })));
+                  }}
+                >
+                  <option value="">Tüm kategorilerde göster</option>
+                  {altKategoriler.map((f) => (
+                    <option key={f} value={f}>{f}</option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
         )}
       />
