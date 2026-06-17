@@ -1837,7 +1837,7 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 
 
-/* Dashboard ÔÇö minimal modern */
+/* Dashboard — minimal analitik */
 .ap-dash {
   width: 100%;
   max-width: none;
@@ -1850,11 +1850,266 @@ html:has(.admin-panel[data-tema='acik']) body {
   align-items: flex-start;
   justify-content: space-between;
   gap: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.75rem;
 }
 
 .ap-dash-hata {
   color: #f87171;
+}
+
+.ap-dash-ornek-not {
+  margin-bottom: 1.25rem;
+  border-radius: 0.5rem;
+  border: 1px dashed var(--ap-border);
+  background: color-mix(in srgb, var(--ap-input-bg) 80%, transparent);
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  color: var(--ap-text-muted);
+}
+
+.ap-dash-donem {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.2rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-input-bg);
+}
+
+.ap-dash-donem button {
+  border: none;
+  border-radius: 0.375rem;
+  background: transparent;
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ap-text-muted);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.ap-dash-donem button:hover {
+  color: var(--ap-heading);
+}
+
+.ap-dash-donem-aktif {
+  background: var(--ap-surface) !important;
+  color: var(--ap-heading) !important;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+}
+
+.ap-dash-kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+@media (min-width: 1024px) {
+  .ap-dash-kpi-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.ap-dash-kpi {
+  border-radius: 0.75rem;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-surface);
+  padding: 1rem 1.125rem;
+}
+
+.ap-dash-kpi-etiket {
+  font-size: 0.7rem;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ap-text-muted);
+}
+
+.ap-dash-kpi-deger {
+  margin-top: 0.35rem;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.1;
+  color: var(--ap-heading);
+}
+
+.ap-dash-kpi-alt {
+  margin-top: 0.25rem;
+  font-size: 0.7rem;
+  color: var(--ap-accent);
+}
+
+.ap-dash-analitik-grid {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+@media (min-width: 1024px) {
+  .ap-dash-analitik-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.ap-dash-panel {
+  border-radius: 0.75rem;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-surface);
+  padding: 1rem 1.125rem;
+  min-height: 12rem;
+}
+
+.ap-dash-panel-genis {
+  min-height: 14rem;
+}
+
+.ap-dash-panel-baslik {
+  margin-bottom: 0.875rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ap-heading);
+}
+
+.ap-dash-panel-bos {
+  padding: 2rem 0;
+  text-align: center;
+  font-size: 0.8125rem;
+  color: var(--ap-text-muted);
+}
+
+.ap-dash-grafik-cubuklar {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 0.35rem;
+  height: 10rem;
+}
+
+.ap-dash-grafik-sutun {
+  display: flex;
+  min-width: 0;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+  height: 100%;
+}
+
+.ap-dash-grafik-deger {
+  font-size: 0.625rem;
+  color: var(--ap-text-muted);
+}
+
+.ap-dash-grafik-track {
+  display: flex;
+  width: 100%;
+  flex: 1;
+  align-items: flex-end;
+}
+
+.ap-dash-grafik-dolgu {
+  width: 100%;
+  min-height: 4px;
+  border-radius: 0.25rem 0.25rem 0 0;
+  background: color-mix(in srgb, var(--ap-accent) 75%, transparent);
+}
+
+.ap-dash-grafik-etiket {
+  font-size: 0.625rem;
+  color: var(--ap-text-muted);
+}
+
+.ap-dash-tablo {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8125rem;
+}
+
+.ap-dash-tablo th {
+  padding: 0 0 0.5rem;
+  border-bottom: 1px solid var(--ap-border);
+  font-size: 0.65rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ap-text-muted);
+  text-align: left;
+}
+
+.ap-dash-tablo-sayisal {
+  width: 4.5rem;
+  text-align: right !important;
+}
+
+.ap-dash-tablo td {
+  padding: 0.55rem 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--ap-border) 55%, transparent);
+  vertical-align: middle;
+}
+
+.ap-dash-tablo tr:last-child td {
+  border-bottom: none;
+}
+
+.ap-dash-tablo-metin {
+  display: block;
+  margin-bottom: 0.25rem;
+  color: var(--ap-heading);
+  line-height: 1.3;
+}
+
+.ap-dash-tablo-cubuk {
+  display: block;
+  height: 3px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ap-border) 50%, transparent);
+  overflow: hidden;
+}
+
+.ap-dash-tablo-cubuk span {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ap-accent);
+  opacity: 0.65;
+}
+
+.ap-dash-buton-liste {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ap-dash-buton-ust {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  font-size: 0.75rem;
+}
+
+.ap-dash-buton-ad {
+  color: var(--ap-heading);
+}
+
+.ap-dash-buton-sayi {
+  font-weight: 600;
+  color: var(--ap-text-muted);
+}
+
+.ap-dash-buton-track {
+  height: 4px;
+  margin-top: 0.25rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ap-border) 50%, transparent);
+  overflow: hidden;
+}
+
+.ap-dash-buton-dolgu {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--ap-accent);
+  opacity: 0.7;
 }
 
 .ap-dash-bolum-baslik {
@@ -1864,6 +2119,85 @@ html:has(.admin-panel[data-tema='acik']) body {
   color: var(--ap-heading);
 }
 
+.ap-dash-hizli-bolum {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--ap-border);
+}
+
+.ap-dash-ayar-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-surface);
+  padding: 0.375rem 0.625rem;
+  font-size: 0.75rem;
+  color: var(--ap-text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.ap-dash-ayar-btn:hover {
+  border-color: var(--ap-accent);
+  color: var(--ap-heading);
+}
+
+.ap-dash-hizli-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.625rem;
+}
+
+@media (min-width: 640px) {
+  .ap-dash-hizli-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .ap-dash-hizli-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.ap-dash-hizli-oge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.875rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-surface);
+  text-align: left;
+  transition: border-color 0.15s;
+}
+
+.ap-dash-hizli-oge:hover {
+  border-color: color-mix(in srgb, var(--ap-accent) 40%, var(--ap-border));
+}
+
+.ap-dash-hizli-ikon {
+  display: flex;
+  height: 2rem;
+  width: 2rem;
+  shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  background: var(--ap-input-bg);
+  font-size: 1rem;
+}
+
+.ap-dash-hizli-baslik {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--ap-heading);
+  line-height: 1.3;
+}
+
+/* Eski dashboard stilleri (geriye uyumluluk) */
 .ap-dash-genel-grid {
   display: grid;
   gap: 1rem;
