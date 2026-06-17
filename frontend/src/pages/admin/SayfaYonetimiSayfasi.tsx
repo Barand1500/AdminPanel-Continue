@@ -62,17 +62,25 @@ export function SayfaYonetimiSayfasi() {
     setHata('');
     setBasari('');
     try {
-      if (seciliId) await adminSayfaGuncelle(seciliId, form);
-      else await adminSayfaOlustur(form);
-      setBasari(seciliId ? 'Sayfa güncellendi.' : 'Yeni sayfa oluşturuldu.');
-      yeniBaslat();
-      await yukle();
+      if (seciliId) {
+        const guncellenen = await adminSayfaGuncelle(seciliId, form);
+        setForm(sayfadanForm(guncellenen));
+        setSeciliId(guncellenen.id);
+        setBasari('Sayfa güncellendi.');
+      } else {
+        const olusturulan = await adminSayfaOlustur(form);
+        setForm(sayfadanForm(olusturulan));
+        setSeciliId(olusturulan.id);
+        setSlugManuel(true);
+        setBasari('Yeni sayfa oluşturuldu.');
+      }
+      setSayfalar(await adminSayfalariGetir());
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Kayıt başarısız');
     } finally {
       setKaydediliyor(false);
     }
-  }, [form, seciliId, yeniBaslat]);
+  }, [form, seciliId]);
 
   const yayinla = useCallback(async () => {
     const guncel = { ...form, yayinda: true };
@@ -80,17 +88,24 @@ export function SayfaYonetimiSayfasi() {
     setHata('');
     setBasari('');
     try {
-      if (seciliId) await adminSayfaGuncelle(seciliId, guncel);
-      else await adminSayfaOlustur(guncel);
+      if (seciliId) {
+        const guncellenen = await adminSayfaGuncelle(seciliId, guncel);
+        setForm(sayfadanForm(guncellenen));
+        setSeciliId(guncellenen.id);
+      } else {
+        const olusturulan = await adminSayfaOlustur(guncel);
+        setForm(sayfadanForm(olusturulan));
+        setSeciliId(olusturulan.id);
+        setSlugManuel(true);
+      }
       setBasari('Sayfa yayınlandı.');
-      yeniBaslat();
-      await yukle();
+      setSayfalar(await adminSayfalariGetir());
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Yayınlama başarısız');
     } finally {
       setKaydediliyor(false);
     }
-  }, [form, seciliId, yeniBaslat]);
+  }, [form, seciliId]);
 
   const sil = useCallback(async () => {
     if (!seciliId || !confirm('Bu sayfayı silmek istediğinize emin misiniz?')) return;

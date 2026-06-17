@@ -19,8 +19,9 @@ function SiteLayoutIcerik() {
   const headerAyarlari = headerAyarlariBirlestir(site.ayarlar);
   const menuOgeleri = headerMenuOlustur(veri.sayfalar, headerAyarlari, site.ayarlar);
   const sistem = sistemAyarlariCoz(site.ayarlar);
-  const matches = useMatches() as { handle?: { is404?: boolean } }[];
-  const is404 = matches.some((m) => m.handle?.is404);
+  const matches = useMatches() as { data?: { bulunamadi?: boolean } }[];
+  const dinamikMatch = [...matches].reverse().find((m) => typeof m.data?.bulunamadi === 'boolean');
+  const is404 = dinamikMatch?.data?.bulunamadi === true;
   const menuTipi = { ...varsayilanSayfa404, ...sistem?.sayfa404 }.menuTipi;
 
   useSiteTemaUygula(site.ayarlar, site.ad);

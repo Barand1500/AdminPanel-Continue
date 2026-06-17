@@ -1,4 +1,4 @@
-import { Navigate, Outlet, createBrowserRouter } from 'react-router-dom';
+import { Navigate, Outlet, createBrowserRouter, type LoaderFunctionArgs } from 'react-router-dom';
 import { PathNormalizer } from '@/components/ortak/PathNormalizer';
 import { SiteLayout } from '@/components/ortak/SiteLayout';
 import { AdminLayout } from '@/components/admin/AdminLayout';
@@ -14,6 +14,15 @@ import { FavorilerSayfasi } from '@/pages/FavorilerSayfasi';
 import { SepetSayfasi } from '@/pages/SepetSayfasi';
 import { BlogSayfasi } from '@/pages/BlogSayfasi';
 import { BlogDetaySayfasi } from '@/pages/BlogDetaySayfasi';
+import { sayfaDetayGetir } from '@/features/site/sayfaApi';
+
+async function dinamikSayfaLoader({ request }: LoaderFunctionArgs) {
+  const pathname = new URL(request.url).pathname.replace(/\/{2,}/g, '/');
+  const slug = pathname.replace(/^\//, '').split('/')[0] ?? '';
+  if (!slug) return { bulunamadi: true, sayfa: null };
+  const sayfa = await sayfaDetayGetir(slug);
+  return { bulunamadi: !sayfa, sayfa };
+}
 
 function RouterShell() {
   return (
@@ -52,7 +61,7 @@ export const siteRouter = createBrowserRouter([
           { path: '/hesabim/sifre', element: <HesapSifreSayfasi /> },
           { path: '/favoriler', element: <FavorilerSayfasi /> },
           { path: '/sepet', element: <SepetSayfasi /> },
-          { path: '*', element: <PublicCatchAll />, handle: { is404: true } },
+          { path: '*', loader: dinamikSayfaLoader, element: <PublicCatchAll /> },
         ],
       },
     ],

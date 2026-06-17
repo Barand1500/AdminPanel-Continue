@@ -1,6 +1,6 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { sayfaDetayGetir, type PublicSayfa } from '@/features/site/sayfaApi';
-import { sayfaIcerikHazirla } from '@/utils/sayfaIcerikIsle';
+import { SayfaShadowIcerik } from '@/components/ortak/SayfaShadowIcerik';
 import { medyaTamUrl } from '@/features/admin/medyaApi';
 
 interface SayfaModalContextDeger {
@@ -64,11 +64,7 @@ export function SayfaModalProvider({ children }: { children: ReactNode }) {
                       className="mb-4 w-full rounded-xl object-cover"
                     />
                   )}
-                  <div
-                    dangerouslySetInnerHTML={{
-                      __html: sayfaIcerikHazirla(sayfa.icerik).html,
-                    }}
-                  />
+                  {sayfa.icerik.trim() && <SayfaShadowIcerik html={sayfa.icerik} />}
                 </>
               ) : null}
             </div>

@@ -1,33 +1,59 @@
 const KOK_SINIF = 'sayfa-icerik-kok';
 
-/** Tam HTML belgesinden yalnızca gövde içeriğini çıkarır */
-export function sayfaHtmlGovdeCikar(html: string): string {
-  let icerik = html.trim();
-  if (!icerik) return '';
+/** Tam HTML belgesinden gövde + head stillerini çıkarır */
+export function sayfaHtmlParcala(html: string): { govde: string; stiller: string[] } {
+  let kaynak = html.trim();
+  const stiller: string[] = [];
 
-  icerik = icerik.replace(/<!DOCTYPE[^>]*>/gi, '');
+  if (!kaynak) return { govde: '', stiller };
 
-  const bodyEslesme = icerik.match(/<body[^>]*>([\s\S]*)<\/body>/i);
-  if (bodyEslesme) return bodyEslesme[1].trim();
+  kaynak = kaynak.replace(/<!DOCTYPE[^>]*>/gi, '');
 
-  icerik = icerik.replace(/<\/?html[^>]*>/gi, '');
-  icerik = icerik.replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '');
-  icerik = icerik.replace(/<\/?body[^>]*>/gi, '');
+  const headEslesme = kaynak.match(/<head[^>]*>([\s\S]*?)<\/head>/i);
+  if (headEslesme) {
+    headEslesme[1].replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, (_t, css) => {
+      stiller.push(String(css).trim());
+      return '';
+    });
+  }
 
-  return icerik.trim();
+  let govde = kaynak;
+  const bodyEslesme = kaynak.match(/<body[^>]*>([\s\S]*)<\/body>/i);
+  if (bodyEslesme) {
+    govde = bodyEslesme[1];
+  } else {
+    govde = govde.replace(/<\/?html[^>]*>/gi, '');
+    govde = govde.replace(/<head[^>]*>[\s\S]*?<\/head>/gi, '');
+    govde = govde.replace(/<\/?body[^>]*>/gi, '');
+  }
+
+  govde = govde.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, (_t, css) => {
+    stiller.push(String(css).trim());
+    return '';
+  });
+
+  return { govde: govde.trim(), stiller };
 }
 
-/** CSS kurallarını sayfa köküne kapsüller — body/html siteyi bozmaz */
+/** Eski API uyumluluğu */
+export function sayfaHtmlGovdeCikar(html: string): string {
+  return sayfaHtmlParcala(html).govde;
+}
+
+/** CSS kurallarını sayfa köküne kapsüller */
 function cssKapsula(css: string, kapsul: string): string {
-  return css.replace(/(^|})\s*([^@{}][^{]*)\{/g, (_match, kapanis, seciciler) => {
+  const bodyHtmlDegistirilmis = css
+    .replace(/\bhtml\b/g, kapsul)
+    .replace(/\bbody\b/g, kapsul);
+
+  return bodyHtmlDegistirilmis.replace(/(^|})\s*([^@{}][^{]*)\{/g, (_match, kapanis, seciciler) => {
     const yeni = seciciler
       .split(',')
       .map((s: string) => {
         const t = s.trim();
         if (!t) return t;
-        if (t === 'body' || t === 'html') return kapsul;
-        if (/^(body|html)\s+/i.test(t)) return t.replace(/^(body|html)\s+/i, `${kapsul} `);
         if (t.startsWith(kapsul)) return t;
+        if (t === ':host' || t.startsWith(':host')) return t;
         return `${kapsul} ${t}`;
       })
       .join(', ');
@@ -38,46 +64,52 @@ function cssKapsula(css: string, kapsul: string): string {
 export interface HazirlanmisSayfaIcerik {
   html: string;
   onizlemeBelgesi: string;
+  govde: string;
+  stiller: string[];
 }
 
-/** Public sitede güvenli render için içeriği hazırlar */
+/** dangerouslySetInnerHTML için kapsüllü HTML (yedek) */
 export function sayfaIcerikHazirla(html: string): HazirlanmisSayfaIcerik {
-  const govde = sayfaHtmlGovdeCikar(html);
-  if (!govde) {
-    return { html: '', onizlemeBelgesi: '' };
+  const { govde, stiller } = sayfaHtmlParcala(html);
+  if (!govde && stiller.length === 0) {
+    return { html: '', onizlemeBelgesi: '', govde: '', stiller: [] };
   }
 
-  const stiller: string[] = [];
   const kapsul = `.${KOK_SINIF}`;
-
-  const govdeStilsiz = govde.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, (_tam, css) => {
-    stiller.push(cssKapsula(String(css).trim(), kapsul));
-    return '';
-  });
-
+  const kapsulluStiller = stiller.map((s) => cssKapsula(s, kapsul));
   const styleEtiketi =
-    stiller.length > 0 ? `<style>${stiller.join('\n')}</style>` : '';
+    kapsulluStiller.length > 0 ? `<style>${kapsulluStiller.join('\n')}</style>` : '';
 
-  const htmlCikti = `${styleEtiketi}<div class="${KOK_SINIF}">${govdeStilsiz}</div>`;
-
-  const onizlemeBelgesi = tamHtmlBelgesiOlustur(govde);
-
-  return { html: htmlCikti, onizlemeBelgesi };
+  return {
+    govde,
+    stiller,
+    html: `${styleEtiketi}<div class="${KOK_SINIF}">${govde}</div>`,
+    onizlemeBelgesi: tamHtmlBelgesiOlustur(html),
+  };
 }
 
 /** Admin önizlemesi — izole iframe belgesi */
 export function tamHtmlBelgesiOlustur(icerik: string): string {
-  const govde = sayfaHtmlGovdeCikar(icerik);
   if (/<html[\s>]/i.test(icerik.trim())) {
     return icerik.trim();
   }
+  const { govde, stiller } = sayfaHtmlParcala(icerik);
+  const styleBlok = stiller.map((s) => `<style>${s}</style>`).join('\n');
   return `<!DOCTYPE html>
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>html,body{margin:0;padding:0;min-height:100%;}</style>
+  ${styleBlok}
 </head>
 <body>${govde || icerik}</body>
 </html>`;
+}
+
+/** Shadow DOM içine yazılacak içerik */
+export function sayfaShadowIcerikHazirla(html: string): string {
+  const { govde, stiller } = sayfaHtmlParcala(html);
+  const styleBlok = stiller.map((s) => `<style>${s}</style>`).join('\n');
+  return `${styleBlok}<div class="sayfa-icerik-govde">${govde}</div>`;
 }

@@ -520,7 +520,9 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   padding: 1.25rem;
 }
 
-.sayfa-icerik-kok {
+.sayfa-icerik-shadow-host {
+  display: block;
   width: 100%;
+  min-height: 1rem;
 }
 

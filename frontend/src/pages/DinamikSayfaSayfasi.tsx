@@ -1,40 +1,19 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useLocation } from 'react-router-dom';
-import { sayfaDetayGetir } from '@/features/site/sayfaApi';
+import { useNavigation } from 'react-router-dom';
+import { useLoaderData } from 'react-router-dom';
 import { medyaTamUrl } from '@/features/admin/medyaApi';
-import { sayfaIcerikHazirla } from '@/utils/sayfaIcerikIsle';
+import type { PublicSayfa } from '@/features/site/sayfaApi';
+import { SayfaShadowIcerik } from '@/components/ortak/SayfaShadowIcerik';
 import { SayfaBulunamadi } from '@/pages/SayfaBulunamadi';
 
+export interface DinamikSayfaLoaderVerisi {
+  bulunamadi: boolean;
+  sayfa: PublicSayfa | null;
+}
+
 export function DinamikSayfaSayfasi() {
-  const { pathname } = useLocation();
-  const slug = pathname.replace(/^\//, '').split('/')[0] ?? '';
-
-  const [yukleniyor, setYukleniyor] = useState(true);
-  const [sayfa, setSayfa] = useState<Awaited<ReturnType<typeof sayfaDetayGetir>>>(null);
-
-  useEffect(() => {
-    if (!slug) {
-      setSayfa(null);
-      setYukleniyor(false);
-      return;
-    }
-
-    const controller = new AbortController();
-    setYukleniyor(true);
-
-    void sayfaDetayGetir(slug, controller.signal).then((veri) => {
-      if (controller.signal.aborted) return;
-      setSayfa(veri);
-      setYukleniyor(false);
-    });
-
-    return () => controller.abort();
-  }, [slug]);
-
-  const hazirIcerik = useMemo(
-    () => (sayfa?.icerik ? sayfaIcerikHazirla(sayfa.icerik) : null),
-    [sayfa?.icerik]
-  );
+  const { sayfa } = useLoaderData() as DinamikSayfaLoaderVerisi;
+  const navigation = useNavigation();
+  const yukleniyor = navigation.state === 'loading';
 
   if (yukleniyor) {
     return (
@@ -51,12 +30,12 @@ export function DinamikSayfaSayfasi() {
   return (
     <section className="py-12 sm:py-16">
       <div className="container-site">
-        <header className="mb-8 max-w-3xl">
-          <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">{sayfa.baslik}</h1>
-        </header>
+        <div className="mx-auto max-w-2xl text-center">
+          <h1 className="section-title text-3xl">{sayfa.baslik}</h1>
+        </div>
 
         {gorsel && (
-          <div className="mb-8 max-w-4xl">
+          <div className="mx-auto mt-8 max-w-4xl">
             <img
               src={gorsel}
               alt={sayfa.baslik}
@@ -65,11 +44,10 @@ export function DinamikSayfaSayfasi() {
           </div>
         )}
 
-        {hazirIcerik?.html && (
-          <div
-            className="sayfa-icerik-html max-w-none"
-            dangerouslySetInnerHTML={{ __html: hazirIcerik.html }}
-          />
+        {sayfa.icerik.trim() && (
+          <div className="mx-auto mt-12 max-w-4xl">
+            <SayfaShadowIcerik html={sayfa.icerik} />
+          </div>
         )}
       </div>
     </section>
