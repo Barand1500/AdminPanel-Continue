@@ -38,6 +38,8 @@ export function menuOgeleriOlustur(
     .map((s) => ({
       baslik: s.baslik,
       yol: sayfaYolunuBul(s.slug),
+      acilisModu: s.acilisModu ?? 'normal',
+      yeniSekme: s.acilisModu === 'yeni_sekme',
     }));
 
   if (apiMenu.length > 0) return apiMenu;

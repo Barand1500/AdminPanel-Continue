@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { sayfaDetayGetir } from '@/features/site/sayfaApi';
 import { medyaTamUrl } from '@/features/admin/medyaApi';
+import { sayfaIcerikHazirla } from '@/utils/sayfaIcerikIsle';
 import { SayfaBulunamadi } from '@/pages/SayfaBulunamadi';
 
 export function DinamikSayfaSayfasi() {
@@ -30,6 +31,11 @@ export function DinamikSayfaSayfasi() {
     return () => controller.abort();
   }, [slug]);
 
+  const hazirIcerik = useMemo(
+    () => (sayfa?.icerik ? sayfaIcerikHazirla(sayfa.icerik) : null),
+    [sayfa?.icerik]
+  );
+
   if (yukleniyor) {
     return (
       <div className="flex min-h-[40vh] items-center justify-center">
@@ -43,29 +49,29 @@ export function DinamikSayfaSayfasi() {
   const gorsel = sayfa.kapakGorsel ? medyaTamUrl(sayfa.kapakGorsel) : null;
 
   return (
-    <article>
-      <header className="bg-gradient-to-br from-primary/5 to-violet-50 py-12">
-        <div className="container-site max-w-4xl">
-          <h1 className="text-3xl font-black text-slate-900 sm:text-4xl">{sayfa.baslik}</h1>
-        </div>
-      </header>
+    <section className="py-12 sm:py-16">
+      <div className="container-site">
+        <header className="mb-8 max-w-3xl">
+          <h1 className="text-3xl font-black tracking-tight text-slate-900 sm:text-4xl">{sayfa.baslik}</h1>
+        </header>
 
-      {gorsel && (
-        <div className="container-site max-w-4xl -mt-2">
-          <img
-            src={gorsel}
-            alt={sayfa.baslik}
-            className="w-full rounded-2xl border border-slate-200 object-cover shadow-lg"
+        {gorsel && (
+          <div className="mb-8 max-w-4xl">
+            <img
+              src={gorsel}
+              alt={sayfa.baslik}
+              className="w-full rounded-2xl border border-slate-200 object-cover shadow-sm"
+            />
+          </div>
+        )}
+
+        {hazirIcerik?.html && (
+          <div
+            className="sayfa-icerik-html max-w-none"
+            dangerouslySetInnerHTML={{ __html: hazirIcerik.html }}
           />
-        </div>
-      )}
-
-      <div className="container-site max-w-4xl py-12">
-        <div
-          className="sayfa-icerik-html max-w-none text-slate-700 leading-relaxed"
-          dangerouslySetInnerHTML={{ __html: sayfa.icerik }}
-        />
+        )}
       </div>
-    </article>
+    </section>
   );
 }

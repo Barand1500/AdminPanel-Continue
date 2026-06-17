@@ -38,6 +38,8 @@ export interface Widget {
   configJson?: Record<string, unknown> | null;
 }
 
+export type SayfaAcilisModu = 'normal' | 'modal' | 'yeni_sekme';
+
 export interface Sayfa {
   id: string;
   baslik: string;
@@ -46,6 +48,7 @@ export interface Sayfa {
   kapakGorsel?: string | null;
   menudeGoster?: boolean;
   sira?: number;
+  acilisModu?: SayfaAcilisModu;
 }
 
 export interface Urun {
@@ -81,6 +84,7 @@ export interface MenuOgesi {
   baslik: string;
   yol: string;
   yeniSekme?: boolean;
+  acilisModu?: SayfaAcilisModu;
 }
 
 export interface HizmetKarti {

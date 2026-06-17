@@ -2,7 +2,7 @@ import { sayfaYolunuBul } from '@/data/bosSiteVerisi';
 import { menuOgeleriOlustur } from '@/data/bosSiteVerisi';
 import type { AdminSayfa } from '@/features/admin/sayfaApi';
 import type { UstMenuOgesi, HeaderAyarlari } from '@/types/header';
-import type { MenuOgesi, Sayfa, SiteAyarlari } from '@/types/site';
+import type { MenuOgesi, Sayfa, SayfaAcilisModu, SiteAyarlari } from '@/types/site';
 import { blogAyarlariBirlestir } from '@/types/blog';
 import { idKarsilastir, idString } from '@/utils/idKarsilastir';
 
@@ -34,14 +34,21 @@ export const SABIT_HIZLI_LINKLER: { ad: string; link: string }[] = [
   { ad: 'İletişim', link: '/iletisim' },
 ];
 
-export function ustMenuOgeleriOlustur(ustMenu: UstMenuOgesi[]): MenuOgesi[] {
+export function ustMenuOgeleriOlustur(ustMenu: UstMenuOgesi[], sayfalar: Sayfa[] = []): MenuOgesi[] {
   return [...ustMenu]
     .sort((a, b) => a.sira - b.sira)
-    .map((o) => ({
-      baslik: o.ad,
-      yol: o.link,
-      yeniSekme: o.yeniSekme,
-    }));
+    .map((o) => {
+      const slug = linktenSlugCikar(o.link);
+      const sayfa = slug ? sayfalar.find((s) => s.slug === slug) : undefined;
+      const acilisModu: SayfaAcilisModu =
+        sayfa?.acilisModu ?? (o.yeniSekme ? 'yeni_sekme' : 'normal');
+      return {
+        baslik: o.ad,
+        yol: o.link,
+        yeniSekme: acilisModu === 'yeni_sekme',
+        acilisModu,
+      };
+    });
 }
 
 export function sayfaMenudenUstMenuAktar(sayfalar: AdminSayfa[]): UstMenuOgesi[] {
@@ -52,7 +59,7 @@ export function sayfaMenudenUstMenuAktar(sayfalar: AdminSayfa[]): UstMenuOgesi[]
       id: yeniMenuId(),
       ad: s.baslik,
       link: sayfaYolunuBul(s.slug),
-      yeniSekme: false,
+      yeniSekme: s.acilisModu === 'yeni_sekme',
       sira: i,
       sayfaId: idString(s.id),
     }));
@@ -65,7 +72,7 @@ export function headerMenuOlustur(
 ): MenuOgesi[] {
   const ust = headerAyarlari?.ustMenu;
   if (ust && ust.length > 0) {
-    return ustMenuOgeleriOlustur(ust);
+    return ustMenuOgeleriOlustur(ust, sayfalar);
   }
   return menuOgeleriOlustur(sayfalar, blogAyarlariBirlestir(siteAyarlari));
 }
@@ -166,6 +173,7 @@ export function ustMenuSayfaSenkronize(
           yayinda: true,
           menudeGoster: true,
           sira: oge.sira,
+          acilisModu: 'normal',
         });
       }
       oge.sayfaId = pendingId;

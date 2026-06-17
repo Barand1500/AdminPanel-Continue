@@ -1,5 +1,7 @@
 import { z } from 'zod';
 
+export const sayfaAcilisModuSchema = z.enum(['normal', 'modal', 'yeni_sekme']);
+
 export const sayfaOlusturSchema = z.object({
   baslik: z.string().min(1),
   slug: z.string().optional(),
@@ -10,6 +12,7 @@ export const sayfaOlusturSchema = z.object({
   yayinda: z.boolean().default(false),
   menudeGoster: z.boolean().default(true),
   sira: z.number().int().default(0),
+  acilisModu: sayfaAcilisModuSchema.default('normal'),
 });
 
 export const sayfaGuncelleSchema = sayfaOlusturSchema.partial();

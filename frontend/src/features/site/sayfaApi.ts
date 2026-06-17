@@ -1,6 +1,8 @@
 const API_URL = import.meta.env.VITE_API_URL ?? '/api';
 const SITE_SLUG = import.meta.env.VITE_SITE_SLUG ?? 'demo';
 
+import type { SayfaAcilisModu } from '@/types/site';
+
 export interface PublicSayfa {
   id: string;
   baslik: string;
@@ -9,6 +11,7 @@ export interface PublicSayfa {
   kapakGorsel?: string | null;
   seoTitle?: string | null;
   seoDesc?: string | null;
+  acilisModu?: SayfaAcilisModu;
 }
 
 export async function sayfaDetayGetir(slug: string, signal?: AbortSignal): Promise<PublicSayfa | null> {

@@ -1,6 +1,13 @@
 import { useMemo, useState } from 'react';
+import type { SayfaAcilisModu } from '@/types/site';
+
+const ACILIS_MODLARI: { id: SayfaAcilisModu; ad: string; aciklama: string }[] = [
+  { id: 'normal', ad: 'Normal sayfa', aciklama: 'İletişim sayfası gibi tam sayfa olarak açılır' },
+  { id: 'modal', ad: 'Modal pencere', aciklama: 'Menüye tıklanınca sayfa popup olarak açılır' },
+  { id: 'yeni_sekme', ad: 'Yeni sekme', aciklama: 'Tarayıcıda yeni sekmede açılır' },
+];
 import type { AdminSayfa, SayfaFormDegeri } from '@/features/admin/sayfaApi';
-import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
+import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
 import { IcerikHtmlEditoru } from '@/components/form/IcerikHtmlEditoru';
 import {
@@ -203,7 +210,27 @@ export function SayfaEditorPanel({
         )}
 
         {sekme === 'ayarlar' && (
-          <AdminFormBolumu baslik="Yayın ve Menü" aciklama="Görünürlük ve sıralama ayarları">
+          <>
+            <AdminFormBolumu baslik="Sayfa Açılış Modu" aciklama="Menüden tıklandığında sayfanın nasıl açılacağını belirleyin">
+              <FormAlani etiket="Açılış şekli">
+                <select
+                  className={formSelectSinifi}
+                  value={form.acilisModu}
+                  onChange={(e) => onChange({ ...form, acilisModu: e.target.value as SayfaAcilisModu })}
+                >
+                  {ACILIS_MODLARI.map((m) => (
+                    <option key={m.id} value={m.id}>
+                      {m.ad}
+                    </option>
+                  ))}
+                </select>
+              </FormAlani>
+              <p className="ap-muted text-xs">
+                {ACILIS_MODLARI.find((m) => m.id === form.acilisModu)?.aciklama}
+              </p>
+            </AdminFormBolumu>
+
+            <AdminFormBolumu baslik="Yayın ve Menü" aciklama="Görünürlük ve sıralama ayarları">
             <div className="ap-switch-grup">
               <AdminAnahtarDugme
                 etiket="Yayında"
@@ -226,6 +253,7 @@ export function SayfaEditorPanel({
               />
             </FormAlani>
           </AdminFormBolumu>
+          </>
         )}
       </div>
     </div>
@@ -243,6 +271,7 @@ export function sayfadanForm(s: AdminSayfa): SayfaFormDegeri {
     yayinda: s.yayinda,
     menudeGoster: s.menudeGoster,
     sira: s.sira,
+    acilisModu: s.acilisModu ?? 'normal',
   };
 }
 
@@ -256,4 +285,5 @@ export const bosSayfaForm: SayfaFormDegeri = {
   yayinda: false,
   menudeGoster: true,
   sira: 0,
+  acilisModu: 'normal',
 };

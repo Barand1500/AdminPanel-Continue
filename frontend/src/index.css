@@ -465,3 +465,62 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   @apply bg-slate-800;
 }
 
+/* Sayfa modal */
+.sayfa-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.sayfa-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  border: none;
+  background: rgb(15 23 42 / 0.55);
+  cursor: pointer;
+}
+
+.sayfa-modal-kart {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  max-height: min(90vh, 720px);
+  width: min(100%, 42rem);
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: 1rem;
+  border: 1px solid #e2e8f0;
+  background: #fff;
+  box-shadow: 0 24px 48px rgb(15 23 42 / 0.2);
+}
+
+.sayfa-modal-baslik {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 1rem 1.25rem;
+}
+
+.sayfa-modal-kapat {
+  border: none;
+  background: transparent;
+  font-size: 1.125rem;
+  color: #64748b;
+  cursor: pointer;
+}
+
+.sayfa-modal-icerik {
+  overflow: auto;
+  padding: 1.25rem;
+}
+
+.sayfa-icerik-kok {
+  width: 100%;
+}
+

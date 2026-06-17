@@ -147,6 +147,7 @@ export function MenuYonetimiSayfasi() {
           yayinda: pending.yayinda,
           menudeGoster: pending.menudeGoster,
           sira: pending.sira,
+          acilisModu: pending.acilisModu ?? 'normal',
         });
         guncelSayfalar = guncelSayfalar.map((s) => (s.id === pending.id ? olusturulan : s));
         guncelUstMenu = guncelUstMenu.map((o) =>
@@ -172,6 +173,7 @@ export function MenuYonetimiSayfasi() {
             yayinda: s.yayinda,
             menudeGoster: s.menudeGoster,
             sira: s.sira,
+            acilisModu: s.acilisModu ?? 'normal',
           });
           guncelSayfalar = guncelSayfalar.map((x) => (x.id === s.id ? guncellenen : x));
         }

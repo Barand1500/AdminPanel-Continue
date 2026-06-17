@@ -29,6 +29,7 @@ export class SayfaService {
       yayinda: dto.yayinda,
       menudeGoster: dto.menudeGoster,
       sira: dto.sira,
+      acilisModu: dto.acilisModu,
     });
   }
 
@@ -46,6 +47,7 @@ export class SayfaService {
       yayinda: dto.yayinda,
       menudeGoster: dto.menudeGoster,
       sira: dto.sira,
+      acilisModu: dto.acilisModu,
     });
   }
 

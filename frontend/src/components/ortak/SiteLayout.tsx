@@ -1,4 +1,5 @@
 import { Outlet, useMatches } from 'react-router-dom';
+import { SayfaModalProvider } from '@/contexts/SayfaModalContext';
 import { SiteHeader } from '@/components/ortak/SiteHeader';
 import { SiteFooter } from '@/components/ortak/SiteFooter';
 import { BakimEkrani } from '@/components/ortak/BakimEkrani';
@@ -58,7 +59,9 @@ export function SiteLayout() {
   return (
     <SiteTemaProvider>
       <SiteAuthProvider>
-        <SiteLayoutIcerik />
+        <SayfaModalProvider>
+          <SiteLayoutIcerik />
+        </SayfaModalProvider>
       </SiteAuthProvider>
     </SiteTemaProvider>
   );

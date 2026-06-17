@@ -121,6 +121,7 @@ model Sayfa {
   yayinda      Boolean  @default(false)
   menudeGoster Boolean  @default(true)
   sira         Int      @default(0)
+  acilisModu   String   @default("normal")
   olusturma    DateTime @default(now())
   guncelleme   DateTime @updatedAt
 

@@ -1,6 +1,8 @@
 import { adminHeaders, adminJsonFetch } from './adminFetch';
 import { idString } from '@/utils/idKarsilastir';
 
+import type { SayfaAcilisModu } from '@/types/site';
+
 export interface AdminSayfa {
   id: string;
   baslik: string;
@@ -12,6 +14,7 @@ export interface AdminSayfa {
   yayinda: boolean;
   menudeGoster: boolean;
   sira: number;
+  acilisModu: SayfaAcilisModu;
 }
 
 export interface SayfaFormDegeri {
@@ -24,6 +27,7 @@ export interface SayfaFormDegeri {
   yayinda: boolean;
   menudeGoster: boolean;
   sira: number;
+  acilisModu: SayfaAcilisModu;
 }
 
 export async function adminSayfalariGetir(): Promise<AdminSayfa[]> {
@@ -63,7 +67,11 @@ export async function adminMenuGuncelle(ogeler: { id: string; sira: number; menu
 }
 
 function normalizeSayfa(sayfa: AdminSayfa): AdminSayfa {
-  return { ...sayfa, id: idString(sayfa.id) };
+  return {
+    ...sayfa,
+    id: idString(sayfa.id),
+    acilisModu: sayfa.acilisModu ?? 'normal',
+  };
 }
 
 function payloadHazirla(form: SayfaFormDegeri) {
@@ -77,5 +85,6 @@ function payloadHazirla(form: SayfaFormDegeri) {
     yayinda: form.yayinda,
     menudeGoster: form.menudeGoster,
     sira: form.sira,
+    acilisModu: form.acilisModu,
   };
 }
