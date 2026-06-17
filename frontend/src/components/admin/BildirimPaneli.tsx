@@ -5,27 +5,19 @@ import {
   adminBildirimleriTumunuOkundu,
   type AdminBildirim,
 } from '@/features/admin/bildirimApi';
-
-function zamanFormat(iso: string) {
-  const tarih = new Date(iso);
-  const fark = Date.now() - tarih.getTime();
-  const dk = Math.floor(fark / 60000);
-  if (dk < 1) return 'Az önce';
-  if (dk < 60) return `${dk} dk önce`;
-  const saat = Math.floor(dk / 60);
-  if (saat < 24) return `${saat} sa önce`;
-  return tarih.toLocaleDateString('tr-TR');
-}
+import { AltPanel, AltPanelBos, AltPanelOge, AltPanelYukleniyor } from './ortak/AltPanel';
 
 interface BildirimPaneliProps {
   acik: boolean;
   onKapat: () => void;
+  onGuncelle?: () => void;
 }
 
-export function BildirimPaneli({ acik, onKapat }: BildirimPaneliProps) {
+export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProps) {
   const navigate = useNavigate();
   const [bildirimler, setBildirimler] = useState<AdminBildirim[]>([]);
   const [yukleniyor, setYukleniyor] = useState(false);
+  const [islemMesaji, setIslemMesaji] = useState<string | null>(null);
 
   const yukle = useCallback(async () => {
     setYukleniyor(true);
@@ -40,12 +32,22 @@ export function BildirimPaneli({ acik, onKapat }: BildirimPaneliProps) {
   }, []);
 
   useEffect(() => {
-    if (acik) void yukle();
+    if (acik) {
+      setIslemMesaji(null);
+      void yukle();
+    }
   }, [acik, yukle]);
 
   async function tumunuOkundu() {
-    await adminBildirimleriTumunuOkundu();
-    await yukle();
+    try {
+      await adminBildirimleriTumunuOkundu();
+      setBildirimler((onceki) => onceki.map((b) => ({ ...b, okundu: true })));
+      setIslemMesaji('Tüm bildirimler okundu işaretlendi.');
+      onGuncelle?.();
+      setTimeout(() => setIslemMesaji(null), 2500);
+    } catch {
+      setIslemMesaji('İşlem başarısız oldu.');
+    }
   }
 
   function tikla(b: AdminBildirim) {
@@ -53,47 +55,31 @@ export function BildirimPaneli({ acik, onKapat }: BildirimPaneliProps) {
     onKapat();
   }
 
-  if (!acik) return null;
-
   return (
-    <>
-      <button type="button" className="fixed inset-0 z-40" aria-label="Bildirim panelini kapat" onClick={onKapat} />
-      <div className="ap-bildirim-paneli fixed bottom-14 right-3 z-50 flex w-80 max-h-[min(420px,70vh)] flex-col overflow-hidden rounded-xl border border-slate-600 bg-slate-900 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-700 px-4 py-3">
-          <h3 className="text-sm font-semibold text-white">Bildirimler</h3>
-          <button
-            type="button"
-            className="text-xs text-blue-400 hover:underline"
-            onClick={() => void tumunuOkundu()}
-          >
-            Tümünü okundu işaretle
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto">
-          {yukleniyor && <p className="p-4 text-sm text-slate-400">Yükleniyor...</p>}
-          {!yukleniyor && bildirimler.length === 0 && (
-            <p className="p-4 text-sm text-slate-400">Henüz bildirim yok.</p>
-          )}
-          {bildirimler.map((b) => (
-            <button
-              key={b.id}
-              type="button"
-              onClick={() => tikla(b)}
-              className={`flex w-full flex-col gap-0.5 border-b border-slate-800 px-4 py-3 text-left transition hover:bg-slate-800/60 ${
-                !b.okundu ? 'bg-blue-950/30' : ''
-              }`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-semibold text-white">{b.baslik}</span>
-                {!b.okundu && <span className="h-2 w-2 shrink-0 rounded-full bg-red-500" />}
-              </div>
-              <span className="text-xs text-slate-400">{b.mesaj}</span>
-              <span className="text-[10px] text-slate-500">{zamanFormat(b.olusturma)}</span>
-            </button>
-          ))}
-        </div>
-      </div>
-    </>
+    <AltPanel
+      acik={acik}
+      onKapat={onKapat}
+      baslik="Bildirimler"
+      ustAksiyon={
+        <button type="button" className="ap-alt-panel-link" onClick={() => void tumunuOkundu()}>
+          Tümünü okundu işaretle
+        </button>
+      }
+    >
+      {islemMesaji && <p className="ap-alt-panel-basari px-1 pb-2">{islemMesaji}</p>}
+      {yukleniyor && <AltPanelYukleniyor />}
+      {!yukleniyor && bildirimler.length === 0 && <AltPanelBos mesaj="Henüz bildirim yok." />}
+      {bildirimler.map((b) => (
+        <AltPanelOge
+          key={b.id}
+          baslik={b.baslik}
+          alt={b.mesaj}
+          zaman={b.olusturma}
+          okunmamis={!b.okundu}
+          onClick={() => tikla(b)}
+        />
+      ))}
+    </AltPanel>
   );
 }
 

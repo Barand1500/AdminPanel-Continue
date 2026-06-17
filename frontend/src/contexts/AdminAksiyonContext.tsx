@@ -21,6 +21,21 @@ export interface AksiyonHandlerlar {
 
 export type AksiyonDurumlari = Partial<Record<AksiyonId, boolean>>;
 
+export interface AksiyonGeriBildirim {
+  aksiyonId: AksiyonId;
+  mesaj: string;
+  tur: 'basari' | 'hata';
+}
+
+const AKSİYON_BASARI: Partial<Record<AksiyonId, string>> = {
+  kaydet: 'Kaydedildi',
+  guncelle: 'Güncellendi',
+  ekle: 'Eklendi',
+  sil: 'Silindi',
+  yayinla: 'Yayınlandı',
+  onizle: 'Önizleme açıldı',
+};
+
 interface ModulAksiyonKaydi {
   handlers: AksiyonHandlerlar;
   durumlar: AksiyonDurumlari;
@@ -33,6 +48,7 @@ interface AdminAksiyonContextType {
   clearHandlers: (modulId: string) => void;
   setAksiyonDurumlari: (modulId: string, durumlar: AksiyonDurumlari) => void;
   aksiyonDurumlari: AksiyonDurumlari;
+  aksiyonGeriBildirim: AksiyonGeriBildirim | null;
   aksiyonCalistir: (id: string) => Promise<void>;
 }
 
@@ -42,6 +58,8 @@ export function AdminAksiyonProvider({ children }: { children: ReactNode }) {
   const kayitlarRef = useRef<Map<string, ModulAksiyonKaydi>>(new Map());
   const [focusModulId, setFocusModulId] = useState('dashboard');
   const [aksiyonDurumlari, setAksiyonDurumlariState] = useState<AksiyonDurumlari>({});
+  const [aksiyonGeriBildirim, setAksiyonGeriBildirim] = useState<AksiyonGeriBildirim | null>(null);
+  const geriBildirimTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const kayit = kayitlarRef.current.get(focusModulId);
@@ -74,15 +92,34 @@ export function AdminAksiyonProvider({ children }: { children: ReactNode }) {
 
   const aksiyonCalistir = useCallback(async (id: string) => {
     const handlers = kayitlarRef.current.get(focusModulId)?.handlers ?? {};
+    const aksiyonId = id as AksiyonId;
+
+    if (geriBildirimTimerRef.current) {
+      clearTimeout(geriBildirimTimerRef.current);
+      geriBildirimTimerRef.current = null;
+    }
+
     try {
       if (id === 'kaydet' && handlers.kaydet) await handlers.kaydet();
-      if (id === 'guncelle' && handlers.guncelle) await handlers.guncelle();
-      if (id === 'ekle' && handlers.ekle) handlers.ekle();
-      if (id === 'sil' && handlers.sil) await handlers.sil();
-      if (id === 'onizle' && handlers.onizle) handlers.onizle();
-      if (id === 'yayinla' && handlers.yayinla) await handlers.yayinla();
+      else if (id === 'guncelle' && handlers.guncelle) await handlers.guncelle();
+      else if (id === 'ekle' && handlers.ekle) handlers.ekle();
+      else if (id === 'sil' && handlers.sil) await handlers.sil();
+      else if (id === 'onizle' && handlers.onizle) handlers.onizle();
+      else if (id === 'yayinla' && handlers.yayinla) await handlers.yayinla();
+      else return;
+
+      const mesaj = AKSİYON_BASARI[aksiyonId];
+      if (mesaj) {
+        setAksiyonGeriBildirim({ aksiyonId, mesaj, tur: 'basari' });
+        geriBildirimTimerRef.current = setTimeout(() => setAksiyonGeriBildirim(null), 2500);
+      }
     } catch {
-      /* Modul kendi hata mesajini gosterir */
+      setAksiyonGeriBildirim({
+        aksiyonId,
+        mesaj: 'İşlem başarısız',
+        tur: 'hata',
+      });
+      geriBildirimTimerRef.current = setTimeout(() => setAksiyonGeriBildirim(null), 2500);
     }
   }, [focusModulId]);
 
@@ -95,6 +132,7 @@ export function AdminAksiyonProvider({ children }: { children: ReactNode }) {
         clearHandlers,
         setAksiyonDurumlari,
         aksiyonDurumlari,
+        aksiyonGeriBildirim,
         aksiyonCalistir,
       }}
     >

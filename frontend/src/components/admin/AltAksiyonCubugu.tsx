@@ -3,53 +3,66 @@ import { GorevCubuguTray } from './GorevCubuguTray';
 import { SaatTakvimWidget } from './SaatTakvimWidget';
 import { modulRehberBul } from '@/data/adminModulRehberleri';
 import { BildirimPaneli, useBildirimSayaci } from './BildirimPaneli';
+import { LogPaneli } from './LogPaneli';
+import { YedeklemeHizliPaneli } from './YedeklemeHizliPaneli';
+import { useAdminAksiyon } from '@/contexts/AdminAksiyonContext';
 import { useState } from 'react';
 
 interface AltAksiyonCubuguProps {
   aksiyonlar: AksiyonButonu[];
   onAksiyon?: (id: string) => void;
-  onYedekle?: () => void;
-  onLoglar?: () => void;
-  onTamEkranYedekle?: () => void;
-  onTamEkranLoglar?: () => void;
   focusModulId?: string;
   onRehberAc?: () => void;
 }
 
+type AcikPanel = 'bildirim' | 'log' | 'yedek' | null;
+
 export function AltAksiyonCubugu({
   aksiyonlar,
   onAksiyon,
-  onYedekle,
-  onLoglar,
-  onTamEkranYedekle,
-  onTamEkranLoglar,
   focusModulId = 'dashboard',
   onRehberAc,
 }: AltAksiyonCubuguProps) {
   const rehber = modulRehberBul(focusModulId);
-  const [panelAcik, setPanelAcik] = useState(false);
+  const [acikPanel, setAcikPanel] = useState<AcikPanel>(null);
   const { okunmamisSayi, yenile } = useBildirimSayaci();
+  const { aksiyonGeriBildirim } = useAdminAksiyon();
+
+  function panelAc(panel: AcikPanel) {
+    setAcikPanel((onceki) => (onceki === panel ? null : panel));
+    if (panel === 'bildirim') void yenile();
+  }
 
   return (
     <footer className="ap-footer ap-gorev-cubugu flex h-12 shrink-0 items-center gap-2 border-t px-3">
       <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto">
-        {aksiyonlar.map((aksiyon) => (
-          <button
-            key={aksiyon.id}
-            type="button"
-            disabled={!aksiyon.aktif}
-            onClick={() => onAksiyon?.(aksiyon.id)}
-            className={`ap-aksiyon-btn shrink-0 rounded px-4 py-1.5 text-sm font-medium transition ${
-              !aksiyon.aktif
-                ? 'ap-aksiyon-pasif cursor-not-allowed opacity-40'
-                : aksiyon.birincil
-                  ? 'ap-aksiyon-birincil bg-blue-600 text-white hover:bg-blue-500'
-                  : 'ap-aksiyon-aktif border border-slate-500 text-slate-200 hover:bg-slate-700'
-            }`}
-          >
-            {aksiyon.etiket}
-          </button>
-        ))}
+        {aksiyonlar.map((aksiyon) => {
+          const geriBildirim =
+            aksiyonGeriBildirim?.aksiyonId === aksiyon.id ? aksiyonGeriBildirim : null;
+          const etiket = geriBildirim?.mesaj ?? aksiyon.etiket;
+
+          return (
+            <button
+              key={aksiyon.id}
+              type="button"
+              disabled={!aksiyon.aktif && !geriBildirim}
+              onClick={() => onAksiyon?.(aksiyon.id)}
+              className={`ap-aksiyon-btn shrink-0 rounded px-4 py-1.5 text-sm font-medium transition ${
+                geriBildirim?.tur === 'basari'
+                  ? 'ap-aksiyon-basari'
+                  : geriBildirim?.tur === 'hata'
+                    ? 'ap-aksiyon-hata'
+                    : !aksiyon.aktif
+                      ? 'ap-aksiyon-pasif cursor-not-allowed opacity-40'
+                      : aksiyon.birincil
+                        ? 'ap-aksiyon-birincil'
+                        : 'ap-aksiyon-aktif'
+              }`}
+            >
+              {etiket}
+            </button>
+          );
+        })}
       </div>
 
       <div className="flex shrink-0 items-center gap-2 border-l border-[var(--ap-border)] pl-3">
@@ -62,23 +75,18 @@ export function AltAksiyonCubugu({
         >
           ?
         </button>
-        {onYedekle && onLoglar && (
-          <GorevCubuguTray
-            onYedekle={onYedekle}
-            onLoglar={onLoglar}
-            onTamEkranYedekle={onTamEkranYedekle}
-            onTamEkranLoglar={onTamEkranLoglar}
-          />
-        )}
+        <GorevCubuguTray
+          logAcik={acikPanel === 'log'}
+          yedekAcik={acikPanel === 'yedek'}
+          onLogToggle={() => panelAc('log')}
+          onYedekToggle={() => panelAc('yedek')}
+        />
         <button
           type="button"
-          className="ap-tray-bildirim-btn relative"
+          className={`ap-tray-bildirim-btn relative ${acikPanel === 'bildirim' ? 'ap-tray-ikon-aktif' : ''}`}
           title="Bildirimler"
           aria-label="Bildirimler"
-          onClick={() => {
-            setPanelAcik((o) => !o);
-            void yenile();
-          }}
+          onClick={() => panelAc('bildirim')}
         >
           🔔
           {okunmamisSayi > 0 && (
@@ -87,7 +95,13 @@ export function AltAksiyonCubugu({
             </span>
           )}
         </button>
-        <BildirimPaneli acik={panelAcik} onKapat={() => setPanelAcik(false)} />
+        <BildirimPaneli
+          acik={acikPanel === 'bildirim'}
+          onKapat={() => setAcikPanel(null)}
+          onGuncelle={yenile}
+        />
+        <LogPaneli acik={acikPanel === 'log'} onKapat={() => setAcikPanel(null)} />
+        <YedeklemeHizliPaneli acik={acikPanel === 'yedek'} onKapat={() => setAcikPanel(null)} />
         <SaatTakvimWidget />
       </div>
     </footer>

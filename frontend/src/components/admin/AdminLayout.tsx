@@ -130,11 +130,6 @@ function AdminPanelGovde() {
     await aksiyonCalistir(aksiyonId);
   }
 
-  function tamEkranModul(modulId: string) {
-    const modul = modulBul(modulId);
-    if (modul) sekmeAc(modul);
-  }
-
   const sekmeAyir = useCallback(
     (sekmeId: string) => {
       const sekme = sekmeler.find((s) => s.id === sekmeId);
@@ -231,10 +226,6 @@ function AdminPanelGovde() {
       <AltAksiyonCubugu
         aksiyonlar={aksiyonlar}
         onAksiyon={(id) => void aksiyonHandler(id)}
-        onYedekle={() => {}}
-        onLoglar={() => {}}
-        onTamEkranYedekle={() => tamEkranModul('veri-yedekleme')}
-        onTamEkranLoglar={() => tamEkranModul('loglar')}
         focusModulId={focusModulId}
         onRehberAc={() => setRehberAcik(true)}
       />
