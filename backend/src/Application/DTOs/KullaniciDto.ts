@@ -18,10 +18,6 @@ export const YETKILER = [
   'ekleme',
   'duzenleme',
   'silme',
-  'yayinlama',
-  'dosya_yukleme',
-  'seo_duzenleme',
-  'tema_duzenleme',
   'kullanici_yonetimi',
 ] as const;
 
@@ -44,36 +40,23 @@ export const ROL_TANIMLARI: Record<
       'ekleme',
       'duzenleme',
       'silme',
-      'yayinlama',
-      'dosya_yukleme',
-      'seo_duzenleme',
-      'tema_duzenleme',
       'kullanici_yonetimi',
     ],
   },
   MUSTERI_ADMIN: {
     baslik: 'Musteri Admin',
     aciklama: 'Kendi sitesinin tum icerigini yonetir.',
-    yetkiler: [
-      'goruntuleme',
-      'ekleme',
-      'duzenleme',
-      'silme',
-      'yayinlama',
-      'dosya_yukleme',
-      'seo_duzenleme',
-      'tema_duzenleme',
-    ],
+    yetkiler: ['goruntuleme', 'ekleme', 'duzenleme', 'silme'],
   },
   EDITOR: {
     baslik: 'Editor',
     aciklama: 'Sayfa, blog ve medya icerigi duzenler.',
-    yetkiler: ['goruntuleme', 'ekleme', 'duzenleme', 'dosya_yukleme'],
+    yetkiler: ['goruntuleme', 'ekleme', 'duzenleme'],
   },
   SEO_EDITOR: {
     baslik: 'SEO Editoru',
     aciklama: 'SEO alanlarini ve meta bilgilerini duzenler.',
-    yetkiler: ['goruntuleme', 'duzenleme', 'seo_duzenleme'],
+    yetkiler: ['goruntuleme', 'duzenleme'],
   },
   GORUNTULEME: {
     baslik: 'Sadece Goruntuleme',
@@ -83,15 +66,11 @@ export const ROL_TANIMLARI: Record<
 };
 
 export const YETKI_ETIKETLERI: Record<YetkiKodu, string> = {
-  goruntuleme: 'Goruntuleme',
+  goruntuleme: 'Görüntüleme',
   ekleme: 'Ekleme',
-  duzenleme: 'Duzenleme',
+  duzenleme: 'Düzenleme',
   silme: 'Silme',
-  yayinlama: 'Yayinlama',
-  dosya_yukleme: 'Dosya Yukleme',
-  seo_duzenleme: 'SEO Duzenleme',
-  tema_duzenleme: 'Tema Duzenleme',
-  kullanici_yonetimi: 'Kullanici Yonetimi',
+  kullanici_yonetimi: 'Kullanıcı Yönetimi',
 };
 
 const rolSchema = z.string().min(1);

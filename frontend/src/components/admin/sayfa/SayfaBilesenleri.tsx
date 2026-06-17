@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import type { AdminSayfa, SayfaFormDegeri } from '@/features/admin/sayfaApi';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
-import { ZenginMetinEditoru } from '@/components/form/ZenginMetinEditoru';
+import { IcerikHtmlEditoru } from '@/components/form/IcerikHtmlEditoru';
 import {
   AdminAnahtarDugme,
   AdminAramaKutusu,
@@ -163,8 +163,8 @@ export function SayfaEditorPanel({
               </FormAlani>
             </AdminFormBolumu>
 
-            <AdminFormBolumu baslik="İçerik" aciklama="Formatlama araç çubuğu ile zengin metin düzenleyin">
-              <ZenginMetinEditoru
+            <AdminFormBolumu baslik="İçerik" aciklama="Görsel editör veya HTML kodu ile sayfa içeriği oluşturun">
+              <IcerikHtmlEditoru
                 deger={form.icerik}
                 onChange={(icerik) => onChange({ ...form, icerik })}
                 placeholder="Sayfa içeriğinizi yazın..."

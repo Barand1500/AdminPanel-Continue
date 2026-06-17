@@ -62,7 +62,7 @@ export function DinamikSayfaSayfasi() {
 
       <div className="container-site max-w-4xl py-12">
         <div
-          className="prose prose-slate max-w-none text-slate-700 leading-relaxed"
+          className="sayfa-icerik-html max-w-none text-slate-700 leading-relaxed"
           dangerouslySetInnerHTML={{ __html: sayfa.icerik }}
         />
       </div>

@@ -1,3 +1,4 @@
+import { useCallback, useRef, useState } from 'react';
 import type { AdminMedya } from '@/features/admin/medyaApi';
 import { medyaTamUrl } from '@/features/admin/medyaApi';
 
@@ -73,40 +74,123 @@ export function MedyaGrid({ medyalar, seciliIds, onSecToggle, onHepsiniSec, onSe
 interface MedyaYukleyiciProps {
   urlForm: { ad: string; url: string };
   yukleniyor: boolean;
+  yuklemeIlerleme?: { tamamlanan: number; toplam: number } | null;
   onUrlFormChange: (form: { ad: string; url: string }) => void;
-  onDosyaSec: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onDosyalarSec: (dosyalar: File[]) => void;
 }
 
-export function MedyaYukleyici({ urlForm, yukleniyor, onUrlFormChange, onDosyaSec }: MedyaYukleyiciProps) {
+function dosyalariAyikla(liste: FileList | File[]): File[] {
+  return Array.from(liste).filter((d) => d.type.startsWith('image/'));
+}
+
+export function MedyaYukleyici({
+  urlForm,
+  yukleniyor,
+  yuklemeIlerleme,
+  onUrlFormChange,
+  onDosyalarSec,
+}: MedyaYukleyiciProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [surukleniyor, setSurukleniyor] = useState(false);
+
+  const dosyaGonder = useCallback(
+    (liste: FileList | File[]) => {
+      const dosyalar = dosyalariAyikla(liste);
+      if (dosyalar.length === 0) return;
+      onDosyalarSec(dosyalar);
+    },
+    [onDosyalarSec]
+  );
+
+  function surukleBirak(e: React.DragEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    setSurukleniyor(false);
+    if (yukleniyor) return;
+    dosyaGonder(e.dataTransfer.files);
+  }
+
   return (
-    <div className="grid gap-4 sm:grid-cols-2">
-      <div className="space-y-3 rounded-lg border border-slate-700 bg-slate-800 p-4">
-        <h3 className="text-sm font-semibold text-white">URL ile Ekle</h3>
-        <p className="text-xs text-slate-400">Alt bardan Kaydet ile URL ekleyin</p>
+    <div className="space-y-4">
+      <div
+        className={`ap-medya-toplu-alan ${surukleniyor ? 'ap-medya-toplu-alan-surukle' : ''} ${yukleniyor ? 'ap-medya-toplu-alan-pasif' : ''}`}
+        onDragEnter={(e) => {
+          e.preventDefault();
+          if (!yukleniyor) setSurukleniyor(true);
+        }}
+        onDragOver={(e) => {
+          e.preventDefault();
+          if (!yukleniyor) setSurukleniyor(true);
+        }}
+        onDragLeave={(e) => {
+          e.preventDefault();
+          if (e.currentTarget === e.target) setSurukleniyor(false);
+        }}
+        onDrop={surukleBirak}
+      >
+        <span className="ap-medya-toplu-ikon" aria-hidden>
+          📤
+        </span>
+        <p className="ap-medya-toplu-baslik">
+          {surukleniyor ? 'Dosyaları buraya bırakın' : 'Toplu görsel yükle'}
+        </p>
+        <p className="ap-medya-toplu-aciklama">
+          Görselleri sürükleyip bırakın veya bilgisayarınızdan seçin. PNG, JPG, WEBP — dosya başına max 5MB.
+        </p>
+        <button
+          type="button"
+          className="ap-medya-toplu-dugme"
+          disabled={yukleniyor}
+          onClick={() => inputRef.current?.click()}
+        >
+          {yukleniyor ? 'Yükleniyor...' : 'Dosya Seç'}
+        </button>
         <input
-          className="input-admin"
-          placeholder="Medya adı"
-          value={urlForm.ad}
-          onChange={(e) => onUrlFormChange({ ...urlForm, ad: e.target.value })}
-          required
+          ref={inputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          disabled={yukleniyor}
+          onChange={(e) => {
+            if (e.target.files?.length) dosyaGonder(e.target.files);
+            e.target.value = '';
+          }}
         />
-        <input
-          className="input-admin"
-          placeholder="https://..."
-          value={urlForm.url}
-          onChange={(e) => onUrlFormChange({ ...urlForm, url: e.target.value })}
-          required
-        />
+        {yuklemeIlerleme && yuklemeIlerleme.toplam > 0 && (
+          <div className="ap-medya-toplu-ilerleme">
+            <div className="ap-medya-toplu-ilerleme-cubuk">
+              <div
+                className="ap-medya-toplu-ilerleme-dolgu"
+                style={{ width: `${(yuklemeIlerleme.tamamlanan / yuklemeIlerleme.toplam) * 100}%` }}
+              />
+            </div>
+            <p className="ap-medya-toplu-ilerleme-metin">
+              {yuklemeIlerleme.tamamlanan} / {yuklemeIlerleme.toplam} yüklendi
+            </p>
+          </div>
+        )}
       </div>
 
       <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
-        <h3 className="text-sm font-semibold text-white">Dosya Yükle</h3>
-        <p className="mt-1 text-xs text-slate-400">PNG, JPG, WEBP — max 5MB</p>
-        <label className="mt-4 flex cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-600 py-8 hover:border-blue-500">
-          <span className="text-2xl">📤</span>
-          <span className="mt-2 text-sm text-slate-300">{yukleniyor ? 'Yükleniyor...' : 'Dosya seç'}</span>
-          <input type="file" accept="image/*" className="hidden" onChange={onDosyaSec} disabled={yukleniyor} />
-        </label>
+        <h3 className="text-sm font-semibold text-white">URL ile Ekle</h3>
+        <p className="mt-1 text-xs text-slate-400">Harici bir görsel bağlantısı eklemek için alanları doldurup alt bardan Kaydet kullanın.</p>
+        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <input
+            className="input-admin"
+            placeholder="Medya adı"
+            value={urlForm.ad}
+            onChange={(e) => onUrlFormChange({ ...urlForm, ad: e.target.value })}
+            required
+          />
+          <input
+            className="input-admin"
+            placeholder="https://..."
+            value={urlForm.url}
+            onChange={(e) => onUrlFormChange({ ...urlForm, url: e.target.value })}
+            required
+          />
+        </div>
       </div>
     </div>
   );

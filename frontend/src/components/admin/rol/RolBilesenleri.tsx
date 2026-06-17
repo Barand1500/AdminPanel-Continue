@@ -1,4 +1,4 @@
-import type { RolTanimi, YetkiKodu, YetkiTanimi } from '@/features/admin/rolApi';
+import { YETKI_ETIKETLERI, type RolTanimi, type YetkiKodu, type YetkiTanimi } from '@/features/admin/rolApi';
 
 const SISTEM_ROL_KODLARI = new Set([
   'SUPER_ADMIN',
@@ -24,7 +24,7 @@ interface RolMatrisiProps {
 export function RolMatrisi({ roller, yetkiler, duzenlenebilir, onYetkiToggle }: RolMatrisiProps) {
   return (
     <div className="overflow-x-auto rounded-lg border border-slate-700 bg-slate-800">
-      <table className="w-full min-w-[720px] text-left text-sm">
+      <table className="w-full min-w-[560px] text-left text-sm">
         <thead>
           <tr className="border-b border-slate-700 bg-slate-900/50">
             <th className="px-4 py-3 font-semibold text-white">Rol</th>
@@ -119,7 +119,7 @@ export function RolKartlari({ roller, seciliKod, duzenlenebilir, onSec, onDuzenl
                     key={y}
                     className="rounded bg-slate-700 px-2 py-0.5 text-[10px] text-slate-300"
                   >
-                    {y.replace(/_/g, ' ')}
+                    {YETKI_ETIKETLERI[y] ?? y.replace(/_/g, ' ')}
                   </span>
                 ))}
               </div>

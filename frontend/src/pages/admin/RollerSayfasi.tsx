@@ -9,9 +9,10 @@ import {
   adminRolleriGetir,
   adminRolleriKaydet,
   baslikdanKodUret,
+  GECERLI_YETKI_LISTESI,
+  rollerTemizle,
   type RolTanimi,
   type YetkiKodu,
-  type YetkiTanimi,
 } from '@/features/admin/rolApi';
 
 function rollerEsitMi(a: RolTanimi[], b: RolTanimi[]): boolean {
@@ -30,7 +31,7 @@ export function RollerSayfasi() {
   const { kullanici } = useAuth();
   const [taslakRoller, setTaslakRoller] = useState<RolTanimi[]>([]);
   const [kayitliRoller, setKayitliRoller] = useState<RolTanimi[]>([]);
-  const [yetkiler, setYetkiler] = useState<YetkiTanimi[]>([]);
+  const yetkiler = GECERLI_YETKI_LISTESI;
   const [yukleniyor, setYukleniyor] = useState(true);
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [hata, setHata] = useState('');
@@ -52,10 +53,10 @@ export function RollerSayfasi() {
     setHata('');
     try {
       const veri = await adminRolleriGetir();
-      setTaslakRoller(veri.roller);
-      setKayitliRoller(veri.roller);
-      kayitliRef.current = veri.roller;
-      setYetkiler(veri.yetkiler);
+      const temiz = rollerTemizle(veri.roller);
+      setTaslakRoller(temiz);
+      setKayitliRoller(temiz);
+      kayitliRef.current = temiz;
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Roller alınamadı');
     } finally {
@@ -129,11 +130,11 @@ export function RollerSayfasi() {
     setKaydediliyor(true);
     setHata('');
     try {
-      const veri = await adminRolleriKaydet(taslakRoller);
-      setTaslakRoller(veri.roller);
-      setKayitliRoller(veri.roller);
-      kayitliRef.current = veri.roller;
-      setYetkiler(veri.yetkiler);
+      const veri = await adminRolleriKaydet(rollerTemizle(taslakRoller));
+      const temiz = rollerTemizle(veri.roller);
+      setTaslakRoller(temiz);
+      setKayitliRoller(temiz);
+      kayitliRef.current = temiz;
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Kaydetme başarısız');
     } finally {

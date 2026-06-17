@@ -5,11 +5,49 @@ export type YetkiKodu =
   | 'ekleme'
   | 'duzenleme'
   | 'silme'
-  | 'yayinlama'
-  | 'dosya_yukleme'
-  | 'seo_duzenleme'
-  | 'tema_duzenleme'
   | 'kullanici_yonetimi';
+
+/** Eski sürümlerde kaldırılmış yetkiler — matriste gösterilmez */
+const KALDIRILAN_YETKILER = new Set([
+  'yayinlama',
+  'dosya_yukleme',
+  'seo_duzenleme',
+  'tema_duzenleme',
+]);
+
+export const YETKI_ETIKETLERI: Record<YetkiKodu, string> = {
+  goruntuleme: 'Görüntüleme',
+  ekleme: 'Ekleme',
+  duzenleme: 'Düzenleme',
+  silme: 'Silme',
+  kullanici_yonetimi: 'Kullanıcı Yönetimi',
+};
+
+const GECERLI_YETKI_KODLARI: YetkiKodu[] = [
+  'goruntuleme',
+  'ekleme',
+  'duzenleme',
+  'silme',
+  'kullanici_yonetimi',
+];
+
+export const GECERLI_YETKI_LISTESI: YetkiTanimi[] = GECERLI_YETKI_KODLARI.map((kod) => ({
+  kod,
+  etiket: YETKI_ETIKETLERI[kod],
+}));
+
+export function gecerliYetkiMi(kod: string): kod is YetkiKodu {
+  return GECERLI_YETKI_KODLARI.includes(kod as YetkiKodu);
+}
+
+export function rollerTemizle(roller: RolTanimi[]): RolTanimi[] {
+  return roller.map((rol) => ({
+    ...rol,
+    yetkiler: rol.yetkiler.filter(
+      (y) => !KALDIRILAN_YETKILER.has(y) && gecerliYetkiMi(y)
+    ),
+  }));
+}
 
 export interface RolTanimi {
   kod: string;

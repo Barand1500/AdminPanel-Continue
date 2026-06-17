@@ -5,7 +5,7 @@ import {
   adminMedyaOlustur,
   adminMedyaSil,
   adminMedyaTopluSil,
-  adminMedyaYukle,
+  adminMedyaTopluYukle,
   adminMedyalariGetir,
   type AdminMedya,
 } from '@/features/admin/medyaApi';
@@ -16,7 +16,9 @@ export function MedyaGalerisiSayfasi() {
   const [seciliIds, setSeciliIds] = useState<string[]>([]);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [islemYapiliyor, setIslemYapiliyor] = useState(false);
+  const [yuklemeIlerleme, setYuklemeIlerleme] = useState<{ tamamlanan: number; toplam: number } | null>(null);
   const [hata, setHata] = useState('');
+  const [basari, setBasari] = useState('');
 
   async function yukle() {
     setYukleniyor(true);
@@ -82,35 +84,52 @@ export function MedyaGalerisiSayfasi() {
     }
   );
 
-  async function dosyaSec(e: React.ChangeEvent<HTMLInputElement>) {
-    const dosya = e.target.files?.[0];
-    if (!dosya) return;
+  async function dosyalariYukle(dosyalar: File[]) {
+    if (dosyalar.length === 0) {
+      setHata('Yüklenecek geçerli görsel dosyası bulunamadı');
+      return;
+    }
     setIslemYapiliyor(true);
     setHata('');
+    setBasari('');
+    setYuklemeIlerleme({ tamamlanan: 0, toplam: dosyalar.length });
     try {
-      await adminMedyaYukle(dosya, dosya.name);
+      const sonuc = await adminMedyaTopluYukle(dosyalar, (tamamlanan, toplam) => {
+        setYuklemeIlerleme({ tamamlanan, toplam });
+      });
       await yukle();
+      if (sonuc.basarili.length > 0) {
+        setBasari(`${sonuc.basarili.length} görsel başarıyla yüklendi.`);
+      }
+      if (sonuc.hatalar.length > 0) {
+        const detay = sonuc.hatalar.map((h) => `${h.dosyaAdi}: ${h.mesaj}`).join(' · ');
+        setHata(sonuc.basarili.length > 0 ? `Bazı dosyalar yüklenemedi: ${detay}` : detay);
+      }
     } catch (err) {
-      setHata(err instanceof Error ? err.message : 'Dosya yüklenemedi');
+      setHata(err instanceof Error ? err.message : 'Dosyalar yüklenemedi');
     } finally {
       setIslemYapiliyor(false);
-      e.target.value = '';
+      setYuklemeIlerleme(null);
     }
   }
 
   return (
     <div>
       <h1 className="text-xl font-bold text-white">Medya Galerisi</h1>
-      <p className="mt-1 text-sm text-slate-400">Görselleri yükleyin veya URL ile ekleyin. Silmek için medya seçip alt bardan Sil kullanın.</p>
+      <p className="mt-1 text-sm text-slate-400">
+        Görselleri toplu sürükleyip bırakın veya seçin. URL ile tek tek de ekleyebilirsiniz. Silmek için medya seçip alt bardan Sil kullanın.
+      </p>
+      {basari && <p className="mt-4 text-sm text-green-400">{basari}</p>}
       {hata && <p className="mt-4 text-sm text-red-400">{hata}</p>}
-      {islemYapiliyor && <p className="mt-4 text-sm text-slate-400">İşlem yapılıyor...</p>}
+      {islemYapiliyor && !yuklemeIlerleme && <p className="mt-4 text-sm text-slate-400">İşlem yapılıyor...</p>}
 
       <div className="mt-6">
         <MedyaYukleyici
           urlForm={urlForm}
           yukleniyor={islemYapiliyor}
+          yuklemeIlerleme={yuklemeIlerleme}
           onUrlFormChange={setUrlForm}
-          onDosyaSec={dosyaSec}
+          onDosyalarSec={dosyalariYukle}
         />
       </div>
 

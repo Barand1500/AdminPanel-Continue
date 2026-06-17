@@ -26,6 +26,7 @@ import {
   widgetTipleriKategoriyeGore,
   WIDGET_TIP_KATEGORILERI,
 } from './widgetRegistry';
+import { WidgetTipSecici } from './WidgetTipSecici';
 import { yerlesimEtiketi, yerlesimOku } from '@/utils/widgetYerlesim';
 
 export {
@@ -168,7 +169,7 @@ export function WidgetEditorPanel({
   yeniMod,
   kaydediliyor,
   hata,
-  varsayilanTip,
+  varsayilanTip: _varsayilanTip,
   tumWidgetlar = [],
   onChange,
   onKaydetTetikleyici,
@@ -188,8 +189,6 @@ export function WidgetEditorPanel({
 
   const seciliTipMeta = WIDGET_TIPLERI.find((t) => t.id === form.tip);
   const IcerikPanel = ICERIK_PANEL_MAP[form.tip];
-
-  const kategoriliTipler = widgetTipleriKategoriyeGore(varsayilanTip);
 
   return (
     <div className="ap-editor-panel">
@@ -225,34 +224,14 @@ export function WidgetEditorPanel({
         {sekme === 'genel' && (
           <>
             {yeniMod && (
-              <AdminFormBolumu baslik="Widget Tipi" aciklama="İçerik türüne göre gruplandırılmış bileşenler — slider, kart, karusel, resimli vb.">
-                <div className="space-y-4">
-                  {kategoriliTipler.map(({ kategori, tipler }) => (
-                    <div key={kategori.id}>
-                      <div className="ap-widget-kategori-baslik">
-                        <span className="ap-widget-kategori-etiket">{kategori.etiket}</span>
-                        <span className="ap-widget-kategori-aciklama">{kategori.aciklama}</span>
-                      </div>
-                      <div className="ap-widget-tip-grid mt-2">
-                        {tipler.map((tip) => (
-                          <button
-                            key={tip.id}
-                            type="button"
-                            onClick={() => {
-                              onChange(tipDegistir(form, tip.id));
-                              onTipSecildi?.(tip.id);
-                            }}
-                            className={`ap-widget-tip-kart ${form.tip === tip.id ? 'ap-widget-tip-kart-secili' : ''}`}
-                          >
-                            <span className="ap-widget-tip-ikon">{tip.ikon}</span>
-                            <span className="ap-widget-tip-ad">{tip.etiket}</span>
-                            <span className="ap-widget-tip-aciklama">{tip.aciklama}</span>
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
+              <AdminFormBolumu baslik="Widget Tipi" aciklama="Üstten kategori seçin; yalnızca o gruptaki bileşenler listelenir.">
+                <WidgetTipSecici
+                  seciliTip={form.tip}
+                  onSec={(tip) => {
+                    onChange(tipDegistir(form, tip));
+                    onTipSecildi?.(tip);
+                  }}
+                />
               </AdminFormBolumu>
             )}
 

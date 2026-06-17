@@ -44,6 +44,43 @@ export async function adminMedyaYukle(dosya: File, ad?: string): Promise<AdminMe
   return veri.medya as AdminMedya;
 }
 
+export interface TopluYuklemeSonucu {
+  basarili: AdminMedya[];
+  hatalar: { dosyaAdi: string; mesaj: string }[];
+}
+
+export async function adminMedyaTopluYukle(
+  dosyalar: File[],
+  onIlerleme?: (tamamlanan: number, toplam: number) => void
+): Promise<TopluYuklemeSonucu> {
+  const gorseller = dosyalar.filter((d) => d.type.startsWith('image/'));
+  const sonuc: TopluYuklemeSonucu = { basarili: [], hatalar: [] };
+
+  for (let i = 0; i < gorseller.length; i++) {
+    const dosya = gorseller[i];
+    try {
+      const medya = await adminMedyaYukle(dosya, dosya.name);
+      sonuc.basarili.push(medya);
+    } catch (err) {
+      sonuc.hatalar.push({
+        dosyaAdi: dosya.name,
+        mesaj: err instanceof Error ? err.message : 'Yuklenemedi',
+      });
+    }
+    onIlerleme?.(i + 1, gorseller.length);
+  }
+
+  const gecersizSayisi = dosyalar.length - gorseller.length;
+  if (gecersizSayisi > 0) {
+    sonuc.hatalar.push({
+      dosyaAdi: `${gecersizSayisi} dosya`,
+      mesaj: 'Gorsel olmayan dosyalar atlandi',
+    });
+  }
+
+  return sonuc;
+}
+
 export async function adminMedyaSil(id: string): Promise<void> {
   await adminJsonFetch(`/medya/${id}`, { method: 'DELETE', headers: adminHeaders() });
 }
