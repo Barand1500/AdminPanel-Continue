@@ -10,7 +10,6 @@ export const adminModulleri: AdminModul[] = [
 
   { id: 'header', baslik: 'Header Yönetimi', ikon: '🔝', kategori: 'Site Yönetimi', yol: '/gt-admin/header' },
   { id: 'hero', baslik: 'Hero Yönetimi', ikon: '🏠', kategori: 'Site Yönetimi', yol: '/gt-admin/hero' },
-  { id: 'menu-yonetimi', baslik: 'Menü Yönetimi', ikon: '📋', kategori: 'Site Yönetimi', yol: '/gt-admin/menu' },
   { id: 'footer', baslik: 'Footer Yönetimi', ikon: '🔻', kategori: 'Site Yönetimi', yol: '/gt-admin/footer' },
 
   { id: 'blog', baslik: 'Blog / Haberler', ikon: '📰', kategori: 'İçerik Yönetimi', yol: '/gt-admin/blog' },

@@ -5,10 +5,20 @@ import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 
 function widgetAdUret(form: WidgetFormDegeri) {
   const ad = form.ad.trim();
-  if (ad) return ad;
+  if (ad.length >= 2) return ad;
   const baslik = form.baslik.trim();
-  if (baslik) return baslik;
-  return tipEtiketi(form.tip) || 'Widget';
+  if (baslik.length >= 2) return baslik;
+  const tipAd = tipEtiketi(form.tip) || 'Widget';
+  return ad.length === 1 ? `${ad} — ${tipAd}` : tipAd;
+}
+
+function apiHataMesaji(veri: { mesaj?: string; hatalar?: Record<string, string[] | undefined> }, varsayilan: string) {
+  if (veri.hatalar && typeof veri.hatalar === 'object') {
+    const satirlar = Object.entries(veri.hatalar)
+      .flatMap(([alan, liste]) => (liste ?? []).map((m) => `${alan}: ${m}`));
+    if (satirlar.length > 0) return satirlar.join(' · ');
+  }
+  return veri.mesaj ?? varsayilan;
 }
 
 const API_URL = import.meta.env.VITE_API_URL ?? '/api';
@@ -74,7 +84,7 @@ export async function widgetlariGetir(tip?: string): Promise<AdminWidget[]> {
     headers: authHeaders(),
   });
   const veri = await yanit.json();
-  if (!yanit.ok) throw new Error(veri.mesaj ?? 'Widgetlar alinamadi');
+  if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widgetlar alinamadi'));
   return veri.widgetlar as AdminWidget[];
 }
 
@@ -85,7 +95,7 @@ export async function widgetOlustur(form: WidgetFormDegeri): Promise<AdminWidget
     body: JSON.stringify(payloadHazirla(form)),
   });
   const veri = await yanit.json();
-  if (!yanit.ok) throw new Error(veri.mesaj ?? 'Widget olusturulamadi');
+  if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widget olusturulamadi'));
   return veri.widget as AdminWidget;
 }
 
@@ -96,7 +106,7 @@ export async function widgetGuncelle(id: string, form: WidgetFormDegeri): Promis
     body: JSON.stringify(payloadHazirla(form, true)),
   });
   const veri = await yanit.json();
-  if (!yanit.ok) throw new Error(veri.mesaj ?? 'Widget guncellenemedi');
+  if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widget guncellenemedi'));
   return veri.widget as AdminWidget;
 }
 
@@ -106,5 +116,5 @@ export async function widgetSil(id: string): Promise<void> {
     headers: authHeaders(),
   });
   const veri = await yanit.json();
-  if (!yanit.ok) throw new Error(veri.mesaj ?? 'Widget silinemedi');
+  if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widget silinemedi'));
 }

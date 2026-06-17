@@ -47,13 +47,6 @@ const modulAksiyonlari: Record<string, AksiyonButonu[]> = {
     A('onizle', 'Önizle', false),
     A('yayinla', 'Yayınla', false),
   ],
-  'menu-yonetimi': [
-    A('kaydet', 'Kaydet', true, true),
-    A('ekle', 'Yeni Ekle', false),
-    A('sil', 'Sil', false),
-    A('onizle', 'Önizle', true),
-    A('yayinla', 'Yayınla', false),
-  ],
   'site-ayarlari': [
     A('kaydet', 'Kaydet', true, true),
     A('ekle', 'Yeni Ekle', false),

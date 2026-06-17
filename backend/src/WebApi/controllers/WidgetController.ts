@@ -1,4 +1,4 @@
-import { WidgetTipi } from '@prisma/client';
+import { WIDGET_TIPLERI, type WidgetTip } from '../../Application/DTOs/WidgetDto.js';
 import type { Request, Response } from 'express';
 import { WidgetService } from '../../Services/WidgetService.js';
 import { cozulenSiteId } from '../utils/cozulenSiteId.js';
@@ -15,8 +15,8 @@ export class WidgetController {
       }
 
       const tipRaw = typeof req.query.tip === 'string' ? req.query.tip : undefined;
-      const tip = tipRaw && Object.values(WidgetTipi).includes(tipRaw as WidgetTipi)
-        ? (tipRaw as WidgetTipi)
+      const tip = tipRaw && (WIDGET_TIPLERI as readonly string[]).includes(tipRaw)
+        ? (tipRaw as WidgetTip)
         : undefined;
 
       const widgetlar = await widgetService.listele(siteId, tip);

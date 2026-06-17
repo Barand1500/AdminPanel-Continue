@@ -72,13 +72,9 @@ export function sayfaMenudenUstMenuAktar(sayfalar: AdminSayfa[]): UstMenuOgesi[]
 
 export function headerMenuOlustur(
   sayfalar: Sayfa[],
-  headerAyarlari?: HeaderAyarlari | null,
+  _headerAyarlari?: HeaderAyarlari | null,
   siteAyarlari?: SiteAyarlari | null
 ): MenuOgesi[] {
-  const ust = headerAyarlari?.ustMenu;
-  if (ust && ust.length > 0) {
-    return ustMenuOgeleriOlustur(ust, sayfalar);
-  }
   return menuOgeleriOlustur(sayfalar, blogAyarlariBirlestir(siteAyarlari));
 }
 

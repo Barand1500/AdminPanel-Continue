@@ -180,6 +180,55 @@ function mockConfig(tip: string): WidgetConfig {
       return {};
     case 'POPUP':
       return { popupGecikme: 0, popupTetikleyici: 'sayfa_yukle' };
+    case 'ZAMAN_CIZELGESI':
+      return {
+        timeline: [
+          { id: id(), tarih: '2015', baslik: 'Kuruluş', aciklama: 'Güzel Teknoloji faaliyete başladı.' },
+          { id: id(), tarih: '2019', baslik: 'Büyüme', aciklama: '100+ kurumsal müşteriye ulaştık.' },
+          { id: id(), tarih: '2024', baslik: 'Yeni Dönem', aciklama: 'Bulut ve yapay zeka çözümleri portföyü genişledi.' },
+        ],
+      };
+    case 'SUREC_ADIMLARI':
+      return {
+        surecAdimlari: [
+          { id: id(), baslik: 'Analiz', aciklama: 'İhtiyaçlarınızı dinliyoruz.', ikon: '🔍' },
+          { id: id(), baslik: 'Tasarım', aciklama: 'Size özel çözüm planlıyoruz.', ikon: '✏️' },
+          { id: id(), baslik: 'Geliştirme', aciklama: 'Uzman ekibimiz hayata geçiriyor.', ikon: '⚙️' },
+          { id: id(), baslik: 'Teslimat', aciklama: 'Destek ile birlikte teslim ediyoruz.', ikon: '🚀' },
+        ],
+      };
+    case 'MARKA_SERIDI':
+      return {
+        markaHizi: 'normal',
+        markalar: [
+          { id: id(), ad: 'TechCorp', gorselUrl: ONIZLEME_GORSEL, link: '#' },
+          { id: id(), ad: 'DataFlow', gorselUrl: ONIZLEME_GORSEL, link: '#' },
+          { id: id(), ad: 'CloudNet', gorselUrl: ONIZLEME_GORSEL, link: '#' },
+          { id: id(), ad: 'InnoLab', gorselUrl: ONIZLEME_GORSEL, link: '#' },
+          { id: id(), ad: 'SmartSys', gorselUrl: ONIZLEME_GORSEL, link: '#' },
+        ],
+      };
+    case 'KARSILASTIRMA_TABLOSU':
+      return {
+        karsilastirmaPaketler: [
+          { id: id(), ad: 'Temel', fiyat: '₺499', oneCikan: false },
+          { id: id(), ad: 'Pro', fiyat: '₺999', oneCikan: true },
+          { id: id(), ad: 'Kurumsal', fiyat: '₺1.999', oneCikan: false },
+        ],
+        karsilastirmaSatirlari: [
+          { id: id(), ozellik: 'Kullanıcı sayısı', hucreler: ['5', '25', 'Sınırsız'] },
+          { id: id(), ozellik: 'Destek', hucreler: ['E-posta', 'Öncelikli', '7/24'] },
+          { id: id(), ozellik: 'API erişimi', hucreler: ['✗', '✓', '✓'] },
+        ],
+      };
+    case 'GERI_SAYIM':
+      return { bitisTarihi: new Date(Date.now() + 7 * 86400000).toISOString() };
+    case 'VIDEO_BANNER':
+      return { videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', videoTip: 'youtube' };
+    case 'ONCESI_SONRASI':
+      return { onceGorsel: ONIZLEME_GORSEL, sonraGorsel: ONIZLEME_GORSEL };
+    case 'BULTEN_KAYIT':
+      return { formSlug: 'bulten', bultenPlaceholder: 'E-posta adresiniz', bultenKvkk: 'Abone olarak gizlilik politikasını kabul etmiş olursunuz.' };
     default:
       return {};
   }
@@ -212,6 +261,20 @@ function configBirlestir(mevcut: WidgetConfig, mock: WidgetConfig): WidgetConfig
   sonuc.ikonKartlar = dizi(sonuc.ikonKartlar, mock.ikonKartlar ?? []);
   sonuc.kategoriler = dizi(sonuc.kategoriler, mock.kategoriler ?? []);
   sonuc.filtreler = dizi(sonuc.filtreler, mock.filtreler ?? []);
+  sonuc.timeline = dizi(sonuc.timeline, mock.timeline ?? []);
+  sonuc.surecAdimlari = dizi(sonuc.surecAdimlari, mock.surecAdimlari ?? []);
+  sonuc.markalar = dizi(sonuc.markalar, mock.markalar ?? []);
+  sonuc.karsilastirmaPaketler = dizi(sonuc.karsilastirmaPaketler, mock.karsilastirmaPaketler ?? []);
+  sonuc.karsilastirmaSatirlari = dizi(sonuc.karsilastirmaSatirlari, mock.karsilastirmaSatirlari ?? []);
+
+  if (!sonuc.bitisTarihi && mock.bitisTarihi) sonuc.bitisTarihi = mock.bitisTarihi;
+  if (!sonuc.videoUrl && mock.videoUrl) sonuc.videoUrl = mock.videoUrl;
+  if (!sonuc.videoTip && mock.videoTip) sonuc.videoTip = mock.videoTip;
+  if (!sonuc.onceGorsel && mock.onceGorsel) sonuc.onceGorsel = mock.onceGorsel;
+  if (!sonuc.sonraGorsel && mock.sonraGorsel) sonuc.sonraGorsel = mock.sonraGorsel;
+  if (!sonuc.bultenPlaceholder && mock.bultenPlaceholder) sonuc.bultenPlaceholder = mock.bultenPlaceholder;
+  if (!sonuc.bultenKvkk && mock.bultenKvkk) sonuc.bultenKvkk = mock.bultenKvkk;
+  if (!sonuc.markaHizi && mock.markaHizi) sonuc.markaHizi = mock.markaHizi;
 
   if (!sonuc.tumunuGorMetin && mock.tumunuGorMetin) sonuc.tumunuGorMetin = mock.tumunuGorMetin;
   if (!sonuc.tumunuGorLink && mock.tumunuGorLink) sonuc.tumunuGorLink = mock.tumunuGorLink;
@@ -236,7 +299,11 @@ export function onizlemeMockVerisiUygula(widget: Widget): Widget {
         ? 'Sorularınız için bize ulaşın, en kısa sürede dönüş yapalım.'
         : 'Bu bölüm önizleme amaçlı örnek içerik göstermektedir.'
     ),
-    gorselUrl: widget.gorselUrl?.trim() ? widget.gorselUrl : (widget.tip === 'BASLIK_METIN_GORSEL' ? ONIZLEME_GORSEL : widget.gorselUrl),
+    gorselUrl: widget.gorselUrl?.trim()
+      ? widget.gorselUrl
+      : ['BASLIK_METIN_GORSEL', 'VIDEO_BANNER'].includes(widget.tip)
+        ? ONIZLEME_GORSEL
+        : widget.gorselUrl,
     butonMetni: metin(widget.butonMetni, 'Daha Fazla'),
     butonLink: metin(widget.butonLink, '/iletisim'),
     configJson: birlesik as Record<string, unknown>,
@@ -264,6 +331,14 @@ function mockBaslik(tip: string): string {
     HARITA: 'Konumumuz',
     ILETISIM_FORMU: 'İletişime Geçin',
     POPUP: 'Özel Teklif',
+    ZAMAN_CIZELGESI: 'Yolculuğumuz',
+    SUREC_ADIMLARI: 'Nasıl Çalışıyoruz?',
+    MARKA_SERIDI: 'Güvenen Markalar',
+    KARSILASTIRMA_TABLOSU: 'Paket Karşılaştırması',
+    GERI_SAYIM: 'Kampanya Bitiyor!',
+    VIDEO_BANNER: 'Tanıtım Videosu',
+    ONCESI_SONRASI: 'Farkı Görün',
+    BULTEN_KAYIT: 'Bültenimize Katılın',
   };
   return basliklar[tip] ?? 'Örnek Başlık';
 }

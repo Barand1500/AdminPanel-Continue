@@ -24,6 +24,17 @@ export const YENI_WIDGET_TIPLERI = [
   'FIYATLANDIRMA',
 ] as const;
 
+export const MODERN_WIDGET_TIPLERI = [
+  'ZAMAN_CIZELGESI',
+  'SUREC_ADIMLARI',
+  'MARKA_SERIDI',
+  'KARSILASTIRMA_TABLOSU',
+  'GERI_SAYIM',
+  'VIDEO_BANNER',
+  'ONCESI_SONRASI',
+  'BULTEN_KAYIT',
+] as const;
+
 export const AKTIF_WIDGET_TIPLERI = [
   'SLIDER',
   'HIZMET_KARTLARI',
@@ -35,6 +46,7 @@ export const AKTIF_WIDGET_TIPLERI = [
   'ILETISIM_FORMU',
   'POPUP',
   ...YENI_WIDGET_TIPLERI,
+  ...MODERN_WIDGET_TIPLERI,
 ] as const;
 
 export type AktifWidgetTipi = (typeof AKTIF_WIDGET_TIPLERI)[number];
@@ -230,6 +242,40 @@ export interface WidgetIkonKart {
   metin: string;
 }
 
+export interface WidgetTimelineOgesi {
+  id: string;
+  tarih: string;
+  baslik: string;
+  aciklama: string;
+}
+
+export interface WidgetSurecAdimi {
+  id: string;
+  baslik: string;
+  aciklama: string;
+  ikon: string;
+}
+
+export interface WidgetMarkaLogosu {
+  id: string;
+  ad: string;
+  gorselUrl: string;
+  link?: string;
+}
+
+export interface WidgetKarsilastirmaPaket {
+  id: string;
+  ad: string;
+  fiyat: string;
+  oneCikan: boolean;
+}
+
+export interface WidgetKarsilastirmaSatiri {
+  id: string;
+  ozellik: string;
+  hucreler: string[];
+}
+
 export interface WidgetConfig {
   yerlesim?: WidgetYerlesim;
   gorunum?: WidgetGorunumAyarlari;
@@ -266,6 +312,19 @@ export interface WidgetConfig {
   formSlug?: string;
   metin?: string;
   kategoriler?: WidgetLinkOgesi[];
+  timeline?: WidgetTimelineOgesi[];
+  surecAdimlari?: WidgetSurecAdimi[];
+  markalar?: WidgetMarkaLogosu[];
+  markaHizi?: 'yavas' | 'normal' | 'hizli';
+  karsilastirmaPaketler?: WidgetKarsilastirmaPaket[];
+  karsilastirmaSatirlari?: WidgetKarsilastirmaSatiri[];
+  bitisTarihi?: string;
+  videoUrl?: string;
+  videoTip?: 'youtube' | 'dosya';
+  onceGorsel?: string;
+  sonraGorsel?: string;
+  bultenPlaceholder?: string;
+  bultenKvkk?: string;
 }
 
 export function uid() {
@@ -363,6 +422,22 @@ export function varsayilanConfig(tip: string): WidgetConfig {
       return { yerlesim, gorunum, ek, yorumlar: [], otomatikKaydir: true };
     case 'FIYATLANDIRMA':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3 }, ek, paketler: [] };
+    case 'ZAMAN_CIZELGESI':
+      return { yerlesim, gorunum, ek, timeline: [] };
+    case 'SUREC_ADIMLARI':
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4 }, ek, surecAdimlari: [] };
+    case 'MARKA_SERIDI':
+      return { yerlesim, gorunum, ek, markalar: [], markaHizi: 'normal' };
+    case 'KARSILASTIRMA_TABLOSU':
+      return { yerlesim, gorunum, ek, karsilastirmaPaketler: [], karsilastirmaSatirlari: [] };
+    case 'GERI_SAYIM':
+      return { yerlesim, gorunum, ek, bitisTarihi: '' };
+    case 'VIDEO_BANNER':
+      return { yerlesim: { bolge: 'slider_alti' }, gorunum, ek, videoUrl: '', videoTip: 'youtube' };
+    case 'ONCESI_SONRASI':
+      return { yerlesim, gorunum, ek, onceGorsel: '', sonraGorsel: '' };
+    case 'BULTEN_KAYIT':
+      return { yerlesim: { bolge: 'footer_ustu' }, gorunum, ek, formSlug: 'bulten', bultenPlaceholder: 'E-posta adresiniz' };
     default:
       return { yerlesim, gorunum, ek };
   }

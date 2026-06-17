@@ -1,31 +1,80 @@
-import { WidgetTipi } from '@prisma/client';
 import { z } from 'zod';
 
-export const widgetTipleri = Object.values(WidgetTipi);
+/** schema.prisma WidgetTipi ile senkron tutulmalı */
+export const WIDGET_TIPLERI = [
+  'HEADER',
+  'NAVBAR',
+  'SLIDER',
+  'HERO_BANNER',
+  'HIZMET_KARTLARI',
+  'KATEGORI',
+  'REFERANSLAR',
+  'SSS',
+  'GALERI',
+  'HARITA',
+  'ILETISIM_FORMU',
+  'POPUP',
+  'FOOTER',
+  'BASLIK_METIN',
+  'BASLIK_METIN_GORSEL',
+  'BLOG_KARUSEL',
+  'LINK_KARTLARI',
+  'GORSEL_GRID_BLOK',
+  'GORSEL_ETIKET_KARTLARI',
+  'EKIP_KARUSEL',
+  'SAYAC_BLOK',
+  'YORUM_KARUSEL',
+  'FIYATLANDIRMA',
+  'ZAMAN_CIZELGESI',
+  'SUREC_ADIMLARI',
+  'MARKA_SERIDI',
+  'KARSILASTIRMA_TABLOSU',
+  'GERI_SAYIM',
+  'VIDEO_BANNER',
+  'ONCESI_SONRASI',
+  'BULTEN_KAYIT',
+] as const;
 
-export const deprecatedWidgetTipleri: WidgetTipi[] = [
-  WidgetTipi.HEADER,
-  WidgetTipi.NAVBAR,
-  WidgetTipi.FOOTER,
+export type WidgetTip = (typeof WIDGET_TIPLERI)[number];
+
+export const widgetTipleri = [...WIDGET_TIPLERI];
+
+export const deprecatedWidgetTipleri: WidgetTip[] = [
+  'HEADER',
+  'NAVBAR',
+  'FOOTER',
 ];
 
+const bosMetin = z
+  .union([z.string(), z.null()])
+  .optional()
+  .transform((v) => {
+    if (v == null) return null;
+    const t = v.trim();
+    return t.length > 0 ? t : null;
+  });
+
 const baseWidgetSchema = z.object({
-  ad: z.string().min(2, 'Widget adi en az 2 karakter olmali'),
-  tip: z.nativeEnum(WidgetTipi),
+  ad: z
+    .string()
+    .trim()
+    .min(1, 'Widget adi gerekli')
+    .transform((v) => (v.length < 2 ? `${v} Widget` : v)),
+  tip: z.enum(WIDGET_TIPLERI, { message: 'Gecersiz widget tipi' }),
   sayfaId: z.string().optional().nullable(),
-  sira: z.number().int().min(0).default(0),
-  aktif: z.boolean().default(true),
-  baslik: z.string().optional().nullable(),
-  altBaslik: z.string().optional().nullable(),
-  aciklama: z.string().optional().nullable(),
-  gorselUrl: z.string().optional().nullable(),
-  butonMetni: z.string().optional().nullable(),
-  butonLink: z.string().optional().nullable(),
-  arkaPlanRenk: z.string().optional().nullable(),
-  yaziRenk: z.string().optional().nullable(),
-  mobilGoster: z.boolean().default(true),
-  masaustuGoster: z.boolean().default(true),
-  configJson: z.record(z.any()).optional().nullable(),
+  sira: z.coerce.number().int().min(0).default(0),
+  aktif: z.coerce.boolean().default(true),
+  baslik: bosMetin,
+  altBaslik: bosMetin,
+  aciklama: bosMetin,
+  gorselUrl: bosMetin,
+  butonMetni: bosMetin,
+  butonLink: bosMetin,
+  arkaPlanRenk: bosMetin,
+  yaziRenk: bosMetin,
+  mobilGoster: z.coerce.boolean().default(true),
+  masaustuGoster: z.coerce.boolean().default(true),
+  configJson: z.record(z.unknown()).optional().nullable(),
 });
 
 export const widgetOlusturSchema = baseWidgetSchema;

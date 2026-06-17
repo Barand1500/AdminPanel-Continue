@@ -19,6 +19,7 @@ export const WIDGET_TIP_KATEGORILERI = [
   { id: 'istatistik', etiket: 'İstatistik', aciklama: 'Sayaç ve rakam blokları' },
   { id: 'iletisim', etiket: 'İletişim', aciklama: 'Harita ve iletişim CTA' },
   { id: 'diger', etiket: 'Diğer', aciklama: 'SSS, referans, popup, kategori' },
+  { id: 'modern', etiket: 'Modern', aciklama: 'Zaman çizelgesi, video, geri sayım ve özel bloklar' },
 ] as const;
 
 export type WidgetTipKategoriId = (typeof WIDGET_TIP_KATEGORILERI)[number]['id'];
@@ -43,6 +44,14 @@ export const WIDGET_TIPLERI = [
   { id: 'HARITA', etiket: 'Harita', ikon: '🗺️', aciklama: 'Konum haritası', grup: 'İletişim', kategori: 'iletisim' as const },
   { id: 'ILETISIM_FORMU', etiket: 'İletişim CTA', ikon: '📧', aciklama: 'İletişim çağrı bandı', grup: 'İletişim', kategori: 'iletisim' as const },
   { id: 'POPUP', etiket: 'Popup', ikon: '💬', aciklama: 'Açılır pencere', grup: 'Diğer', kategori: 'diger' as const },
+  { id: 'ZAMAN_CIZELGESI', etiket: 'Zaman Çizelgesi', ikon: '📅', aciklama: 'Dikey timeline — şirket tarihçesi', grup: 'Modern', kategori: 'modern' as const },
+  { id: 'SUREC_ADIMLARI', etiket: 'Süreç Adımları', ikon: '🪜', aciklama: 'Numaralı adım akışı', grup: 'Modern', kategori: 'modern' as const },
+  { id: 'MARKA_SERIDI', etiket: 'Marka Şeridi', ikon: '🏷️', aciklama: 'Kayan logo / partner şeridi', grup: 'Modern', kategori: 'modern' as const },
+  { id: 'KARSILASTIRMA_TABLOSU', etiket: 'Karşılaştırma Tablosu', ikon: '📋', aciklama: 'Paket özellik karşılaştırması', grup: 'Modern', kategori: 'modern' as const },
+  { id: 'GERI_SAYIM', etiket: 'Geri Sayım', ikon: '⏳', aciklama: 'Kampanya countdown + CTA', grup: 'Modern', kategori: 'modern' as const },
+  { id: 'VIDEO_BANNER', etiket: 'Video Banner', ikon: '🎬', aciklama: 'YouTube veya video arka plan', grup: 'Modern', kategori: 'modern' as const },
+  { id: 'ONCESI_SONRASI', etiket: 'Öncesi / Sonrası', ikon: '↔️', aciklama: 'Kaydırmalı görsel karşılaştırma', grup: 'Modern', kategori: 'modern' as const },
+  { id: 'BULTEN_KAYIT', etiket: 'Bülten Kayıt', ikon: '✉️', aciklama: 'E-posta abonelik formu', grup: 'Modern', kategori: 'modern' as const },
 ] as const;
 
 export type WidgetTipMeta = (typeof WIDGET_TIPLERI)[number];

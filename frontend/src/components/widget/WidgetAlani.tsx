@@ -16,6 +16,14 @@ import { FiyatlandirmaWidget } from './FiyatlandirmaWidget';
 import { GaleriWidget } from './GaleriWidget';
 import { SssWidget } from './SssWidget';
 import { PopupWidget } from './PopupWidget';
+import { ZamanCizelgesiWidget } from './ZamanCizelgesiWidget';
+import { SurecAdimlariWidget } from './SurecAdimlariWidget';
+import { MarkaSeridiWidget } from './MarkaSeridiWidget';
+import { KarsilastirmaTablosuWidget } from './KarsilastirmaTablosuWidget';
+import { GeriSayimWidget } from './GeriSayimWidget';
+import { VideoBannerWidget } from './VideoBannerWidget';
+import { OncesiSonrasiWidget } from './OncesiSonrasiWidget';
+import { BultenKayitWidget } from './BultenKayitWidget';
 import { configOkuFromWidget, widgetSectionClass, widgetSectionStyle } from './widgetHelpers';
 
 interface WidgetRenderProps {
@@ -63,6 +71,22 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
         return <IletisimCtaWidget widget={widget} />;
       case 'POPUP':
         return <PopupWidget widget={widget} onizleme={onizleme} />;
+      case 'ZAMAN_CIZELGESI':
+        return <ZamanCizelgesiWidget widget={widget} />;
+      case 'SUREC_ADIMLARI':
+        return <SurecAdimlariWidget widget={widget} />;
+      case 'MARKA_SERIDI':
+        return <MarkaSeridiWidget widget={widget} />;
+      case 'KARSILASTIRMA_TABLOSU':
+        return <KarsilastirmaTablosuWidget widget={widget} />;
+      case 'GERI_SAYIM':
+        return <GeriSayimWidget widget={widget} />;
+      case 'VIDEO_BANNER':
+        return <VideoBannerWidget widget={widget} />;
+      case 'ONCESI_SONRASI':
+        return <OncesiSonrasiWidget widget={widget} />;
+      case 'BULTEN_KAYIT':
+        return <BultenKayitWidget widget={widget} />;
       case 'HARITA': {
         const cfg = configOkuFromWidget(widget);
         const src = cfg.haritaUrl || (cfg.haritaLat && cfg.haritaLng

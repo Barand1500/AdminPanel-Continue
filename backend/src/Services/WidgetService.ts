@@ -1,5 +1,5 @@
 import type { WidgetTipi } from '@prisma/client';
-import type { WidgetGuncelleDto, WidgetOlusturDto } from '../Application/DTOs/WidgetDto.js';
+import type { WidgetGuncelleDto, WidgetOlusturDto, WidgetTip } from '../Application/DTOs/WidgetDto.js';
 import { deprecatedWidgetTipleri } from '../Application/DTOs/WidgetDto.js';
 import { WidgetRepository } from '../Infrastructure/repositories/WidgetRepository.js';
 
@@ -8,7 +8,7 @@ import { opsiyonelSayisalId } from '../Infrastructure/utils/sayisalId.js';
 const widgetRepo = new WidgetRepository();
 
 export class WidgetService {
-  async listele(siteId: number, tip?: WidgetTipi) {
+  async listele(siteId: number, tip?: WidgetTip) {
     return widgetRepo.findAdminBySiteId(siteId, tip);
   }
 
@@ -18,7 +18,7 @@ export class WidgetService {
     }
     return widgetRepo.createForSite(siteId, {
       ad: dto.ad,
-      tip: dto.tip,
+      tip: dto.tip as WidgetTipi,
       sayfa: dto.sayfaId ? { connect: { id: opsiyonelSayisalId(dto.sayfaId)! } } : undefined,
       sira: dto.sira,
       aktif: dto.aktif,
@@ -44,7 +44,7 @@ export class WidgetService {
 
     return widgetRepo.updateForSite(widgetId, {
       ad: dto.ad,
-      tip: dto.tip,
+      tip: dto.tip as WidgetTipi | undefined,
       sayfa:
         dto.sayfaId !== undefined
           ? opsiyonelSayisalId(dto.sayfaId)

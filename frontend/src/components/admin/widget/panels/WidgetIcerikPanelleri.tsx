@@ -23,6 +23,16 @@ import {
 } from '@/types/widget';
 import { ListeSiralayici, SecimAlani } from './WidgetPanelOrtak';
 import { FiltreEtiketYonetici } from './FiltreEtiketYonetici';
+import {
+  BultenKayitIcerik,
+  GeriSayimIcerik,
+  KarsilastirmaTablosuIcerik,
+  MarkaSeridiIcerik,
+  OncesiSonrasiIcerik,
+  SurecAdimlariIcerik,
+  VideoBannerIcerik,
+  ZamanCizelgesiIcerik,
+} from './WidgetModernPanelleri';
 import type { WidgetPanelProps } from './types';
 
 function MetinAlanlari({ form, onChange, gorsel = false }: WidgetPanelProps & { gorsel?: boolean }) {
@@ -727,4 +737,12 @@ export const ICERIK_PANEL_MAP: Record<string, ComponentType<WidgetPanelProps>> =
   ILETISIM_FORMU: IletisimIcerik,
   POPUP: PopupIcerik,
   KATEGORI: KategoriIcerik,
+  ZAMAN_CIZELGESI: ZamanCizelgesiIcerik,
+  SUREC_ADIMLARI: SurecAdimlariIcerik,
+  MARKA_SERIDI: MarkaSeridiIcerik,
+  KARSILASTIRMA_TABLOSU: KarsilastirmaTablosuIcerik,
+  GERI_SAYIM: GeriSayimIcerik,
+  VIDEO_BANNER: VideoBannerIcerik,
+  ONCESI_SONRASI: OncesiSonrasiIcerik,
+  BULTEN_KAYIT: BultenKayitIcerik,
 };

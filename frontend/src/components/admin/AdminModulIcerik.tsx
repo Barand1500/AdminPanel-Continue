@@ -4,7 +4,6 @@ import { FooterYonetimiFormu } from './site/FooterYonetimiFormu';
 import { WidgetYonetimiSayfasi } from '@/pages/admin/WidgetYonetimiSayfasi';
 import { SiteAyarlariSayfasi } from '@/pages/admin/SiteAyarlariSayfasi';
 import { SayfaYonetimiSayfasi } from '@/pages/admin/SayfaYonetimiSayfasi';
-import { MenuYonetimiSayfasi } from '@/pages/admin/MenuYonetimiSayfasi';
 import { MedyaGalerisiSayfasi } from '@/pages/admin/MedyaGalerisiSayfasi';
 import { SeoYonetimiSayfasi } from '@/pages/admin/SeoYonetimiSayfasi';
 import { DashboardSayfasi } from '@/pages/admin/DashboardSayfasi';
@@ -48,8 +47,6 @@ function AdminModulGovde({ modulId, onModulAc }: AdminModulIcerikProps) {
       return <SiteAyarlariSayfasi />;
     case 'sayfalar':
       return <SayfaYonetimiSayfasi />;
-    case 'menu-yonetimi':
-      return <MenuYonetimiSayfasi />;
     case 'medya':
       return <MedyaGalerisiSayfasi />;
     case 'seo':
