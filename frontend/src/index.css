@@ -6,12 +6,20 @@
   --color-primary-light: #a78bfa;
   --color-accent: #f3f0ff;
   --color-surface: #fafafa;
+  --color-surface-elevated: #ffffff;
+  --color-text: #1e293b;
+  --color-text-muted: #64748b;
+  --color-border: #e2e8f0;
+  --color-footer-bg: #f3f0ff;
+  --color-footer-text: #64748b;
   --font-sans: "Inter", system-ui, sans-serif;
 }
 
 body {
   font-family: var(--font-sans);
-  @apply bg-surface text-slate-800 antialiased;
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  @apply antialiased;
 }
 
 .container-site {
@@ -23,14 +31,19 @@ body {
 }
 
 .btn-outline {
-  @apply inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-5 py-2.5 text-sm font-semibold text-slate-700 transition hover:border-primary hover:text-primary;
+  @apply inline-flex items-center justify-center rounded-lg border px-5 py-2.5 text-sm font-semibold transition hover:border-primary hover:text-primary;
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
+  color: var(--color-text);
 }
 .section-title {
-  @apply text-xl font-bold tracking-tight text-slate-900 sm:text-2xl;
+  @apply text-xl font-bold tracking-tight sm:text-2xl;
+  color: var(--color-text);
 }
 
 .section-subtitle {
-  @apply text-sm text-slate-500 sm:text-base;
+  @apply text-sm sm:text-base;
+  color: var(--color-text-muted);
 }
 
 .footer-baslik {
@@ -50,7 +63,10 @@ body {
 }
 
 .iletisim-kart {
-  @apply flex gap-3 rounded-xl border border-slate-100 bg-white p-4 shadow-sm;
+  @apply flex gap-3 rounded-xl border p-4 shadow-sm;
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
+  color: var(--color-text);
 }
 
 .phone-cerceve {
@@ -119,23 +135,37 @@ body {
 }
 
 .tema-toggle {
-  @apply flex h-9 w-9 items-center justify-center rounded-full text-slate-600 transition hover:bg-accent hover:text-primary;
+  @apply flex h-9 w-9 items-center justify-center rounded-full transition hover:text-primary;
+  color: var(--color-text-muted);
+  background-color: transparent;
+}
+
+.tema-toggle:hover {
+  background-color: var(--color-accent);
 }
 
 .hesap-auth-kart {
-  @apply rounded-2xl border border-slate-200 bg-white p-8 shadow-sm;
+  @apply rounded-2xl border p-8 shadow-sm;
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
 }
 
 .hesap-label {
-  @apply mb-1 block text-sm font-medium text-slate-700;
+  @apply mb-1 block text-sm font-medium;
+  color: var(--color-text);
 }
 
 .hesap-input {
-  @apply w-full rounded-xl border border-slate-200 px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20;
+  @apply w-full rounded-xl border px-4 py-3 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20;
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
+  color: var(--color-text);
 }
 
 .hesap-form-kart {
-  @apply space-y-4 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm;
+  @apply space-y-4 rounded-2xl border p-6 shadow-sm;
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
 }
 
 .hesap-menu-grid {
@@ -143,15 +173,23 @@ body {
 }
 
 .hesap-menu-kart {
-  @apply flex flex-col items-center justify-center rounded-xl border border-slate-200 bg-white p-5 text-center transition hover:border-primary/40 hover:shadow-md hover:shadow-primary/5;
+  @apply flex flex-col items-center justify-center rounded-xl border p-5 text-center transition hover:border-primary/40 hover:shadow-md hover:shadow-primary/5;
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.hesap-menu-kart span {
+  color: var(--color-text);
 }
 
 .hesap-menu-cikis {
-  @apply cursor-pointer text-slate-600 hover:border-red-200 hover:text-red-600;
+  @apply cursor-pointer hover:border-red-200 hover:text-red-600;
 }
 
 .site-footer {
-  @apply bg-accent text-slate-600;
+  background-color: var(--color-footer-bg);
+  color: var(--color-footer-text);
 }
 
 .site-footer-baslik {
@@ -159,7 +197,8 @@ body {
 }
 
 .site-footer-link {
-  @apply text-slate-600 transition hover:text-primary;
+  color: var(--color-footer-text);
+  @apply transition hover:text-primary-light;
 }
 
 .footer-icerik {
@@ -204,7 +243,10 @@ body {
 
 
 .card {
-  @apply rounded-xl border border-slate-200 bg-white shadow-sm transition hover:shadow-md;
+  @apply rounded-xl border shadow-sm transition hover:shadow-md;
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
+  color: var(--color-text);
 }
 
 .input-admin {
@@ -212,7 +254,14 @@ body {
 }
 
 .input-search {
-  @apply w-full rounded-full border border-slate-200 bg-white py-3 pl-12 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20;
+  @apply w-full rounded-full border py-3 pl-12 pr-4 text-sm outline-none transition focus:border-primary focus:ring-2 focus:ring-primary/20;
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.input-search::placeholder {
+  color: var(--color-text-muted);
 }
 
 .input-search-kare {
@@ -220,7 +269,8 @@ body {
 }
 
 .input-search-minimal {
-  @apply rounded-none border-0 border-b border-slate-300 bg-transparent pl-12 pr-4 focus:ring-0;
+  @apply rounded-none border-0 border-b bg-transparent pl-12 pr-4 focus:ring-0;
+  border-color: var(--color-border);
 }
 
 .scrollbar-hide {
@@ -260,129 +310,49 @@ body:has(.site-public)::-webkit-scrollbar,
   @apply grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6;
 }
 
-/* Gece / gündüz modu — tüm public sayfalar */
-html[data-site-tema='koyu'] body {
-  @apply bg-slate-950 text-slate-100;
+.site-header {
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
 }
 
-html[data-site-tema='koyu'] .site-public {
-  @apply bg-slate-950 text-slate-100;
+.site-public {
+  background-color: var(--color-surface);
+  color: var(--color-text);
 }
 
-html[data-site-tema='koyu'] .site-header,
-html[data-site-tema='koyu'] .site-header-alt {
-  @apply border-slate-700 bg-slate-900;
+/* Gece modu — kalan sabit slate sınıfları semantik renklere yönlendir */
+html[data-site-tema='koyu'] .text-slate-900,
+html[data-site-tema='koyu'] .text-slate-800 {
+  color: var(--color-text);
 }
 
-html[data-site-tema='koyu'] .site-header nav a,
-html[data-site-tema='koyu'] .site-header .text-slate-700,
-html[data-site-tema='koyu'] .site-header .text-slate-600,
-html[data-site-tema='koyu'] .site-header .text-slate-900 {
-  @apply text-slate-200;
-}
-
-html[data-site-tema='koyu'] .section-title {
-  @apply text-white;
-}
-
-html[data-site-tema='koyu'] .section-subtitle {
-  @apply text-slate-400;
-}
-
-html[data-site-tema='koyu'] .card,
-html[data-site-tema='koyu'] .iletisim-kart {
-  @apply border-slate-700 bg-slate-800 text-slate-200;
-}
-
-html[data-site-tema='koyu'] .input-search {
-  @apply border-slate-600 bg-slate-800 text-slate-100 placeholder:text-slate-500;
-}
-
-html[data-site-tema='koyu'] .btn-outline {
-  @apply border-slate-600 bg-slate-800 text-slate-200 hover:border-primary;
-}
-
-html[data-site-tema='koyu'] .tema-toggle {
-  @apply text-slate-300 hover:bg-slate-800 hover:text-primary-light;
-}
-
-html[data-site-tema='koyu'] .phone-cerceve-icerik {
-  @apply bg-slate-800;
-}
-
-html[data-site-tema='koyu'] .phone-input-alan {
-  @apply bg-slate-700 text-slate-100 placeholder:text-slate-400;
-}
-
-html[data-site-tema='koyu'] .phone-input-etiket {
-  @apply text-slate-400;
-}
-
-html[data-site-tema='koyu'] .guven-serit {
-  @apply border-slate-700 bg-slate-900;
+html[data-site-tema='koyu'] .text-slate-700,
+html[data-site-tema='koyu'] .text-slate-600,
+html[data-site-tema='koyu'] .text-slate-500 {
+  color: var(--color-text-muted);
 }
 
 html[data-site-tema='koyu'] .bg-white {
-  @apply bg-slate-900;
-}
-
-html[data-site-tema='koyu'] .bg-accent {
-  @apply bg-slate-800/50;
-}
-
-html[data-site-tema='koyu'] .text-slate-900 {
-  @apply text-slate-100;
-}
-
-html[data-site-tema='koyu'] .text-slate-800 {
-  @apply text-slate-200;
-}
-
-html[data-site-tema='koyu'] .text-slate-700 {
-  @apply text-slate-300;
-}
-
-html[data-site-tema='koyu'] .text-slate-600 {
-  @apply text-slate-400;
-}
-
-html[data-site-tema='koyu'] .text-slate-500 {
-  @apply text-slate-400;
+  background-color: var(--color-surface-elevated);
 }
 
 html[data-site-tema='koyu'] .border-slate-100,
 html[data-site-tema='koyu'] .border-slate-200 {
-  @apply border-slate-700;
+  border-color: var(--color-border);
 }
 
-html[data-site-tema='koyu'] .site-footer {
-  @apply bg-slate-900 text-slate-400;
+html[data-site-tema='koyu'] .guven-serit {
+  background-color: var(--color-surface-elevated);
+  border-color: var(--color-border);
 }
 
-html[data-site-tema='koyu'] .site-footer-baslik {
-  @apply text-primary-light;
+html[data-site-tema='koyu'] .phone-cerceve-icerik {
+  background-color: var(--color-surface-elevated);
 }
 
-html[data-site-tema='koyu'] .site-footer-link {
-  @apply text-slate-400 hover:text-primary-light;
-}
-
-html[data-site-tema='koyu'] .hesap-auth-kart,
-html[data-site-tema='koyu'] .hesap-form-kart,
-html[data-site-tema='koyu'] .hesap-menu-kart {
-  @apply border-slate-700 bg-slate-800;
-}
-
-html[data-site-tema='koyu'] .hesap-menu-kart span {
-  @apply text-slate-200;
-}
-
-html[data-site-tema='koyu'] .hesap-input {
-  @apply border-slate-600 bg-slate-900 text-slate-100;
-}
-
-html[data-site-tema='koyu'] .hesap-label {
-  @apply text-slate-300;
+html[data-site-tema='koyu'] .phone-input-alan {
+  background-color: var(--color-surface);
+  color: var(--color-text);
 }
 
 /* Dinamik sayfa — ham HTML içerik */

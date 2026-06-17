@@ -111,6 +111,7 @@ export function SiteAyarlariProvider({ children }: { children: ReactNode }) {
         heroJson: ayarlar.heroJson ?? null,
         footerAyarlariJson: ayarlar.footerAyarlariJson ?? null,
         blogAyarlariJson: ayarlar.blogAyarlariJson ?? null,
+        temaAyarlariJson: ayarlar.temaAyarlariJson ?? null,
       };
       if (siteAd !== orijinalSiteAd) payload.siteAd = siteAd;
 

@@ -1,5 +1,12 @@
 import { useEffect } from 'react';
 import type { SiteAyarlari } from '@/types/site';
+import { temaAyarlariBirlestir } from '@/types/temaAyarlari';
+import { useSiteTema } from '@/contexts/SiteTemaContext';
+import {
+  aktifPaletiHesapla,
+  paletiCssVarsTemizle,
+  paletiCssVarsUygula,
+} from '@/utils/temaRenkleri';
 
 const FONT_MAP: Record<string, string> = {
   Inter: 'Inter',
@@ -27,24 +34,18 @@ function fontLinkYukle(font: string) {
   link.href = `https://fonts.googleapis.com/css2?family=${ailesi}:wght@400;500;600;700&display=swap`;
 }
 
-function ikincilRenkAcik(renk: string) {
-  return `${renk}22`;
-}
-
 /** Admin panelden kaydedilen site ayarlarini public siteye uygular */
 export function useSiteTemaUygula(ayarlar?: SiteAyarlari | null, siteAd?: string) {
+  const { tema } = useSiteTema();
+
   useEffect(() => {
     const root = document.documentElement;
+    const anaRenk = ayarlar?.anaRenk ?? '#7c3aed';
+    const ikincilRenk = ayarlar?.ikincilRenk ?? '#a78bfa';
+    const temaAyarlari = temaAyarlariBirlestir(ayarlar?.temaAyarlariJson);
 
-    if (ayarlar?.anaRenk) {
-      root.style.setProperty('--color-primary', ayarlar.anaRenk);
-      root.style.setProperty('--color-primary-dark', ayarlar.anaRenk);
-    }
-
-    if (ayarlar?.ikincilRenk) {
-      root.style.setProperty('--color-primary-light', ayarlar.ikincilRenk);
-      root.style.setProperty('--color-accent', ikincilRenkAcik(ayarlar.ikincilRenk));
-    }
+    const palet = aktifPaletiHesapla(tema, anaRenk, ikincilRenk, temaAyarlari.geceSablon);
+    paletiCssVarsUygula(root, palet);
 
     if (ayarlar?.font) {
       fontLinkYukle(ayarlar.font);
@@ -66,11 +67,8 @@ export function useSiteTemaUygula(ayarlar?: SiteAyarlari | null, siteAd?: string
     }
 
     return () => {
-      root.style.removeProperty('--color-primary');
-      root.style.removeProperty('--color-primary-dark');
-      root.style.removeProperty('--color-primary-light');
-      root.style.removeProperty('--color-accent');
+      paletiCssVarsTemizle(root);
       root.style.removeProperty('--font-sans');
     };
-  }, [ayarlar, siteAd]);
+  }, [ayarlar, siteAd, tema]);
 }

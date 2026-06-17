@@ -16,6 +16,7 @@ export interface SiteAyarlari {
   footerAyarlariJson?: import('./footer').FooterAyarlari | null;
   blogAyarlariJson?: import('./blog').BlogAyarlari | null;
   sistemAyarlariJson?: import('./sistemAyarlari').SistemAyarlariJson | null;
+  temaAyarlariJson?: import('./temaAyarlari').TemaAyarlari | null;
 }
 
 export interface Widget {

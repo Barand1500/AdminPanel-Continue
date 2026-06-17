@@ -35,6 +35,8 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
   const kategori = header.kategori!;
   const arama = header.arama!;
   const kurlar = (header.kurlar ?? []).filter((k) => k.kod !== 'TRY').sort((a, b) => a.sira - b.sira);
+  const anaRenk = ayarlar?.anaRenk ?? '#7c3aed';
+  const ikincilRenk = ayarlar?.ikincilRenk ?? '#a78bfa';
 
   return (
     <>
@@ -64,18 +66,23 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
         </div>
       </div>
 
-      <header className="site-header sticky top-0 z-40 border-b border-slate-200 bg-white shadow-sm">
+      <header className="site-header sticky top-0 z-40 border-b shadow-sm">
         <div className="container-site flex h-16 items-center justify-between gap-4">
           <Link to="/" className="flex shrink-0 items-center gap-2">
             {header.logoUrl ? (
               <img src={header.logoUrl} alt={siteAdi} className="h-10 w-auto" />
             ) : (
               <>
-                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-blue-500 text-lg font-black text-white shadow-md">
+                <div
+                  className="flex h-10 w-10 items-center justify-center rounded-xl text-lg font-black text-white shadow-md"
+                  style={{
+                    background: `linear-gradient(135deg, ${anaRenk}, ${ikincilRenk})`,
+                  }}
+                >
                   {siteAdi.charAt(0).toUpperCase()}
                 </div>
                 <div className="leading-none">
-                  <span className="block text-xl font-black tracking-tight text-slate-900">
+                  <span className="block text-xl font-black tracking-tight" style={{ color: 'var(--color-text)' }}>
                     {siteAdi.split(' ')[0]?.toLowerCase() ?? siteAdi}
                   </span>
                   <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-primary">
@@ -91,7 +98,8 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
               <MenuNavLink
                 key={`${oge.yol}-${i}`}
                 oge={oge}
-                className="text-sm font-medium text-slate-700 transition hover:text-primary"
+                className="text-sm font-medium transition hover:text-primary"
+                style={{ color: 'var(--color-text-muted)' }}
               />
             ))}
           </nav>
@@ -100,14 +108,16 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
             <TemaToggle tema={ikonlar.tema} />
             <Link
               to="/hesabim"
-              className="rounded-full p-2 text-slate-600 transition hover:bg-accent hover:text-primary"
+              className="rounded-full p-2 transition hover:bg-accent hover:text-primary"
+              style={{ color: 'var(--color-text-muted)' }}
               title="Hesabım"
             >
               <HeaderIkon ikon={ikonlar.hesap} grup="hesap" />
             </Link>
             <button
               type="button"
-              className="rounded-lg p-2 text-slate-600 lg:hidden"
+              className="rounded-lg p-2 lg:hidden"
+              style={{ color: 'var(--color-text-muted)' }}
               onClick={() => setMenuAcik((a) => !a)}
               aria-label="Menü"
             >
@@ -123,7 +133,7 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
           </div>
         </div>
 
-        <div className="site-header-alt border-t border-slate-100 bg-white py-3">
+        <div className="site-header-alt border-t py-3" style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface-elevated)' }}>
           <div className="container-site flex gap-3">
             <KategoriMenu
               baslikMetni={kategori.baslikMetni}
@@ -143,16 +153,23 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
         </div>
 
         {menuAcik && (
-          <nav className="border-t border-slate-100 bg-white px-4 py-3 lg:hidden">
+          <nav
+            className="border-t px-4 py-3 lg:hidden"
+            style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface-elevated)' }}
+          >
             {menuOgeleri.map((oge, i) => (
               <MenuNavLink
                 key={`${oge.yol}-${i}`}
                 oge={oge}
                 onClick={() => setMenuAcik(false)}
-                className="block border-b border-slate-50 py-3 text-sm font-medium text-slate-700 last:border-0"
+                className="block border-b py-3 text-sm font-medium last:border-0"
+                style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
               />
             ))}
-            <div className="mt-2 flex flex-wrap items-center gap-3 border-t border-slate-100 pt-3 text-sm font-medium">
+            <div
+              className="mt-2 flex flex-wrap items-center gap-3 border-t pt-3 text-sm font-medium"
+              style={{ borderColor: 'var(--color-border)' }}
+            >
               <TemaToggle tema={ikonlar.tema} />
               <Link to="/hesabim" onClick={() => setMenuAcik(false)} className="text-primary">
                 Hesabım

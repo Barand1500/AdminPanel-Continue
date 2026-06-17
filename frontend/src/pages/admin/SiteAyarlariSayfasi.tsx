@@ -15,7 +15,15 @@ import {
   YukleniyorDurumu,
   HataDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
+import { GunduzSablonSecici, GeceSablonSecici } from '@/components/admin/site/TemaSablonSecici';
+import { TemaOnizlemePaneli } from '@/components/admin/site/TemaOnizlemePaneli';
 import { whatsappFormatla, whatsappKayitDegeri } from '@/utils/telefonFormat';
+import {
+  GUNDUZ_SABLONLARI,
+  temaAyarlariBirlestir,
+  type GeceSablonId,
+  type TemaAyarlari,
+} from '@/types/temaAyarlari';
 
 export function SiteAyarlariSayfasi() {
   const { site, siteAd, ayarlar, yukleniyor, hata, kaydediliyor, alanGuncelle } = useSiteAyarlariYonetimi();
@@ -28,6 +36,47 @@ export function SiteAyarlariSayfasi() {
       alanGuncelle('whatsapp', deger ? whatsappKayitDegeri(deger) : '');
     },
     [alanGuncelle]
+  );
+
+  const temaAyarlari = temaAyarlariBirlestir(ayarlar?.temaAyarlariJson);
+
+  const temaGuncelle = useCallback(
+    (guncel: Partial<TemaAyarlari>) => {
+      alanGuncelle('temaAyarlariJson', { ...temaAyarlariBirlestir(ayarlar?.temaAyarlariJson), ...guncel });
+    },
+    [alanGuncelle, ayarlar?.temaAyarlariJson]
+  );
+
+  const gunduzSablonSec = useCallback(
+    (id: 'mor' | 'mavi' | 'yesil') => {
+      const sablon = GUNDUZ_SABLONLARI.find((s) => s.id === id);
+      if (!sablon) return;
+      alanGuncelle('anaRenk', sablon.anaRenk);
+      alanGuncelle('ikincilRenk', sablon.ikincilRenk);
+      temaGuncelle({ gunduzSablon: id });
+    },
+    [alanGuncelle, temaGuncelle]
+  );
+
+  const anaRenkGuncelle = useCallback(
+    (v: string) => {
+      alanGuncelle('anaRenk', v);
+      temaGuncelle({ gunduzSablon: 'ozel' });
+    },
+    [alanGuncelle, temaGuncelle]
+  );
+
+  const ikincilRenkGuncelle = useCallback(
+    (v: string) => {
+      alanGuncelle('ikincilRenk', v);
+      temaGuncelle({ gunduzSablon: 'ozel' });
+    },
+    [alanGuncelle, temaGuncelle]
+  );
+
+  const geceSablonSec = useCallback(
+    (id: GeceSablonId) => temaGuncelle({ geceSablon: id }),
+    [temaGuncelle]
   );
 
   if (yukleniyor) return <YukleniyorDurumu mesaj="Site ayarları yükleniyor..." />;
@@ -51,7 +100,7 @@ export function SiteAyarlariSayfasi() {
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <AdminPanelKarti baslik="Marka ve Tema" altBaslik="Favicon ve renk paleti">
+        <AdminPanelKarti baslik="Marka ve Tema" altBaslik="Favicon, renk paleti ve gece modu şablonları">
           <div className="space-y-5">
             <GorselAlan
               etiket="Favicon"
@@ -64,14 +113,16 @@ export function SiteAyarlariSayfasi() {
               <RenkSecici
                 etiket="Ana Renk"
                 deger={ayarlar.anaRenk ?? '#7c3aed'}
-                onChange={(v) => alanGuncelle('anaRenk', v)}
+                onChange={anaRenkGuncelle}
               />
               <RenkSecici
                 etiket="İkincil Renk"
                 deger={ayarlar.ikincilRenk ?? '#a78bfa'}
-                onChange={(v) => alanGuncelle('ikincilRenk', v)}
+                onChange={ikincilRenkGuncelle}
               />
             </div>
+            <GunduzSablonSecici secili={temaAyarlari.gunduzSablon} onSec={gunduzSablonSec} />
+            <GeceSablonSecici secili={temaAyarlari.geceSablon} onSec={geceSablonSec} />
           </div>
         </AdminPanelKarti>
 
@@ -107,50 +158,14 @@ export function SiteAyarlariSayfasi() {
           </div>
         </AdminPanelKarti>
 
-        <AdminPanelKarti baslik="Önizleme" altBaslik="Renk ve font önizlemesi">
-          <div
-            className="rounded-xl border border-[var(--ap-border)] p-5"
-            style={{
-              fontFamily: `"${ayarlar.font ?? 'Inter'}", sans-serif`,
-              background: `linear-gradient(135deg, ${ayarlar.anaRenk ?? '#7c3aed'}18, ${ayarlar.ikincilRenk ?? '#a78bfa'}22)`,
-            }}
-          >
-            <div className="flex items-center gap-3">
-              <div
-                className="flex h-10 w-10 items-center justify-center rounded-xl text-lg font-bold text-white"
-                style={{
-                  background: `linear-gradient(135deg, ${ayarlar.anaRenk ?? '#7c3aed'}, ${ayarlar.ikincilRenk ?? '#a78bfa'})`,
-                }}
-              >
-                G
-              </div>
-              <div>
-                <p className="font-bold" style={{ color: ayarlar.anaRenk ?? '#7c3aed' }}>
-                  {siteAd}
-                </p>
-                <p className="text-sm opacity-70">Logo → Header Yönetimi</p>
-              </div>
-            </div>
-            <div className="mt-4 flex gap-2">
-              <span
-                className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white"
-                style={{ background: ayarlar.anaRenk ?? '#7c3aed' }}
-              >
-                Ana renk
-              </span>
-              <span
-                className="rounded-lg px-3 py-1.5 text-xs font-semibold text-white"
-                style={{ background: ayarlar.ikincilRenk ?? '#a78bfa' }}
-              >
-                İkincil
-              </span>
-            </div>
-            {ayarlar.telefon && (
-              <p className="ap-muted mt-4 text-sm">
-                Tel: <span className="ap-heading">{ayarlar.telefon}</span>
-              </p>
-            )}
-          </div>
+        <AdminPanelKarti baslik="Önizleme" altBaslik="Gündüz ve gece modu canlı önizleme">
+          <TemaOnizlemePaneli
+            siteAd={siteAd || site?.ad || 'Site'}
+            anaRenk={ayarlar.anaRenk ?? '#7c3aed'}
+            ikincilRenk={ayarlar.ikincilRenk ?? '#a78bfa'}
+            geceSablon={temaAyarlari.geceSablon}
+            font={ayarlar.font}
+          />
         </AdminPanelKarti>
       </div>
     </div>

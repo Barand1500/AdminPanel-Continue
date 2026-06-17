@@ -49,11 +49,18 @@ function FooterMarka({
             <img src={headerLogo} alt={siteAdi} className="h-10 w-auto" />
           ) : (
             <>
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-violet-500 via-fuchsia-500 to-blue-500 text-lg font-black text-white">
+              <div
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-lg font-black text-white"
+                style={{
+                  background: `linear-gradient(135deg, ${ayarlar?.anaRenk ?? '#7c3aed'}, ${ayarlar?.ikincilRenk ?? '#a78bfa'})`,
+                }}
+              >
                 G
               </div>
               <div className="leading-none">
-                <span className="block text-lg font-black text-slate-800">güzel</span>
+                <span className="block text-lg font-black" style={{ color: 'var(--color-text)' }}>
+                  güzel
+                </span>
                 <span className="text-[8px] font-bold uppercase tracking-[0.2em] text-primary">Teknoloji</span>
               </div>
             </>
@@ -61,7 +68,7 @@ function FooterMarka({
         </Link>
       )}
 
-      <ul className="mt-5 space-y-3 text-sm text-slate-600">
+      <ul className="mt-5 space-y-3 text-sm" style={{ color: 'var(--color-footer-text)' }}>
         {ayarlar?.adres && (
           <li className="flex gap-2">
             <span className="text-primary">{ikonlar.adres}</span>
