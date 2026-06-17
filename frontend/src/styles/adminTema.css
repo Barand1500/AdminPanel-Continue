@@ -918,6 +918,43 @@ html:has(.admin-panel[data-tema='acik']) body {
   background: #0d9488;
 }
 
+.ap-sayfa-alt-menu-secim-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+.ap-sayfa-alt-menu-secim {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-surface-2);
+  padding: 0.875rem 1rem;
+  text-align: left;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.ap-sayfa-alt-menu-secim:hover {
+  border-color: color-mix(in srgb, var(--ap-accent) 35%, var(--ap-border));
+}
+
+.ap-sayfa-alt-menu-secim-aktif {
+  border-color: var(--ap-accent);
+  background: color-mix(in srgb, var(--ap-accent) 10%, var(--ap-surface-2));
+}
+
+.ap-sayfa-alt-menu-secim-baslik {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--ap-heading);
+}
+
+.ap-sayfa-ust-bilgi {
+  margin-bottom: 0.75rem;
+}
+
 .ap-editor-sekmeler-satir {
   display: flex;
   flex-wrap: wrap;
@@ -989,9 +1026,18 @@ html:has(.admin-panel[data-tema='acik']) body {
 }
 
 .ap-sayfa-agac-altlar {
-  margin-left: 0.75rem;
-  border-left: 2px solid var(--ap-border);
-  padding-left: 0.25rem;
+  margin-left: 1rem;
+  border-left: 2px solid color-mix(in srgb, var(--ap-accent) 35%, var(--ap-border));
+  padding-left: 0.35rem;
+  margin-top: 0.125rem;
+  margin-bottom: 0.25rem;
+}
+
+.ap-sayfa-alt-oge {
+  border-left: 2px solid color-mix(in srgb, var(--ap-accent) 25%, transparent);
+  margin-left: 0.25rem !important;
+  padding-left: 0.35rem;
+  background: color-mix(in srgb, var(--ap-accent) 4%, var(--ap-surface));
 }
 
 .ap-sayfa-alt-cizgi {

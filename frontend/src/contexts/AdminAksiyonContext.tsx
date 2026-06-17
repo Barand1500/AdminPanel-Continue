@@ -8,12 +8,13 @@ import {
   type ReactNode,
 } from 'react';
 
-export type AksiyonId = 'kaydet' | 'guncelle' | 'ekle' | 'sil' | 'onizle' | 'yayinla';
+export type AksiyonId = 'kaydet' | 'guncelle' | 'ekle' | 'altEkle' | 'sil' | 'onizle' | 'yayinla';
 
 export interface AksiyonHandlerlar {
   kaydet?: () => Promise<void> | void;
   guncelle?: () => Promise<void> | void;
   ekle?: () => void;
+  altEkle?: () => void;
   sil?: () => Promise<void> | void;
   onizle?: () => void;
   yayinla?: () => Promise<void> | void;
@@ -103,6 +104,7 @@ export function AdminAksiyonProvider({ children }: { children: ReactNode }) {
       if (id === 'kaydet' && handlers.kaydet) await handlers.kaydet();
       else if (id === 'guncelle' && handlers.guncelle) await handlers.guncelle();
       else if (id === 'ekle' && handlers.ekle) handlers.ekle();
+      else if (id === 'altEkle' && handlers.altEkle) handlers.altEkle();
       else if (id === 'sil' && handlers.sil) await handlers.sil();
       else if (id === 'onizle' && handlers.onizle) handlers.onizle();
       else if (id === 'yayinla' && handlers.yayinla) await handlers.yayinla();

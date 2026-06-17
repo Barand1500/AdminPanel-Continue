@@ -16,9 +16,15 @@ export class SayfaRepository {
     });
   }
 
+  async findBySlugKayit(siteId: number, slug: string) {
+    const temiz = slug.replace(/^\/+|\/+$/g, '');
+    return prisma.sayfa.findFirst({ where: { siteId, slug: temiz } });
+  }
+
   async findBySlug(siteId: number, slug: string) {
+    const temiz = slug.replace(/^\/+|\/+$/g, '');
     return prisma.sayfa.findFirst({
-      where: { siteId, slug, yayinda: true },
+      where: { siteId, slug: temiz, yayinda: true },
       include: {
         widgetlar: {
           where: { aktif: true },
@@ -26,6 +32,10 @@ export class SayfaRepository {
         },
       },
     });
+  }
+
+  async countChildren(siteId: number, ustSayfaId: number) {
+    return prisma.sayfa.count({ where: { siteId, ustSayfaId } });
   }
 
   async findByIdAndSiteId(id: number, siteId: number) {

@@ -11,6 +11,7 @@ import {
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
+import { sayfadanForm } from '@/components/admin/sayfa/SayfaBilesenleri';
 import { adminMenuGuncelle, adminSayfaGuncelle, adminSayfaOlustur, adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
 import { adminSiteApi } from '@/features/site/adminSiteApi';
 import type { UstMenuOgesi } from '@/types/header';
@@ -137,19 +138,7 @@ export function MenuYonetimiSayfasi() {
       let guncelUstMenu = [...ustMenu];
 
       for (const pending of guncelSayfalar.filter((s) => pendingSayfaMi(s.id))) {
-        const olusturulan = await adminSayfaOlustur({
-          baslik: pending.baslik,
-          slug: pending.slug,
-          icerik: pending.icerik,
-          kapakGorsel: '',
-          seoTitle: '',
-          seoDesc: '',
-          yayinda: pending.yayinda,
-          menudeGoster: pending.menudeGoster,
-          sira: pending.sira,
-          acilisModu: pending.acilisModu ?? 'normal',
-          ustSayfaId: pending.ustSayfaId ?? null,
-        });
+        const olusturulan = await adminSayfaOlustur(sayfadanForm(pending));
         guncelSayfalar = guncelSayfalar.map((s) => (s.id === pending.id ? olusturulan : s));
         guncelUstMenu = guncelUstMenu.map((o) =>
           o.sayfaId === pending.id ? { ...o, sayfaId: olusturulan.id } : o
@@ -164,19 +153,7 @@ export function MenuYonetimiSayfasi() {
           s.yayinda !== kayitli.yayinda ||
           s.slug !== kayitli.slug
         ) {
-          const guncellenen = await adminSayfaGuncelle(s.id, {
-            baslik: s.baslik,
-            slug: s.slug,
-            icerik: s.icerik,
-            kapakGorsel: s.kapakGorsel ?? '',
-            seoTitle: s.seoTitle ?? '',
-            seoDesc: s.seoDesc ?? '',
-            yayinda: s.yayinda,
-            menudeGoster: s.menudeGoster,
-            sira: s.sira,
-            acilisModu: s.acilisModu ?? 'normal',
-            ustSayfaId: s.ustSayfaId ?? null,
-          });
+          const guncellenen = await adminSayfaGuncelle(s.id, sayfadanForm(s));
           guncelSayfalar = guncelSayfalar.map((x) => (x.id === s.id ? guncellenen : x));
         }
       }

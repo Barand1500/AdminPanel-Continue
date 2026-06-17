@@ -9,7 +9,7 @@ import { sayfaAltMenuOgeleriOlustur } from '@/utils/sayfaAgaci';
 
 export function yoldanSlug(yol: string): string | null {
   if (yol === '/') return 'ana-sayfa';
-  const path = yol.replace(/^\//, '').split('/')[0];
+  const path = yol.replace(/^\//, '').replace(/\/$/, '');
   return path || null;
 }
 
@@ -22,13 +22,9 @@ export function menuOgeleriCevir(
     return {
       ...o,
       baslik: slug ? sayfaBaslik(slug, o.baslik) : o.baslik,
-      altOgeler: o.altOgeler?.map((alt) => {
-        const altSlug = yoldanSlug(alt.yol);
-        return {
-          ...alt,
-          baslik: altSlug ? sayfaBaslik(altSlug, alt.baslik) : alt.baslik,
-        };
-      }),
+      altOgeler: o.altOgeler
+        ? menuOgeleriCevir(o.altOgeler, sayfaBaslik)
+        : undefined,
     };
   });
 }
@@ -65,10 +61,9 @@ export function ustMenuOgeleriOlustur(ustMenu: UstMenuOgesi[], sayfalar: Sayfa[]
   return [...ustMenu]
     .sort((a, b) => a.sira - b.sira)
     .map((o) => {
-      const slug = linktenSlugCikar(o.link);
       const sayfa =
         (o.sayfaId ? sayfalar.find((s) => idString(s.id) === idString(o.sayfaId!)) : undefined) ??
-        (slug ? sayfalar.find((s) => s.slug === slug && !s.ustSayfaId) : undefined);
+        sayfalar.find((s) => sayfaYolunuBul(s.slug) === o.link.trim());
       const acilisModu: SayfaAcilisModu =
         sayfa?.acilisModu ?? (o.yeniSekme ? 'yeni_sekme' : 'normal');
       const altOgeler = sayfa ? sayfaAltMenuOgeleriOlustur(sayfa.id, sayfalar) : [];
@@ -133,8 +128,8 @@ export function linktenSlugCikar(link: string): string | null {
   if (!t.startsWith('/')) return null;
   const path = t.replace(/^\//, '').replace(/\/$/, '');
   if (!path) return 'ana-sayfa';
-  if (path.startsWith('sayfa/')) return path.slice(6).split('/')[0] || null;
-  return path.split('/')[0] || null;
+  if (path.startsWith('sayfa/')) return path.slice(6) || null;
+  return path;
 }
 
 export function sayfaLinkiEslesiyor(sayfa: AdminSayfa, link: string): boolean {

@@ -1,5 +1,6 @@
 import { config } from '../config/env.js';
 import { SayfaRepository } from '../Infrastructure/repositories/SayfaRepository.js';
+import { SayfaService } from './SayfaService.js';
 import { SiteRepository } from '../Infrastructure/repositories/SiteRepository.js';
 import { SistemAyariRepository } from '../Infrastructure/repositories/SistemAyariRepository.js';
 import { WidgetRepository } from '../Infrastructure/repositories/WidgetRepository.js';
@@ -12,6 +13,7 @@ import {
 
 const siteRepo = new SiteRepository();
 const sayfaRepo = new SayfaRepository();
+const sayfaService = new SayfaService();
 const widgetRepo = new WidgetRepository();
 const blogRepo = new BlogRepository();
 const sistemAyariRepo = new SistemAyariRepository();
@@ -37,6 +39,8 @@ export class SiteService {
     if (!site) {
       return null;
     }
+
+    await sayfaService.hiyerarsiOnar(site.id);
 
     const [sayfalar, widgetlar, bloglar, sistemSatiri] = await Promise.all([
       sayfaRepo.findBySiteId(site.id),

@@ -1,7 +1,8 @@
 import { adminHeaders, adminJsonFetch } from './adminFetch';
 import { idString } from '@/utils/idKarsilastir';
+import { sayfaHiyerarsisiTamamla } from '@/utils/sayfaAgaci';
 
-import type { SayfaAcilisModu } from '@/types/site';
+import type { AltMenuGorunum, AltMenuTetikleyici, SayfaAcilisModu } from '@/types/site';
 
 export interface AdminSayfa {
   id: string;
@@ -16,6 +17,8 @@ export interface AdminSayfa {
   sira: number;
   acilisModu: SayfaAcilisModu;
   ustSayfaId?: string | null;
+  altMenuGorunum?: AltMenuGorunum;
+  altMenuTetikleyici?: AltMenuTetikleyici;
 }
 
 export interface SayfaFormDegeri {
@@ -30,11 +33,13 @@ export interface SayfaFormDegeri {
   sira: number;
   acilisModu: SayfaAcilisModu;
   ustSayfaId: string | null;
+  altMenuGorunum: AltMenuGorunum;
+  altMenuTetikleyici: AltMenuTetikleyici;
 }
 
 export async function adminSayfalariGetir(): Promise<AdminSayfa[]> {
   const veri = await adminJsonFetch<{ sayfalar: AdminSayfa[] }>('/sayfalar', { headers: adminHeaders() });
-  return veri.sayfalar.map(normalizeSayfa);
+  return sayfaHiyerarsisiTamamla(veri.sayfalar.map(normalizeSayfa));
 }
 
 export async function adminSayfaOlustur(form: SayfaFormDegeri): Promise<AdminSayfa> {
@@ -74,6 +79,8 @@ function normalizeSayfa(sayfa: AdminSayfa): AdminSayfa {
     id: idString(sayfa.id),
     acilisModu: sayfa.acilisModu ?? 'normal',
     ustSayfaId: sayfa.ustSayfaId != null ? idString(sayfa.ustSayfaId) : null,
+    altMenuGorunum: sayfa.altMenuGorunum ?? 'dikey',
+    altMenuTetikleyici: sayfa.altMenuTetikleyici ?? 'hover',
   };
 }
 
@@ -90,5 +97,7 @@ function payloadHazirla(form: SayfaFormDegeri) {
     sira: form.sira,
     acilisModu: form.acilisModu,
     ustSayfaId: form.ustSayfaId ? Number(form.ustSayfaId) : null,
+    altMenuGorunum: form.altMenuGorunum,
+    altMenuTetikleyici: form.altMenuTetikleyici,
   };
 }

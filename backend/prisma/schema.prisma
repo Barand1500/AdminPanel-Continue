@@ -110,27 +110,33 @@ model SiteAyarlari {
 // ─── İçerik ──────────────────────────────────────────────────────────────────
 
 model Sayfa {
-  id           Int      @id @default(autoincrement())
-  siteId       Int
-  site         Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
-  baslik       String
-  slug         String
-  icerik       String   @db.Text
-  kapakGorsel  String?
-  seoTitle     String?
-  seoDesc      String?
-  yayinda      Boolean  @default(false)
-  menudeGoster Boolean  @default(true)
-  sira         Int      @default(0)
-  acilisModu   String   @default("normal")
-  olusturma    DateTime @default(now())
-  guncelleme   DateTime @updatedAt
+  id                 Int      @id @default(autoincrement())
+  siteId             Int
+  site               Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  baslik             String
+  slug               String
+  icerik             String   @db.Text
+  kapakGorsel        String?
+  seoTitle           String?
+  seoDesc            String?
+  yayinda            Boolean  @default(false)
+  menudeGoster       Boolean  @default(true)
+  sira               Int      @default(0)
+  acilisModu         String   @default("normal")
+  ustSayfaId         Int?
+  ustSayfa           Sayfa?   @relation("SayfaHiyerarsi", fields: [ustSayfaId], references: [id], onDelete: Restrict)
+  altSayfalar        Sayfa[]  @relation("SayfaHiyerarsi")
+  altMenuGorunum     String   @default("dikey")
+  altMenuTetikleyici String   @default("hover")
+  olusturma          DateTime @default(now())
+  guncelleme         DateTime @updatedAt
 
   widgetlar                    Widget[]
   onerilenOlduguSistemAyarlari SistemAyari[] @relation("SistemAyariOneriSayfa")
 
   @@unique([siteId, slug])
   @@index([siteId, yayinda, sira])
+  @@index([siteId, ustSayfaId])
   @@map("sayfalar")
 }
 

@@ -18,7 +18,7 @@ import { sayfaDetayGetir } from '@/features/site/sayfaApi';
 
 async function dinamikSayfaLoader({ request }: LoaderFunctionArgs) {
   const pathname = new URL(request.url).pathname.replace(/\/{2,}/g, '/');
-  const slug = pathname.replace(/^\//, '').split('/')[0] ?? '';
+  const slug = pathname.replace(/^\//, '').replace(/\/$/, '');
   if (!slug) return { bulunamadi: true, sayfa: null };
   const sayfa = await sayfaDetayGetir(slug);
   return { bulunamadi: !sayfa, sayfa };

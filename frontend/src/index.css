@@ -513,6 +513,106 @@ body:has(.site-public)::-webkit-scrollbar,
   color: var(--color-primary);
 }
 
+.site-menu-dropdown-hover:hover .site-menu-dropdown-panel,
+.site-menu-dropdown-acik .site-menu-dropdown-panel {
+  display: block;
+}
+
+.site-menu-dropdown-panel-yatay {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem;
+  min-width: min(480px, 90vw);
+  padding: 0.5rem;
+}
+
+.site-menu-dropdown-panel-yatay .site-menu-dropdown-alt-link {
+  border-radius: 0.375rem;
+  padding: 0.5rem 0.75rem;
+  white-space: nowrap;
+}
+
+.site-menu-dropdown-yatay .site-menu-dropdown-panel {
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.site-menu-dropdown-ic {
+  position: relative;
+}
+
+.site-menu-dropdown-ic .site-menu-dropdown-panel {
+  left: 100%;
+  top: 0;
+  margin-left: 0.25rem;
+}
+
+.site-menu-dropdown-mobil {
+  display: block;
+  width: 100%;
+}
+
+.site-menu-dropdown-mobil .site-menu-dropdown-panel {
+  position: static;
+  box-shadow: none;
+  border: none;
+  padding: 0 0 0 1rem;
+  margin-top: 0.25rem;
+  min-width: 0;
+}
+
+.site-menu-dropdown-mobil .site-menu-dropdown-tetik {
+  width: 100%;
+  justify-content: space-between;
+  padding: 0.625rem 0;
+  border-bottom: 1px solid var(--color-border);
+}
+
+.sayfa-alt-kart-grid {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.sayfa-alt-kart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  border-radius: 1rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-elevated);
+  padding: 1.25rem 1.5rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.sayfa-alt-kart:hover {
+  border-color: color-mix(in srgb, var(--color-primary) 40%, var(--color-border));
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.08);
+  transform: translateY(-2px);
+}
+
+.sayfa-alt-kart-baslik {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
+
+.sayfa-alt-kart-yol {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.sayfa-alt-kart-ok {
+  margin-top: 0.5rem;
+  font-size: 1.125rem;
+  color: var(--color-primary);
+  transition: transform 0.2s ease;
+}
+
+.sayfa-alt-kart:hover .sayfa-alt-kart-ok {
+  transform: translateX(4px);
+}
+
 .site-public {
   background-color: var(--color-surface);
   color: var(--color-text);

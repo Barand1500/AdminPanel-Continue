@@ -3,68 +3,158 @@ import { sayfaYolunuBul } from '@/data/bosSiteVerisi';
 import type { MenuOgesi, SayfaAcilisModu } from '@/types/site';
 import { idString } from '@/utils/idKarsilastir';
 
+export type AltMenuGorunum = 'dikey' | 'yatay';
+export type AltMenuTetikleyici = 'hover' | 'tikla';
+
 export interface SayfaAgacDugumu {
   sayfa: AdminSayfa;
-  altSayfalar: AdminSayfa[];
+  altSayfalar: SayfaAgacDugumu[];
 }
 
 interface SayfaMenuKaynak {
   id: string | number;
   baslik: string;
   slug: string;
+  icerik?: string;
   sira?: number;
   menudeGoster?: boolean;
   acilisModu?: SayfaAcilisModu;
   ustSayfaId?: string | number | null;
+  altMenuGorunum?: AltMenuGorunum;
+  altMenuTetikleyici?: AltMenuTetikleyici;
 }
 
-/** Bir ana sayfanın alt menü öğelerini (dropdown) üretir. */
+export function sayfaSegmentSlug(slug: string): string {
+  const parcalar = slug.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+  return parcalar[parcalar.length - 1] ?? slug;
+}
+
+export function sayfaTamSlugOlustur(ustSlug: string | null | undefined, segment: string): string {
+  const seg = segment.replace(/^\/+|\/+$/g, '').split('/').pop() ?? segment;
+  if (!ustSlug) return seg;
+  return `${ustSlug.replace(/\/+$/g, '')}/${seg}`;
+}
+
+function ustSlugYolu(slug: string): string | null {
+  const parcalar = slug.replace(/^\/+|\/+$/g, '').split('/').filter(Boolean);
+  if (parcalar.length < 2) return null;
+  return parcalar.slice(0, -1).join('/');
+}
+
+/** ustSayfaId bos ise slug yolundan ust sayfayi tahmin eder (gorunum icin). */
+export function sayfaHiyerarsisiTamamla<T extends { id: string | number; slug: string; ustSayfaId?: string | number | null }>(
+  sayfalar: T[]
+): T[] {
+  const slugIndeks = new Map(
+    sayfalar.map((s) => [s.slug.replace(/^\/+|\/+$/g, ''), s] as const)
+  );
+
+  return sayfalar.map((sayfa) => {
+    if (sayfa.ustSayfaId) return sayfa;
+    const ustSlug = ustSlugYolu(sayfa.slug);
+    if (!ustSlug) return sayfa;
+    const ust = slugIndeks.get(ustSlug);
+    if (!ust || ust.id === sayfa.id) return sayfa;
+    return { ...sayfa, ustSayfaId: idString(ust.id) };
+  });
+}
+
+function cocuklariSirala<T extends { sira?: number; baslik: string }>(liste: T[]): T[] {
+  return [...liste].sort(
+    (a, b) => (a.sira ?? 0) - (b.sira ?? 0) || a.baslik.localeCompare(b.baslik, 'tr')
+  );
+}
+
+function menuOgesiUret(sayfa: SayfaMenuKaynak, sayfalar: SayfaMenuKaynak[]): MenuOgesi {
+  const altKaynaklar = cocuklariSirala(
+    sayfalar.filter(
+      (s) => s.ustSayfaId != null && idString(s.ustSayfaId) === idString(sayfa.id) && s.menudeGoster !== false
+    )
+  );
+
+  const altOgeler = altKaynaklar.map((alt) => menuOgesiUret(alt, sayfalar));
+  const icerikVar = Boolean(sayfa.icerik?.trim());
+
+  return {
+    baslik: sayfa.baslik,
+    yol: sayfaYolunuBul(sayfa.slug),
+    acilisModu: sayfa.acilisModu ?? 'normal',
+    yeniSekme: sayfa.acilisModu === 'yeni_sekme',
+    icerikVar,
+    altMenuGorunum: sayfa.altMenuGorunum ?? 'dikey',
+    altMenuTetikleyici: sayfa.altMenuTetikleyici ?? 'hover',
+    ...(altOgeler.length > 0 ? { altOgeler } : {}),
+  };
+}
+
+export function sayfaMenuAgaciOlustur(sayfalar: SayfaMenuKaynak[]): MenuOgesi[] {
+  const duzeltildi = sayfaHiyerarsisiTamamla(sayfalar);
+  const kokler = cocuklariSirala(
+    duzeltildi.filter((s) => !s.ustSayfaId && s.menudeGoster !== false)
+  );
+  return kokler.map((sayfa) => menuOgesiUret(sayfa, duzeltildi));
+}
+
+/** Bir ana sayfanın doğrudan alt menü öğelerini üretir. */
 export function sayfaAltMenuOgeleriOlustur(
   ustSayfaId: string | number,
   sayfalar: SayfaMenuKaynak[]
 ): MenuOgesi[] {
-  return sayfalar
-    .filter(
+  return cocuklariSirala(
+    sayfalar.filter(
       (s) =>
         s.ustSayfaId != null &&
         idString(s.ustSayfaId) === idString(ustSayfaId) &&
         s.menudeGoster !== false
     )
-    .sort((a, b) => (a.sira ?? 0) - (b.sira ?? 0))
-    .map((alt) => ({
-      baslik: alt.baslik,
-      yol: sayfaYolunuBul(alt.slug),
-      acilisModu: alt.acilisModu ?? 'normal',
-      yeniSekme: alt.acilisModu === 'yeni_sekme',
-    }));
+  ).map((alt) => menuOgesiUret(alt, sayfalar));
 }
 
-/** Kök sayfalar ve alt sayfalarını gruplar (tek seviye hiyerarşi). */
+/** Sınırsız derinlikte sayfa ağacı. */
 export function sayfaAgaciOlustur(sayfalar: AdminSayfa[]): SayfaAgacDugumu[] {
-  const kokler = sayfalar
-    .filter((s) => !s.ustSayfaId)
-    .sort((a, b) => a.sira - b.sira || a.baslik.localeCompare(b.baslik, 'tr'));
+  const duzeltildi = sayfaHiyerarsisiTamamla(sayfalar);
 
-  return kokler.map((sayfa) => ({
-    sayfa,
-    altSayfalar: sayfalar
-      .filter((s) => s.ustSayfaId && idString(s.ustSayfaId) === idString(sayfa.id))
-      .sort((a, b) => a.sira - b.sira || a.baslik.localeCompare(b.baslik, 'tr')),
-  }));
+  function dal(ustId: string | null): SayfaAgacDugumu[] {
+    return cocuklariSirala(
+      duzeltildi.filter((s) =>
+        ustId ? s.ustSayfaId && idString(s.ustSayfaId) === idString(ustId) : !s.ustSayfaId
+      )
+    ).map((sayfa) => ({
+      sayfa,
+      altSayfalar: dal(sayfa.id),
+    }));
+  }
+
+  return dal(null);
 }
 
-/** Üst sayfa seçenekleri: yalnızca kök sayfalar, kendisi hariç. */
+/** Üst sayfa seçenekleri: kendisi ve alt ağacı hariç tüm sayfalar. */
 export function ustSayfaSecenekleri(
   sayfalar: AdminSayfa[],
   haricId?: string | null
 ): AdminSayfa[] {
-  return sayfalar
-    .filter((s) => !s.ustSayfaId && s.id !== haricId)
-    .sort((a, b) => a.sira - b.sira || a.baslik.localeCompare(b.baslik, 'tr'));
+  const haric = new Set<string>();
+  if (haricId) {
+    function topla(id: string) {
+      haric.add(id);
+      sayfalar
+        .filter((s) => s.ustSayfaId && idString(s.ustSayfaId) === idString(id))
+        .forEach((s) => topla(s.id));
+    }
+    topla(haricId);
+  }
+
+  return cocuklariSirala(sayfalar.filter((s) => !haric.has(s.id)));
 }
 
 export function altSayfaSayisi(sayfalar: AdminSayfa[], ustId: string): number {
   return sayfalar.filter((s) => s.ustSayfaId && idString(s.ustSayfaId) === idString(ustId)).length;
+}
+
+export function dogrudanAltSayfalar(sayfalar: AdminSayfa[], ustId: string): AdminSayfa[] {
+  return cocuklariSirala(
+    sayfalar.filter((s) => s.ustSayfaId && idString(s.ustSayfaId) === idString(ustId))
+  );
 }
 
 export function ustSayfaBul(
@@ -73,4 +163,8 @@ export function ustSayfaBul(
 ): AdminSayfa | undefined {
   if (!ustSayfaId) return undefined;
   return sayfalar.find((s) => idString(s.id) === idString(ustSayfaId));
+}
+
+export function sayfaIcerikVar(icerik?: string | null): boolean {
+  return Boolean(icerik?.replace(/<[^>]*>/g, '').trim());
 }

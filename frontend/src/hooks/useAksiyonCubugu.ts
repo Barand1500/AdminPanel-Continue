@@ -22,6 +22,7 @@ const modulAksiyonlari: Record<string, AksiyonButonu[]> = {
   sayfalar: [
     A('kaydet', 'Kaydet', true, true),
     A('ekle', 'Yeni Ekle', true),
+    A('altEkle', 'Yeni Alt Ekle', false),
     A('sil', 'Sil', true),
     A('onizle', 'Önizle', true),
     A('yayinla', 'Yayınla', true),

@@ -39,6 +39,8 @@ export interface Widget {
 }
 
 export type SayfaAcilisModu = 'normal' | 'modal' | 'yeni_sekme';
+export type AltMenuGorunum = 'dikey' | 'yatay';
+export type AltMenuTetikleyici = 'hover' | 'tikla';
 
 export interface Sayfa {
   id: string;
@@ -50,6 +52,8 @@ export interface Sayfa {
   sira?: number;
   acilisModu?: SayfaAcilisModu;
   ustSayfaId?: string | null;
+  altMenuGorunum?: AltMenuGorunum;
+  altMenuTetikleyici?: AltMenuTetikleyici;
 }
 
 export interface Urun {
@@ -86,6 +90,9 @@ export interface MenuOgesi {
   yol: string;
   yeniSekme?: boolean;
   acilisModu?: SayfaAcilisModu;
+  icerikVar?: boolean;
+  altMenuGorunum?: AltMenuGorunum;
+  altMenuTetikleyici?: AltMenuTetikleyici;
   altOgeler?: MenuOgesi[];
 }
 

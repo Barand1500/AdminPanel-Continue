@@ -1,6 +1,8 @@
 import { z } from 'zod';
 
 export const sayfaAcilisModuSchema = z.enum(['normal', 'modal', 'yeni_sekme']);
+export const altMenuGorunumSchema = z.enum(['dikey', 'yatay']);
+export const altMenuTetikleyiciSchema = z.enum(['hover', 'tikla']);
 
 export const sayfaOlusturSchema = z.object({
   baslik: z.string().min(1),
@@ -13,6 +15,9 @@ export const sayfaOlusturSchema = z.object({
   menudeGoster: z.boolean().default(true),
   sira: z.number().int().default(0),
   acilisModu: sayfaAcilisModuSchema.default('normal'),
+  ustSayfaId: z.number().int().nullable().optional(),
+  altMenuGorunum: altMenuGorunumSchema.optional(),
+  altMenuTetikleyici: altMenuTetikleyiciSchema.optional(),
 });
 
 export const sayfaGuncelleSchema = sayfaOlusturSchema.partial();

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { SayfaAcilisModu } from '@/types/site';
+import type { AltMenuGorunum, AltMenuTetikleyici, SayfaAcilisModu } from '@/types/site';
 import { SayfaMenuOnizleme } from '@/components/admin/sayfa/SayfaMenuOnizleme';
 
 const ACILIS_MODLARI: { id: SayfaAcilisModu; ad: string; aciklama: string }[] = [
@@ -7,6 +7,17 @@ const ACILIS_MODLARI: { id: SayfaAcilisModu; ad: string; aciklama: string }[] = 
   { id: 'modal', ad: 'Modal pencere', aciklama: 'Menüye tıklanınca sayfa popup olarak açılır' },
   { id: 'yeni_sekme', ad: 'Yeni sekme', aciklama: 'Tarayıcıda yeni sekmede açılır' },
 ];
+
+const ALT_MENU_GORUNUM: { id: AltMenuGorunum; ad: string; aciklama: string }[] = [
+  { id: 'dikey', ad: 'Dikey liste', aciklama: 'Alt sayfalar aşağı doğru dropdown olarak listelenir' },
+  { id: 'yatay', ad: 'Yatay şerit', aciklama: 'Alt sayfalar yan yana menü şeridinde gösterilir' },
+];
+
+const ALT_MENU_TETIK: { id: AltMenuTetikleyici; ad: string }[] = [
+  { id: 'hover', ad: 'Üzerine gelince (hover)' },
+  { id: 'tikla', ad: 'Tıklayınca açılsın' },
+];
+
 import type { AdminSayfa, SayfaFormDegeri } from '@/features/admin/sayfaApi';
 import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
@@ -22,11 +33,14 @@ import {
 } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
   altSayfaSayisi,
+  dogrudanAltSayfalar,
   sayfaAgaciOlustur,
+  type SayfaAgacDugumu,
+  sayfaIcerikVar,
+  sayfaSegmentSlug,
+  sayfaTamSlugOlustur,
   ustSayfaBul,
-  ustSayfaSecenekleri,
 } from '@/utils/sayfaAgaci';
-import { idString } from '@/utils/idKarsilastir';
 
 type EditorSekme = 'icerik' | 'seo' | 'ayarlar' | 'alt-sayfa';
 
@@ -34,8 +48,6 @@ interface SayfaListesiPanelProps {
   sayfalar: AdminSayfa[];
   seciliId: string | null;
   onSec: (sayfa: AdminSayfa) => void;
-  onYeniSayfa?: () => void;
-  onAltSayfaEkle?: (ustSayfa: AdminSayfa) => void;
 }
 
 function SayfaListeSatiri({
@@ -69,46 +81,103 @@ function SayfaListeSatiri({
         ) : (
           <AdminDurumEtiketi tur="taslak">Taslak</AdminDurumEtiketi>
         )}
-        {sayfa.menudeGoster && !altSayfa && <AdminDurumEtiketi tur="menu">Menüde</AdminDurumEtiketi>}
-        {altSayfa && <AdminDurumEtiketi tur="bilgi">Alt sayfa</AdminDurumEtiketi>}
+        {sayfa.menudeGoster && <AdminDurumEtiketi tur="menu">Menüde</AdminDurumEtiketi>}
+        {altSayfa && <AdminDurumEtiketi tur="bilgi">Alt</AdminDurumEtiketi>}
       </div>
     </button>
   );
 }
 
-export function SayfaListesiPanel({
-  sayfalar,
+function SayfaAgacDallari({
+  dugumler,
   seciliId,
   onSec,
-  onYeniSayfa,
-  onAltSayfaEkle,
-}: SayfaListesiPanelProps) {
+  daraltildi,
+  onToggle,
+  girinti = 0,
+}: {
+  dugumler: SayfaAgacDugumu[];
+  seciliId: string | null;
+  onSec: (sayfa: AdminSayfa) => void;
+  daraltildi: Record<string, boolean>;
+  onToggle: (id: string) => void;
+  girinti?: number;
+}) {
+  return (
+    <>
+      {dugumler.map((dugum) => {
+        const altSayi = dugum.altSayfalar.length;
+        const kapali = daraltildi[dugum.sayfa.id];
+
+        return (
+          <div key={dugum.sayfa.id} className="ap-sayfa-agac-dugum">
+            <div className="flex items-stretch gap-0.5">
+              {altSayi > 0 ? (
+                <button
+                  type="button"
+                  className="ap-sayfa-agac-toggle"
+                  aria-label={kapali ? 'Alt sayfaları aç' : 'Alt sayfaları kapat'}
+                  onClick={() => onToggle(dugum.sayfa.id)}
+                >
+                  {kapali ? '▸' : '▾'}
+                </button>
+              ) : (
+                <span className="ap-sayfa-agac-toggle ap-sayfa-agac-toggle-bos" />
+              )}
+              <div className="min-w-0 flex-1">
+                <SayfaListeSatiri
+                  sayfa={dugum.sayfa}
+                  seciliId={seciliId}
+                  onSec={onSec}
+                  girinti={girinti}
+                  altSayfa={girinti > 0}
+                />
+              </div>
+            </div>
+            {altSayi > 0 && !kapali && (
+              <div className="ap-sayfa-agac-altlar">
+                <SayfaAgacDallari
+                  dugumler={dugum.altSayfalar}
+                  seciliId={seciliId}
+                  onSec={onSec}
+                  daraltildi={daraltildi}
+                  onToggle={onToggle}
+                  girinti={girinti + 1}
+                />
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </>
+  );
+}
+
+function agacFiltrele(dugumler: SayfaAgacDugumu[], q: string): SayfaAgacDugumu[] {
+  if (!q) return dugumler;
+
+  return dugumler
+    .map((dugum) => {
+      const kokEslesir =
+        dugum.sayfa.baslik.toLowerCase().includes(q) ||
+        dugum.sayfa.slug.toLowerCase().includes(q);
+      const altFiltre = agacFiltrele(dugum.altSayfalar, q);
+      if (kokEslesir) return { ...dugum, altSayfalar: altFiltre.length ? altFiltre : dugum.altSayfalar };
+      if (altFiltre.length) return { ...dugum, altSayfalar: altFiltre };
+      return null;
+    })
+    .filter((d): d is SayfaAgacDugumu => d != null);
+}
+
+export function SayfaListesiPanel({ sayfalar, seciliId, onSec }: SayfaListesiPanelProps) {
   const [arama, setArama] = useState('');
   const [daraltildi, setDaraltildi] = useState<Record<string, boolean>>({});
 
   const agac = useMemo(() => sayfaAgaciOlustur(sayfalar), [sayfalar]);
-
   const filtreliAgac = useMemo(() => {
     const q = arama.toLowerCase().trim();
-    if (!q) return agac;
-
-    return agac
-      .map((dugum) => {
-        const kokEslesir =
-          dugum.sayfa.baslik.toLowerCase().includes(q) ||
-          dugum.sayfa.slug.toLowerCase().includes(q);
-        const altEslesen = dugum.altSayfalar.filter(
-          (s) => s.baslik.toLowerCase().includes(q) || s.slug.toLowerCase().includes(q)
-        );
-        if (kokEslesir) return { ...dugum, altSayfalar: altEslesen.length ? altEslesen : dugum.altSayfalar };
-        if (altEslesen.length) return { ...dugum, altSayfalar: altEslesen };
-        return null;
-      })
-      .filter((d): d is (typeof agac)[number] => d != null);
+    return q ? agacFiltrele(agac, q) : agac;
   }, [agac, arama]);
-
-  const seciliSayfa = seciliId ? sayfalar.find((s) => s.id === seciliId) : undefined;
-  const altSayfaEklenebilir = seciliSayfa && !seciliSayfa.ustSayfaId;
 
   function toggleDugum(id: string) {
     setDaraltildi((o) => ({ ...o, [id]: !o[id] }));
@@ -116,24 +185,6 @@ export function SayfaListesiPanel({
 
   return (
     <aside className="ap-sidebar-panel">
-      {(onYeniSayfa || altSayfaEklenebilir) && (
-        <div className="ap-sayfa-aksiyon-cubugu">
-          {onYeniSayfa && (
-            <button type="button" className="ap-sayfa-aksiyon-btn ap-sayfa-aksiyon-yeni" onClick={onYeniSayfa}>
-              Yeni Sayfa
-            </button>
-          )}
-          {altSayfaEklenebilir && onAltSayfaEkle && seciliSayfa && (
-            <button
-              type="button"
-              className="ap-sayfa-aksiyon-btn ap-sayfa-aksiyon-alt"
-              onClick={() => onAltSayfaEkle(seciliSayfa)}
-            >
-              Alt Sayfa
-            </button>
-          )}
-        </div>
-      )}
       <div className="ap-sidebar-baslik">
         <div>
           <h2 className="ap-heading text-sm font-semibold">Sayfa Listesi</h2>
@@ -146,54 +197,16 @@ export function SayfaListesiPanel({
           <AdminBosDurum
             ikon="📄"
             baslik={arama ? 'Sonuç yok' : 'Henüz sayfa yok'}
-            aciklama={arama ? 'Farklı bir arama deneyin' : 'Alt bardan Yeni Ekle ile başlayın'}
+            aciklama={arama ? 'Farklı bir arama deneyin' : 'Alttaki Yeni Ekle ile başlayın'}
           />
         ) : (
-          filtreliAgac.map((dugum) => {
-            const altSayi = dugum.altSayfalar.length;
-            const kapali = daraltildi[dugum.sayfa.id];
-
-            return (
-              <div key={dugum.sayfa.id} className="ap-sayfa-agac-dugum">
-                <div className="flex items-stretch gap-0.5">
-                  {altSayi > 0 ? (
-                    <button
-                      type="button"
-                      className="ap-sayfa-agac-toggle"
-                      aria-label={kapali ? 'Alt sayfaları aç' : 'Alt sayfaları kapat'}
-                      onClick={() => toggleDugum(dugum.sayfa.id)}
-                    >
-                      {kapali ? '▸' : '▾'}
-                    </button>
-                  ) : (
-                    <span className="ap-sayfa-agac-toggle ap-sayfa-agac-toggle-bos" />
-                  )}
-                  <div className="min-w-0 flex-1">
-                    <SayfaListeSatiri sayfa={dugum.sayfa} seciliId={seciliId} onSec={onSec} />
-                  </div>
-                </div>
-                {altSayi > 0 && !kapali && (
-                  <div className="ap-sayfa-agac-altlar">
-                    {dugum.altSayfalar.map((alt) => (
-                      <SayfaListeSatiri
-                        key={alt.id}
-                        sayfa={alt}
-                        seciliId={seciliId}
-                        onSec={onSec}
-                        girinti={2}
-                        altSayfa
-                      />
-                    ))}
-                  </div>
-                )}
-                {altSayi > 0 && (
-                  <p className="ap-sayfa-agac-etiket ap-muted px-2 pb-1 text-[10px]">
-                    {altSayi} alt sayfa
-                  </p>
-                )}
-              </div>
-            );
-          })
+          <SayfaAgacDallari
+            dugumler={filtreliAgac}
+            seciliId={seciliId}
+            onSec={onSec}
+            daraltildi={daraltildi}
+            onToggle={toggleDugum}
+          />
         )}
       </div>
     </aside>
@@ -222,20 +235,14 @@ export function SayfaEditorPanel({
   onSayfaSec,
 }: SayfaEditorPanelProps) {
   const [sekme, setSekme] = useState<EditorSekme>('icerik');
-  const ustSecenekler = ustSayfaSecenekleri(sayfalar, seciliId);
   const ustSayfa = ustSayfaBul(sayfalar, form.ustSayfaId);
   const altSayi = seciliId ? altSayfaSayisi(sayfalar, seciliId) : 0;
   const seciliSayfa = seciliId ? sayfalar.find((s) => s.id === seciliId) : undefined;
-  const altSayfaEklenebilir = !!seciliSayfa && !seciliSayfa.ustSayfaId;
-  const altSayfalar = useMemo(
-    () =>
-      seciliId
-        ? sayfalar
-            .filter((s) => s.ustSayfaId && idString(s.ustSayfaId) === idString(seciliId))
-            .sort((a, b) => a.sira - b.sira || a.baslik.localeCompare(b.baslik, 'tr'))
-        : [],
-    [sayfalar, seciliId]
-  );
+  const altSayfalar = seciliId ? dogrudanAltSayfalar(sayfalar, seciliId) : [];
+  const altMenuAyarlariGoster = !!seciliId && altSayi >= 2;
+  const segmentSlug = form.ustSayfaId
+    ? sayfaSegmentSlug(form.slug || slugUret(form.baslik))
+    : form.slug;
 
   const sekmeler = useMemo((): { id: EditorSekme; etiket: string; ikon: string }[] => {
     const liste: { id: EditorSekme; etiket: string; ikon: string }[] = [
@@ -243,11 +250,11 @@ export function SayfaEditorPanel({
       { id: 'seo', etiket: 'SEO', ikon: '🔍' },
       { id: 'ayarlar', etiket: 'Ayarlar', ikon: '⚙️' },
     ];
-    if (altSayfaEklenebilir) {
-      liste.push({ id: 'alt-sayfa', etiket: 'Alt Sayfalar', ikon: '📂' });
+    if (seciliId) {
+      liste.push({ id: 'alt-sayfa', etiket: `Alt Sayfalar${altSayi ? ` (${altSayi})` : ''}`, ikon: '📂' });
     }
     return liste;
-  }, [altSayfaEklenebilir]);
+  }, [seciliId, altSayi]);
 
   function altSayfaEkleBaslat() {
     if (!seciliSayfa || !onAltSayfaEkle) return;
@@ -258,9 +265,19 @@ export function SayfaEditorPanel({
   function baslikDegistir(baslik: string) {
     const guncel = { ...form, baslik };
     if (!slugManuel && !seciliId) {
-      guncel.slug = slugUret(baslik);
+      const segment = slugUret(baslik);
+      guncel.slug = ustSayfa ? sayfaTamSlugOlustur(ustSayfa.slug, segment) : segment;
     }
     onChange(guncel);
+  }
+
+  function segmentDegistir(segment: string) {
+    onSlugManuelChange(true);
+    const temiz = slugUret(segment);
+    onChange({
+      ...form,
+      slug: ustSayfa ? sayfaTamSlugOlustur(ustSayfa.slug, temiz) : temiz,
+    });
   }
 
   return (
@@ -272,7 +289,7 @@ export function SayfaEditorPanel({
           </h2>
           <p className="ap-muted text-xs">
             {ustSayfa
-              ? `Kategori: ${ustSayfa.baslik} · /${form.slug || '...'}`
+              ? `Üst: ${ustSayfa.baslik} · /${form.slug || '...'}`
               : seciliId
                 ? `Düzenleniyor: /${form.slug || '...'}`
                 : 'Boş sayfa şablonu'}
@@ -285,9 +302,7 @@ export function SayfaEditorPanel({
             <AdminDurumEtiketi tur="taslak">Taslak</AdminDurumEtiketi>
           )}
           {form.ustSayfaId && <AdminDurumEtiketi tur="bilgi">Alt sayfa</AdminDurumEtiketi>}
-          {altSayi > 0 && (
-            <AdminDurumEtiketi tur="menu">{altSayi} alt sayfa</AdminDurumEtiketi>
-          )}
+          {altSayi > 0 && <AdminDurumEtiketi tur="menu">{altSayi} alt sayfa</AdminDurumEtiketi>}
         </div>
       </div>
 
@@ -308,24 +323,70 @@ export function SayfaEditorPanel({
               </FormAlani>
               <FormAlani
                 etiket="Slug (URL)"
-                aciklama={slugManuel ? 'Manuel düzenleme açık' : 'Başlıktan otomatik üretiliyor'}
+                aciklama={
+                  ustSayfa
+                    ? `Tam yol: /${form.slug || '...'}`
+                    : slugManuel
+                      ? 'Manuel düzenleme açık'
+                      : 'Başlıktan otomatik üretiliyor'
+                }
               >
                 <div className="flex gap-2">
-                  <span className="ap-muted flex items-center rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface-2)] px-3 text-sm">
-                    /
+                  <span className="ap-muted flex items-center rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface-2)] px-3 text-sm whitespace-nowrap">
+                    /{ustSayfa ? `${ustSayfa.slug}/` : ''}
                   </span>
                   <input
                     className={`${formInputSinifi} flex-1`}
-                    value={form.slug}
-                    onChange={(e) => {
-                      onSlugManuelChange(true);
-                      onChange({ ...form, slug: slugUret(e.target.value) });
-                    }}
-                    placeholder="hakkimizda"
+                    value={ustSayfa ? segmentSlug : form.slug}
+                    onChange={(e) =>
+                      ustSayfa ? segmentDegistir(e.target.value) : segmentDegistir(e.target.value)
+                    }
+                    placeholder={ustSayfa ? 'hakkimizda' : 'kurumsal'}
                   />
                 </div>
               </FormAlani>
             </AdminFormBolumu>
+
+            {altMenuAyarlariGoster && (
+              <AdminFormBolumu
+                baslik="Alt Menü Görünümü"
+                aciklama="Bu sayfanın alt kategorileri sitede nasıl görünecek (2+ alt sayfa)"
+              >
+                <FormAlani etiket="Düzen">
+                  <div className="ap-sayfa-alt-menu-secim-grid">
+                    {ALT_MENU_GORUNUM.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        className={`ap-sayfa-alt-menu-secim ${form.altMenuGorunum === m.id ? 'ap-sayfa-alt-menu-secim-aktif' : ''}`}
+                        onClick={() => onChange({ ...form, altMenuGorunum: m.id })}
+                      >
+                        <span className="ap-sayfa-alt-menu-secim-baslik">{m.ad}</span>
+                        <span className="ap-muted text-xs">{m.aciklama}</span>
+                      </button>
+                    ))}
+                  </div>
+                </FormAlani>
+                <FormAlani etiket="Açılış tetikleyici">
+                  <div className="flex flex-wrap gap-2">
+                    {ALT_MENU_TETIK.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        className={`rounded-lg border px-3 py-2 text-sm ${
+                          form.altMenuTetikleyici === m.id
+                            ? 'border-blue-500 bg-blue-600/20 text-blue-400'
+                            : 'border-[var(--ap-border)] hover:bg-[var(--ap-hover)]'
+                        }`}
+                        onClick={() => onChange({ ...form, altMenuTetikleyici: m.id })}
+                      >
+                        {m.ad}
+                      </button>
+                    ))}
+                  </div>
+                </FormAlani>
+              </AdminFormBolumu>
+            )}
 
             <AdminFormBolumu baslik="İçerik" aciklama="Görsel editör veya HTML kodu ile sayfa içeriği oluşturun">
               <IcerikHtmlEditoru
@@ -333,6 +394,11 @@ export function SayfaEditorPanel({
                 onChange={(icerik) => onChange({ ...form, icerik })}
                 placeholder="Sayfa içeriğinizi yazın..."
               />
+              {!sayfaIcerikVar(form.icerik) && altSayi > 0 && (
+                <p className="ap-muted mt-2 text-xs">
+                  İçerik boş bırakılırsa menüde tıklanınca yalnızca alt kategoriler gösterilir.
+                </p>
+              )}
             </AdminFormBolumu>
 
             <GorselAlan
@@ -345,7 +411,7 @@ export function SayfaEditorPanel({
         )}
 
         {sekme === 'seo' && (
-          <AdminFormBolumu baslik="Arama Motoru" aciklama="Google ve sosyal paylasim meta verileri">
+          <AdminFormBolumu baslik="Arama Motoru" aciklama="Google ve sosyal paylaşım meta verileri">
             <FormAlani etiket="SEO Başlık" aciklama="Tarayıcı sekmesinde görünür (max ~60 karakter)">
               <input
                 className={formInputSinifi}
@@ -367,98 +433,65 @@ export function SayfaEditorPanel({
         )}
 
         {sekme === 'ayarlar' && (
-          <>
-            <AdminFormBolumu baslik="Sayfa Açılış Modu" aciklama="Menüden tıklandığında sayfanın nasıl açılacağını belirleyin">
-              <FormAlani etiket="Açılış şekli">
-                <select
-                  className={formSelectSinifi}
-                  value={form.acilisModu}
-                  onChange={(e) => onChange({ ...form, acilisModu: e.target.value as SayfaAcilisModu })}
-                >
-                  {ACILIS_MODLARI.map((m) => (
-                    <option key={m.id} value={m.id}>
-                      {m.ad}
-                    </option>
-                  ))}
-                </select>
-              </FormAlani>
-              <p className="ap-muted text-xs">
-                {ACILIS_MODLARI.find((m) => m.id === form.acilisModu)?.aciklama}
-              </p>
-            </AdminFormBolumu>
-
-            <AdminFormBolumu baslik="Yayın ve Menü">
-              <FormAlani etiket="Üst sayfa">
-                <select
-                  className={formSelectSinifi}
-                  value={form.ustSayfaId ?? ''}
-                  disabled={altSayi > 0}
-                  onChange={(e) =>
-                    onChange({
-                      ...form,
-                      ustSayfaId: e.target.value || null,
-                      menudeGoster: true,
-                    })
-                  }
-                >
-                  <option value="">Ana menü (üst seviye)</option>
-                  {ustSecenekler.map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.baslik}
-                    </option>
-                  ))}
-                </select>
-              </FormAlani>
-              {ustSayfa && (
-                <p className="ap-muted text-xs">
-                  {ustSayfa.baslik} altında listelenir
-                </p>
-              )}
-              <div className="ap-switch-grup">
-                <AdminAnahtarDugme
-                  etiket="Yayında"
-                  acik={form.yayinda}
-                  onDegistir={(v) => onChange({ ...form, yayinda: v })}
-                />
-                <AdminAnahtarDugme
-                  etiket={form.ustSayfaId ? 'Alt menüde göster' : 'Menüde göster'}
-                  acik={form.menudeGoster}
-                  onDegistir={(v) => onChange({ ...form, menudeGoster: v })}
-                />
-              </div>
-              <FormAlani
-                etiket="Sıra"
-                aciklama={
-                  form.ustSayfaId
-                    ? 'Üst sayfa altındaki sıralama (küçük = önce)'
-                    : 'Ana menü sırası (küçük = önce)'
-                }
+          <AdminFormBolumu baslik="Yayın ve Menü">
+            <FormAlani etiket="Sayfa Açılış Modu" aciklama="Menüden tıklandığında sayfanın nasıl açılacağı">
+              <select
+                className={formSelectSinifi}
+                value={form.acilisModu}
+                onChange={(e) => onChange({ ...form, acilisModu: e.target.value as SayfaAcilisModu })}
               >
-                <input
-                  type="number"
-                  min={0}
-                  className={`${formInputSinifi} max-w-[120px]`}
-                  value={form.sira}
-                  onChange={(e) => onChange({ ...form, sira: Number(e.target.value) })}
-                />
-              </FormAlani>
-            </AdminFormBolumu>
-          </>
+                {ACILIS_MODLARI.map((m) => (
+                  <option key={m.id} value={m.id}>
+                    {m.ad}
+                  </option>
+                ))}
+              </select>
+            </FormAlani>
+            {ustSayfa && (
+              <div className="ap-sayfa-ust-bilgi rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface-2)] px-3 py-2">
+                <p className="ap-muted text-xs">Üst sayfa</p>
+                <p className="ap-heading text-sm font-medium">{ustSayfa.baslik}</p>
+                <p className="ap-muted text-xs">/{ustSayfa.slug}</p>
+              </div>
+            )}
+            <div className="ap-switch-grup">
+              <AdminAnahtarDugme
+                etiket="Yayında"
+                acik={form.yayinda}
+                onDegistir={(v) => onChange({ ...form, yayinda: v })}
+              />
+              <AdminAnahtarDugme
+                etiket={form.ustSayfaId ? 'Alt menüde göster' : 'Menüde göster'}
+                acik={form.menudeGoster}
+                onDegistir={(v) => onChange({ ...form, menudeGoster: v })}
+              />
+            </div>
+            <FormAlani
+              etiket="Sıra"
+              aciklama={
+                form.ustSayfaId
+                  ? 'Üst sayfa altındaki sıralama (küçük = önce)'
+                  : 'Ana menü sırası (küçük = önce)'
+              }
+            >
+              <input
+                type="number"
+                min={0}
+                className={`${formInputSinifi} max-w-[120px]`}
+                value={form.sira}
+                onChange={(e) => onChange({ ...form, sira: Number(e.target.value) })}
+              />
+            </FormAlani>
+          </AdminFormBolumu>
         )}
 
-        {sekme === 'alt-sayfa' && altSayfaEklenebilir && seciliSayfa && (
+        {sekme === 'alt-sayfa' && seciliSayfa && (
           <>
-            <AdminFormBolumu
-              baslik="Menü Önizleme"
-              aciklama="Ana menüde dropdown olarak görünecek alt sayfalar"
-            >
+            <AdminFormBolumu baslik="Menü Önizleme" aciklama="Canlı sitede menüde böyle görünür">
               <SayfaMenuOnizleme sayfalar={sayfalar} vurguluUstId={seciliId} />
             </AdminFormBolumu>
 
-            <AdminFormBolumu
-              baslik="Alt Sayfalar"
-              aciklama={`${seciliSayfa.baslik} menüsü altındaki sayfalar`}
-            >
+            <AdminFormBolumu baslik="Alt Sayfalar" aciklama={`${seciliSayfa.baslik} altındaki sayfalar`}>
               {altSayfalar.length === 0 ? (
                 <p className="ap-muted text-sm">Henüz alt sayfa eklenmedi.</p>
               ) : (
@@ -478,9 +511,7 @@ export function SayfaEditorPanel({
                           ) : (
                             <AdminDurumEtiketi tur="taslak">Taslak</AdminDurumEtiketi>
                           )}
-                          {alt.menudeGoster && (
-                            <AdminDurumEtiketi tur="menu">Menüde</AdminDurumEtiketi>
-                          )}
+                          {alt.menudeGoster && <AdminDurumEtiketi tur="menu">Menüde</AdminDurumEtiketi>}
                         </div>
                       </button>
                     </li>
@@ -495,11 +526,6 @@ export function SayfaEditorPanel({
               >
                 + Yeni Alt Sayfa Ekle
               </button>
-
-              <p className="ap-muted mt-3 text-xs">
-                Alt sayfalar kaydedilip yayınlandığında ve &quot;Alt menüde göster&quot; açıkken üst
-                sayfa menüsünde dropdown olarak listelenir.
-              </p>
             </AdminFormBolumu>
           </>
         )}
@@ -521,6 +547,8 @@ export function sayfadanForm(s: AdminSayfa): SayfaFormDegeri {
     sira: s.sira,
     acilisModu: s.acilisModu ?? 'normal',
     ustSayfaId: s.ustSayfaId ?? null,
+    altMenuGorunum: s.altMenuGorunum ?? 'dikey',
+    altMenuTetikleyici: s.altMenuTetikleyici ?? 'hover',
   };
 }
 
@@ -536,6 +564,8 @@ export const bosSayfaForm: SayfaFormDegeri = {
   sira: 0,
   acilisModu: 'normal',
   ustSayfaId: null,
+  altMenuGorunum: 'dikey',
+  altMenuTetikleyici: 'hover',
 };
 
 export function altSayfaFormu(ustSayfa: AdminSayfa, mevcutAltSayi: number): SayfaFormDegeri {
@@ -545,5 +575,7 @@ export function altSayfaFormu(ustSayfa: AdminSayfa, mevcutAltSayi: number): Sayf
     sira: mevcutAltSayi,
     menudeGoster: true,
     yayinda: false,
+    altMenuGorunum: ustSayfa.altMenuGorunum ?? 'dikey',
+    altMenuTetikleyici: ustSayfa.altMenuTetikleyici ?? 'hover',
   };
 }

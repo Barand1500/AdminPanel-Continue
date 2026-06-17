@@ -1,5 +1,5 @@
 import type { SitePublicData } from '@/types/site';
-import { sayfaAltMenuOgeleriOlustur } from '@/utils/sayfaAgaci';
+import { sayfaMenuAgaciOlustur } from '@/utils/sayfaAgaci';
 
 export const bosSiteVerisi: SitePublicData = {
   site: {
@@ -33,21 +33,7 @@ export function menuOgeleriOlustur(
   sayfalar: SitePublicData['sayfalar'],
   blogAyarlari?: import('@/types/blog').BlogAyarlari
 ) {
-  const kokler = sayfalar
-    .filter((s) => s.menudeGoster !== false && !s.ustSayfaId)
-    .sort((a, b) => (a.sira ?? 0) - (b.sira ?? 0));
-
-  const apiMenu = kokler.map((s) => {
-    const altOgeler = sayfaAltMenuOgeleriOlustur(s.id, sayfalar);
-
-    return {
-      baslik: s.baslik,
-      yol: sayfaYolunuBul(s.slug),
-      acilisModu: s.acilisModu ?? 'normal',
-      yeniSekme: s.acilisModu === 'yeni_sekme',
-      ...(altOgeler.length > 0 ? { altOgeler } : {}),
-    };
-  });
+  const apiMenu = sayfaMenuAgaciOlustur(sayfalar);
 
   if (apiMenu.length > 0) return apiMenu;
 

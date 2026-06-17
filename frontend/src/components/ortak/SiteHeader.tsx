@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type CSSProperties } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
 import { headerAyarlariBirlestir, headerMarkaMetni } from '@/types/header';
 import type { ParaBirimiKaydi } from '@/types/header';
@@ -36,6 +36,36 @@ function aramaSinifi(stil: 'yuvarlak' | 'kare' | 'minimal') {
   if (stil === 'kare') return 'input-search input-search-kare';
   if (stil === 'minimal') return 'input-search input-search-minimal';
   return 'input-search';
+}
+
+function MenuOgeGoster({
+  oge,
+  linkClassName,
+  style,
+  onClick,
+  mobil,
+}: {
+  oge: MenuOgesi;
+  linkClassName: string;
+  style?: CSSProperties;
+  onClick?: () => void;
+  mobil?: boolean;
+}) {
+  if (oge.altOgeler && oge.altOgeler.length > 0) {
+    return (
+      <MenuDropdown
+        oge={oge}
+        className={mobil ? 'site-menu-dropdown-mobil' : ''}
+        linkClassName={`flex items-center gap-1 ${linkClassName}`}
+        style={style}
+        onClick={onClick}
+      />
+    );
+  }
+
+  return (
+    <MenuNavLink oge={oge} className={linkClassName} style={style} onClick={onClick} />
+  );
 }
 
 export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
@@ -115,24 +145,14 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
           />
 
           <nav className="hidden items-center gap-5 lg:flex">
-            {cevrilmisMenu.map((oge, i) =>
-              oge.altOgeler && oge.altOgeler.length > 0 ? (
-                <MenuDropdown
-                  key={`${oge.yol}-${i}`}
-                  oge={oge}
-                  className=""
-                  linkClassName="flex items-center gap-1 text-sm font-medium transition hover:text-primary"
-                  style={{ color: 'var(--color-text-muted)' }}
-                />
-              ) : (
-                <MenuNavLink
-                  key={`${oge.yol}-${i}`}
-                  oge={oge}
-                  className="text-sm font-medium transition hover:text-primary"
-                  style={{ color: 'var(--color-text-muted)' }}
-                />
-              )
-            )}
+            {cevrilmisMenu.map((oge, i) => (
+              <MenuOgeGoster
+                key={`${oge.yol}-${i}`}
+                oge={oge}
+                linkClassName="text-sm font-medium transition hover:text-primary"
+                style={{ color: 'var(--color-text-muted)' }}
+              />
+            ))}
           </nav>
 
           <div className="flex items-center gap-1 sm:gap-2">
@@ -191,21 +211,13 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
           >
             {cevrilmisMenu.map((oge, i) => (
               <div key={`${oge.yol}-${i}`}>
-                <MenuNavLink
+                <MenuOgeGoster
                   oge={oge}
                   onClick={() => setMenuAcik(false)}
-                  className="block border-b py-3 text-sm font-medium last:border-0"
+                  linkClassName="block border-b py-3 text-sm font-medium last:border-0"
                   style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
+                  mobil
                 />
-                {oge.altOgeler?.map((alt) => (
-                  <MenuNavLink
-                    key={alt.yol}
-                    oge={alt}
-                    onClick={() => setMenuAcik(false)}
-                    className="block border-b py-2.5 pl-4 text-sm last:border-0"
-                    style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
-                  />
-                ))}
               </div>
             ))}
             <div

@@ -140,6 +140,10 @@ export function SayfaYonetimiSayfasi() {
     {
       kaydet,
       ekle: yeniBaslat,
+      altEkle: () => {
+        const secili = sayfalar.find((s) => s.id === seciliId);
+        if (secili) altSayfaBaslat(secili);
+      },
       sil,
       yayinla,
       onizle: () => {
@@ -150,6 +154,7 @@ export function SayfaYonetimiSayfasi() {
     {
       kaydet: !kaydediliyor,
       ekle: true,
+      altEkle: !!seciliId && !kaydediliyor && !sayfalar.find((s) => s.id === seciliId)?.ustSayfaId,
       sil: !!seciliId && !kaydediliyor,
       yayinla: !kaydediliyor,
       onizle: true,
@@ -179,8 +184,6 @@ export function SayfaYonetimiSayfasi() {
               sayfalar={sayfalar}
               seciliId={seciliId}
               onSec={sayfaSec}
-              onYeniSayfa={yeniBaslat}
-              onAltSayfaEkle={altSayfaBaslat}
             />
             <SayfaEditorPanel
               form={form}

@@ -16,8 +16,9 @@ export interface PublicSayfa {
 
 export async function sayfaDetayGetir(slug: string, signal?: AbortSignal): Promise<PublicSayfa | null> {
   try {
+    const temiz = slug.replace(/^\/+|\/+$/g, '');
     const yanit = await fetch(
-      `${API_URL}/sayfalar/${encodeURIComponent(slug)}?site=${encodeURIComponent(SITE_SLUG)}`,
+      `${API_URL}/sayfalar/${encodeURIComponent(temiz)}?site=${encodeURIComponent(SITE_SLUG)}`,
       { signal }
     );
     if (!yanit.ok) return null;
