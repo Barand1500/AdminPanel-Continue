@@ -11,6 +11,7 @@ import { AramaStilSecici } from '@/components/admin/header/AramaStilSecici';
 import { SiteOnizlemePaneli } from './SiteOnizlemePaneli';
 import type { HeaderAyarlari } from '@/types/header';
 import { headerMarkaMetni } from '@/types/header';
+import { VARSAYILAN_SITE_DILLERI } from '@/data/siteDilleri';
 import {
   AdminPanelKarti,
   BildirimKutusu,
@@ -21,6 +22,7 @@ import {
 
 const SEKMELER = [
   { id: 'ust-bant', ad: 'Üst Bant' },
+  { id: 'dil', ad: 'Dil' },
   { id: 'logo-gorunum', ad: 'Logo Görünümü' },
   { id: 'para', ad: 'Para Birimi' },
   { id: 'ikonlar', ad: 'İkonlar' },
@@ -83,6 +85,7 @@ export function HeaderYonetimiFormu() {
   const ikonlar = headerAyarlari.ikonlar!;
   const kategori = headerAyarlari.kategori!;
   const arama = headerAyarlari.arama!;
+  const dilDestegi = headerAyarlari.dilDestegi!;
 
   return (
     <div className="grid gap-6 xl:grid-cols-[1fr_min(480px,44%)]">
@@ -138,8 +141,29 @@ export function HeaderYonetimiFormu() {
                 />
               </FormAlani>
               <p className="ap-muted text-xs leading-relaxed">
-                Telefon ve e-posta üst bantta Site Ayarları&apos;ndaki iletişim bilgilerinden otomatik gösterilir.
+                Telefon, e-posta ve sosyal medya Site Ayarları&apos;ndaki iletişim bilgilerinden gelir.
               </p>
+              <ToggleSatir
+                etiket="Telefonu göster"
+                acik={ustBant.telefonGoster}
+                onDegistir={(telefonGoster) =>
+                  headerGuncelleParcali({ ustBant: { ...ustBant, telefonGoster } })
+                }
+              />
+              <ToggleSatir
+                etiket="E-postayı göster"
+                acik={ustBant.emailGoster}
+                onDegistir={(emailGoster) =>
+                  headerGuncelleParcali({ ustBant: { ...ustBant, emailGoster } })
+                }
+              />
+              <ToggleSatir
+                etiket="Sosyal medya ikonları"
+                acik={ustBant.sosyalGoster}
+                onDegistir={(sosyalGoster) =>
+                  headerGuncelleParcali({ ustBant: { ...ustBant, sosyalGoster } })
+                }
+              />
               <ToggleSatir
                 etiket="Kurları göster"
                 acik={ustBant.kurlarGoster}
@@ -147,6 +171,88 @@ export function HeaderYonetimiFormu() {
                   headerGuncelleParcali({ ustBant: { ...ustBant, kurlarGoster } })
                 }
               />
+            </div>
+          </AdminPanelKarti>
+        )}
+
+        {sekme === 'dil' && (
+          <AdminPanelKarti baslik="Dil Desteği" altBaslik="Header dil seçici görünümü">
+            <div className="space-y-4">
+              <ToggleSatir
+                etiket="Dil seçiciyi göster"
+                acik={dilDestegi.aktif}
+                onDegistir={(aktif) =>
+                  headerGuncelleParcali({ dilDestegi: { ...dilDestegi, aktif } })
+                }
+              />
+              <FormAlani etiket="Görünüm">
+                <div className="flex flex-wrap gap-2">
+                  {(
+                    [
+                      { id: 'kod', ad: 'Kod (TR, EN…)' },
+                      { id: 'bayrak', ad: 'Bayraklı' },
+                    ] as const
+                  ).map((s) => (
+                    <button
+                      key={s.id}
+                      type="button"
+                      onClick={() =>
+                        headerGuncelleParcali({ dilDestegi: { ...dilDestegi, gorunum: s.id } })
+                      }
+                      className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                        dilDestegi.gorunum === s.id
+                          ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)] text-white'
+                          : 'border-[var(--ap-border)] ap-muted hover:bg-[var(--ap-hover)]'
+                      }`}
+                    >
+                      {s.ad}
+                    </button>
+                  ))}
+                </div>
+              </FormAlani>
+              <FormAlani etiket="Varsayılan dil">
+                <select
+                  className={formInputSinifi}
+                  value={dilDestegi.varsayilanDil}
+                  onChange={(e) =>
+                    headerGuncelleParcali({
+                      dilDestegi: { ...dilDestegi, varsayilanDil: e.target.value },
+                    })
+                  }
+                >
+                  {dilDestegi.diller.map((d) => (
+                    <option key={d.kod} value={d.kod}>
+                      {d.kod} — {d.ad}
+                    </option>
+                  ))}
+                </select>
+              </FormAlani>
+              <FormAlani etiket="Aktif diller">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {(dilDestegi.diller.length ? dilDestegi.diller : VARSAYILAN_SITE_DILLERI).map(
+                    (d) => (
+                      <label
+                        key={d.kod}
+                        className="flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--ap-border)] px-3 py-2 text-sm"
+                      >
+                        <input
+                          type="checkbox"
+                          checked={d.aktif}
+                          onChange={(e) => {
+                            const diller = dilDestegi.diller.map((x) =>
+                              x.kod === d.kod ? { ...x, aktif: e.target.checked } : x
+                            );
+                            headerGuncelleParcali({ dilDestegi: { ...dilDestegi, diller } });
+                          }}
+                        />
+                        <span>{d.bayrak}</span>
+                        <span className="font-semibold">{d.kod}</span>
+                        <span className="ap-muted text-xs">{d.ad}</span>
+                      </label>
+                    )
+                  )}
+                </div>
+              </FormAlani>
             </div>
           </AdminPanelKarti>
         )}

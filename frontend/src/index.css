@@ -315,6 +315,102 @@ body:has(.site-public)::-webkit-scrollbar,
   border-color: var(--color-border);
 }
 
+.header-dil-secici {
+  position: relative;
+}
+
+.header-dil-tetik {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(255 255 255 / 0.25);
+  background: rgb(255 255 255 / 0.12);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: inherit;
+  line-height: 1;
+}
+
+.site-header .header-dil-tetik {
+  border-color: var(--color-border);
+  background: var(--color-surface-elevated);
+  color: var(--color-text-muted);
+}
+
+.bg-primary .header-dil-tetik {
+  color: #fff;
+}
+
+.header-dil-globe svg {
+  width: 0.875rem;
+  height: 0.875rem;
+}
+
+.header-dil-bayrak {
+  font-size: 0.875rem;
+  line-height: 1;
+}
+
+.header-dil-kod {
+  letter-spacing: 0.04em;
+}
+
+.header-dil-liste {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 50;
+  min-width: 3.5rem;
+  overflow: hidden;
+  border-radius: 0.5rem;
+  border: 1px solid var(--color-border);
+  background: var(--color-surface-elevated);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.header-dil-liste-kod {
+  min-width: 3.25rem;
+}
+
+.header-dil-liste-bayrak {
+  min-width: 5.5rem;
+}
+
+.header-dil-liste button {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  border: none;
+  border-bottom: 1px solid var(--color-border);
+  background: transparent;
+  padding: 0.45rem 0.65rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  cursor: pointer;
+}
+
+.header-dil-liste-bayrak button {
+  justify-content: flex-start;
+}
+
+.header-dil-liste li:last-child button {
+  border-bottom: none;
+}
+
+.header-dil-liste button:hover,
+.header-dil-oge-aktif {
+  background: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  color: var(--color-primary);
+}
+
 .site-menu-dropdown {
   position: relative;
 }

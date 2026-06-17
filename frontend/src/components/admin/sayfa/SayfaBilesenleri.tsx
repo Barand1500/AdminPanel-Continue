@@ -32,6 +32,7 @@ interface SayfaListesiPanelProps {
   sayfalar: AdminSayfa[];
   seciliId: string | null;
   onSec: (sayfa: AdminSayfa) => void;
+  onYeniSayfa?: () => void;
   onAltSayfaEkle?: (ustSayfa: AdminSayfa) => void;
 }
 
@@ -77,6 +78,7 @@ export function SayfaListesiPanel({
   sayfalar,
   seciliId,
   onSec,
+  onYeniSayfa,
   onAltSayfaEkle,
 }: SayfaListesiPanelProps) {
   const [arama, setArama] = useState('');
@@ -112,25 +114,29 @@ export function SayfaListesiPanel({
 
   return (
     <aside className="ap-sidebar-panel">
+      {(onYeniSayfa || altSayfaEklenebilir) && (
+        <div className="ap-sayfa-aksiyon-cubugu">
+          {onYeniSayfa && (
+            <button type="button" className="ap-sayfa-aksiyon-btn ap-sayfa-aksiyon-yeni" onClick={onYeniSayfa}>
+              Yeni Sayfa
+            </button>
+          )}
+          {altSayfaEklenebilir && onAltSayfaEkle && seciliSayfa && (
+            <button
+              type="button"
+              className="ap-sayfa-aksiyon-btn ap-sayfa-aksiyon-alt"
+              onClick={() => onAltSayfaEkle(seciliSayfa)}
+            >
+              Alt Sayfa
+            </button>
+          )}
+        </div>
+      )}
       <div className="ap-sidebar-baslik">
         <div>
           <h2 className="ap-heading text-sm font-semibold">Sayfa Listesi</h2>
           <p className="ap-muted text-xs">{sayfalar.length} sayfa</p>
         </div>
-        {altSayfaEklenebilir && onAltSayfaEkle && (
-          <button
-            type="button"
-            className="ap-sayfa-alt-ekle-btn"
-            title={`"${seciliSayfa.baslik}" menüsüne alt sayfa ekle`}
-            onClick={() => onAltSayfaEkle(seciliSayfa)}
-          >
-            + Alt sayfa ekle
-          </button>
-        )}
-      </div>
-      <div className="ap-sayfa-liste-ipucu">
-        <strong>İpucu:</strong> Dropdown menü için önce ana sayfayı seçin, sonra{' '}
-        <em>+ Alt sayfa ekle</em> ile alt maddeleri oluşturun. Kaydet ve Yayınla unutmayın.
       </div>
       <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Başlık veya slug ara..." />
       <div className="ap-scroll ap-sidebar-icerik">
@@ -199,6 +205,7 @@ interface SayfaEditorPanelProps {
   sayfalar: AdminSayfa[];
   onChange: (form: SayfaFormDegeri) => void;
   onSlugManuelChange: (v: boolean) => void;
+  onAltSayfaEkle?: (ustSayfa: AdminSayfa) => void;
 }
 
 export function SayfaEditorPanel({
@@ -208,11 +215,14 @@ export function SayfaEditorPanel({
   sayfalar,
   onChange,
   onSlugManuelChange,
+  onAltSayfaEkle,
 }: SayfaEditorPanelProps) {
   const [sekme, setSekme] = useState<EditorSekme>('icerik');
   const ustSecenekler = ustSayfaSecenekleri(sayfalar, seciliId);
   const ustSayfa = ustSayfaBul(sayfalar, form.ustSayfaId);
   const altSayi = seciliId ? altSayfaSayisi(sayfalar, seciliId) : 0;
+  const seciliSayfa = seciliId ? sayfalar.find((s) => s.id === seciliId) : undefined;
+  const altSayfaEklenebilir = !!seciliSayfa && !seciliSayfa.ustSayfaId && altSayi >= 0;
 
   function baslikDegistir(baslik: string) {
     const guncel = { ...form, baslik };
@@ -224,15 +234,6 @@ export function SayfaEditorPanel({
 
   return (
     <div className="ap-editor-panel">
-      <SayfaMenuKonumuKarti
-        form={form}
-        seciliId={seciliId}
-        ustSayfa={ustSayfa}
-        altSayi={altSayi}
-        ustSecenekler={ustSecenekler}
-        onChange={onChange}
-      />
-
       <div className="ap-editor-baslik">
         <div>
           <h2 className="ap-heading text-base font-semibold">
@@ -259,15 +260,26 @@ export function SayfaEditorPanel({
         </div>
       </div>
 
-      <AdminSekmeler
-        aktif={sekme}
-        onDegistir={setSekme}
-        sekmeler={[
-          { id: 'icerik', etiket: 'İçerik', ikon: '📝' },
-          { id: 'seo', etiket: 'SEO', ikon: '🔍' },
-          { id: 'ayarlar', etiket: 'Ayarlar', ikon: '⚙️' },
-        ]}
-      />
+      <div className="ap-editor-sekmeler-satir">
+        <AdminSekmeler
+          aktif={sekme}
+          onDegistir={setSekme}
+          sekmeler={[
+            { id: 'icerik', etiket: 'İçerik', ikon: '📝' },
+            { id: 'seo', etiket: 'SEO', ikon: '🔍' },
+            { id: 'ayarlar', etiket: 'Ayarlar', ikon: '⚙️' },
+          ]}
+        />
+        {altSayfaEklenebilir && onAltSayfaEkle && seciliSayfa && (
+          <button
+            type="button"
+            className="ap-sekme ap-sekme-aksiyon"
+            onClick={() => onAltSayfaEkle(seciliSayfa)}
+          >
+            + Alt Sayfa Ekle
+          </button>
+        )}
+      </div>
 
       <div className="ap-editor-icerik">
         {sekme === 'icerik' && (
@@ -363,7 +375,33 @@ export function SayfaEditorPanel({
               </p>
             </AdminFormBolumu>
 
-            <AdminFormBolumu baslik="Yayın ve Menü" aciklama="Görünürlük ve sıralama ayarları">
+            <AdminFormBolumu baslik="Yayın ve Menü">
+              <FormAlani etiket="Üst sayfa">
+                <select
+                  className={formSelectSinifi}
+                  value={form.ustSayfaId ?? ''}
+                  disabled={altSayi > 0}
+                  onChange={(e) =>
+                    onChange({
+                      ...form,
+                      ustSayfaId: e.target.value || null,
+                      menudeGoster: true,
+                    })
+                  }
+                >
+                  <option value="">Ana menü (üst seviye)</option>
+                  {ustSecenekler.map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.baslik}
+                    </option>
+                  ))}
+                </select>
+              </FormAlani>
+              {ustSayfa && (
+                <p className="ap-muted text-xs">
+                  {ustSayfa.baslik} altında listelenir
+                </p>
+              )}
               <div className="ap-switch-grup">
                 <AdminAnahtarDugme
                   etiket="Yayında"
@@ -438,109 +476,4 @@ export function altSayfaFormu(ustSayfa: AdminSayfa, mevcutAltSayi: number): Sayf
     menudeGoster: true,
     yayinda: false,
   };
-}
-
-function SayfaMenuKonumuKarti({
-  form,
-  seciliId,
-  ustSayfa,
-  altSayi,
-  ustSecenekler,
-  onChange,
-}: {
-  form: SayfaFormDegeri;
-  seciliId: string | null;
-  ustSayfa: AdminSayfa | undefined;
-  altSayi: number;
-  ustSecenekler: AdminSayfa[];
-  onChange: (form: SayfaFormDegeri) => void;
-}) {
-  const anaMenu = !form.ustSayfaId;
-
-  return (
-    <div className="ap-sayfa-menu-konum">
-      <p className="ap-sayfa-menu-konum-baslik">Menüde nerede görünsün?</p>
-      <div className="ap-sayfa-menu-konum-secenekler">
-        <label className={`ap-sayfa-menu-konum-etiket ${anaMenu ? 'ap-sayfa-menu-konum-etiket-aktif' : ''}`}>
-          <input
-            type="radio"
-            name="menu-konum"
-            checked={anaMenu}
-            disabled={!!form.ustSayfaId && !!seciliId}
-            onChange={() => onChange({ ...form, ustSayfaId: null })}
-          />
-          <span>
-            <strong>Ana menü</strong>
-            <small>Üst barda tek başına görünür (ör. Blog, İletişim)</small>
-          </span>
-        </label>
-        <label
-          className={`ap-sayfa-menu-konum-etiket ${!anaMenu ? 'ap-sayfa-menu-konum-etiket-aktif' : ''} ${
-            altSayi > 0 ? 'ap-sayfa-menu-konum-etiket-pasif' : ''
-          }`}
-        >
-          <input
-            type="radio"
-            name="menu-konum"
-            checked={!anaMenu}
-            disabled={altSayi > 0}
-            onChange={() => {
-              const ilkUst = ustSecenekler[0];
-              if (ilkUst) onChange({ ...form, ustSayfaId: ilkUst.id });
-            }}
-          />
-          <span>
-            <strong>Başka sayfanın altında (dropdown)</strong>
-            <small>Seçilen ana sayfanın açılır menüsünde listelenir</small>
-          </span>
-        </label>
-      </div>
-
-      {!anaMenu && (
-        <FormAlani etiket="Hangi ana sayfanın altında?">
-          <select
-            className={formSelectSinifi}
-            value={form.ustSayfaId ?? ''}
-            onChange={(e) => onChange({ ...form, ustSayfaId: e.target.value || null })}
-          >
-            {ustSecenekler.length === 0 ? (
-              <option value="">Önce ana menü sayfası oluşturun</option>
-            ) : (
-              ustSecenekler.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.baslik}
-                </option>
-              ))
-            )}
-          </select>
-        </FormAlani>
-      )}
-
-      {anaMenu && altSayi > 0 && seciliId && (
-        <p className="ap-sayfa-menu-konum-ozet">
-          Bu sayfanın <strong>{altSayi}</strong> alt sayfası var — sitede üzerine gelince dropdown
-          açılır.
-        </p>
-      )}
-      {!anaMenu && ustSayfa && (
-        <p className="ap-sayfa-menu-konum-ozet">
-          <strong>{ustSayfa.baslik}</strong> menüsünün altında görünecek. Ana menüde ayrı satır
-          olarak çıkmaz.
-        </p>
-      )}
-      {!seciliId && !form.ustSayfaId && (
-        <p className="ap-sayfa-menu-konum-ozet ap-muted">
-          Ana menü sayfası oluşturduktan sonra soldan seçip <em>+ Alt sayfa ekle</em> ile dropdown
-          maddeleri ekleyin.
-        </p>
-      )}
-
-      <ul className="ap-sayfa-menu-konum-adimlar">
-        <li>1. Ana kategori sayfasını oluşturun (ör. Hasta Rehberi) → Kaydet + Yayınla</li>
-        <li>2. Soldan o sayfayı seçin → <em>+ Alt sayfa ekle</em></li>
-        <li>3. Alt sayfaları doldurun → Kaydet + Yayınla</li>
-        <li>4. Ana sayfa ve alt sayfaların <strong>Menüde göster</strong> açık olsun</li>
-      </ul>
-    </div>
-  );
 }

@@ -55,13 +55,13 @@ function FooterMarka({
       )}
 
       <ul className="mt-5 space-y-3 text-sm" style={{ color: 'var(--color-footer-text)' }}>
-        {ayarlar?.adres && (
+        {footer.marka.adresGoster && ayarlar?.adres && (
           <li className="flex gap-2">
             <span className="text-primary">{ikonlar.adres}</span>
             <span>{ayarlar.adres}</span>
           </li>
         )}
-        {ayarlar?.email && (
+        {footer.marka.emailGoster && ayarlar?.email && (
           <li>
             <a href={`mailto:${ayarlar.email}`} className="site-footer-link flex gap-2">
               <span className="text-primary">{ikonlar.email}</span>
@@ -69,7 +69,7 @@ function FooterMarka({
             </a>
           </li>
         )}
-        {ayarlar?.telefon && (
+        {footer.marka.telefonGoster && ayarlar?.telefon && (
           <li>
             <a href={`tel:${ayarlar.telefon.replace(/\s/g, '')}`} className="site-footer-link flex gap-2">
               <span className="text-primary">{ikonlar.telefon}</span>
@@ -77,7 +77,7 @@ function FooterMarka({
             </a>
           </li>
         )}
-        {ayarlar?.whatsapp && (
+        {footer.marka.whatsappGoster && ayarlar?.whatsapp && (
           <li>
             <a
               href={`https://wa.me/${ayarlar.whatsapp.replace(/\D/g, '')}`}

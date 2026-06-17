@@ -224,6 +224,36 @@ export function FooterYonetimiFormu() {
 
             <AdminPanelKarti baslik="İletişim Bilgileri" altBaslik="Footer sol sütununda görünür">
               <div className="space-y-4">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  <ToggleSatir
+                    etiket="Adres göster"
+                    acik={footer.marka.adresGoster}
+                    onDegistir={(adresGoster) =>
+                      footerGuncelle({ ...footer, marka: { ...footer.marka, adresGoster } })
+                    }
+                  />
+                  <ToggleSatir
+                    etiket="Telefon göster"
+                    acik={footer.marka.telefonGoster}
+                    onDegistir={(telefonGoster) =>
+                      footerGuncelle({ ...footer, marka: { ...footer.marka, telefonGoster } })
+                    }
+                  />
+                  <ToggleSatir
+                    etiket="E-posta göster"
+                    acik={footer.marka.emailGoster}
+                    onDegistir={(emailGoster) =>
+                      footerGuncelle({ ...footer, marka: { ...footer.marka, emailGoster } })
+                    }
+                  />
+                  <ToggleSatir
+                    etiket="WhatsApp göster"
+                    acik={footer.marka.whatsappGoster}
+                    onDegistir={(whatsappGoster) =>
+                      footerGuncelle({ ...footer, marka: { ...footer.marka, whatsappGoster } })
+                    }
+                  />
+                </div>
                 <FormAlani etiket="Adres">
                   <textarea
                     rows={3}

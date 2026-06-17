@@ -10,6 +10,12 @@ import { HeaderIkon } from './HeaderIkon';
 import { MenuNavLink } from './MenuNavLink';
 import { MenuDropdown } from './MenuDropdown';
 import { SiteMarkaAlani } from './SiteMarkaAlani';
+import { HeaderDilSecici } from './HeaderDilSecici';
+import {
+  SosyalMedyaIkonGoster,
+  platformIkonDegeri,
+  sosyalMedyaLinkleri,
+} from './SosyalMedyaIkon';
 
 interface SiteHeaderProps {
   siteAdi: string;
@@ -49,16 +55,34 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
         <div className="container-site flex flex-wrap items-center justify-between gap-2 py-2 text-xs sm:text-sm">
           <p className="max-w-xl opacity-95">{header.slogan}</p>
           <div className="flex flex-wrap items-center gap-4 text-[11px] sm:text-xs">
-            {ayarlar?.telefon && (
+            {ustBant.telefonGoster && ayarlar?.telefon && (
               <a href={`tel:${ayarlar.telefon.replace(/\s/g, '')}`} className="opacity-90 hover:opacity-100">
                 📞 {ayarlar.telefon}
               </a>
             )}
-            {ayarlar?.email && (
+            {ustBant.emailGoster && ayarlar?.email && (
               <a href={`mailto:${ayarlar.email}`} className="opacity-90 hover:opacity-100">
                 ✉️ {ayarlar.email}
               </a>
             )}
+            {ustBant.sosyalGoster &&
+              ayarlar?.sosyalMedyaJson &&
+              sosyalMedyaLinkleri(ayarlar.sosyalMedyaJson).map(([platform, url]) => (
+                <a
+                  key={platform}
+                  href={url}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 transition hover:bg-white/25"
+                  title={platform}
+                >
+                  <SosyalMedyaIkonGoster
+                    platform={platform}
+                    ikonDeger={platformIkonDegeri(ayarlar.sosyalMedyaJson!, platform)}
+                    className="h-3.5 w-3.5"
+                  />
+                </a>
+              ))}
             {ustBant.kurlarGoster &&
               kurlar.map((kur, i) => (
                 <span key={kur.id} className="whitespace-nowrap">
@@ -105,6 +129,7 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
           </nav>
 
           <div className="flex items-center gap-1 sm:gap-2">
+            {header.dilDestegi?.aktif && <HeaderDilSecici ayar={header.dilDestegi} />}
             <TemaToggle tema={ikonlar.tema} />
             <Link
               to="/hesabim"

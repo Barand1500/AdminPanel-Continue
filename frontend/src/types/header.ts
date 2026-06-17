@@ -1,5 +1,6 @@
 import type { LogoBoyutu } from './logo';
 import { logoBoyutuNormalize } from './logo';
+import { dilDestegiBirlestir } from '@/data/siteDilleri';
 
 export type KurTipi = 'doviz_alis' | 'doviz_satis' | 'efektif_alis' | 'efektif_satis';
 
@@ -50,6 +51,23 @@ export interface UstMenuOgesi {
   sayfaId?: string;
 }
 
+export type DilGorunumModu = 'bayrak' | 'kod';
+
+export interface SiteDilKaydi {
+  kod: string;
+  ad: string;
+  bayrak: string;
+  aktif: boolean;
+  sira: number;
+}
+
+export interface DilDestegiAyarlari {
+  aktif: boolean;
+  gorunum: DilGorunumModu;
+  varsayilanDil: string;
+  diller: SiteDilKaydi[];
+}
+
 export interface HeaderAyarlari {
   slogan?: string | null;
   /** Header marka alanında görünen metin (tarayıcı sekmesi site adından bağımsız) */
@@ -60,6 +78,7 @@ export interface HeaderAyarlari {
     telefonGoster: boolean;
     emailGoster: boolean;
     kurlarGoster: boolean;
+    sosyalGoster: boolean;
   };
   kurlar?: ParaBirimiKaydi[];
   ikonlar?: {
@@ -77,6 +96,7 @@ export interface HeaderAyarlari {
   };
   sonKurGuncelleme?: string | null;
   ustMenu?: UstMenuOgesi[];
+  dilDestegi?: DilDestegiAyarlari;
 }
 
 export const VARSAYILAN_IKON = (presetId: string): IkonSecimi => ({
@@ -128,10 +148,12 @@ export function varsayilanHeaderAyarlari(
     markaMetni: mevcut?.markaMetni ?? null,
     logoUrl: mevcut?.logoUrl ?? legacy?.logoUrl ?? null,
     logoBoyutu: logoBoyutuNormalize(mevcut?.logoBoyutu),
-    ustBant: mevcut?.ustBant ?? {
+    ustBant: {
       telefonGoster: true,
       emailGoster: true,
       kurlarGoster: true,
+      sosyalGoster: false,
+      ...mevcut?.ustBant,
     },
     kurlar: mevcut?.kurlar ?? [
       {
@@ -178,6 +200,7 @@ export function varsayilanHeaderAyarlari(
     },
     sonKurGuncelleme: mevcut?.sonKurGuncelleme ?? null,
     ustMenu: mevcut?.ustMenu ?? [],
+    dilDestegi: dilDestegiBirlestir(mevcut?.dilDestegi),
   };
 }
 

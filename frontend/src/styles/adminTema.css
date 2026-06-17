@@ -869,6 +869,66 @@ html:has(.admin-panel[data-tema='acik']) body {
 .ap-etiket-menu { background: color-mix(in srgb, var(--ap-accent) 15%, transparent); color: var(--ap-accent); }
 .ap-etiket-bilgi { background: color-mix(in srgb, #8b5cf6 12%, transparent); color: #7c3aed; }
 
+.ap-sayfa-aksiyon-cubugu {
+  display: flex;
+  gap: 0.375rem;
+  padding: 0.625rem 0.75rem 0;
+}
+
+.ap-sayfa-aksiyon-btn {
+  flex: 1;
+  border: none;
+  border-radius: 0.625rem 0.625rem 0 0.25rem;
+  padding: 0.5rem 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s;
+}
+
+.ap-sayfa-aksiyon-btn:hover {
+  opacity: 0.9;
+}
+
+.ap-sayfa-aksiyon-yeni {
+  background: #1e3a5f;
+}
+
+.ap-sayfa-aksiyon-alt {
+  background: #0d9488;
+}
+
+.ap-editor-sekmeler-satir {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--ap-border);
+  padding: 0 0.75rem;
+}
+
+.ap-editor-sekmeler-satir .ap-sekme-cubugu {
+  flex: 1;
+  border-bottom: none;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.ap-sekme-aksiyon {
+  align-self: center;
+  margin-bottom: 0.35rem;
+  border-radius: 0.5rem;
+  border: 1px dashed var(--ap-accent);
+  background: color-mix(in srgb, var(--ap-accent) 8%, transparent);
+  color: var(--ap-accent);
+  white-space: nowrap;
+}
+
+.ap-sekme-aksiyon:hover {
+  background: color-mix(in srgb, var(--ap-accent) 15%, transparent);
+}
+
 /* Sayfa hiyerarşi listesi */
 .ap-sayfa-alt-ekle-btn {
   flex-shrink: 0;

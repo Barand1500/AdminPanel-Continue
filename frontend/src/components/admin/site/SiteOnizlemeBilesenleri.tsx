@@ -7,6 +7,11 @@ import { headerLogoUrl } from '@/types/logo';
 import { HeaderIkon } from '@/components/ortak/HeaderIkon';
 import { SiteFooter } from '@/components/ortak/SiteFooter';
 import { KategoriModuOnizleme } from './KategoriModuOnizleme';
+import {
+  SosyalMedyaIkonGoster,
+  platformIkonDegeri,
+  sosyalMedyaLinkleri,
+} from '@/components/ortak/SosyalMedyaIkon';
 
 interface SiteHeaderOnizlemeProps {
   siteAdi: string;
@@ -54,16 +59,40 @@ export function SiteHeaderOnizleme({
       <div className="overflow-hidden rounded-lg border border-slate-200 bg-white shadow-sm">
         <div className="bg-primary px-3 py-1.5 text-[10px] text-white">
           <p className="truncate opacity-95">{header.slogan}</p>
-          {ustBant.kurlarGoster && kurlar.length > 0 && (
-            <div className="mt-0.5 flex flex-wrap gap-2 text-[9px]">
-              {kurlar.map((k, i) => (
-                <span key={k.id} className="whitespace-nowrap">
-                  {i > 0 && <span className="mr-1 opacity-40">·</span>}
-                  {k.sembol} {kurDegeri(k)}
-                </span>
-              ))}
+          {(ustBant.telefonGoster && telefon) ||
+          (ustBant.emailGoster && email) ||
+          ustBant.sosyalGoster ||
+          (ustBant.kurlarGoster && kurlar.length > 0) ? (
+            <div className="mt-0.5 flex flex-wrap items-center gap-2 text-[9px]">
+              {ustBant.telefonGoster && telefon && <span className="whitespace-nowrap">📞 {telefon}</span>}
+              {ustBant.emailGoster && email && <span className="whitespace-nowrap">✉️ {email}</span>}
+              {ustBant.sosyalGoster &&
+                ayarlar?.sosyalMedyaJson &&
+                sosyalMedyaLinkleri(ayarlar.sosyalMedyaJson).map(([platform, url]) => (
+                  <a
+                    key={platform}
+                    href={url}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex h-4 w-4 items-center justify-center rounded-full bg-white/15"
+                    title={platform}
+                  >
+                    <SosyalMedyaIkonGoster
+                      platform={platform}
+                      ikonDeger={platformIkonDegeri(ayarlar.sosyalMedyaJson!, platform)}
+                      className="h-2.5 w-2.5"
+                    />
+                  </a>
+                ))}
+              {ustBant.kurlarGoster &&
+                kurlar.map((k, i) => (
+                  <span key={k.id} className="whitespace-nowrap">
+                    {i > 0 && <span className="mr-1 opacity-40">·</span>}
+                    {k.sembol} {kurDegeri(k)}
+                  </span>
+                ))}
             </div>
-          )}
+          ) : null}
         </div>
 
         <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-3 py-2">

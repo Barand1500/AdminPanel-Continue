@@ -165,10 +165,7 @@ export function SayfaYonetimiSayfasi() {
   }
 
   return (
-      <AdminModulKabuk
-        baslik="Sayfa Yönetimi"
-        aciklama="Site sayfalarını oluşturun, üst menü altına alt sayfalar ekleyin. Alt sayfalar sitede dropdown menü olarak görünür."
-      >
+      <AdminModulKabuk baslik="Sayfa Yönetimi" aciklama="Site sayfalarını oluşturun ve düzenleyin.">
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
@@ -182,6 +179,7 @@ export function SayfaYonetimiSayfasi() {
               sayfalar={sayfalar}
               seciliId={seciliId}
               onSec={sayfaSec}
+              onYeniSayfa={yeniBaslat}
               onAltSayfaEkle={altSayfaBaslat}
             />
             <SayfaEditorPanel
@@ -191,6 +189,7 @@ export function SayfaYonetimiSayfasi() {
               sayfalar={sayfalar}
               onChange={setForm}
               onSlugManuelChange={setSlugManuel}
+              onAltSayfaEkle={altSayfaBaslat}
             />
           </div>
         </>

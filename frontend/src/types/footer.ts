@@ -62,6 +62,10 @@ export interface FooterAyarlari {
     logoGoster: boolean;
     logoBoyutu: LogoBoyutu;
     sosyalGoster: boolean;
+    adresGoster: boolean;
+    emailGoster: boolean;
+    telefonGoster: boolean;
+    whatsappGoster: boolean;
     bankaLinki: { aktif: boolean; ad: string; link: string; ikon: string };
     iletisimIkonlari: { adres: string; email: string; telefon: string; whatsapp: string };
   };
@@ -176,6 +180,10 @@ export function varsayilanFooterAyarlari(): FooterAyarlari {
       logoGoster: true,
       logoBoyutu: VARSAYILAN_LOGO_BOYUTU,
       sosyalGoster: true,
+      adresGoster: true,
+      emailGoster: true,
+      telefonGoster: true,
+      whatsappGoster: true,
       bankaLinki: { aktif: true, ad: 'Banka Hesaplarımız', link: '/iletisim', ikon: '🏦' },
       iletisimIkonlari: { adres: '📍', email: '✉️', telefon: '📞', whatsapp: '💬' },
     },
@@ -238,6 +246,10 @@ export function footerAyarlariBirlestir(
       logoGoster: ham.marka?.logoGoster ?? varsayilan.marka.logoGoster,
       logoBoyutu: logoBoyutuNormalize(ham.marka?.logoBoyutu ?? varsayilan.marka.logoBoyutu),
       sosyalGoster: ham.marka?.sosyalGoster ?? varsayilan.marka.sosyalGoster,
+      adresGoster: ham.marka?.adresGoster ?? varsayilan.marka.adresGoster,
+      emailGoster: ham.marka?.emailGoster ?? varsayilan.marka.emailGoster,
+      telefonGoster: ham.marka?.telefonGoster ?? varsayilan.marka.telefonGoster,
+      whatsappGoster: ham.marka?.whatsappGoster ?? varsayilan.marka.whatsappGoster,
       bankaLinki: { ...varsayilan.marka.bankaLinki, ...ham.marka?.bankaLinki },
       iletisimIkonlari: { ...varsayilan.marka.iletisimIkonlari, ...ham.marka?.iletisimIkonlari },
     },
