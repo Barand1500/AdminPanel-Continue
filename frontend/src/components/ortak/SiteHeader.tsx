@@ -1,9 +1,11 @@
 import { Link } from 'react-router-dom';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
 import { headerAyarlariBirlestir, headerMarkaMetni } from '@/types/header';
 import type { ParaBirimiKaydi } from '@/types/header';
 import { headerLogoUrl } from '@/types/logo';
+import { useSiteDil } from '@/contexts/SiteDilContext';
+import { menuOgeleriCevir } from '@/utils/menuYardimci';
 import { KategoriMenu } from './KategoriMenu';
 import { TemaToggle } from './TemaToggle';
 import { HeaderIkon } from './HeaderIkon';
@@ -38,6 +40,11 @@ function aramaSinifi(stil: 'yuvarlak' | 'kare' | 'minimal') {
 
 export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
   const [menuAcik, setMenuAcik] = useState(false);
+  const { sayfaBaslik } = useSiteDil();
+  const cevrilmisMenu = useMemo(
+    () => menuOgeleriCevir(menuOgeleri, sayfaBaslik),
+    [menuOgeleri, sayfaBaslik]
+  );
   const header = headerAyarlariBirlestir(ayarlar);
   const ustBant = header.ustBant!;
   const ikonlar = header.ikonlar!;
@@ -108,7 +115,7 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
           />
 
           <nav className="hidden items-center gap-5 lg:flex">
-            {menuOgeleri.map((oge, i) =>
+            {cevrilmisMenu.map((oge, i) =>
               oge.altOgeler && oge.altOgeler.length > 0 ? (
                 <MenuDropdown
                   key={`${oge.yol}-${i}`}
@@ -182,7 +189,7 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
             className="border-t px-4 py-3 lg:hidden"
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface-elevated)' }}
           >
-            {menuOgeleri.map((oge, i) => (
+            {cevrilmisMenu.map((oge, i) => (
               <div key={`${oge.yol}-${i}`}>
                 <MenuNavLink
                   oge={oge}

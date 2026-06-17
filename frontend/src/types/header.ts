@@ -66,6 +66,8 @@ export interface DilDestegiAyarlari {
   gorunum: DilGorunumModu;
   varsayilanDil: string;
   diller: SiteDilKaydi[];
+  /** Dil kodu → çeviri anahtarı → metin */
+  ceviriler?: Record<string, Record<string, string>>;
 }
 
 export interface HeaderAyarlari {

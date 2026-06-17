@@ -11,7 +11,7 @@ import { AramaStilSecici } from '@/components/admin/header/AramaStilSecici';
 import { SiteOnizlemePaneli } from './SiteOnizlemePaneli';
 import type { HeaderAyarlari } from '@/types/header';
 import { headerMarkaMetni } from '@/types/header';
-import { VARSAYILAN_SITE_DILLERI } from '@/data/siteDilleri';
+import { HeaderDilYonetimi } from '@/components/admin/header/HeaderDilYonetimi';
 import {
   AdminPanelKarti,
   BildirimKutusu,
@@ -176,85 +176,10 @@ export function HeaderYonetimiFormu() {
         )}
 
         {sekme === 'dil' && (
-          <AdminPanelKarti baslik="Dil Desteği" altBaslik="Header dil seçici görünümü">
-            <div className="space-y-4">
-              <ToggleSatir
-                etiket="Dil seçiciyi göster"
-                acik={dilDestegi.aktif}
-                onDegistir={(aktif) =>
-                  headerGuncelleParcali({ dilDestegi: { ...dilDestegi, aktif } })
-                }
-              />
-              <FormAlani etiket="Görünüm">
-                <div className="flex flex-wrap gap-2">
-                  {(
-                    [
-                      { id: 'kod', ad: 'Kod (TR, EN…)' },
-                      { id: 'bayrak', ad: 'Bayraklı' },
-                    ] as const
-                  ).map((s) => (
-                    <button
-                      key={s.id}
-                      type="button"
-                      onClick={() =>
-                        headerGuncelleParcali({ dilDestegi: { ...dilDestegi, gorunum: s.id } })
-                      }
-                      className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
-                        dilDestegi.gorunum === s.id
-                          ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)] text-white'
-                          : 'border-[var(--ap-border)] ap-muted hover:bg-[var(--ap-hover)]'
-                      }`}
-                    >
-                      {s.ad}
-                    </button>
-                  ))}
-                </div>
-              </FormAlani>
-              <FormAlani etiket="Varsayılan dil">
-                <select
-                  className={formInputSinifi}
-                  value={dilDestegi.varsayilanDil}
-                  onChange={(e) =>
-                    headerGuncelleParcali({
-                      dilDestegi: { ...dilDestegi, varsayilanDil: e.target.value },
-                    })
-                  }
-                >
-                  {dilDestegi.diller.map((d) => (
-                    <option key={d.kod} value={d.kod}>
-                      {d.kod} — {d.ad}
-                    </option>
-                  ))}
-                </select>
-              </FormAlani>
-              <FormAlani etiket="Aktif diller">
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {(dilDestegi.diller.length ? dilDestegi.diller : VARSAYILAN_SITE_DILLERI).map(
-                    (d) => (
-                      <label
-                        key={d.kod}
-                        className="flex cursor-pointer items-center gap-2 rounded-lg border border-[var(--ap-border)] px-3 py-2 text-sm"
-                      >
-                        <input
-                          type="checkbox"
-                          checked={d.aktif}
-                          onChange={(e) => {
-                            const diller = dilDestegi.diller.map((x) =>
-                              x.kod === d.kod ? { ...x, aktif: e.target.checked } : x
-                            );
-                            headerGuncelleParcali({ dilDestegi: { ...dilDestegi, diller } });
-                          }}
-                        />
-                        <span>{d.bayrak}</span>
-                        <span className="font-semibold">{d.kod}</span>
-                        <span className="ap-muted text-xs">{d.ad}</span>
-                      </label>
-                    )
-                  )}
-                </div>
-              </FormAlani>
-            </div>
-          </AdminPanelKarti>
+          <HeaderDilYonetimi
+            dilDestegi={dilDestegi}
+            onGuncelle={headerGuncelleParcali}
+          />
         )}
 
         {sekme === 'logo-gorunum' && (

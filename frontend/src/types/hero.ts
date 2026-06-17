@@ -36,6 +36,7 @@ export interface HeroKart {
   ikon: string;
   baslik: string;
   aciklama: string;
+  link?: string;
   sira: number;
 }
 
@@ -128,7 +129,9 @@ export function heroAyarlariBirlestir(ham?: HeroAyarlari | null): HeroAyarlari {
   return {
     gecisSuresiSn: ham.gecisSuresiSn ?? varsayilan.gecisSuresiSn,
     kartlarAktif: ham.kartlarAktif ?? varsayilan.kartlarAktif,
-    kartlar: ham.kartlar?.length ? [...ham.kartlar].sort((a, b) => a.sira - b.sira) : varsayilan.kartlar,
+    kartlar: ham.kartlar?.length
+      ? [...ham.kartlar].sort((a, b) => a.sira - b.sira).map((k) => ({ ...k, link: k.link ?? '' }))
+      : varsayilan.kartlar,
     sliderlar: [...(ham.sliderlar ?? [])].map(slideNormalize).sort((a, b) => a.sira - b.sira),
     sliderDuzenlemeModu: ham.sliderDuzenlemeModu ?? 'ayni-sekme',
   };

@@ -40,5 +40,5 @@ export function SosyalMedyaIkonGoster({
 }
 
 export function platformIkonDegeri(sosyal: Record<string, string>, platform: string) {
-  return sosyal[sosyalIkonAnahtar(platform as SosyalPlatform)] ?? 'solid';
+  return sosyal[sosyalIkonAnahtar(platform as SosyalPlatform)] ?? 'brand';
 }

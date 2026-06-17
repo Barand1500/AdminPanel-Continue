@@ -87,7 +87,7 @@ export function FooterYonetimiFormu() {
     : '';
 
   return (
-    <div className={sekme === 'sema' ? 'space-y-6' : 'grid gap-6 xl:grid-cols-[1fr_min(480px,44%)]'}>
+    <div className="space-y-6">
       <div className="space-y-5">
         <ModulBaslik
           baslik="Footer Yönetimi"
@@ -115,12 +115,9 @@ export function FooterYonetimiFormu() {
         </div>
 
         {sekme === 'sema' && (
-          <>
-            <AdminPanelKarti baslik="Şema & Görünüm" altBaslik="Footer düzenini seçin; değişiklikler aşağıdaki önizlemede görünür">
-              <FooterSemaSecici footer={footer} onDegistir={footerGuncelle} />
-            </AdminPanelKarti>
-            <FooterOnizleme siteAdi={siteAd} ayarlar={ayarlar} footer={footer} buyuk />
-          </>
+          <AdminPanelKarti baslik="Şema & Görünüm" altBaslik="Footer düzenini seçin; değişiklikler aşağıdaki önizlemede görünür">
+            <FooterSemaSecici footer={footer} onDegistir={footerGuncelle} />
+          </AdminPanelKarti>
         )}
 
         {sekme === 'marka' && (
@@ -353,9 +350,7 @@ export function FooterYonetimiFormu() {
         )}
       </div>
 
-      {sekme !== 'sema' && (
-        <FooterOnizleme siteAdi={siteAd} ayarlar={ayarlar} footer={footer} />
-      )}
+      <FooterOnizleme siteAdi={siteAd} ayarlar={ayarlar} footer={footer} buyuk />
     </div>
   );
 }

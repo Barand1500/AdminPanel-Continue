@@ -1,8 +1,30 @@
-import type { HeroAyarlari } from '@/types/hero';
+import { Link } from 'react-router-dom';
+import type { ReactNode } from 'react';
+import type { HeroAyarlari, HeroKart } from '@/types/hero';
 import { heroAyarlariBirlestir } from '@/types/hero';
 
 interface GuvenSeritProps {
   heroJson?: HeroAyarlari | null;
+}
+
+function KartSarmalayici({ kart, children }: { kart: HeroKart; children: ReactNode }) {
+  const link = kart.link?.trim();
+  if (!link) return <>{children}</>;
+
+  const sinif = 'flex items-center gap-3 transition hover:opacity-90';
+  if (link.startsWith('http')) {
+    return (
+      <a href={link} target="_blank" rel="noreferrer" className={sinif}>
+        {children}
+      </a>
+    );
+  }
+  const yol = link.startsWith('/') ? link : `/${link}`;
+  return (
+    <Link to={yol} className={sinif}>
+      {children}
+    </Link>
+  );
 }
 
 export function GuvenSerit({ heroJson }: GuvenSeritProps) {
@@ -26,7 +48,7 @@ export function GuvenSerit({ heroJson }: GuvenSeritProps) {
     <section className="guven-serit border-y border-primary/10 bg-white">
       <div className={`container-site grid gap-4 py-6 ${kolonSinifi}`}>
         {kartlar.map((o) => (
-          <div key={o.id} className="flex items-center gap-3">
+          <KartSarmalayici key={o.id} kart={o}>
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-accent text-lg">
               {o.ikon}
             </span>
@@ -34,7 +56,7 @@ export function GuvenSerit({ heroJson }: GuvenSeritProps) {
               <p className="truncate text-xs font-bold text-slate-900 sm:text-sm">{o.baslik}</p>
               <p className="truncate text-[10px] text-slate-500 sm:text-xs">{o.aciklama}</p>
             </div>
-          </div>
+          </KartSarmalayici>
         ))}
       </div>
     </section>

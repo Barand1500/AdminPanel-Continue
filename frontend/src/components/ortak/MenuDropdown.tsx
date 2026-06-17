@@ -59,15 +59,6 @@ export function MenuDropdown({ oge, className, linkClassName, style, onClick }: 
 
       {acik && altOgeler.length > 0 && (
         <div className="site-menu-dropdown-panel" role="menu">
-          <MenuNavLink
-            oge={oge}
-            className="site-menu-dropdown-ust-link"
-            onClick={() => {
-              onClick?.();
-              setAcik(false);
-            }}
-          />
-          <div className="site-menu-dropdown-ayrac" />
           {altOgeler.map((alt) => (
             <MenuNavLink
               key={alt.yol}

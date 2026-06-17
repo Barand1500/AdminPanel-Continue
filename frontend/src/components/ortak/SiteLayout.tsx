@@ -1,5 +1,6 @@
 import { Outlet, useMatches } from 'react-router-dom';
 import { SayfaModalProvider } from '@/contexts/SayfaModalContext';
+import { SiteDilProvider } from '@/contexts/SiteDilContext';
 import { SiteHeader } from '@/components/ortak/SiteHeader';
 import { SiteFooter } from '@/components/ortak/SiteFooter';
 import { BakimEkrani } from '@/components/ortak/BakimEkrani';
@@ -45,14 +46,16 @@ function SiteLayoutIcerik() {
   }
 
   return (
-    <div className="site-public flex min-h-screen flex-col">
-      {headerGoster && <SiteHeader siteAdi={site.ad} ayarlar={site.ayarlar} menuOgeleri={menuOgeleri} />}
-      <main className="flex-1">
-        <Outlet context={veri} />
-      </main>
-      {footerGoster && <SiteFooter siteAdi={site.ad} ayarlar={site.ayarlar} />}
-      <FloatingButonlar ayarlar={site.ayarlar} />
-    </div>
+    <SiteDilProvider ayarlar={site.ayarlar} sayfalar={veri.sayfalar}>
+      <div className="site-public flex min-h-screen flex-col">
+        {headerGoster && <SiteHeader siteAdi={site.ad} ayarlar={site.ayarlar} menuOgeleri={menuOgeleri} />}
+        <main className="flex-1">
+          <Outlet context={veri} />
+        </main>
+        {footerGoster && <SiteFooter siteAdi={site.ad} ayarlar={site.ayarlar} />}
+        <FloatingButonlar ayarlar={site.ayarlar} />
+      </div>
+    </SiteDilProvider>
   );
 }
 

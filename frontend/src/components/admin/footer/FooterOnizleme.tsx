@@ -26,7 +26,7 @@ export function FooterOnizleme({ siteAdi, ayarlar, footer, buyuk = false }: Foot
   } as CSSProperties;
 
   return (
-    <div className={buyuk ? '' : 'xl:sticky xl:top-4'}>
+    <div className={buyuk ? '' : ''}>
       <AdminPanelKarti baslik="Önizleme" altBaslik="Footer düzeni ve içerik canlı yansır">
         <div
           className={`site-public ap-scroll overflow-x-hidden rounded-xl border border-[var(--ap-border)] ${

@@ -179,11 +179,11 @@ const SIRA_ANAHTAR = '__sira__';
 /** Platform SVG path (24x24 viewBox) */
 const PLATFORM_GLYPH: Record<string, string> = {
   facebook:
-    'M13.5 22v-8h2.7l.4-3.2H13.5V9.1c0-.9.3-1.6 1.7-1.6h1.5V4.5c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4v2.4H7.8v3.2h2.7V22h2.9z',
+    'M14 8h-2.5c-.8 0-1.5.7-1.5 1.5V11H8v3h2V22h3v-8h2.6l.4-3H11V9.2c0-.7.6-1.2 1.3-1.2H14V5.1c-.3 0-1.2-.1-2.3-.1-2.3 0-3.9 1.4-3.9 4.1V11H6v3h2v8h3v-8h3v-3z',
   instagram:
-    'M7 3h10a4 4 0 0 1 4 4v10a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V7a4 4 0 0 1 4-4zm5 4.8A4.2 4.2 0 1 0 16.2 12 4.2 4.2 0 0 0 12 7.8zm5.4-2.3a1 1 0 1 0-1 1 1 1 0 0 0 1-1z',
+    'M12 7.2A4.8 4.8 0 1 0 16.8 12 4.8 4.8 0 0 0 12 7.2zm0-2.4c3.2 0 3.6 0 4.8.1 1.2.1 1.9.3 2.3.5.6.2 1 .5 1.5 1 .5.5.8.9 1 1.5.2.4.4 1.1.5 2.3.1 1.2.1 1.6.1 4.8s0 3.6-.1 4.8c-.1 1.2-.3 1.9-.5 2.3-.2.6-.5 1-1 1.5-.5.5-.9.8-1.5 1-.4.2-1.1.4-2.3.5-1.2.1-1.6.1-4.8.1s-3.6 0-4.8-.1c-1.2-.1-1.9-.3-2.3-.5-.6-.2-1-.5-1.5-1-.5-.5-.8-.9-1-1.5-.2-.4-.4-1.1-.5-2.3-.1-1.2-.1-1.6-.1-4.8s0-3.6.1-4.8c.1-1.2.3-1.9.5-2.3.2-.6.5-1 1-1.5.5-.5.9-.8 1.5-1 .4-.2 1.1-.4 2.3-.5 1.2-.1 1.6-.1 4.8-.1zM12 5a7 7 0 1 0 7 7 7 7 0 0 0-7-7zm7.4-.9a1.6 1.6 0 1 0-1.6 1.6 1.6 1.6 0 0 0 1.6-1.6z',
   twitter:
-    'M17.5 4h3.1l-6.8 7.8L21.5 20h-5.9l-4.6-6-5.3 6H2.5l7.3-8.4L2.5 4h6l4.2 5.5L17.5 4zm-1 14.3h1.7L7.1 5.6H5.3l11.2 12.7z',
+    'M18.9 5.5h2.7l-5.9 6.7 7 9.3h-5.4l-4.3-5.6-4.9 5.6H5.4l6.3-7.2L5 5.5h5.5l3.9 5.1 4.5-5.1zm-1 14.8h1.5L7.6 7.1H6l11.9 13.2z',
   youtube:
     'M21.6 7.2a2.5 2.5 0 0 0-1.8-1.8C17.8 5 12 5 12 5s-5.8 0-7.8.4a2.5 2.5 0 0 0-1.8 1.8C2 9.2 2 12 2 12s0 2.8.4 4.8a2.5 2.5 0 0 0 1.8 1.8C6.2 19 12 19 12 19s5.8 0 7.8-.4a2.5 2.5 0 0 0 1.8-1.8c.4-2 .4-4.8.4-4.8s0-2.8-.4-4.8zM10 15.5V8.5l5.2 3.5L10 15.5z',
   linkedin:
@@ -191,7 +191,7 @@ const PLATFORM_GLYPH: Record<string, string> = {
   tiktok:
     'M16.5 3.5c.8 1.6 2.2 2.8 3.9 3.2v3.1c-1.4 0-2.8-.4-4-1.2v6.8a5.4 5.4 0 1 1-4.7-5.4v3.2a2.2 2.2 0 1 0 1.6 2.1V3.5h3.2z',
   whatsapp:
-    'M12 2a10 10 0 0 0-8.7 15l-1.3 4.8 4.9-1.3A10 10 0 1 0 12 2zm5.2 14.2c-.2.6-1.2 1.1-1.7 1.1-.4 0-1.1.2-3.5-.8-2.9-1.2-4.8-4.1-4.9-4.3-.1-.2-1.2-1.6-1.2-3.1s.8-2.2 1.1-2.5.5-.4.8-.4h.6c.2 0 .4 0 .6.5s.7 1.7.8 1.8.1.3 0 .5-.1.4-.3.6-.3.4-.5.7-.2.3 0 .6.7 1.2 1.5 2 2.1 1.3 1 2.3 1.1.9.4 1.6-.1 1.8-.4.5-.8.4-1.1.3z',
+    'M12 2C6.5 2 2 6.5 2 12c0 1.9.5 3.7 1.4 5.3L2 22l4.9-1.3A9.9 9.9 0 0 0 12 22c5.5 0 10-4.5 10-10S17.5 2 12 2zm5.2 14.2c-.3.8-1.5 1.5-2.1 1.6-.5.1-1.2.2-2-.4-1.5-.8-2.5-1.9-3.4-3.1-.9-1.2-1.6-2.5-1.7-2.9-.1-.4-.2-.8 0-1.1.1-.3.3-.5.4-.7.1-.2.2-.4.2-.6 0-.2 0-.4-.1-.6-.1-.2-.6-1.5-.9-2.1-.2-.5-.5-.4-.7-.4h-.6c-.2 0-.5.1-.8.4-.3.3-1.1 1-1.1 2.4 0 1.4 1 2.8 1.1 3 .1.2 2 3.1 4.8 4.3.7.3 1.2.5 1.6.6.7.2 1.3.2 1.8.1.5-.1 1.6-.7 1.8-1.3.2-.6.2-1.1.1-1.3-.1-.2-.3-.3-.6-.5z',
   telegram:
     'M21.5 4.5 3.8 11.3c-1 .4-1 1 .2 1.3l4.6 1.4 1.8 5.5c.2.7.6.9 1 .9s.6-.2.9-.7l2.6-2.5 5.4 4c1 .6 1.7.3 2-1l3.2-15.2c.4-1.5-.6-2.2-1.6-1.7zM9.2 13.8l9.7-6.1c.5-.3.9-.1.5.2l-8.3 7.6-.3 3.5-1.6-5.2z',
   github:
@@ -234,7 +234,7 @@ export function SosyalIkonSvg({
     return (
       <svg className={className} viewBox="0 0 24 24" aria-hidden>
         <circle cx="12" cy="12" r="12" fill={platformRenk} />
-        <g transform="translate(0 0)">
+        <g transform="translate(12 12) scale(0.5) translate(-12 -12)">
           <GlyphIcerik platform={platform} renk="#ffffff" />
         </g>
       </svg>
@@ -245,7 +245,9 @@ export function SosyalIkonSvg({
     return (
       <svg className={className} viewBox="0 0 24 24" aria-hidden>
         <rect width="24" height="24" rx="6" fill={platformRenk} />
-        <GlyphIcerik platform={platform} renk="#ffffff" />
+        <g transform="translate(12 12) scale(0.5) translate(-12 -12)">
+          <GlyphIcerik platform={platform} renk="#ffffff" />
+        </g>
       </svg>
     );
   }
@@ -258,9 +260,16 @@ export function SosyalIkonSvg({
 }
 
 export const IKON_VARYANTLARI: { id: SosyalIkonVaryant; ad: string }[] = [
+  { id: 'brand', ad: 'Marka' },
   { id: 'solid', ad: 'Dolu' },
   { id: 'minimal', ad: 'Çizgi' },
-  { id: 'brand', ad: 'Marka' },
+];
+
+/** İkon paketleri — admin panelde seçim etiketleri */
+export const IKON_PAKETLERI = [
+  { id: 'brand' as const, ad: 'Marka renkli', aciklama: 'Platform marka renkleri' },
+  { id: 'solid' as const, ad: 'Dolu yuvarlak', aciklama: 'Renkli daire içinde beyaz ikon' },
+  { id: 'minimal' as const, ad: 'Çizgi', aciklama: 'Sade kontur ikon' },
 ];
 
 export function sosyalIkonAnahtar(platform: string) {

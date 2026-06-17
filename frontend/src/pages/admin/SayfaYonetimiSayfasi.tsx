@@ -190,6 +190,7 @@ export function SayfaYonetimiSayfasi() {
               onChange={setForm}
               onSlugManuelChange={setSlugManuel}
               onAltSayfaEkle={altSayfaBaslat}
+              onSayfaSec={sayfaSec}
             />
           </div>
         </>

@@ -55,9 +55,18 @@ export const FOOTER_YUZUCU_TIP_ETIKET: Record<FooterYuzucuButonTip, string> = {
   link: 'Özel link',
 };
 
+export type FooterGorselKonum = 'sag' | 'sol' | 'ust' | 'alt';
+
+export interface FooterGorselDekor {
+  aktif: boolean;
+  gorselUrl: string;
+  konum: FooterGorselKonum;
+}
+
 export interface FooterAyarlari {
   sema: FooterSema;
   linkIkon: FooterLinkIkon;
+  gorselDekor?: FooterGorselDekor;
   marka: {
     logoGoster: boolean;
     logoBoyutu: LogoBoyutu;
@@ -80,6 +89,13 @@ export const FOOTER_SEMA_ETIKET: Record<FooterSema, { ad: string; aciklama: stri
   'uc-kolon': { ad: '3 Kolon', aciklama: 'Marka üstte, linkler altta' },
   'iki-kolon': { ad: '2 Kolon', aciklama: 'Marka ve linkler dengeli 2 sütun' },
   merkezi: { ad: 'Merkezi', aciklama: 'Ortalanmış, dikey düzen' },
+};
+
+export const FOOTER_GORSEL_KONUM_ETIKET: Record<FooterGorselKonum, string> = {
+  sag: 'Sağ',
+  sol: 'Sol',
+  ust: 'Üst',
+  alt: 'Alt',
 };
 
 export const FOOTER_LINK_IKON_ETIKET: Record<FooterLinkIkon, string> = {
@@ -176,6 +192,7 @@ export function varsayilanFooterAyarlari(): FooterAyarlari {
   return {
     sema: 'dort-kolon',
     linkIkon: 'chevron',
+    gorselDekor: { aktif: false, gorselUrl: '', konum: 'sag' },
     marka: {
       logoGoster: true,
       logoBoyutu: VARSAYILAN_LOGO_BOYUTU,
@@ -242,6 +259,11 @@ export function footerAyarlariBirlestir(
   return {
     sema: ham.sema ?? varsayilan.sema,
     linkIkon: ham.linkIkon ?? varsayilan.linkIkon,
+    gorselDekor: {
+      aktif: ham.gorselDekor?.aktif ?? varsayilan.gorselDekor!.aktif,
+      gorselUrl: ham.gorselDekor?.gorselUrl ?? varsayilan.gorselDekor!.gorselUrl,
+      konum: ham.gorselDekor?.konum ?? varsayilan.gorselDekor!.konum,
+    },
     marka: {
       logoGoster: ham.marka?.logoGoster ?? varsayilan.marka.logoGoster,
       logoBoyutu: logoBoyutuNormalize(ham.marka?.logoBoyutu ?? varsayilan.marka.logoBoyutu),

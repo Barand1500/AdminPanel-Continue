@@ -7,6 +7,32 @@ import { blogAyarlariBirlestir } from '@/types/blog';
 import { idKarsilastir, idString } from '@/utils/idKarsilastir';
 import { sayfaAltMenuOgeleriOlustur } from '@/utils/sayfaAgaci';
 
+export function yoldanSlug(yol: string): string | null {
+  if (yol === '/') return 'ana-sayfa';
+  const path = yol.replace(/^\//, '').split('/')[0];
+  return path || null;
+}
+
+export function menuOgeleriCevir(
+  ogeler: MenuOgesi[],
+  sayfaBaslik: (slug: string, varsayilan: string) => string
+): MenuOgesi[] {
+  return ogeler.map((o) => {
+    const slug = yoldanSlug(o.yol);
+    return {
+      ...o,
+      baslik: slug ? sayfaBaslik(slug, o.baslik) : o.baslik,
+      altOgeler: o.altOgeler?.map((alt) => {
+        const altSlug = yoldanSlug(alt.yol);
+        return {
+          ...alt,
+          baslik: altSlug ? sayfaBaslik(altSlug, alt.baslik) : alt.baslik,
+        };
+      }),
+    };
+  });
+}
+
 export function yeniMenuId(): string {
   return crypto.randomUUID();
 }

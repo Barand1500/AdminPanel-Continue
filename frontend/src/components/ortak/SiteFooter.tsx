@@ -174,15 +174,36 @@ export function SiteFooter({ siteAdi, ayarlar }: SiteFooterProps) {
 
   const pazaryeriOgeleri = footer.pazaryeri.ogeler.filter((o) => o.aktif);
   const rozetler = footer.guvenBandi.rozetler.filter((r) => r.aktif);
+  const dekor = footer.gorselDekor;
+  const dekorAktif = !!dekor?.aktif && !!dekor.gorselUrl?.trim();
+
+  const dekorGorsel = dekorAktif ? (
+    <div className={`footer-dekor-gorsel footer-dekor-gorsel-${dekor!.konum}`}>
+      <img src={dekor!.gorselUrl} alt="" className="footer-dekor-gorsel-img" />
+    </div>
+  ) : null;
+
+  const icerik = (
+    <div className={`footer-icerik ${semaSinif}`}>
+      <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} />
+      <div className="footer-kolonlar">
+        <FooterKolonlar footer={footer} />
+      </div>
+    </div>
+  );
 
   return (
     <footer className="site-footer mt-auto">
-      <div className={`container-site footer-icerik ${semaSinif}`}>
-        <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} />
-        <div className="footer-kolonlar">
-          <FooterKolonlar footer={footer} />
+      {dekorAktif && dekor!.konum === 'ust' && dekorGorsel}
+      {dekorAktif && (dekor!.konum === 'sol' || dekor!.konum === 'sag') ? (
+        <div className={`container-site footer-dekor-yatay footer-dekor-yer-${dekor!.konum}`}>
+          {dekor!.konum === 'sol' && dekorGorsel}
+          {icerik}
+          {dekor!.konum === 'sag' && dekorGorsel}
         </div>
-      </div>
+      ) : (
+        <div className="container-site">{icerik}</div>
+      )}
 
       {footer.pazaryeri.aktif && pazaryeriOgeleri.length > 0 && (
         <div className="border-t border-primary/10 bg-white/50">
@@ -223,6 +244,8 @@ export function SiteFooter({ siteAdi, ayarlar }: SiteFooterProps) {
           </div>
         </div>
       )}
+
+      {dekorAktif && dekor!.konum === 'alt' && dekorGorsel}
 
       <div className="border-t border-primary/10 bg-white/80">
         <div className="container-site py-4 text-center text-xs text-slate-500">

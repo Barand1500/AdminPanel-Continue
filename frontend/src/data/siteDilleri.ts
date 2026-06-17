@@ -29,6 +29,7 @@ export function dilDestegiBirlestir(ham?: Partial<DilDestegiAyarlari> | null): D
     gorunum: ham.gorunum === 'bayrak' ? 'bayrak' : 'kod',
     varsayilanDil: ham.varsayilanDil ?? varsayilan.varsayilanDil,
     diller: diller.length ? diller : varsayilan.diller,
+    ceviriler: ham.ceviriler ?? undefined,
   };
 }
 

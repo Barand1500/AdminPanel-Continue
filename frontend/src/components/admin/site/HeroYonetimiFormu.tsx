@@ -3,6 +3,7 @@ import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import { useSiteYonetimiAksiyonlari } from '@/hooks/useSiteYonetimiAksiyonlari';
 import { GorselAlan } from '@/components/form/GorselAlan';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
+import { LinkYoluAlani } from '@/components/form/LinkYoluAlani';
 import { medyaTamUrl } from '@/features/admin/medyaApi';
 import {
   AdminPanelKarti,
@@ -344,6 +345,11 @@ export function HeroYonetimiFormu() {
 
   const hero = useMemo(() => heroAyarlariBirlestir(ayarlar?.heroJson), [ayarlar?.heroJson]);
   const [seciliSlideId, setSeciliSlideId] = useState<string | null>(null);
+  const [gecisMetin, setGecisMetin] = useState('6');
+
+  useEffect(() => {
+    setGecisMetin(String(hero.gecisSuresiSn));
+  }, [hero.gecisSuresiSn]);
 
   useEffect(() => {
     if (!seciliSlideId && hero.sliderlar.length > 0) {
@@ -390,6 +396,7 @@ export function HeroYonetimiFormu() {
       ikon: '⭐',
       baslik: 'Yeni Özellik',
       aciklama: 'Kısa açıklama',
+      link: '',
       sira: hero.kartlar.length,
     };
     heroGuncelle({ ...hero, kartlar: [...hero.kartlar, yeni] });
@@ -427,26 +434,30 @@ export function HeroYonetimiFormu() {
                     min={2}
                     max={60}
                     className={formInputSinifi}
-                    value={hero.gecisSuresiSn}
-                    onChange={(e) =>
-                      heroGuncelle({
-                        ...hero,
-                        gecisSuresiSn: Math.min(60, Math.max(2, Number(e.target.value) || HERO_VARSAYILAN_GECIS_SN)),
-                      })
-                    }
+                    value={gecisMetin}
+                    onChange={(e) => {
+                      const raw = e.target.value;
+                      setGecisMetin(raw);
+                      const n = Number(raw);
+                      if (raw !== '' && !Number.isNaN(n) && n >= 2 && n <= 60) {
+                        heroGuncelle({ ...hero, gecisSuresiSn: n });
+                      }
+                    }}
+                    onBlur={() => {
+                      const n = Number(gecisMetin);
+                      if (gecisMetin === '' || Number.isNaN(n) || n < 2) {
+                        setGecisMetin(String(HERO_VARSAYILAN_GECIS_SN));
+                        heroGuncelle({ ...hero, gecisSuresiSn: HERO_VARSAYILAN_GECIS_SN });
+                        return;
+                      }
+                      const v = Math.min(60, Math.max(2, n));
+                      setGecisMetin(String(v));
+                      heroGuncelle({ ...hero, gecisSuresiSn: v });
+                    }}
                   />
                   <span className="ap-muted shrink-0 text-sm">saniye</span>
                 </div>
               </FormAlani>
-              <div className="ap-hero-ozet-kart flex items-center gap-3 rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] p-3">
-                <span className="text-2xl">🖼️</span>
-                <div>
-                  <p className="ap-heading text-sm font-semibold">{hero.sliderlar.length} slider</p>
-                  <p className="ap-muted text-xs">
-                    {hero.sliderlar.filter((s) => s.aktif).length} yayında
-                  </p>
-                </div>
-              </div>
             </div>
 
             <div className="mt-5 flex flex-wrap gap-2 border-b border-[var(--ap-border)] pb-4">
@@ -499,35 +510,44 @@ export function HeroYonetimiFormu() {
                 {hero.kartlar.map((kart) => (
                   <div
                     key={kart.id}
-                    className="grid gap-3 rounded-lg border border-[var(--ap-border)] p-3 sm:grid-cols-[3rem_1fr_1fr_auto]"
+                    className="space-y-3 rounded-lg border border-[var(--ap-border)] p-3"
                   >
-                    <input
-                      className={`${formInputSinifi} text-center text-xl`}
-                      value={kart.ikon}
-                      onChange={(e) => kartGuncelle(kart.id, { ikon: e.target.value })}
-                      title="Emoji / ikon"
-                      maxLength={4}
-                    />
-                    <input
-                      className={formInputSinifi}
-                      value={kart.baslik}
-                      onChange={(e) => kartGuncelle(kart.id, { baslik: e.target.value })}
-                      placeholder="Başlık"
-                    />
-                    <input
-                      className={formInputSinifi}
-                      value={kart.aciklama}
-                      onChange={(e) => kartGuncelle(kart.id, { aciklama: e.target.value })}
-                      placeholder="Açıklama"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => kartSil(kart.id)}
-                      disabled={hero.kartlar.length <= 1}
-                      className="text-sm text-red-400 disabled:opacity-30"
-                    >
-                      Sil
-                    </button>
+                    <div className="grid gap-3 sm:grid-cols-[3rem_1fr_1fr_auto]">
+                      <input
+                        className={`${formInputSinifi} text-center text-xl`}
+                        value={kart.ikon}
+                        onChange={(e) => kartGuncelle(kart.id, { ikon: e.target.value })}
+                        title="Emoji / ikon"
+                        maxLength={4}
+                      />
+                      <input
+                        className={formInputSinifi}
+                        value={kart.baslik}
+                        onChange={(e) => kartGuncelle(kart.id, { baslik: e.target.value })}
+                        placeholder="Başlık"
+                      />
+                      <input
+                        className={formInputSinifi}
+                        value={kart.aciklama}
+                        onChange={(e) => kartGuncelle(kart.id, { aciklama: e.target.value })}
+                        placeholder="Açıklama"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => kartSil(kart.id)}
+                        disabled={hero.kartlar.length <= 1}
+                        className="text-sm text-red-400 disabled:opacity-30"
+                      >
+                        Sil
+                      </button>
+                    </div>
+                    <FormAlani etiket="Link (opsiyonel)">
+                      <LinkYoluAlani
+                        deger={kart.link ?? ''}
+                        onChange={(link) => kartGuncelle(kart.id, { link })}
+                        placeholder="/hizmetler veya https://..."
+                      />
+                    </FormAlani>
                   </div>
                 ))}
                 <button type="button" onClick={kartEkle} className="ap-link-btn text-sm">

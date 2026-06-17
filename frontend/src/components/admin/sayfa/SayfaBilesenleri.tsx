@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { SayfaAcilisModu } from '@/types/site';
+import { SayfaMenuOnizleme } from '@/components/admin/sayfa/SayfaMenuOnizleme';
 
 const ACILIS_MODLARI: { id: SayfaAcilisModu; ad: string; aciklama: string }[] = [
   { id: 'normal', ad: 'Normal sayfa', aciklama: 'İletişim sayfası gibi tam sayfa olarak açılır' },
@@ -25,8 +26,9 @@ import {
   ustSayfaBul,
   ustSayfaSecenekleri,
 } from '@/utils/sayfaAgaci';
+import { idString } from '@/utils/idKarsilastir';
 
-type EditorSekme = 'icerik' | 'seo' | 'ayarlar';
+type EditorSekme = 'icerik' | 'seo' | 'ayarlar' | 'alt-sayfa';
 
 interface SayfaListesiPanelProps {
   sayfalar: AdminSayfa[];
@@ -206,6 +208,7 @@ interface SayfaEditorPanelProps {
   onChange: (form: SayfaFormDegeri) => void;
   onSlugManuelChange: (v: boolean) => void;
   onAltSayfaEkle?: (ustSayfa: AdminSayfa) => void;
+  onSayfaSec?: (sayfa: AdminSayfa) => void;
 }
 
 export function SayfaEditorPanel({
@@ -216,13 +219,41 @@ export function SayfaEditorPanel({
   onChange,
   onSlugManuelChange,
   onAltSayfaEkle,
+  onSayfaSec,
 }: SayfaEditorPanelProps) {
   const [sekme, setSekme] = useState<EditorSekme>('icerik');
   const ustSecenekler = ustSayfaSecenekleri(sayfalar, seciliId);
   const ustSayfa = ustSayfaBul(sayfalar, form.ustSayfaId);
   const altSayi = seciliId ? altSayfaSayisi(sayfalar, seciliId) : 0;
   const seciliSayfa = seciliId ? sayfalar.find((s) => s.id === seciliId) : undefined;
-  const altSayfaEklenebilir = !!seciliSayfa && !seciliSayfa.ustSayfaId && altSayi >= 0;
+  const altSayfaEklenebilir = !!seciliSayfa && !seciliSayfa.ustSayfaId;
+  const altSayfalar = useMemo(
+    () =>
+      seciliId
+        ? sayfalar
+            .filter((s) => s.ustSayfaId && idString(s.ustSayfaId) === idString(seciliId))
+            .sort((a, b) => a.sira - b.sira || a.baslik.localeCompare(b.baslik, 'tr'))
+        : [],
+    [sayfalar, seciliId]
+  );
+
+  const sekmeler = useMemo((): { id: EditorSekme; etiket: string; ikon: string }[] => {
+    const liste: { id: EditorSekme; etiket: string; ikon: string }[] = [
+      { id: 'icerik', etiket: 'İçerik', ikon: '📝' },
+      { id: 'seo', etiket: 'SEO', ikon: '🔍' },
+      { id: 'ayarlar', etiket: 'Ayarlar', ikon: '⚙️' },
+    ];
+    if (altSayfaEklenebilir) {
+      liste.push({ id: 'alt-sayfa', etiket: 'Alt Sayfalar', ikon: '📂' });
+    }
+    return liste;
+  }, [altSayfaEklenebilir]);
+
+  function altSayfaEkleBaslat() {
+    if (!seciliSayfa || !onAltSayfaEkle) return;
+    onAltSayfaEkle(seciliSayfa);
+    setSekme('icerik');
+  }
 
   function baslikDegistir(baslik: string) {
     const guncel = { ...form, baslik };
@@ -260,26 +291,7 @@ export function SayfaEditorPanel({
         </div>
       </div>
 
-      <div className="ap-editor-sekmeler-satir">
-        <AdminSekmeler
-          aktif={sekme}
-          onDegistir={setSekme}
-          sekmeler={[
-            { id: 'icerik', etiket: 'İçerik', ikon: '📝' },
-            { id: 'seo', etiket: 'SEO', ikon: '🔍' },
-            { id: 'ayarlar', etiket: 'Ayarlar', ikon: '⚙️' },
-          ]}
-        />
-        {altSayfaEklenebilir && onAltSayfaEkle && seciliSayfa && (
-          <button
-            type="button"
-            className="ap-sekme ap-sekme-aksiyon"
-            onClick={() => onAltSayfaEkle(seciliSayfa)}
-          >
-            + Alt Sayfa Ekle
-          </button>
-        )}
-      </div>
+      <AdminSekmeler aktif={sekme} onDegistir={setSekme} sekmeler={sekmeler} />
 
       <div className="ap-editor-icerik">
         {sekme === 'icerik' && (
@@ -430,6 +442,64 @@ export function SayfaEditorPanel({
                   onChange={(e) => onChange({ ...form, sira: Number(e.target.value) })}
                 />
               </FormAlani>
+            </AdminFormBolumu>
+          </>
+        )}
+
+        {sekme === 'alt-sayfa' && altSayfaEklenebilir && seciliSayfa && (
+          <>
+            <AdminFormBolumu
+              baslik="Menü Önizleme"
+              aciklama="Ana menüde dropdown olarak görünecek alt sayfalar"
+            >
+              <SayfaMenuOnizleme sayfalar={sayfalar} vurguluUstId={seciliId} />
+            </AdminFormBolumu>
+
+            <AdminFormBolumu
+              baslik="Alt Sayfalar"
+              aciklama={`${seciliSayfa.baslik} menüsü altındaki sayfalar`}
+            >
+              {altSayfalar.length === 0 ? (
+                <p className="ap-muted text-sm">Henüz alt sayfa eklenmedi.</p>
+              ) : (
+                <ul className="ap-sayfa-alt-liste space-y-2">
+                  {altSayfalar.map((alt) => (
+                    <li key={alt.id}>
+                      <button
+                        type="button"
+                        className="ap-sayfa-alt-liste-oge w-full text-left"
+                        onClick={() => onSayfaSec?.(alt)}
+                      >
+                        <span className="ap-heading text-sm font-medium">{alt.baslik}</span>
+                        <span className="ap-muted block text-xs">/{alt.slug}</span>
+                        <div className="mt-1 flex flex-wrap gap-1">
+                          {alt.yayinda ? (
+                            <AdminDurumEtiketi tur="yayinda">Yayında</AdminDurumEtiketi>
+                          ) : (
+                            <AdminDurumEtiketi tur="taslak">Taslak</AdminDurumEtiketi>
+                          )}
+                          {alt.menudeGoster && (
+                            <AdminDurumEtiketi tur="menu">Menüde</AdminDurumEtiketi>
+                          )}
+                        </div>
+                      </button>
+                    </li>
+                  ))}
+                </ul>
+              )}
+
+              <button
+                type="button"
+                className="ap-btn ap-btn-birincil mt-4 text-sm"
+                onClick={altSayfaEkleBaslat}
+              >
+                + Yeni Alt Sayfa Ekle
+              </button>
+
+              <p className="ap-muted mt-3 text-xs">
+                Alt sayfalar kaydedilip yayınlandığında ve &quot;Alt menüde göster&quot; açıkken üst
+                sayfa menüsünde dropdown olarak listelenir.
+              </p>
             </AdminFormBolumu>
           </>
         )}

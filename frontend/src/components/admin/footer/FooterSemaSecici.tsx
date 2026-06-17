@@ -1,11 +1,14 @@
 import {
+  FOOTER_GORSEL_KONUM_ETIKET,
   FOOTER_SEMA_ETIKET,
   FOOTER_LINK_IKON_ETIKET,
   type FooterAyarlari,
+  type FooterGorselKonum,
   type FooterLinkIkon,
   type FooterSema,
 } from '@/types/footer';
 import { formInputSinifi } from '@/components/form/FormAlani';
+import { GorselAlan } from '@/components/form/GorselAlan';
 
 const SEMALAR: FooterSema[] = ['dort-kolon', 'uc-kolon', 'iki-kolon', 'merkezi'];
 
@@ -55,7 +58,11 @@ interface FooterSemaSeciciProps {
   onDegistir: (footer: FooterAyarlari) => void;
 }
 
+const GORSEL_KONUMLAR: FooterGorselKonum[] = ['sag', 'sol', 'ust', 'alt'];
+
 export function FooterSemaSecici({ footer, onDegistir }: FooterSemaSeciciProps) {
+  const dekor = footer.gorselDekor ?? { aktif: false, gorselUrl: '', konum: 'sag' as FooterGorselKonum };
+
   return (
     <div className="space-y-5">
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
@@ -97,6 +104,62 @@ export function FooterSemaSecici({ footer, onDegistir }: FooterSemaSeciciProps) 
           ))}
         </select>
       </label>
+
+      <div className="rounded-xl border border-[var(--ap-border)] p-4">
+        <label className={`ap-toggle-kart mb-3 flex cursor-pointer items-center justify-between ${dekor.aktif ? 'ap-toggle-aktif ap-toggle-yesil' : ''}`}>
+          <div>
+            <p className="ap-heading text-sm font-semibold">Footer görseli</p>
+            <p className="ap-muted text-xs">Sağ/sol/üst/alt konuma dekoratif görsel</p>
+          </div>
+          <button
+            type="button"
+            role="switch"
+            aria-checked={dekor.aktif}
+            onClick={() =>
+              onDegistir({
+                ...footer,
+                gorselDekor: { ...dekor, aktif: !dekor.aktif },
+              })
+            }
+            className={`ap-toggle ${dekor.aktif ? 'ap-toggle-on' : ''}`}
+          >
+            <span className="ap-toggle-thumb" />
+          </button>
+        </label>
+
+        {dekor.aktif && (
+          <div className="space-y-4">
+            <GorselAlan
+              etiket="Görsel"
+              deger={dekor.gorselUrl}
+              onChange={(gorselUrl) =>
+                onDegistir({ ...footer, gorselDekor: { ...dekor, gorselUrl } })
+              }
+            />
+            <div>
+              <span className="ap-muted mb-2 block text-xs font-medium">Konum</span>
+              <div className="flex flex-wrap gap-2">
+                {GORSEL_KONUMLAR.map((konum) => (
+                  <button
+                    key={konum}
+                    type="button"
+                    onClick={() =>
+                      onDegistir({ ...footer, gorselDekor: { ...dekor, konum } })
+                    }
+                    className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
+                      dekor.konum === konum
+                        ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)] text-white'
+                        : 'border-[var(--ap-border)] ap-muted hover:bg-[var(--ap-hover)]'
+                    }`}
+                  >
+                    {FOOTER_GORSEL_KONUM_ETIKET[konum]}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }

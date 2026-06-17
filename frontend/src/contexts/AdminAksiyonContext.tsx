@@ -111,7 +111,7 @@ export function AdminAksiyonProvider({ children }: { children: ReactNode }) {
       const mesaj = AKSİYON_BASARI[aksiyonId];
       if (mesaj) {
         setAksiyonGeriBildirim({ aksiyonId, mesaj, tur: 'basari' });
-        geriBildirimTimerRef.current = setTimeout(() => setAksiyonGeriBildirim(null), 2500);
+        geriBildirimTimerRef.current = setTimeout(() => setAksiyonGeriBildirim(null), 1500);
       }
     } catch {
       setAksiyonGeriBildirim({

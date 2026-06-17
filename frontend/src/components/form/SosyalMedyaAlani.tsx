@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { formInputSinifi } from './FormAlani';
 import {
-  IKON_VARYANTLARI,
+  IKON_PAKETLERI,
   SOSYAL_PLATFORMLAR,
   SosyalIkonSvg,
   platformAra,
@@ -89,22 +89,22 @@ function PlatformKarti({
       )}
 
       <div className="ap-sosyal-ikon-secim mt-3">
-        <p className="ap-muted mb-2 text-xs font-medium uppercase tracking-wide">İkon stili</p>
+        <p className="ap-muted mb-2 text-xs font-medium uppercase tracking-wide">İkon paketi</p>
         <div className="flex flex-wrap gap-2">
-          {IKON_VARYANTLARI.map((v) => (
+          {IKON_PAKETLERI.map((paket) => (
             <button
-              key={v.id}
+              key={paket.id}
               type="button"
-              onClick={() => onGuncelle({ ...oge, ikonVaryant: v.id, ozelLogoUrl: undefined })}
-              className={`ap-sosyal-ikon-btn ${seciliVaryant === v.id ? 'ap-sosyal-ikon-btn-secili' : ''}`}
-              title={v.ad}
+              onClick={() => onGuncelle({ ...oge, ikonVaryant: paket.id, ozelLogoUrl: undefined })}
+              className={`ap-sosyal-ikon-btn ${seciliVaryant === paket.id ? 'ap-sosyal-ikon-btn-secili' : ''}`}
+              title={paket.aciklama}
             >
               {platform ? (
-                <SosyalIkonSvg platform={gosterilecekPlatform} varyant={v.id} className="h-7 w-7" />
+                <SosyalIkonSvg platform={gosterilecekPlatform} varyant={paket.id} className="h-7 w-7" />
               ) : (
-                <span className="flex h-7 w-7 items-center justify-center text-xs font-bold">{v.ad.charAt(0)}</span>
+                <span className="flex h-7 w-7 items-center justify-center text-xs font-bold">{paket.ad.charAt(0)}</span>
               )}
-              <span className="text-[10px] text-[var(--ap-text-muted)]">{v.ad}</span>
+              <span className="text-[10px] text-[var(--ap-text-muted)]">{paket.ad}</span>
             </button>
           ))}
           <button
