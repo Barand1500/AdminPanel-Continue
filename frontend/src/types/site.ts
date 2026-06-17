@@ -49,6 +49,7 @@ export interface Sayfa {
   menudeGoster?: boolean;
   sira?: number;
   acilisModu?: SayfaAcilisModu;
+  ustSayfaId?: string | null;
 }
 
 export interface Urun {
@@ -85,6 +86,7 @@ export interface MenuOgesi {
   yol: string;
   yeniSekme?: boolean;
   acilisModu?: SayfaAcilisModu;
+  altOgeler?: MenuOgesi[];
 }
 
 export interface HizmetKarti {

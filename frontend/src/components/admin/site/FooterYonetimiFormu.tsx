@@ -22,7 +22,7 @@ import {
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
 import { footerAyarlariBirlestir, type FooterAyarlari } from '@/types/footer';
-import { whatsappFormatla } from '@/utils/telefonFormat';
+import { telefonFormatla, whatsappFormatla } from '@/utils/telefonFormat';
 
 const SEKMELER = [
   { id: 'sema', ad: 'Şema & Görünüm' },
@@ -234,7 +234,7 @@ export function FooterYonetimiFormu() {
                   />
                 </FormAlani>
                 <TelefonInput
-                  deger={ayarlar.telefon ?? ''}
+                  deger={ayarlar.telefon ? telefonFormatla(ayarlar.telefon) : ''}
                   onChange={(v) => alanGuncelle('telefon', v || null)}
                 />
                 <EmailInput

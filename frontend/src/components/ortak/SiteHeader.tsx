@@ -8,6 +8,7 @@ import { KategoriMenu } from './KategoriMenu';
 import { TemaToggle } from './TemaToggle';
 import { HeaderIkon } from './HeaderIkon';
 import { MenuNavLink } from './MenuNavLink';
+import { MenuDropdown } from './MenuDropdown';
 import { SiteMarkaAlani } from './SiteMarkaAlani';
 
 interface SiteHeaderProps {
@@ -83,14 +84,24 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
           />
 
           <nav className="hidden items-center gap-5 lg:flex">
-            {menuOgeleri.map((oge, i) => (
-              <MenuNavLink
-                key={`${oge.yol}-${i}`}
-                oge={oge}
-                className="text-sm font-medium transition hover:text-primary"
-                style={{ color: 'var(--color-text-muted)' }}
-              />
-            ))}
+            {menuOgeleri.map((oge, i) =>
+              oge.altOgeler && oge.altOgeler.length > 0 ? (
+                <MenuDropdown
+                  key={`${oge.yol}-${i}`}
+                  oge={oge}
+                  className=""
+                  linkClassName="flex items-center gap-1 text-sm font-medium transition hover:text-primary"
+                  style={{ color: 'var(--color-text-muted)' }}
+                />
+              ) : (
+                <MenuNavLink
+                  key={`${oge.yol}-${i}`}
+                  oge={oge}
+                  className="text-sm font-medium transition hover:text-primary"
+                  style={{ color: 'var(--color-text-muted)' }}
+                />
+              )
+            )}
           </nav>
 
           <div className="flex items-center gap-1 sm:gap-2">
@@ -147,13 +158,23 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
             style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface-elevated)' }}
           >
             {menuOgeleri.map((oge, i) => (
-              <MenuNavLink
-                key={`${oge.yol}-${i}`}
-                oge={oge}
-                onClick={() => setMenuAcik(false)}
-                className="block border-b py-3 text-sm font-medium last:border-0"
-                style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
-              />
+              <div key={`${oge.yol}-${i}`}>
+                <MenuNavLink
+                  oge={oge}
+                  onClick={() => setMenuAcik(false)}
+                  className="block border-b py-3 text-sm font-medium last:border-0"
+                  style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
+                />
+                {oge.altOgeler?.map((alt) => (
+                  <MenuNavLink
+                    key={alt.yol}
+                    oge={alt}
+                    onClick={() => setMenuAcik(false)}
+                    className="block border-b py-2.5 pl-4 text-sm last:border-0"
+                    style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
+                  />
+                ))}
+              </div>
             ))}
             <div
               className="mt-2 flex flex-wrap items-center gap-3 border-t pt-3 text-sm font-medium"

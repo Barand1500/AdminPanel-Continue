@@ -1,19 +1,27 @@
 import { useState } from 'react';
 import { FormAlani, formInputSinifi } from './FormAlani';
-import { telefonFormatla } from '@/utils/telefonFormat';
+import {
+  ORNEK_TELEFON_0850,
+  ORNEK_TELEFON_KISA,
+  ORNEK_TELEFON_SIFIRLI,
+  ORNEK_TELEFON_SIFIRSIZ,
+  telefonFormatla,
+} from '@/utils/telefonFormat';
 
 interface TelefonInputProps {
   etiket?: string;
   aciklama?: string;
   deger: string;
   onChange: (deger: string) => void;
+  placeholder?: string;
 }
 
 export function TelefonInput({
   etiket = 'Telefon',
-  aciklama = '0 ile baslarsa 0538 930 33 14, baslamazsa 538 930 33 14 formatinda',
+  aciklama = `0 ile başlarsa ${ORNEK_TELEFON_SIFIRLI} veya ${ORNEK_TELEFON_0850}, başlamazsa ${ORNEK_TELEFON_SIFIRSIZ}, kısa kod ${ORNEK_TELEFON_KISA}`,
   deger,
   onChange,
+  placeholder = ORNEK_TELEFON_0850,
 }: TelefonInputProps) {
   const [odak, setOdak] = useState(false);
 
@@ -27,13 +35,14 @@ export function TelefonInput({
         </span>
         <input
           type="tel"
-          inputMode="numeric"
+          inputMode="tel"
+          autoComplete="tel"
           value={deger}
           onChange={(e) => onChange(telefonFormatla(e.target.value))}
           onFocus={() => setOdak(true)}
           onBlur={() => setOdak(false)}
           className={`${formInputSinifi} ap-input-ikonlu ${odak ? 'ap-input-odak' : ''}`}
-          placeholder="0538 930 33 14"
+          placeholder={placeholder}
         />
       </div>
     </FormAlani>

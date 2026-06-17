@@ -1,18 +1,25 @@
 import { useState } from 'react';
 import { FormAlani, formInputSinifi } from './FormAlani';
-import { whatsappFormatla } from '@/utils/telefonFormat';
+import { ORNEK_WHATSAPP, whatsappFormatla } from '@/utils/telefonFormat';
 
 interface WhatsAppInputProps {
   deger: string;
   onChange: (deger: string) => void;
+  aciklama?: string;
+  placeholder?: string;
 }
 
-export function WhatsAppInput({ deger, onChange }: WhatsAppInputProps) {
+export function WhatsAppInput({
+  deger,
+  onChange,
+  aciklama = `Uluslararası format: ${ORNEK_WHATSAPP}`,
+  placeholder = ORNEK_WHATSAPP,
+}: WhatsAppInputProps) {
   const [odak, setOdak] = useState(false);
   const gorunen = deger.includes('+') ? deger : whatsappFormatla(deger);
 
   return (
-    <FormAlani etiket="WhatsApp" aciklama="Uluslararasi format: +90 538 930 33 14">
+    <FormAlani etiket="WhatsApp" aciklama={aciklama}>
       <div className="relative">
         <span className="ap-input-ikon text-green-500">
           <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4">
@@ -21,13 +28,14 @@ export function WhatsAppInput({ deger, onChange }: WhatsAppInputProps) {
         </span>
         <input
           type="tel"
-          inputMode="numeric"
+          inputMode="tel"
+          autoComplete="tel"
           value={gorunen}
           onChange={(e) => onChange(whatsappFormatla(e.target.value))}
           onFocus={() => setOdak(true)}
           onBlur={() => setOdak(false)}
           className={`${formInputSinifi} ap-input-ikonlu ${odak ? 'ap-input-odak' : ''}`}
-          placeholder="+90 538 930 33 14"
+          placeholder={placeholder}
         />
       </div>
     </FormAlani>

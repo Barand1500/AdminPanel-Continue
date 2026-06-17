@@ -867,6 +867,165 @@ html:has(.admin-panel[data-tema='acik']) body {
 .ap-etiket-yayinda { background: rgb(22 163 74 / 0.15); color: #4ade80; }
 .ap-etiket-taslak { background: rgb(100 116 139 / 0.2); color: var(--ap-text-muted); }
 .ap-etiket-menu { background: color-mix(in srgb, var(--ap-accent) 15%, transparent); color: var(--ap-accent); }
+.ap-etiket-bilgi { background: color-mix(in srgb, #8b5cf6 12%, transparent); color: #7c3aed; }
+
+/* Sayfa hiyerarşi listesi */
+.ap-sayfa-alt-ekle-btn {
+  flex-shrink: 0;
+  border-radius: 0.375rem;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-surface-2);
+  padding: 0.25rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--ap-accent);
+}
+
+.ap-sayfa-alt-ekle-btn:hover {
+  background: var(--ap-hover);
+}
+
+.ap-sidebar-baslik {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.ap-sayfa-agac-toggle {
+  display: flex;
+  width: 1.25rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 0.625rem;
+  color: var(--ap-text-muted);
+}
+
+.ap-sayfa-agac-toggle-bos {
+  visibility: hidden;
+}
+
+.ap-sayfa-agac-altlar {
+  margin-left: 0.75rem;
+  border-left: 2px solid var(--ap-border);
+  padding-left: 0.25rem;
+}
+
+.ap-sayfa-alt-cizgi {
+  display: inline-block;
+  height: 0.5rem;
+  width: 0.5rem;
+  border-bottom: 2px solid var(--ap-border);
+  border-left: 2px solid var(--ap-border);
+  margin-right: 0.125rem;
+}
+
+.ap-sayfa-alt-oge .ap-liste-oge-baslik {
+  font-size: 0.8125rem;
+}
+
+.ap-sayfa-agac-etiket {
+  margin-top: -0.25rem;
+  padding-left: 1.5rem;
+}
+
+.ap-sayfa-liste-ipucu {
+  margin: 0 0.75rem 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px dashed var(--ap-border);
+  background: var(--ap-surface-2);
+  padding: 0.5rem 0.625rem;
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  color: var(--ap-text-muted);
+}
+
+.ap-sayfa-menu-konum {
+  margin-bottom: 1rem;
+  border-radius: 0.625rem;
+  border: 1px solid var(--ap-border);
+  background: color-mix(in srgb, var(--ap-accent) 6%, var(--ap-surface));
+  padding: 1rem;
+}
+
+.ap-sayfa-menu-konum-baslik {
+  margin-bottom: 0.75rem;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: var(--ap-heading);
+}
+
+.ap-sayfa-menu-konum-secenekler {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.ap-sayfa-menu-konum-etiket {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.625rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-surface);
+  padding: 0.625rem 0.75rem;
+  cursor: pointer;
+  font-size: 0.8125rem;
+  color: var(--ap-text);
+}
+
+.ap-sayfa-menu-konum-etiket input {
+  margin-top: 0.2rem;
+  flex-shrink: 0;
+}
+
+.ap-sayfa-menu-konum-etiket strong {
+  display: block;
+  color: var(--ap-heading);
+}
+
+.ap-sayfa-menu-konum-etiket small {
+  display: block;
+  margin-top: 0.125rem;
+  font-size: 0.6875rem;
+  color: var(--ap-text-muted);
+}
+
+.ap-sayfa-menu-konum-etiket-aktif {
+  border-color: var(--ap-accent);
+  background: color-mix(in srgb, var(--ap-accent) 8%, var(--ap-surface));
+}
+
+.ap-sayfa-menu-konum-etiket-pasif {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.ap-sayfa-menu-konum-ozet {
+  margin-top: 0.75rem;
+  font-size: 0.75rem;
+  line-height: 1.45;
+  color: var(--ap-text);
+}
+
+.ap-sayfa-menu-konum-adimlar {
+  margin-top: 0.75rem;
+  border-top: 1px solid var(--ap-border);
+  padding-top: 0.75rem;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: var(--ap-text-muted);
+  list-style: decimal;
+  padding-left: 1.25rem;
+}
+
+.ap-sayfa-menu-konum-adimlar li + li {
+  margin-top: 0.25rem;
+}
+
 .ap-etiket-pasif { background: rgb(153 27 27 / 0.15); color: #f87171; }
 .ap-etiket-aktif { background: rgb(22 163 74 / 0.15); color: #4ade80; }
 .ap-etiket-gri { background: color-mix(in srgb, var(--ap-text-muted) 15%, transparent); color: var(--ap-text-muted); }

@@ -15,6 +15,7 @@ export interface AdminSayfa {
   menudeGoster: boolean;
   sira: number;
   acilisModu: SayfaAcilisModu;
+  ustSayfaId?: string | null;
 }
 
 export interface SayfaFormDegeri {
@@ -28,6 +29,7 @@ export interface SayfaFormDegeri {
   menudeGoster: boolean;
   sira: number;
   acilisModu: SayfaAcilisModu;
+  ustSayfaId: string | null;
 }
 
 export async function adminSayfalariGetir(): Promise<AdminSayfa[]> {
@@ -71,6 +73,7 @@ function normalizeSayfa(sayfa: AdminSayfa): AdminSayfa {
     ...sayfa,
     id: idString(sayfa.id),
     acilisModu: sayfa.acilisModu ?? 'normal',
+    ustSayfaId: sayfa.ustSayfaId != null ? idString(sayfa.ustSayfaId) : null,
   };
 }
 
@@ -86,5 +89,6 @@ function payloadHazirla(form: SayfaFormDegeri) {
     menudeGoster: form.menudeGoster,
     sira: form.sira,
     acilisModu: form.acilisModu,
+    ustSayfaId: form.ustSayfaId ? Number(form.ustSayfaId) : null,
   };
 }

@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
   bosSayfaForm,
+  altSayfaFormu,
   SayfaEditorPanel,
   SayfaListesiPanel,
   sayfadanForm,
@@ -19,6 +20,7 @@ import {
   type AdminSayfa,
   type SayfaFormDegeri,
 } from '@/features/admin/sayfaApi';
+import { altSayfaSayisi } from '@/utils/sayfaAgaci';
 
 export function SayfaYonetimiSayfasi() {
   const [sayfalar, setSayfalar] = useState<AdminSayfa[]>([]);
@@ -52,6 +54,17 @@ export function SayfaYonetimiSayfasi() {
     setBasari('');
     setHata('');
   }, []);
+
+  const altSayfaBaslat = useCallback(
+    (ustSayfa: AdminSayfa) => {
+      setSeciliId(null);
+      setForm(altSayfaFormu(ustSayfa, altSayfaSayisi(sayfalar, ustSayfa.id)));
+      setSlugManuel(false);
+      setBasari('');
+      setHata('');
+    },
+    [sayfalar]
+  );
 
   const kaydet = useCallback(async () => {
     if (!form.baslik.trim()) {
@@ -154,7 +167,7 @@ export function SayfaYonetimiSayfasi() {
   return (
       <AdminModulKabuk
         baslik="Sayfa Yönetimi"
-        aciklama="Site sayfalarını oluşturun, içerik ve SEO ayarlarını düzenleyin. Tüm işlemler alt aksiyon çubuğundan yapılır."
+        aciklama="Site sayfalarını oluşturun, üst menü altına alt sayfalar ekleyin. Alt sayfalar sitede dropdown menü olarak görünür."
       >
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
@@ -165,11 +178,17 @@ export function SayfaYonetimiSayfasi() {
       ) : (
         <>
           <div className="ap-split-layout">
-            <SayfaListesiPanel sayfalar={sayfalar} seciliId={seciliId} onSec={sayfaSec} />
+            <SayfaListesiPanel
+              sayfalar={sayfalar}
+              seciliId={seciliId}
+              onSec={sayfaSec}
+              onAltSayfaEkle={altSayfaBaslat}
+            />
             <SayfaEditorPanel
               form={form}
               seciliId={seciliId}
               slugManuel={slugManuel}
+              sayfalar={sayfalar}
               onChange={setForm}
               onSlugManuelChange={setSlugManuel}
             />

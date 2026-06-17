@@ -60,7 +60,7 @@ export function AdminDurumEtiketi({
   tur,
   children,
 }: {
-  tur: 'yayinda' | 'taslak' | 'menu' | 'pasif' | 'aktif';
+  tur: 'yayinda' | 'taslak' | 'menu' | 'pasif' | 'aktif' | 'bilgi';
   children: ReactNode;
 }) {
   return <span className={`ap-etiket ap-etiket-${tur}`}>{children}</span>;

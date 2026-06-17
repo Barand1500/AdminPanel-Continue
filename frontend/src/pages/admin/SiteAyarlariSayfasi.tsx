@@ -17,7 +17,7 @@ import {
 } from '@/components/admin/ortak/AdminBilesenleri';
 import { GunduzSablonSecici, GeceSablonSecici } from '@/components/admin/site/TemaSablonSecici';
 import { TemaOnizlemePaneli } from '@/components/admin/site/TemaOnizlemePaneli';
-import { whatsappFormatla, whatsappKayitDegeri } from '@/utils/telefonFormat';
+import { whatsappFormatla, whatsappKayitDegeri, telefonFormatla } from '@/utils/telefonFormat';
 import {
   GUNDUZ_SABLONLARI,
   temaAyarlariBirlestir,
@@ -147,7 +147,7 @@ export function SiteAyarlariSayfasi() {
         <AdminPanelKarti baslik="İletişim Bilgileri" altBaslik="Footer, üst bant ve iletişim sayfasında kullanılır">
           <div className="space-y-4">
             <TelefonInput
-              deger={ayarlar.telefon ?? ''}
+              deger={ayarlar.telefon ? telefonFormatla(ayarlar.telefon) : ''}
               onChange={(v) => alanGuncelle('telefon', v || null)}
             />
             <EmailInput deger={ayarlar.email ?? ''} onChange={(v) => alanGuncelle('email', v || null)} />

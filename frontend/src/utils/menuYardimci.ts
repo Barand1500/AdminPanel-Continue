@@ -5,6 +5,7 @@ import type { UstMenuOgesi, HeaderAyarlari } from '@/types/header';
 import type { MenuOgesi, Sayfa, SayfaAcilisModu, SiteAyarlari } from '@/types/site';
 import { blogAyarlariBirlestir } from '@/types/blog';
 import { idKarsilastir, idString } from '@/utils/idKarsilastir';
+import { sayfaAltMenuOgeleriOlustur } from '@/utils/sayfaAgaci';
 
 export function yeniMenuId(): string {
   return crypto.randomUUID();
@@ -39,21 +40,25 @@ export function ustMenuOgeleriOlustur(ustMenu: UstMenuOgesi[], sayfalar: Sayfa[]
     .sort((a, b) => a.sira - b.sira)
     .map((o) => {
       const slug = linktenSlugCikar(o.link);
-      const sayfa = slug ? sayfalar.find((s) => s.slug === slug) : undefined;
+      const sayfa =
+        (o.sayfaId ? sayfalar.find((s) => idString(s.id) === idString(o.sayfaId!)) : undefined) ??
+        (slug ? sayfalar.find((s) => s.slug === slug && !s.ustSayfaId) : undefined);
       const acilisModu: SayfaAcilisModu =
         sayfa?.acilisModu ?? (o.yeniSekme ? 'yeni_sekme' : 'normal');
+      const altOgeler = sayfa ? sayfaAltMenuOgeleriOlustur(sayfa.id, sayfalar) : [];
       return {
         baslik: o.ad,
         yol: o.link,
         yeniSekme: acilisModu === 'yeni_sekme',
         acilisModu,
+        ...(altOgeler.length > 0 ? { altOgeler } : {}),
       };
     });
 }
 
 export function sayfaMenudenUstMenuAktar(sayfalar: AdminSayfa[]): UstMenuOgesi[] {
   return [...sayfalar]
-    .filter((s) => s.menudeGoster && s.yayinda)
+    .filter((s) => s.menudeGoster && s.yayinda && !s.ustSayfaId)
     .sort((a, b) => a.sira - b.sira)
     .map((s, i) => ({
       id: yeniMenuId(),
@@ -174,6 +179,7 @@ export function ustMenuSayfaSenkronize(
           menudeGoster: true,
           sira: oge.sira,
           acilisModu: 'normal',
+          ustSayfaId: null,
         });
       }
       oge.sayfaId = pendingId;
