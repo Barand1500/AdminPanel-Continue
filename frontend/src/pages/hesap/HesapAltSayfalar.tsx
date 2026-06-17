@@ -136,24 +136,3 @@ function HesapAltSayfa({
     </section>
   );
 }
-
-export function HesapBosSayfa({ baslik, aciklama }: { baslik: string; aciklama: string }) {
-  const { uye, yukleniyor } = useSiteAuth();
-  if (yukleniyor) return null;
-  if (!uye) return <Navigate to="/hesabim" replace />;
-
-  return (
-    <section className="py-10 sm:py-14">
-      <div className="container-site">
-        <Link to="/hesabim/panel" className="mb-6 inline-flex items-center gap-1 text-sm font-medium text-primary hover:underline">
-          ← Hesabım
-        </Link>
-        <h1 className="section-title text-2xl">{baslik}</h1>
-        <div className="mt-8 max-w-lg rounded-2xl border border-dashed border-primary/30 bg-accent/30 p-10 text-center">
-          <span className="text-4xl">📋</span>
-          <p className="mt-4 text-slate-600">{aciklama}</p>
-        </div>
-      </div>
-    </section>
-  );
-}

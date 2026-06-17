@@ -3,7 +3,7 @@ import type { SitePublicData } from '@/types/site';
 import { blogAyarlariBirlestir, blogOnizlemeListesi } from '@/types/blog';
 import { HeroSlider } from '@/components/eticaret/HeroSlider';
 import { GuvenSerit } from '@/components/eticaret/GuvenSerit';
-import { UrunBolumu, BosUrunDurumu } from '@/components/eticaret/UrunBolumu';
+import { UrunBolumu } from '@/components/eticaret/UrunBolumu';
 import { BlogBolumu } from '@/components/blog/BlogBolumu';
 import { BlogHizmetBolumu } from '@/components/blog/BlogHizmetBolumu';
 import { PopupWidgetlar, WidgetBolge } from '@/components/widget/WidgetBolge';
@@ -34,7 +34,6 @@ export function AnaSayfa() {
 
   const yeniUrunler = urunler.filter((u) => u.yeni);
   const cokSatanlar = urunler.filter((u) => u.cokSatan);
-  const urunYok = urunler.length === 0;
 
   const blogBolumu =
     blogAyarlari.anaSayfa && blogOnizleme.length > 0 ? (
@@ -49,7 +48,6 @@ export function AnaSayfa() {
       {cokSatanlar.length > 0 ? (
         <UrunBolumu baslik="Çok Satanlar" urunler={cokSatanlar} filtre="cokSatan" />
       ) : null}
-      {urunYok && yeniUrunler.length === 0 && cokSatanlar.length === 0 && <BosUrunDurumu />}
       {urunler.length > 0 && !yeniUrunler.length && !cokSatanlar.length && (
         <UrunBolumu baslik="Ürünlerimiz" urunler={urunler} />
       )}

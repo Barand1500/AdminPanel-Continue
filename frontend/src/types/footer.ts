@@ -195,10 +195,8 @@ export function varsayilanFooterAyarlari(): FooterAyarlari {
       ]),
       kolonOlustur('Bilgi / İletişim', 2, [
         { ad: 'Hakkımızda', link: '/hakkimizda' },
-        { ad: 'Online Ödeme', link: '/hesabim/serbest-odeme' },
         { ad: 'İletişim', link: '/iletisim' },
         { ad: 'Hesabım', link: '/hesabim' },
-        { ad: 'Sepetim', link: '/sepet' },
       ]),
     ],
     pazaryeri: {

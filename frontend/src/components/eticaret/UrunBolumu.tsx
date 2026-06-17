@@ -34,23 +34,3 @@ export function UrunBolumu({ baslik, urunler, filtre, tumunuGorLink = '/urunler'
     </section>
   );
 }
-
-interface BosUrunDurumuProps {
-  baslik?: string;
-  mesaj?: string;
-}
-
-export function BosUrunDurumu({
-  baslik = 'Henüz ürün eklenmedi',
-  mesaj = 'Admin panelinden ürün eklediğinizde burada görünecek.',
-}: BosUrunDurumuProps) {
-  return (
-    <div className="container-site py-16">
-      <div className="mx-auto max-w-lg rounded-2xl border-2 border-dashed border-primary/20 bg-white p-12 text-center">
-        <span className="text-5xl">🛍️</span>
-        <h2 className="mt-4 text-xl font-bold text-slate-900">{baslik}</h2>
-        <p className="mt-2 text-sm text-slate-500">{mesaj}</p>
-      </div>
-    </div>
-  );
-}

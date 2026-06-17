@@ -232,6 +232,30 @@ body {
   display: none;
 }
 
+/* Public site — sağ scrollbar gizli, kaydırma çalışır */
+html:has(.site-public),
+body:has(.site-public) {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html:has(.site-public)::-webkit-scrollbar,
+body:has(.site-public)::-webkit-scrollbar,
+.site-public,
+.site-public * {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+html:has(.site-public)::-webkit-scrollbar,
+body:has(.site-public)::-webkit-scrollbar,
+.site-public::-webkit-scrollbar,
+.site-public *::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
 .product-grid {
   @apply grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6;
 }
