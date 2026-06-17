@@ -25,9 +25,15 @@ export class SiteController {
     return res.json(data);
   }
 
-  async getSayfa(req: Request, res: Response) {
+  async getSayfa(req: Request, res: Response, slugYolu?: string) {
     const siteSlug = (req.query.site as string) ?? config.defaultSiteSlug;
-    const slug = req.params.slug as string;
+    const querySlug = typeof req.query.slug === 'string' ? req.query.slug.trim() : '';
+    const paramSlug = slugYolu ?? '';
+    const slug = (querySlug || paramSlug).replace(/^\/+|\/+$/g, '');
+
+    if (!slug) {
+      return res.status(400).json({ mesaj: 'Slug gerekli' });
+    }
 
     const sayfa = await siteService.getSayfaBySlug(siteSlug, slug);
 

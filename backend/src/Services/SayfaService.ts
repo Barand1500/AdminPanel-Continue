@@ -1,5 +1,5 @@
 import type { Prisma } from '@prisma/client';
-import type { MenuGuncelleDto, SayfaGuncelleDto, SayfaOlusturDto } from '../Application/DTOs/SayfaDto.js';
+import type { MenuGuncelleDto, SayfaGuncelleDto, SayfaOlusturDto, SayfaTasiDto } from '../Application/DTOs/SayfaDto.js';
 import { SayfaRepository } from '../Infrastructure/repositories/SayfaRepository.js';
 import { sayisalId } from '../Infrastructure/utils/sayisalId.js';
 
@@ -122,7 +122,7 @@ export class SayfaService {
 
     if (dto.ustSayfaId !== undefined && dto.ustSayfaId != null) {
       if (dto.ustSayfaId === sayfaId) throw new Error('Sayfa kendi ust sayfasi olamaz');
-      await this.ustSayfaDogrula(siteId, dto.ustSayfaId, sayfaId);
+      await this.donguKontrol(siteId, sayfaId, dto.ustSayfaId);
     }
 
     const data: Prisma.SayfaUpdateInput = {};
@@ -203,15 +203,75 @@ export class SayfaService {
     }
   }
 
-  private async ustSayfaDogrula(siteId: number, ustSayfaId: number, sayfaId?: number) {
-    const ust = await sayfaRepo.findByIdAndSiteId(ustSayfaId, siteId);
-    if (!ust) throw new Error('Ust sayfa bulunamadi');
-    const ustKayit = ust as typeof ust & { ustSayfaId?: number | null };
-    if (ustKayit.ustSayfaId != null) throw new Error('Alt sayfa baska bir alt sayfanin altina eklenemez');
-    if (sayfaId != null) {
-      const altSayfaVar = await sayfaRepo.altSayfaVarMi(sayfaId, siteId);
-      if (altSayfaVar) throw new Error('Alt sayfalari olan bir sayfa baska sayfanin altina tasinamaz');
+  private async donguKontrol(siteId: number, sayfaId: number, hedefUstId: number) {
+    let current: number | null = hedefUstId;
+    while (current != null) {
+      if (current === sayfaId) throw new Error('Sayfa kendi alt agacina tasinamaz');
+      const kayit = await sayfaRepo.findByIdAndSiteId(current, siteId);
+      if (!kayit) break;
+      current = kayit.ustSayfaId ?? null;
     }
+  }
+
+  async tasi(siteId: number, sayfaId: number, dto: SayfaTasiDto) {
+    const mevcut = await sayfaRepo.findByIdAndSiteId(sayfaId, siteId);
+    if (!mevcut) throw new Error('Sayfa bulunamadi');
+
+    const yeniUstId = dto.ustSayfaId ?? null;
+    if (yeniUstId === sayfaId) throw new Error('Sayfa kendi ust sayfasi olamaz');
+
+    if (yeniUstId != null) {
+      await this.donguKontrol(siteId, sayfaId, yeniUstId);
+    }
+
+    let ustSlug: string | null = null;
+    if (yeniUstId != null) {
+      const ust = await sayfaRepo.findByIdAndSiteId(yeniUstId, siteId);
+      if (!ust) throw new Error('Ust sayfa bulunamadi');
+      if (ust.slug === mevcut.slug || ust.slug.startsWith(`${mevcut.slug}/`)) {
+        throw new Error('Gecersiz ust sayfa secimi');
+      }
+      ustSlug = ust.slug;
+    }
+
+    const eskiSlug = mevcut.slug;
+    const segment = slugSegmenti(mevcut.slug);
+    const yeniSlug = tamSlugOlustur(ustSlug, segment);
+
+    const cakisan = await sayfaRepo.findBySlugKayit(siteId, yeniSlug);
+    if (cakisan && cakisan.id !== sayfaId) throw new Error('Bu slug zaten kullaniliyor');
+
+    let yeniSira = dto.sira;
+    if (yeniSira === undefined && dto.hedefSayfaId != null) {
+      const hedef = await sayfaRepo.findByIdAndSiteId(dto.hedefSayfaId, siteId);
+      if (hedef) {
+        if (dto.konum === 'once') yeniSira = hedef.sira;
+        else if (dto.konum === 'sonra') yeniSira = hedef.sira + 1;
+        else yeniSira = hedef.sira;
+      }
+    }
+    if (yeniSira === undefined) {
+      const tum = await sayfaRepo.findAdminBySiteId(siteId);
+      const kardesler = tum.filter((s) => (s.ustSayfaId ?? null) === yeniUstId && s.id !== sayfaId);
+      yeniSira =
+        kardesler.length > 0 ? Math.max(...kardesler.map((s) => s.sira)) + 1 : 0;
+    }
+
+    const data: Prisma.SayfaUpdateInput = { slug: yeniSlug, sira: yeniSira };
+    if (yeniUstId == null) {
+      data.ustSayfa = { disconnect: true };
+    } else {
+      data.ustSayfa = { connect: { id: yeniUstId } };
+    }
+
+    await sayfaRepo.updateForSite(sayfaId, data);
+    if (yeniSlug !== eskiSlug) {
+      await this.altSluglariGuncelle(siteId, eskiSlug, yeniSlug);
+    }
+
+    const guncel = await sayfaRepo.findByIdAndSiteId(sayfaId, siteId);
+    if (!guncel) throw new Error('Sayfa bulunamadi');
+    return guncel;
   }
 
   async sil(siteId: number, sayfaId: number) {

@@ -19,7 +19,15 @@ const publicFormController = new PublicFormController();
 
 router.get('/health', (req, res) => controller.health(req, res));
 router.get('/site', (req, res) => controller.getPublicSite(req, res));
-router.get('/sayfalar/:slug', (req, res) => controller.getSayfa(req, res));
+router.get('/sayfalar/detay', (req, res) => controller.getSayfa(req, res));
+router.get('/sayfalar/*splat', (req, res) => {
+  const raw = req.params.splat;
+  const parcalar = Array.isArray(raw) ? raw : [String(raw)];
+  if (parcalar.length === 1 && parcalar[0] === 'detay') {
+    return controller.getSayfa(req, res);
+  }
+  return controller.getSayfa(req, res, parcalar.join('/'));
+});
 router.get('/blog', (req, res) => controller.listeleBlog(req, res));
 router.get('/blog/:slug', (req, res) => controller.getBlog(req, res));
 

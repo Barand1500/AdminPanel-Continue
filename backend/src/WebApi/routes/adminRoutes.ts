@@ -10,6 +10,7 @@ import {
   menuGuncelleSchema,
   sayfaGuncelleSchema,
   sayfaOlusturSchema,
+  sayfaTasiSchema,
 } from '../../Application/DTOs/SayfaDto.js';
 import { medyaOlusturSchema, medyaTopluSilSchema } from '../../Application/DTOs/MedyaDto.js';
 import {
@@ -108,6 +109,7 @@ router.delete('/sekmeler/:id', authMiddleware, (req, res) => sekmeController.sil
 
 router.get('/sayfalar', authMiddleware, (req, res) => sayfaController.listele(req, res));
 router.post('/sayfalar', authMiddleware, validateBySchema(sayfaOlusturSchema), (req, res) => sayfaController.olustur(req, res));
+router.put('/sayfalar/:id/tasi', authMiddleware, validateBySchema(sayfaTasiSchema), (req, res) => sayfaController.tasi(req, res));
 router.put('/sayfalar/:id', authMiddleware, validateBySchema(sayfaGuncelleSchema), (req, res) => sayfaController.guncelle(req, res));
 router.delete('/sayfalar/:id', authMiddleware, (req, res) => sayfaController.sil(req, res));
 router.put('/menu', authMiddleware, validateBySchema(menuGuncelleSchema), (req, res) => sayfaController.menuGuncelle(req, res));

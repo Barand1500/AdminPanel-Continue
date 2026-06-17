@@ -67,4 +67,17 @@ export class SayfaController {
       return res.status(400).json({ mesaj });
     }
   }
+
+  async tasi(req: Request, res: Response) {
+    try {
+      const siteId = cozulenSiteId(req);
+      if (!siteId) return res.status(400).json({ mesaj: 'Site secimi gerekli' });
+      const sayfa = await service.tasi(siteId, paramId(req.params.id), req.body);
+      return res.json({ sayfa });
+    } catch (err) {
+      const mesaj = err instanceof Error ? err.message : 'Sayfa tasinamadi';
+      const status = mesaj === 'Sayfa bulunamadi' ? 404 : 400;
+      return res.status(status).json({ mesaj });
+    }
+  }
 }

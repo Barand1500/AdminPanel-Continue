@@ -16,6 +16,7 @@ import {
   adminSayfaGuncelle,
   adminSayfaOlustur,
   adminSayfaSil,
+  adminSayfaSirala,
   adminSayfalariGetir,
   type AdminSayfa,
   type SayfaFormDegeri,
@@ -136,6 +137,28 @@ export function SayfaYonetimiSayfasi() {
     }
   }, [seciliId, yeniBaslat]);
 
+  const sayfaSirala = useCallback(
+    async (sayfaId: string, yon: 'yukari' | 'asagi') => {
+      setKaydediliyor(true);
+      setHata('');
+      setBasari('');
+      try {
+        const liste = await adminSayfaSirala(sayfaId, yon, sayfalar);
+        setSayfalar(liste);
+        if (seciliId === sayfaId) {
+          const guncel = liste.find((s) => s.id === sayfaId);
+          if (guncel) setForm(sayfadanForm(guncel));
+        }
+        setBasari('Sıralama güncellendi.');
+      } catch (err) {
+        setHata(err instanceof Error ? err.message : 'Sıralama başarısız');
+      } finally {
+        setKaydediliyor(false);
+      }
+    },
+    [seciliId, sayfalar]
+  );
+
   useModulAksiyonlari(
     {
       kaydet,
@@ -154,7 +177,7 @@ export function SayfaYonetimiSayfasi() {
     {
       kaydet: !kaydediliyor,
       ekle: true,
-      altEkle: !!seciliId && !kaydediliyor && !sayfalar.find((s) => s.id === seciliId)?.ustSayfaId,
+      altEkle: !!seciliId && !kaydediliyor,
       sil: !!seciliId && !kaydediliyor,
       yayinla: !kaydediliyor,
       onizle: true,
@@ -184,6 +207,8 @@ export function SayfaYonetimiSayfasi() {
               sayfalar={sayfalar}
               seciliId={seciliId}
               onSec={sayfaSec}
+              onSirala={sayfaSirala}
+              islemde={kaydediliyor}
             />
             <SayfaEditorPanel
               form={form}
@@ -194,6 +219,8 @@ export function SayfaYonetimiSayfasi() {
               onSlugManuelChange={setSlugManuel}
               onAltSayfaEkle={altSayfaBaslat}
               onSayfaSec={sayfaSec}
+              onSirala={sayfaSirala}
+              islemde={kaydediliyor}
             />
           </div>
         </>

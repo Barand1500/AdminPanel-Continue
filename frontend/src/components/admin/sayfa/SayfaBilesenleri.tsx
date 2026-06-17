@@ -40,6 +40,7 @@ import {
   sayfaSegmentSlug,
   sayfaTamSlugOlustur,
   ustSayfaBul,
+  ustSayfaSecenekleri,
 } from '@/utils/sayfaAgaci';
 
 type EditorSekme = 'icerik' | 'seo' | 'ayarlar' | 'alt-sayfa';
@@ -48,43 +49,106 @@ interface SayfaListesiPanelProps {
   sayfalar: AdminSayfa[];
   seciliId: string | null;
   onSec: (sayfa: AdminSayfa) => void;
+  onSirala?: (sayfaId: string, yon: 'yukari' | 'asagi') => void;
+  islemde?: boolean;
+}
+
+function SayfaSiraTuslari({
+  ilk,
+  son,
+  islemde,
+  onYukari,
+  onAsagi,
+}: {
+  ilk: boolean;
+  son: boolean;
+  islemde?: boolean;
+  onYukari: () => void;
+  onAsagi: () => void;
+}) {
+  return (
+    <div className="ap-sayfa-sira-tuslar">
+      <button
+        type="button"
+        className="ap-sayfa-sira-tus"
+        disabled={ilk || islemde}
+        onClick={onYukari}
+        aria-label="Yukarı taşı"
+        title="Yukarı"
+      >
+        ↑
+      </button>
+      <button
+        type="button"
+        className="ap-sayfa-sira-tus"
+        disabled={son || islemde}
+        onClick={onAsagi}
+        aria-label="Aşağı taşı"
+        title="Aşağı"
+      >
+        ↓
+      </button>
+    </div>
+  );
 }
 
 function SayfaListeSatiri({
   sayfa,
   seciliId,
   onSec,
-  girinti = 0,
   altSayfa = false,
+  duzenlemeModu,
+  ilk,
+  son,
+  onSirala,
+  islemde,
 }: {
   sayfa: AdminSayfa;
   seciliId: string | null;
   onSec: (sayfa: AdminSayfa) => void;
-  girinti?: number;
   altSayfa?: boolean;
+  duzenlemeModu: boolean;
+  ilk: boolean;
+  son: boolean;
+  onSirala?: (sayfaId: string, yon: 'yukari' | 'asagi') => void;
+  islemde?: boolean;
 }) {
   return (
-    <button
-      type="button"
-      onClick={() => onSec(sayfa)}
-      className={`ap-liste-oge mb-1 ${seciliId === sayfa.id ? 'ap-liste-oge-secili' : ''} ${altSayfa ? 'ap-sayfa-alt-oge' : ''}`}
-      style={girinti > 0 ? { marginLeft: `${girinti * 12}px` } : undefined}
-    >
-      <div className="flex items-center gap-1.5">
-        {altSayfa && <span className="ap-sayfa-alt-cizgi" aria-hidden />}
-        <p className="ap-liste-oge-baslik">{sayfa.baslik}</p>
-      </div>
-      <p className="ap-liste-oge-alt">/{sayfa.slug}</p>
-      <div className="ap-liste-oge-etiketler">
-        {sayfa.yayinda ? (
-          <AdminDurumEtiketi tur="yayinda">Yayında</AdminDurumEtiketi>
-        ) : (
-          <AdminDurumEtiketi tur="taslak">Taslak</AdminDurumEtiketi>
+    <div className="ap-sayfa-liste-satir min-w-0 flex-1">
+      <div className="flex items-stretch gap-1">
+        {duzenlemeModu && onSirala && (
+          <SayfaSiraTuslari
+            ilk={ilk}
+            son={son}
+            islemde={islemde}
+            onYukari={() => onSirala(sayfa.id, 'yukari')}
+            onAsagi={() => onSirala(sayfa.id, 'asagi')}
+          />
         )}
-        {sayfa.menudeGoster && <AdminDurumEtiketi tur="menu">Menüde</AdminDurumEtiketi>}
-        {altSayfa && <AdminDurumEtiketi tur="bilgi">Alt</AdminDurumEtiketi>}
+        <button
+          type="button"
+          onClick={() => onSec(sayfa)}
+          className={`ap-liste-oge mb-1 min-w-0 flex-1 text-left ${seciliId === sayfa.id ? 'ap-liste-oge-secili' : ''} ${
+            altSayfa ? 'ap-sayfa-alt-oge' : ''
+          }`}
+        >
+          <div className="flex items-center gap-1.5 min-w-0">
+            {altSayfa && <span className="ap-sayfa-alt-cizgi shrink-0" aria-hidden />}
+            <p className="ap-liste-oge-baslik truncate">{sayfa.baslik}</p>
+          </div>
+          <p className="ap-liste-oge-alt truncate">/{sayfa.slug}</p>
+          <div className="ap-liste-oge-etiketler">
+            {sayfa.yayinda ? (
+              <AdminDurumEtiketi tur="yayinda">Yayında</AdminDurumEtiketi>
+            ) : (
+              <AdminDurumEtiketi tur="taslak">Taslak</AdminDurumEtiketi>
+            )}
+            {sayfa.menudeGoster && <AdminDurumEtiketi tur="menu">Menüde</AdminDurumEtiketi>}
+            {altSayfa && <AdminDurumEtiketi tur="bilgi">Alt</AdminDurumEtiketi>}
+          </div>
+        </button>
       </div>
-    </button>
+    </div>
   );
 }
 
@@ -95,6 +159,9 @@ function SayfaAgacDallari({
   daraltildi,
   onToggle,
   girinti = 0,
+  duzenlemeModu,
+  onSirala,
+  islemde,
 }: {
   dugumler: SayfaAgacDugumu[];
   seciliId: string | null;
@@ -102,10 +169,13 @@ function SayfaAgacDallari({
   daraltildi: Record<string, boolean>;
   onToggle: (id: string) => void;
   girinti?: number;
+  duzenlemeModu: boolean;
+  onSirala?: (sayfaId: string, yon: 'yukari' | 'asagi') => void;
+  islemde?: boolean;
 }) {
   return (
     <>
-      {dugumler.map((dugum) => {
+      {dugumler.map((dugum, index) => {
         const altSayi = dugum.altSayfalar.length;
         const kapali = daraltildi[dugum.sayfa.id];
 
@@ -124,15 +194,17 @@ function SayfaAgacDallari({
               ) : (
                 <span className="ap-sayfa-agac-toggle ap-sayfa-agac-toggle-bos" />
               )}
-              <div className="min-w-0 flex-1">
-                <SayfaListeSatiri
-                  sayfa={dugum.sayfa}
-                  seciliId={seciliId}
-                  onSec={onSec}
-                  girinti={girinti}
-                  altSayfa={girinti > 0}
-                />
-              </div>
+              <SayfaListeSatiri
+                sayfa={dugum.sayfa}
+                seciliId={seciliId}
+                onSec={onSec}
+                altSayfa={girinti > 0}
+                duzenlemeModu={duzenlemeModu}
+                ilk={index === 0}
+                son={index === dugumler.length - 1}
+                onSirala={onSirala}
+                islemde={islemde}
+              />
             </div>
             {altSayi > 0 && !kapali && (
               <div className="ap-sayfa-agac-altlar">
@@ -143,6 +215,9 @@ function SayfaAgacDallari({
                   daraltildi={daraltildi}
                   onToggle={onToggle}
                   girinti={girinti + 1}
+                  duzenlemeModu={duzenlemeModu}
+                  onSirala={onSirala}
+                  islemde={islemde}
                 />
               </div>
             )}
@@ -169,15 +244,24 @@ function agacFiltrele(dugumler: SayfaAgacDugumu[], q: string): SayfaAgacDugumu[]
     .filter((d): d is SayfaAgacDugumu => d != null);
 }
 
-export function SayfaListesiPanel({ sayfalar, seciliId, onSec }: SayfaListesiPanelProps) {
+export function SayfaListesiPanel({
+  sayfalar,
+  seciliId,
+  onSec,
+  onSirala,
+  islemde,
+}: SayfaListesiPanelProps) {
   const [arama, setArama] = useState('');
   const [daraltildi, setDaraltildi] = useState<Record<string, boolean>>({});
+  const [duzenlemeModu, setDuzenlemeModu] = useState(false);
 
   const agac = useMemo(() => sayfaAgaciOlustur(sayfalar), [sayfalar]);
   const filtreliAgac = useMemo(() => {
     const q = arama.toLowerCase().trim();
     return q ? agacFiltrele(agac, q) : agac;
   }, [agac, arama]);
+
+  const siralaAktif = duzenlemeModu && Boolean(onSirala) && !arama.trim();
 
   function toggleDugum(id: string) {
     setDaraltildi((o) => ({ ...o, [id]: !o[id] }));
@@ -190,7 +274,21 @@ export function SayfaListesiPanel({ sayfalar, seciliId, onSec }: SayfaListesiPan
           <h2 className="ap-heading text-sm font-semibold">Sayfa Listesi</h2>
           <p className="ap-muted text-xs">{sayfalar.length} sayfa</p>
         </div>
+        <button
+          type="button"
+          className={`ap-sayfa-duzenleme-modu-tus ${duzenlemeModu ? 'ap-sayfa-duzenleme-modu-tus-aktif' : ''}`}
+          onClick={() => setDuzenlemeModu((v) => !v)}
+          disabled={Boolean(arama.trim())}
+          title={arama.trim() ? 'Arama varken düzenleme modu kapalı' : undefined}
+        >
+          {duzenlemeModu ? 'Bitti' : 'Sırala'}
+        </button>
       </div>
+      {duzenlemeModu && siralaAktif && (
+        <p className="ap-muted mb-2 px-1 text-[11px] leading-snug">
+          Aynı seviyedeki sayfaları ↑ ↓ ile sıralayın. Üst sayfa değiştirmek için Ayarlar sekmesini kullanın.
+        </p>
+      )}
       <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Başlık veya slug ara..." />
       <div className="ap-scroll ap-sidebar-icerik">
         {filtreliAgac.length === 0 ? (
@@ -206,6 +304,9 @@ export function SayfaListesiPanel({ sayfalar, seciliId, onSec }: SayfaListesiPan
             onSec={onSec}
             daraltildi={daraltildi}
             onToggle={toggleDugum}
+            duzenlemeModu={siralaAktif}
+            onSirala={onSirala}
+            islemde={islemde}
           />
         )}
       </div>
@@ -222,6 +323,8 @@ interface SayfaEditorPanelProps {
   onSlugManuelChange: (v: boolean) => void;
   onAltSayfaEkle?: (ustSayfa: AdminSayfa) => void;
   onSayfaSec?: (sayfa: AdminSayfa) => void;
+  onSirala?: (sayfaId: string, yon: 'yukari' | 'asagi') => void;
+  islemde?: boolean;
 }
 
 export function SayfaEditorPanel({
@@ -233,13 +336,15 @@ export function SayfaEditorPanel({
   onSlugManuelChange,
   onAltSayfaEkle,
   onSayfaSec,
+  onSirala,
+  islemde,
 }: SayfaEditorPanelProps) {
   const [sekme, setSekme] = useState<EditorSekme>('icerik');
   const ustSayfa = ustSayfaBul(sayfalar, form.ustSayfaId);
   const altSayi = seciliId ? altSayfaSayisi(sayfalar, seciliId) : 0;
   const seciliSayfa = seciliId ? sayfalar.find((s) => s.id === seciliId) : undefined;
   const altSayfalar = seciliId ? dogrudanAltSayfalar(sayfalar, seciliId) : [];
-  const altMenuAyarlariGoster = !!seciliId && !form.ustSayfaId && altSayi >= 1;
+  const altMenuAyarlariGoster = !!seciliId && altSayi >= 1;
   const segmentSlug = form.ustSayfaId
     ? sayfaSegmentSlug(form.slug || slugUret(form.baslik))
     : form.slug;
@@ -277,6 +382,17 @@ export function SayfaEditorPanel({
     onChange({
       ...form,
       slug: ustSayfa ? sayfaTamSlugOlustur(ustSayfa.slug, temiz) : temiz,
+    });
+  }
+
+  function ustSayfaDegistir(yeniUstId: string) {
+    const ust = yeniUstId ? ustSayfaBul(sayfalar, yeniUstId) : undefined;
+    const segment = sayfaSegmentSlug(form.slug || slugUret(form.baslik));
+    onSlugManuelChange(true);
+    onChange({
+      ...form,
+      ustSayfaId: yeniUstId || null,
+      slug: ust ? sayfaTamSlugOlustur(ust.slug, segment) : segment,
     });
   }
 
@@ -396,7 +512,7 @@ export function SayfaEditorPanel({
             {altMenuAyarlariGoster && (
               <AdminFormBolumu
                 baslik="Alt Menü Görünümü"
-                aciklama="Bu ana sayfanın alt kategorileri ziyaretçi sitesinde böyle açılır. Değiştirdikten sonra Kaydet'e basın."
+                aciklama="Bu sayfanın alt kategorileri ziyaretçi sitesinde böyle açılır. Değiştirdikten sonra Kaydet'e basın."
               >
                 <FormAlani etiket="Düzen">
                   <div className="ap-sayfa-alt-menu-secim-grid">
@@ -439,6 +555,25 @@ export function SayfaEditorPanel({
             )}
 
             <AdminFormBolumu baslik="Yayın ve Menü">
+            {seciliId && (
+              <FormAlani
+                etiket="Üst sayfa"
+                aciklama="Sayfanın hangi kategori altında olduğunu seçin. Değiştirdikten sonra Kaydet'e basın — URL otomatik güncellenir."
+              >
+                <select
+                  className={formSelectSinifi}
+                  value={form.ustSayfaId ?? ''}
+                  onChange={(e) => ustSayfaDegistir(e.target.value)}
+                >
+                  <option value="">— Ana menü (üst sayfa yok) —</option>
+                  {ustSayfaSecenekleri(sayfalar, seciliId).map((s) => (
+                    <option key={s.id} value={s.id}>
+                      {s.baslik} (/{s.slug})
+                    </option>
+                  ))}
+                </select>
+              </FormAlani>
+            )}
             <FormAlani etiket="Sayfa Açılış Modu" aciklama="Menüden tıklandığında sayfanın nasıl açılacağı">
               <select
                 className={formSelectSinifi}
@@ -453,11 +588,9 @@ export function SayfaEditorPanel({
               </select>
             </FormAlani>
             {ustSayfa && (
-              <div className="ap-sayfa-ust-bilgi rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface-2)] px-3 py-2">
-                <p className="ap-muted text-xs">Üst sayfa</p>
-                <p className="ap-heading text-sm font-medium">{ustSayfa.baslik}</p>
-                <p className="ap-muted text-xs">/{ustSayfa.slug}</p>
-              </div>
+              <p className="ap-muted text-xs">
+                Mevcut üst: <strong>{ustSayfa.baslik}</strong> · /{ustSayfa.slug}
+              </p>
             )}
             <div className="ap-switch-grup">
               <AdminAnahtarDugme
@@ -502,11 +635,20 @@ export function SayfaEditorPanel({
                 <p className="ap-muted text-sm">Henüz alt sayfa eklenmedi.</p>
               ) : (
                 <ul className="ap-sayfa-alt-liste space-y-2">
-                  {altSayfalar.map((alt) => (
-                    <li key={alt.id}>
+                  {altSayfalar.map((alt, index) => (
+                    <li key={alt.id} className="ap-sayfa-alt-liste-satir">
+                      {onSirala && (
+                        <SayfaSiraTuslari
+                          ilk={index === 0}
+                          son={index === altSayfalar.length - 1}
+                          islemde={islemde}
+                          onYukari={() => onSirala(alt.id, 'yukari')}
+                          onAsagi={() => onSirala(alt.id, 'asagi')}
+                        />
+                      )}
                       <button
                         type="button"
-                        className="ap-sayfa-alt-liste-oge w-full text-left"
+                        className="ap-sayfa-alt-liste-oge min-w-0 flex-1 text-left"
                         onClick={() => onSayfaSec?.(alt)}
                       >
                         <span className="ap-heading text-sm font-medium">{alt.baslik}</span>

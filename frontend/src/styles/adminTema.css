@@ -1031,17 +1031,17 @@ html:has(.admin-panel[data-tema='acik']) body {
 }
 
 .ap-sayfa-agac-altlar {
-  margin-left: 1rem;
+  margin-left: 0.75rem;
   border-left: 2px solid color-mix(in srgb, var(--ap-accent) 35%, var(--ap-border));
-  padding-left: 0.35rem;
+  padding-left: 0.5rem;
   margin-top: 0.125rem;
   margin-bottom: 0.25rem;
 }
 
 .ap-sayfa-alt-oge {
-  border-left: 2px solid color-mix(in srgb, var(--ap-accent) 25%, transparent);
-  margin-left: 0.25rem !important;
-  padding-left: 0.35rem;
+  margin-left: 0 !important;
+  padding-left: 0.5rem;
+  border-left: none;
   background: color-mix(in srgb, var(--ap-accent) 4%, var(--ap-surface));
 }
 
@@ -1061,6 +1061,74 @@ html:has(.admin-panel[data-tema='acik']) body {
 .ap-sayfa-agac-etiket {
   margin-top: -0.25rem;
   padding-left: 1.5rem;
+}
+
+.ap-sayfa-duzenleme-modu-tus {
+  flex-shrink: 0;
+  border: 1px solid var(--ap-border);
+  border-radius: 0.5rem;
+  background: var(--ap-surface-2);
+  padding: 0.25rem 0.6rem;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--ap-text-muted);
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+}
+
+.ap-sayfa-duzenleme-modu-tus:hover:not(:disabled) {
+  border-color: var(--ap-accent, #3b82f6);
+  color: var(--ap-heading);
+}
+
+.ap-sayfa-duzenleme-modu-tus-aktif {
+  border-color: var(--ap-accent, #3b82f6);
+  background: color-mix(in srgb, var(--ap-accent, #3b82f6) 12%, var(--ap-surface));
+  color: var(--ap-accent, #3b82f6);
+}
+
+.ap-sayfa-duzenleme-modu-tus:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ap-sayfa-sira-tuslar {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2px;
+  flex-shrink: 0;
+  padding: 0.15rem 0;
+}
+
+.ap-sayfa-sira-tus {
+  display: flex;
+  width: 1.35rem;
+  height: 1.15rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ap-border);
+  border-radius: 0.35rem;
+  background: var(--ap-surface-2);
+  font-size: 0.65rem;
+  line-height: 1;
+  color: var(--ap-text-muted);
+}
+
+.ap-sayfa-sira-tus:hover:not(:disabled) {
+  border-color: var(--ap-accent, #3b82f6);
+  color: var(--ap-accent, #3b82f6);
+  background: color-mix(in srgb, var(--ap-accent, #3b82f6) 8%, var(--ap-surface));
+}
+
+.ap-sayfa-sira-tus:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ap-sayfa-alt-liste-satir {
+  display: flex;
+  align-items: stretch;
+  gap: 0.35rem;
 }
 
 .ap-sayfa-menu-onizleme {

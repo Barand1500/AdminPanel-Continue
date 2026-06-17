@@ -64,6 +64,57 @@ export async function adminSayfaSil(id: string): Promise<void> {
   await adminJsonFetch(`/sayfalar/${id}`, { method: 'DELETE', headers: adminHeaders() });
 }
 
+function sayfaFormuOlustur(s: AdminSayfa): SayfaFormDegeri {
+  return {
+    baslik: s.baslik,
+    slug: s.slug,
+    icerik: s.icerik,
+    kapakGorsel: s.kapakGorsel ?? '',
+    seoTitle: s.seoTitle ?? '',
+    seoDesc: s.seoDesc ?? '',
+    yayinda: s.yayinda,
+    menudeGoster: s.menudeGoster,
+    sira: s.sira,
+    acilisModu: s.acilisModu ?? 'normal',
+    ustSayfaId: s.ustSayfaId ?? null,
+    altMenuGorunum: s.altMenuGorunum ?? 'dikey',
+    altMenuTetikleyici: s.altMenuTetikleyici ?? 'hover',
+  };
+}
+
+export async function adminSayfaSirala(
+  id: string,
+  yon: 'yukari' | 'asagi',
+  sayfalar: AdminSayfa[]
+): Promise<AdminSayfa[]> {
+  const duzeltildi = sayfaHiyerarsisiTamamla(sayfalar);
+  const mevcut = duzeltildi.find((s) => s.id === id);
+  if (!mevcut) throw new Error('Sayfa bulunamadi');
+
+  const kardesler = duzeltildi
+    .filter((s) => (s.ustSayfaId ?? null) === (mevcut.ustSayfaId ?? null))
+    .sort((a, b) => a.sira - b.sira || a.baslik.localeCompare(b.baslik, 'tr'));
+
+  const idx = kardesler.findIndex((s) => s.id === id);
+  const hedefIdx = yon === 'yukari' ? idx - 1 : idx + 1;
+  if (idx < 0 || hedefIdx < 0 || hedefIdx >= kardesler.length) {
+    return duzeltildi.map(normalizeSayfa);
+  }
+
+  const yeni = [...kardesler];
+  [yeni[idx], yeni[hedefIdx]] = [yeni[hedefIdx], yeni[idx]];
+
+  for (let i = 0; i < yeni.length; i++) {
+    if (yeni[i].sira === i) continue;
+    const form = sayfaFormuOlustur(yeni[i]);
+    form.sira = i;
+    await adminSayfaGuncelle(yeni[i].id, form);
+    yeni[i] = { ...yeni[i], sira: i };
+  }
+
+  return adminSayfalariGetir();
+}
+
 export async function adminMenuGuncelle(ogeler: { id: string; sira: number; menudeGoster: boolean }[]): Promise<AdminSayfa[]> {
   const veri = await adminJsonFetch<{ sayfalar: AdminSayfa[] }>('/menu', {
     method: 'PUT',

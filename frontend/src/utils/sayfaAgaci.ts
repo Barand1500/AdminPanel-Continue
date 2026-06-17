@@ -169,3 +169,16 @@ export function ustSayfaBul(
   if (!ustSayfaId) return undefined;
   return sayfalar.find((s) => idString(s.id) === idString(ustSayfaId));
 }
+
+/** hedefId, kaynakId'nin torunu mu? */
+export function sayfaTorunMu(sayfalar: AdminSayfa[], kaynakId: string, hedefId: string): boolean {
+  if (kaynakId === hedefId) return true;
+  const duzeltildi = sayfaHiyerarsisiTamamla(sayfalar);
+  let current = duzeltildi.find((s) => idString(s.id) === idString(hedefId));
+  while (current?.ustSayfaId) {
+    const ustId = idString(current.ustSayfaId);
+    if (ustId === idString(kaynakId)) return true;
+    current = duzeltildi.find((s) => idString(s.id) === ustId);
+  }
+  return false;
+}

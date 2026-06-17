@@ -22,6 +22,13 @@ export const sayfaOlusturSchema = z.object({
 
 export const sayfaGuncelleSchema = sayfaOlusturSchema.partial();
 
+export const sayfaTasiSchema = z.object({
+  ustSayfaId: z.number().int().positive().nullable(),
+  hedefSayfaId: z.number().int().positive().optional(),
+  konum: z.enum(['once', 'sonra', 'ic']).optional(),
+  sira: z.number().int().optional(),
+});
+
 export const menuGuncelleSchema = z.object({
   ogeler: z.array(
     z.object({
@@ -34,4 +41,5 @@ export const menuGuncelleSchema = z.object({
 
 export type SayfaOlusturDto = z.infer<typeof sayfaOlusturSchema>;
 export type SayfaGuncelleDto = z.infer<typeof sayfaGuncelleSchema>;
+export type SayfaTasiDto = z.infer<typeof sayfaTasiSchema>;
 export type MenuGuncelleDto = z.infer<typeof menuGuncelleSchema>;
