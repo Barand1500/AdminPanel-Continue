@@ -24,8 +24,8 @@ export function Sistem404Sekme({
   return (
     <div className="space-y-6">
       <AdminPanelKarti baslik="404 İçeriği" altBaslik="Sayfa bulunamadığında gösterilecek metinler">
-        <div className="grid gap-5 lg:grid-cols-2">
-          <div className="space-y-4">
+        <div className="space-y-5">
+          <div className="grid gap-5 lg:grid-cols-2">
             <FormAlani etiket="Başlık">
               <input
                 className={formInputSinifi}
@@ -33,22 +33,6 @@ export function Sistem404Sekme({
                 onChange={(e) => guncelle({ baslik: e.target.value })}
               />
             </FormAlani>
-            <FormAlani etiket="Açıklama Mesajı">
-              <textarea
-                className={formInputSinifi}
-                rows={3}
-                value={s404.mesaj}
-                onChange={(e) => guncelle({ mesaj: e.target.value })}
-              />
-            </FormAlani>
-            <DurumAnahtari
-              etiket="Ana Sayfa Butonu"
-              aciklama="404 sayfasında ana sayfaya dön butonu göster"
-              acik={s404.anaSayfaButonu}
-              onChange={(v) => guncelle({ anaSayfaButonu: v })}
-              renk="mavi"
-              ikon="🏠"
-            />
             <FormAlani etiket="Önerilen Sayfa" aciklama="Ziyaretçiye yönlendirilebilecek alternatif sayfa">
               <select
                 className={formSelectSinifi}
@@ -66,13 +50,32 @@ export function Sistem404Sekme({
               </select>
             </FormAlani>
           </div>
-          <GorselAlan
-            etiket="404 Görseli"
-            aciklama="İsteğe bağlı illüstrasyon veya ikon"
-            deger={s404.gorselUrl}
-            onChange={(url) => guncelle({ gorselUrl: url })}
-            onizlemeSinifi="h-28 w-full rounded-xl object-contain bg-[var(--ap-input-bg)] border border-[var(--ap-border)] p-3"
+          <FormAlani etiket="Açıklama Mesajı">
+            <textarea
+              className={formInputSinifi}
+              rows={3}
+              value={s404.mesaj}
+              onChange={(e) => guncelle({ mesaj: e.target.value })}
+            />
+          </FormAlani>
+          <DurumAnahtari
+            etiket="Ana Sayfa Butonu"
+            aciklama="404 sayfasında ana sayfaya dön butonu göster"
+            acik={s404.anaSayfaButonu}
+            onChange={(v) => guncelle({ anaSayfaButonu: v })}
+            renk="mavi"
+            ikon="🏠"
           />
+          <div className="ap-sistem-404-gorsel-alan">
+            <GorselAlan
+              etiket="404 Görseli"
+              aciklama="İsteğe bağlı illüstrasyon veya ikon"
+              deger={s404.gorselUrl}
+              onChange={(url) => guncelle({ gorselUrl: url })}
+              duzen="dikey"
+              onizlemeSinifi="h-28 w-28 rounded-xl object-contain bg-[var(--ap-input-bg)] border border-[var(--ap-border)] p-2"
+            />
+          </div>
         </div>
       </AdminPanelKarti>
 
@@ -166,11 +169,15 @@ export function SistemBilgiPaneli({
   surum,
   siteAdi,
   form,
+  onBakimToggle,
+  bakimIslemYukleniyor,
 }: {
   siteSlug: string;
   surum: string;
   siteAdi: string;
   form: SistemAyarlariForm;
+  onBakimToggle?: () => void;
+  bakimIslemYukleniyor?: boolean;
 }) {
   return (
     <div className="ap-sistem-bilgi-grid">
@@ -198,12 +205,31 @@ export function SistemBilgiPaneli({
           {form.siteAktif ? '● Yayında' : '○ Kapalı'}
         </strong>
       </div>
-      <div className="ap-sistem-bilgi-kutu">
+      <button
+        type="button"
+        onClick={onBakimToggle}
+        disabled={!onBakimToggle || bakimIslemYukleniyor}
+        className={`ap-sistem-bilgi-kutu ap-sistem-bakim-kutu text-left ${
+          form.bakimModu ? 'ap-sistem-bakim-kutu-aktif' : ''
+        } ${onBakimToggle ? 'ap-sistem-bakim-kutu-tiklanabilir' : ''}`}
+        title={
+          onBakimToggle
+            ? form.bakimModu
+              ? 'Bakım modunu kapat'
+              : 'Bakım modunu aç'
+            : undefined
+        }
+      >
         <span className="ap-muted text-[10px] uppercase">Bakım</span>
         <strong className={`mt-1 block text-sm ${form.bakimModu ? 'text-orange-400' : 'text-slate-400'}`}>
-          {form.bakimModu ? '● Aktif' : '○ Kapalı'}
+          {bakimIslemYukleniyor ? '…' : form.bakimModu ? '● Aktif' : '○ Kapalı'}
         </strong>
-      </div>
+        {onBakimToggle && (
+          <span className="ap-muted mt-1 block text-[10px]">
+            {form.bakimModu ? 'Kapatmak için tıklayın' : 'Açmak için tıklayın'}
+          </span>
+        )}
+      </button>
     </div>
   );
 }

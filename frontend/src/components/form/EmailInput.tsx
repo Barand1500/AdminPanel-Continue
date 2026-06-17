@@ -11,7 +11,7 @@ interface EmailInputProps {
 
 export function EmailInput({
   etiket = 'E-posta',
-  aciklama = 'Yazarken gmail, hotmail gibi oneriler cikar',
+  aciklama = 'gmail.com · hotmail.com · outlook.com',
   deger,
   onChange,
 }: EmailInputProps) {

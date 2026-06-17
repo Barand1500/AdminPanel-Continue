@@ -44,7 +44,7 @@ export interface SistemAyarlariForm {
   robotsEngelle: boolean;
 }
 
-export type SistemSekmeId = 'genel' | 'bakim' | 'sayfa404' | 'dil' | 'guvenlik' | 'sistem';
+export type SistemSekmeId = 'genel' | 'bakim' | 'sayfa404' | 'dil' | 'guvenlik';
 
 export const SISTEM_SEKMELER: { id: SistemSekmeId; ad: string; ikon: string }[] = [
   { id: 'genel', ad: 'Genel', ikon: '⚡' },
@@ -52,7 +52,6 @@ export const SISTEM_SEKMELER: { id: SistemSekmeId; ad: string; ikon: string }[] 
   { id: 'sayfa404', ad: '404 Sayfası', ikon: '🚫' },
   { id: 'dil', ad: 'Panel Dili', ikon: '🌐' },
   { id: 'guvenlik', ad: 'Güvenlik', ikon: '🛡️' },
-  { id: 'sistem', ad: 'Sistem', ikon: '💻' },
 ];
 
 export const PANEL_DILLERI: { kod: string; ad: string }[] = [

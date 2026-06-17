@@ -9,6 +9,7 @@ interface GorselAlanProps {
   onChange: (url: string) => void;
   kabul?: string;
   onizlemeSinifi?: string;
+  duzen?: 'yatay' | 'dikey';
 }
 
 function YukleIkon({ sinif }: { sinif?: string }) {
@@ -27,6 +28,7 @@ export function GorselAlan({
   onChange,
   kabul = 'image/*,.svg',
   onizlemeSinifi = 'h-16 w-16 rounded-lg object-contain bg-[var(--ap-input-bg)] border border-[var(--ap-border)]',
+  duzen = 'yatay',
 }: GorselAlanProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [yukleniyor, setYukleniyor] = useState(false);
@@ -58,7 +60,7 @@ export function GorselAlan({
 
   return (
     <FormAlani etiket={etiket} aciklama={aciklama}>
-      <div className="ap-gorsel-alan">
+      <div className={`ap-gorsel-alan ${duzen === 'dikey' ? 'ap-gorsel-alan-dikey' : ''}`}>
         <div className="ap-gorsel-onizleme">
           {onizlemeUrl ? (
             <img src={onizlemeUrl} alt="" className={onizlemeSinifi} />

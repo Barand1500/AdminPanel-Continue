@@ -99,13 +99,15 @@ export function WidgetListesiPanel({ widgetlar, seciliId, tipFiltre, onSec }: Wi
   }, [widgetlar, arama, tipFiltre]);
 
   return (
-    <aside className="ap-sidebar-panel">
+    <aside className="ap-sidebar-panel ap-widget-sidebar">
       <div className="ap-sidebar-baslik">
         <h2 className="ap-heading text-sm font-semibold">Widgetlar</h2>
         <p className="ap-muted text-xs">{widgetlar.length} kayıt</p>
+        <div className="ap-sidebar-arama mt-3">
+          <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Widget ara..." />
+        </div>
       </div>
-      <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Widget ara..." />
-      <div className="ap-scroll ap-sidebar-icerik">
+      <div className="ap-scroll ap-sidebar-icerik ap-widget-sidebar-icerik">
         {gruplu.length === 0 ? (
           <AdminBosDurum ikon="🧩" baslik="Widget yok" aciklama="Alt bardan Yeni Ekle ile widget oluşturun" />
         ) : (
@@ -196,34 +198,36 @@ export function WidgetEditorPanel({
   );
 
   return (
-    <div className="ap-editor-panel">
-      <div className="ap-editor-baslik">
-        <div className="flex items-center gap-3">
-          <span className="text-2xl">{tipIkon(form.tip)}</span>
-          <div>
-            <h2 className="ap-heading text-base font-semibold">
-              {yeniMod ? 'Yeni Widget' : form.ad || 'Widget Düzenle'}
-            </h2>
-            <p className="ap-muted text-xs">{seciliTipMeta?.aciklama ?? tipEtiketi(form.tip)}</p>
+    <div className="ap-editor-panel ap-widget-editor">
+      <div className="ap-editor-ust">
+        <div className="ap-editor-baslik">
+          <div className="flex items-center gap-3">
+            <span className="text-2xl">{tipIkon(form.tip)}</span>
+            <div>
+              <h2 className="ap-heading text-base font-semibold">
+                {yeniMod ? 'Yeni Widget' : form.ad || 'Widget Düzenle'}
+              </h2>
+              <p className="ap-muted text-xs">{seciliTipMeta?.aciklama ?? tipEtiketi(form.tip)}</p>
+            </div>
           </div>
+          {form.aktif ? (
+            <AdminDurumEtiketi tur="aktif">Aktif</AdminDurumEtiketi>
+          ) : (
+            <AdminDurumEtiketi tur="pasif">Pasif</AdminDurumEtiketi>
+          )}
         </div>
-        {form.aktif ? (
-          <AdminDurumEtiketi tur="aktif">Aktif</AdminDurumEtiketi>
-        ) : (
-          <AdminDurumEtiketi tur="pasif">Pasif</AdminDurumEtiketi>
-        )}
-      </div>
 
-      <AdminSekmeler
-        aktif={sekme}
-        onDegistir={setSekme}
-        sekmeler={[
-          { id: 'genel', etiket: 'Genel', ikon: '⚙️' },
-          { id: 'icerik', etiket: 'İçerik', ikon: '📝' },
-          { id: 'gorunum', etiket: 'Görünüm', ikon: '🎨' },
-          { id: 'gelismis', etiket: 'Ek Ayarlar', ikon: '🔧' },
-        ]}
-      />
+        <AdminSekmeler
+          aktif={sekme}
+          onDegistir={setSekme}
+          sekmeler={[
+            { id: 'genel', etiket: 'Genel', ikon: '⚙️' },
+            { id: 'icerik', etiket: 'İçerik', ikon: '📝' },
+            { id: 'gorunum', etiket: 'Görünüm', ikon: '🎨' },
+            { id: 'gelismis', etiket: 'Ek Ayarlar', ikon: '🔧' },
+          ]}
+        />
+      </div>
 
       <div className="ap-editor-icerik">
         {sekme === 'genel' && (

@@ -58,6 +58,34 @@ export function SistemAyarlariSayfasi() {
     }
   }, [form, dilAyarla, cevirileriAyarla]);
 
+  const bakimModuToggle = useCallback(async () => {
+    const yeniBakim = !form.bakimModu;
+    const guncel = { ...form, bakimModu: yeniBakim };
+    setForm(guncel);
+    if (yeniBakim) setSekme('bakim');
+
+    setKaydediliyor(true);
+    setHata('');
+    setBasari('');
+    try {
+      const veri = await sistemAyarlariGuncelle(guncel);
+      setBasari(yeniBakim ? 'Bakım modu açıldı.' : 'Bakım modu kapatıldı.');
+      setSiteAdi(veri.site.ad);
+      setSiteSlug(veri.site.slug);
+      setSurum(veri.surum);
+      const yeniForm = sistemdenForm(veri.site, veri.sistem);
+      setForm(yeniForm);
+      dilAyarla(yeniForm.panelDili);
+      cevirileriAyarla(yeniForm.panelCeviriler);
+      siteVerisiGuncellendiYayinla();
+    } catch (err) {
+      setForm(form);
+      setHata(err instanceof Error ? err.message : 'Bakım modu güncellenemedi');
+    } finally {
+      setKaydediliyor(false);
+    }
+  }, [form, dilAyarla, cevirileriAyarla]);
+
   useEffect(() => {
     void (async () => {
       try {
@@ -93,7 +121,14 @@ export function SistemAyarlariSayfasi() {
           <aside className="ap-sistem-sol">
             <SistemSekmeCubugu aktif={sekme} onDegistir={setSekme} />
             <div className="mt-4">
-              <SistemBilgiPaneli siteSlug={siteSlug} surum={surum} siteAdi={siteAdi} form={form} />
+              <SistemBilgiPaneli
+                siteSlug={siteSlug}
+                surum={surum}
+                siteAdi={siteAdi}
+                form={form}
+                onBakimToggle={bakimModuToggle}
+                bakimIslemYukleniyor={kaydediliyor}
+              />
             </div>
           </aside>
 
@@ -107,11 +142,7 @@ export function SistemAyarlariSayfasi() {
               {sekme === 'sayfa404' && <Sistem404Sekme form={form} sayfalar={sayfalar} onChange={setForm} />}
               {sekme === 'dil' && <PanelDilSekme form={form} onChange={setForm} />}
               {sekme === 'guvenlik' && <SistemGuvenlikSekme form={form} onChange={setForm} />}
-              {sekme === 'sistem' && (
-                <SistemBilgiPaneli siteSlug={siteSlug} surum={surum} siteAdi={siteAdi} form={form} />
-              )}
-            </AdminPanelKarti>
-          </div>
+            </AdminPanelKarti>          </div>
         </div>
       </div>
     </AdminModulKabuk>
@@ -124,7 +155,6 @@ const SEKME_BASLIK: Record<SistemSekmeId, string> = {
   sayfa404: '404 Sayfası',
   dil: 'Panel Dili & Çeviriler',
   guvenlik: 'Güvenlik & Yedekleme',
-  sistem: 'Sistem Bilgisi',
 };
 
 const SEKME_ALT: Record<SistemSekmeId, string> = {
@@ -133,5 +163,4 @@ const SEKME_ALT: Record<SistemSekmeId, string> = {
   sayfa404: 'Menü ve içerik yapılandırması',
   dil: 'JSON çeviri editörü',
   guvenlik: 'Güvenlik başlıkları ve otomatik yedek',
-  sistem: 'Teknik özet',
 };

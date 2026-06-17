@@ -1,4 +1,5 @@
 import { useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import { useSiteYonetimiAksiyonlari } from '@/hooks/useSiteYonetimiAksiyonlari';
 import { GorselAlan } from '@/components/form/GorselAlan';
@@ -22,6 +23,7 @@ import {
   GUNDUZ_SABLONLARI,
   temaAyarlariBirlestir,
   type GeceSablonId,
+  type GunduzSablonId,
   type TemaAyarlari,
 } from '@/types/temaAyarlari';
 
@@ -49,7 +51,7 @@ export function SiteAyarlariSayfasi() {
   );
 
   const gunduzSablonSec = useCallback(
-    (id: 'mor' | 'mavi' | 'yesil') => {
+    (id: Exclude<GunduzSablonId, 'ozel'>) => {
       const sablon = GUNDUZ_SABLONLARI.find((s) => s.id === id);
       if (!sablon) return;
       alanGuncelle('anaRenk', sablon.anaRenk);
@@ -96,8 +98,14 @@ export function SiteAyarlariSayfasi() {
       <div className="mt-4 rounded-lg border border-dashed border-[var(--ap-border)] bg-[var(--ap-input-bg)] p-4">
         <p className="ap-muted text-xs leading-relaxed">
           Header&apos;daki marka metni ve logo için{' '}
-          <strong className="text-[var(--ap-accent)]">Header Yönetimi</strong> modülünü kullanın.
-          Footer logo boyutu Footer Yönetimi&apos;ndedir.
+          <Link to="/gt-admin/header" className="font-semibold text-[var(--ap-accent)] hover:underline">
+            Header Yönetimi
+          </Link>{' '}
+          modülünü kullanın. Footer logo boyutu{' '}
+          <Link to="/gt-admin/footer" className="font-semibold text-[var(--ap-accent)] hover:underline">
+            Footer Yönetimi
+          </Link>
+          &apos;ndedir.
         </p>
       </div>
 

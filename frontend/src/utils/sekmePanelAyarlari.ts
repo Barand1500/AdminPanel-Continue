@@ -4,6 +4,8 @@ export type VarsayilanAcilis = 'tek-sekme' | 'yeni-sekme';
 export type GrupDavranisi = 'ustuste' | 'yan-yana';
 export type SekmeGorunumModu = 'isim' | 'ikon' | 'ikon-isim';
 
+export type SekmeAramaGorunum = 'ikon' | 'input';
+
 export interface SekmePanelAyarlari {
   sekmeYukseklik: SekmeYukseklik;
   hoverOnizleme: boolean;
@@ -13,6 +15,8 @@ export interface SekmePanelAyarlari {
   surukleAyirPencere: boolean;
   grupDavranisi: GrupDavranisi;
   sekmeGorunumModu: SekmeGorunumModu;
+  sekmeAramaAktif: boolean;
+  sekmeAramaGorunum: SekmeAramaGorunum;
 }
 
 export const VARSAYILAN_SEKME_AYARLARI: SekmePanelAyarlari = {
@@ -24,6 +28,8 @@ export const VARSAYILAN_SEKME_AYARLARI: SekmePanelAyarlari = {
   surukleAyirPencere: true,
   grupDavranisi: 'yan-yana',
   sekmeGorunumModu: 'ikon-isim',
+  sekmeAramaAktif: false,
+  sekmeAramaGorunum: 'ikon',
 };
 
 const STORAGE_KEY = 'ap-sekme-panel-ayarlari';

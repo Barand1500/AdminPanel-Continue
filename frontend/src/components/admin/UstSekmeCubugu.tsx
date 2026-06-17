@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState, type DragEvent, type MouseEvent } from 'react';
-import type { AdminSekme } from '@/types/admin';
+import type { AdminModul, AdminSekme } from '@/types/admin';
 import { modulBul } from '@/data/adminMenuYapisi';
 import {
   sekmeAyarlariOku,
   type SekmePanelAyarlari,
 } from '@/utils/sekmePanelAyarlari';
+import { SekmeCubuguArama } from './SekmeCubuguArama';
 
 interface UstSekmeCubuguProps {
   sekmeler: AdminSekme[];
@@ -15,6 +16,7 @@ interface UstSekmeCubuguProps {
   onSekmeBirlestir: (kaynakId: string, hedefId: string) => void;
   sekmeAyarlari?: SekmePanelAyarlari;
   onSekmeAyir?: (sekmeId: string) => void;
+  onModulSec?: (modul: AdminModul) => void;
 }
 
 type GrupOgesi =
@@ -152,6 +154,7 @@ export function UstSekmeCubugu({
   onSekmeBirlestir,
   sekmeAyarlari: disAyarlari,
   onSekmeAyir,
+  onModulSec,
 }: UstSekmeCubuguProps) {
   const [ayarlar, setAyarlar] = useState<SekmePanelAyarlari>(() => disAyarlari ?? sekmeAyarlariOku());
   const [surukleniyor, setSurukleniyor] = useState<string | null>(null);
@@ -352,6 +355,10 @@ export function UstSekmeCubugu({
           );
         })}
       </div>
+
+      {ayarlar.sekmeAramaAktif && onModulSec && (
+        <SekmeCubuguArama gorunum={ayarlar.sekmeAramaGorunum} onModulSec={onModulSec} />
+      )}
 
       {sagOk && (
         <button type="button" className="ap-sekme-scroll-btn ap-sekme-scroll-sag" onClick={() => kaydir('sag')} aria-label="Sağa">

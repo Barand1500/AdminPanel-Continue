@@ -9,7 +9,7 @@ interface GunduzSablonSeciciProps {
 export function GunduzSablonSecici({ secili, onSec }: GunduzSablonSeciciProps) {
   return (
     <div>
-      <p className="ap-muted mb-2 text-xs font-medium">Gündüz şablonları</p>
+      <p className="ap-muted mb-2 text-xs font-medium">Gündüz modu şablonu</p>
       <div className="flex flex-wrap gap-2">
         {GUNDUZ_SABLONLARI.map((sablon) => {
           const aktif = secili === sablon.id;
@@ -48,7 +48,7 @@ interface GeceSablonSeciciProps {
 export function GeceSablonSecici({ secili, onSec }: GeceSablonSeciciProps) {
   return (
     <div>
-      <p className="ap-muted mb-2 text-xs font-medium">Gece modu şablonları</p>
+      <p className="ap-muted mb-2 text-xs font-medium">Gece modu şablonu</p>
       <div className="flex flex-wrap gap-2">
         {GECE_SABLONLARI.map((sablon) => {
           const aktif = secili === sablon.id;

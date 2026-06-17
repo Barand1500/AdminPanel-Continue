@@ -154,6 +154,40 @@ export function SekmeYonetimiSayfasi() {
               onDegistir={(surukleAyirPencere) => setAyarlar((a) => ({ ...a, surukleAyirPencere }))}
             />
 
+            <ToggleSatir
+              etiket="Sekmelerde arama"
+              aciklama="Üst sekme çubuğunda modül arama alanı gösterilir"
+              acik={ayarlar.sekmeAramaAktif}
+              onDegistir={(sekmeAramaAktif) => setAyarlar((a) => ({ ...a, sekmeAramaAktif }))}
+            />
+
+            {ayarlar.sekmeAramaAktif && (
+              <div>
+                <p className="ap-heading mb-2 text-sm font-medium">Arama görünümü</p>
+                <div className="flex flex-wrap gap-2">
+                  {(
+                    [
+                      { id: 'ikon', ad: 'Sadece ikon (Windows tarzı)' },
+                      { id: 'input', ad: 'Arama kutusu' },
+                    ] as const
+                  ).map((m) => (
+                    <button
+                      key={m.id}
+                      type="button"
+                      onClick={() => setAyarlar((a) => ({ ...a, sekmeAramaGorunum: m.id }))}
+                      className={`rounded-lg border px-3 py-1.5 text-sm ${
+                        ayarlar.sekmeAramaGorunum === m.id
+                          ? 'border-blue-500 bg-blue-600/20 text-blue-400'
+                          : 'border-[var(--ap-border)] hover:bg-[var(--ap-hover)]'
+                      }`}
+                    >
+                      {m.ad}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div>
               <p className="ap-heading mb-2 text-sm font-medium">Grup davranışı</p>
               <select
@@ -216,13 +250,21 @@ export function SekmeYonetimiSayfasi() {
               onSekmeTasi={() => {}}
               onSekmeBirlestir={() => {}}
               sekmeAyarlari={ayarlar}
+              onModulSec={() => {}}
             />
           </div>
           <p className="ap-muted mt-3 text-xs">
             Boyut: <strong>{ayarlar.sekmeYukseklik}</strong> · Görünüm:{' '}
             <strong>{ayarlar.sekmeGorunumModu}</strong> · Önizleme:{' '}
             <strong>{ayarlar.hoverOnizleme ? 'Açık' : 'Kapalı'}</strong> · Grup:{' '}
-            <strong>{ayarlar.grupDavranisi}</strong>
+            <strong>{ayarlar.grupDavranisi}</strong> · Arama:{' '}
+            <strong>
+              {ayarlar.sekmeAramaAktif
+                ? ayarlar.sekmeAramaGorunum === 'ikon'
+                  ? 'İkon'
+                  : 'Kutu'
+                : 'Kapalı'}
+            </strong>
           </p>
         </AdminPanelKarti>
       </div>

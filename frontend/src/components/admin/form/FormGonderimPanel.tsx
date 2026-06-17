@@ -1,5 +1,5 @@
 import type { FormGonderim } from '@/features/admin/formApi';
-import { AdminPanelKarti } from '@/components/admin/ortak/AdminBilesenleri';
+import { AdminBosDurum } from '@/components/admin/ortak/AdminFormBilesenleri';
 
 interface FormGonderimPanelProps {
   gonderimler: FormGonderim[];
@@ -12,47 +12,74 @@ export function FormGonderimPanel({ gonderimler, seciliId, onOkundu, onSil }: Fo
   const okunmamis = gonderimler.filter((g) => !g.okundu).length;
 
   return (
-    <AdminPanelKarti
-      baslik={`Gönderimler${okunmamis > 0 ? ` (${okunmamis} yeni)` : ''}`}
-      altBaslik={seciliId ? 'Seçili forma ait' : 'Form seçin'}
-    >
-      {!seciliId ? (
-        <p className="ap-muted py-8 text-center text-sm">Gönderimleri görmek için soldan bir form seçin.</p>
-      ) : gonderimler.length === 0 ? (
-        <p className="ap-muted py-8 text-center text-sm">Henüz gönderim yok.</p>
-      ) : (
-        <div className="max-h-[560px] space-y-2 overflow-y-auto">
-          {gonderimler.map((g) => (
-            <div
-              key={g.id}
-              className={`ap-form-gonderim-kart ${!g.okundu ? 'ap-form-gonderim-yeni' : ''}`}
-            >
-              <div className="flex items-center justify-between gap-2">
-                <span className="ap-muted text-xs">{new Date(g.olusturma).toLocaleString('tr-TR')}</span>
-                {!g.okundu && <span className="ap-form-yeni-rozet">YENİ</span>}
-              </div>
-              <dl className="mt-2 space-y-1.5">
-                {Object.entries(g.veriJson).map(([anahtar, deger]) => (
-                  <div key={anahtar} className="text-sm">
-                    <dt className="font-medium text-[var(--ap-muted)]">{anahtar}</dt>
-                    <dd className="mt-0.5 break-words text-[var(--ap-text)]">{String(deger)}</dd>
-                  </div>
-                ))}
-              </dl>
-              <div className="mt-3 flex gap-2 border-t border-[var(--ap-border)] pt-2">
-                {!g.okundu && (
-                  <button type="button" onClick={() => onOkundu(g.id)} className="ap-link-btn text-xs">
-                    Okundu işaretle
-                  </button>
-                )}
-                <button type="button" onClick={() => onSil(g.id)} className="text-xs text-red-400 hover:text-red-300">
-                  Sil
-                </button>
-              </div>
-            </div>
-          ))}
+    <div className="ap-form-gonderim-panel">
+      <div className="ap-form-gonderim-baslik">
+        <div>
+          <h3 className="ap-heading text-sm font-semibold">Gönderimler</h3>
+          <p className="ap-muted text-xs">
+            {seciliId
+              ? okunmamis > 0
+                ? `${okunmamis} yeni gönderim`
+                : `${gonderimler.length} kayıt`
+              : 'Form seçin'}
+          </p>
         </div>
-      )}
-    </AdminPanelKarti>
+        {okunmamis > 0 && <span className="ap-form-yeni-rozet">{okunmamis} YENİ</span>}
+      </div>
+
+      <div className="ap-form-gonderim-icerik ap-scroll">
+        {!seciliId ? (
+          <AdminBosDurum
+            ikon="📬"
+            baslik="Form seçilmedi"
+            aciklama="Gönderimleri görmek için soldan bir form seçin."
+          />
+        ) : gonderimler.length === 0 ? (
+          <AdminBosDurum
+            ikon="📭"
+            baslik="Henüz gönderim yok"
+            aciklama="Bu forma henüz ziyaretçi başvurusu gelmedi."
+          />
+        ) : (
+          <div className="space-y-2.5">
+            {gonderimler.map((g) => (
+              <article
+                key={g.id}
+                className={`ap-form-gonderim-kart ${!g.okundu ? 'ap-form-gonderim-yeni' : ''}`}
+              >
+                <div className="flex items-center justify-between gap-2">
+                  <time className="ap-muted text-xs" dateTime={g.olusturma}>
+                    {new Date(g.olusturma).toLocaleString('tr-TR')}
+                  </time>
+                  {!g.okundu && <span className="ap-form-yeni-rozet">YENİ</span>}
+                </div>
+                <dl className="ap-form-gonderim-veri mt-3">
+                  {Object.entries(g.veriJson).map(([anahtar, deger]) => (
+                    <div key={anahtar} className="ap-form-gonderim-satir">
+                      <dt>{anahtar}</dt>
+                      <dd>{String(deger)}</dd>
+                    </div>
+                  ))}
+                </dl>
+                <div className="ap-form-gonderim-aksiyonlar">
+                  {!g.okundu && (
+                    <button type="button" onClick={() => onOkundu(g.id)} className="ap-link-btn text-xs">
+                      Okundu işaretle
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => onSil(g.id)}
+                    className="text-xs text-red-400 hover:text-red-300"
+                  >
+                    Sil
+                  </button>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
   );
 }

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FormEditorKabuk } from '@/components/admin/form/FormEditorKabuk';
 import { FormGonderimPanel } from '@/components/admin/form/FormGonderimPanel';
 import { FormListePanel } from '@/components/admin/form/FormListePanel';
@@ -8,6 +8,7 @@ import {
   BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
+import { AdminIstatistikKarti } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
   adminFormGonderimleriGetir,
   adminFormGuncelle,
@@ -31,6 +32,16 @@ export function FormYonetimiSayfasi() {
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [hata, setHata] = useState('');
   const [basari, setBasari] = useState('');
+
+  const istatistik = useMemo(
+    () => ({
+      toplam: formlar.length,
+      yayinda: formlar.filter((f) => f.aktif).length,
+      taslak: formlar.filter((f) => !f.aktif).length,
+      gonderim: formlar.reduce((t, f) => t + (f._count?.gonderimler ?? 0), 0),
+    }),
+    [formlar]
+  );
 
   async function yukle() {
     setYukleniyor(true);
@@ -156,7 +167,7 @@ export function FormYonetimiSayfasi() {
   return (
     <AdminModulKabuk
       baslik="Form Yönetimi"
-      aciklama="İletişim ve başvuru formları oluşturun; alanları, yerleşimi, koşulları ve bildirimleri yapılandırın. Kaydetmek için alt aksiyon çubuğunu kullanın."
+      aciklama="İletişim ve başvuru formları oluşturun; alanları, yerleşimi, koşulları ve bildirimleri yapılandırın."
     >
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
@@ -165,10 +176,18 @@ export function FormYonetimiSayfasi() {
       {yukleniyor ? (
         <YukleniyorDurumu mesaj="Formlar yükleniyor..." />
       ) : (
-        <div className="ap-form-yonetimi space-y-5">
-          <div className="ap-form-layout ap-form-layout-sade">
+        <div className="ap-form-yonetim">
+          <div className="ap-stat-grid ap-form-stat-grid">
+            <AdminIstatistikKarti etiket="Toplam" deger={istatistik.toplam} ikon="📝" vurgu="mavi" />
+            <AdminIstatistikKarti etiket="Yayında" deger={istatistik.yayinda} ikon="✅" vurgu="yesil" />
+            <AdminIstatistikKarti etiket="Taslak" deger={istatistik.taslak} ikon="📄" vurgu="amber" />
+            <AdminIstatistikKarti etiket="Gönderim" deger={istatistik.gonderim} ikon="📬" vurgu="gri" />
+          </div>
+
+          <div className="ap-split-layout ap-form-split">
             <FormListePanel formlar={formlar} seciliId={seciliId} onSec={formSec} />
-            <div className="space-y-5">
+
+            <div className="ap-form-ana-alan">
               <FormEditorKabuk form={form} seciliId={seciliId} onChange={setForm} />
               {seciliId && (
                 <FormGonderimPanel

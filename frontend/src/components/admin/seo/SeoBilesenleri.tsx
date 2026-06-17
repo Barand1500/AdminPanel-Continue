@@ -208,17 +208,19 @@ export function SeoMetaTablo({
             ))}
           </select>
         </label>
-        <div className="ap-arama ap-seo-arama !p-0">
-          <span className="ap-arama-ikon !top-1/2 !-translate-y-1/2">🔍</span>
-          <input
-            className={`${formInputSinifi} ap-arama-input`}
-            placeholder="URL, başlık veya açıklama ara..."
-            value={arama}
-            onChange={(e) => {
-              setArama(e.target.value);
-              setSayfa(0);
-            }}
-          />
+        <div className="ap-arama ap-seo-arama">
+          <div className="ap-arama-input-wrap">
+            <span className="ap-arama-ikon">🔍</span>
+            <input
+              className={`${formInputSinifi} ap-arama-input`}
+              placeholder="URL, başlık veya açıklama ara..."
+              value={arama}
+              onChange={(e) => {
+                setArama(e.target.value);
+                setSayfa(0);
+              }}
+            />
+          </div>
         </div>
       </div>
 

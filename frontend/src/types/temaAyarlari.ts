@@ -1,5 +1,5 @@
-export type GunduzSablonId = 'mor' | 'mavi' | 'yesil' | 'ozel';
-export type GeceSablonId = 'midnight' | 'slate' | 'carbon';
+export type GunduzSablonId = 'mor' | 'mavi' | 'yesil' | 'turuncu' | 'indigo' | 'ozel';
+export type GeceSablonId = 'midnight' | 'slate' | 'carbon' | 'ocean' | 'ember';
 
 export interface TemaAyarlari {
   gunduzSablon: GunduzSablonId;
@@ -42,6 +42,8 @@ export const GUNDUZ_SABLONLARI: GunduzSablonTanimi[] = [
   { id: 'mor', ad: 'Mor', anaRenk: '#7c3aed', ikincilRenk: '#a78bfa' },
   { id: 'mavi', ad: 'Mavi', anaRenk: '#2563eb', ikincilRenk: '#60a5fa' },
   { id: 'yesil', ad: 'Yeşil', anaRenk: '#059669', ikincilRenk: '#34d399' },
+  { id: 'turuncu', ad: 'Turuncu', anaRenk: '#ea580c', ikincilRenk: '#fb923c' },
+  { id: 'indigo', ad: 'İndigo', anaRenk: '#4f46e5', ikincilRenk: '#818cf8' },
 ];
 
 export const GECE_SABLONLARI: GeceSablonTanimi[] = [
@@ -96,7 +98,44 @@ export const GECE_SABLONLARI: GeceSablonTanimi[] = [
       footerText: '#a3a3a3',
     },
   },
+  {
+    id: 'ocean',
+    ad: 'Ocean',
+    palet: {
+      surface: '#0c1929',
+      surfaceElevated: '#132f4c',
+      text: '#e3f2fd',
+      textMuted: '#90caf9',
+      border: '#1e3a5f',
+      primary: '#42a5f5',
+      primaryDark: '#1e88e5',
+      primaryLight: '#64b5f6',
+      accent: '#42a5f522',
+      footerBg: '#0c1929',
+      footerText: '#90caf9',
+    },
+  },
+  {
+    id: 'ember',
+    ad: 'Ember',
+    palet: {
+      surface: '#1a0f0a',
+      surfaceElevated: '#2d1810',
+      text: '#fef3c7',
+      textMuted: '#d97706',
+      border: '#451a03',
+      primary: '#f59e0b',
+      primaryDark: '#d97706',
+      primaryLight: '#fbbf24',
+      accent: '#f59e0b22',
+      footerBg: '#1a0f0a',
+      footerText: '#d97706',
+    },
+  },
 ];
+
+const GUNDUZ_SABLON_IDLERI: GunduzSablonId[] = ['mor', 'mavi', 'yesil', 'turuncu', 'indigo', 'ozel'];
+const GECE_SABLON_IDLERI: GeceSablonId[] = ['midnight', 'slate', 'carbon', 'ocean', 'ember'];
 
 export function temaAyarlariBirlestir(
   kaynak?: TemaAyarlari | null | Record<string, unknown>
@@ -106,11 +145,11 @@ export function temaAyarlariBirlestir(
   const gece = g?.geceSablon;
   return {
     gunduzSablon:
-      gunduz === 'mor' || gunduz === 'mavi' || gunduz === 'yesil' || gunduz === 'ozel'
+      gunduz && GUNDUZ_SABLON_IDLERI.includes(gunduz)
         ? gunduz
         : VARSAYILAN_TEMA_AYARLARI.gunduzSablon,
     geceSablon:
-      gece === 'midnight' || gece === 'slate' || gece === 'carbon'
+      gece && GECE_SABLON_IDLERI.includes(gece)
         ? gece
         : VARSAYILAN_TEMA_AYARLARI.geceSablon,
   };

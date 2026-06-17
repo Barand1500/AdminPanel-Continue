@@ -18,7 +18,7 @@ interface TelefonInputProps {
 
 export function TelefonInput({
   etiket = 'Telefon',
-  aciklama = `0 ile başlarsa ${ORNEK_TELEFON_SIFIRLI} veya ${ORNEK_TELEFON_0850}, başlamazsa ${ORNEK_TELEFON_SIFIRSIZ}, kısa kod ${ORNEK_TELEFON_KISA}`,
+  aciklama = `${ORNEK_TELEFON_SIFIRLI} · ${ORNEK_TELEFON_0850} · ${ORNEK_TELEFON_SIFIRSIZ} · ${ORNEK_TELEFON_KISA}`,
   deger,
   onChange,
   placeholder = ORNEK_TELEFON_0850,

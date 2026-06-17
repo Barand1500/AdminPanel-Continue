@@ -77,14 +77,16 @@ export function AdminAramaKutusu({
 }) {
   return (
     <div className="ap-arama">
-      <span className="ap-arama-ikon">🔍</span>
-      <input
-        type="search"
-        value={deger}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className={`${formInputSinifi} ap-arama-input`}
-      />
+      <div className="ap-arama-input-wrap">
+        <span className="ap-arama-ikon">🔍</span>
+        <input
+          type="search"
+          value={deger}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          className={`${formInputSinifi} ap-arama-input`}
+        />
+      </div>
     </div>
   );
 }

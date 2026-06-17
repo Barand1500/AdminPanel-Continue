@@ -12,7 +12,7 @@ interface WhatsAppInputProps {
 export function WhatsAppInput({
   deger,
   onChange,
-  aciklama = `Uluslararası format: ${ORNEK_WHATSAPP}`,
+  aciklama = ORNEK_WHATSAPP,
   placeholder = ORNEK_WHATSAPP,
 }: WhatsAppInputProps) {
   const [odak, setOdak] = useState(false);

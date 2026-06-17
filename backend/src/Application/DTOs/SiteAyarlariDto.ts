@@ -25,8 +25,8 @@ export const siteAyarlariGuncelleSchema = z.object({
   blogAyarlariJson: esnekJson,
   temaAyarlariJson: z
     .object({
-      gunduzSablon: z.enum(['mor', 'mavi', 'yesil', 'ozel']).optional(),
-      geceSablon: z.enum(['midnight', 'slate', 'carbon']).optional(),
+      gunduzSablon: z.enum(['mor', 'mavi', 'yesil', 'turuncu', 'indigo', 'ozel']).optional(),
+      geceSablon: z.enum(['midnight', 'slate', 'carbon', 'ocean', 'ember']).optional(),
     })
     .nullable()
     .optional(),

@@ -88,7 +88,7 @@ export function HeaderYonetimiFormu() {
   const dilDestegi = headerAyarlari.dilDestegi!;
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[1fr_min(480px,44%)]">
+    <div className="space-y-6">
       <div className="space-y-5">
         <ModulBaslik
           baslik="Header Yönetimi"

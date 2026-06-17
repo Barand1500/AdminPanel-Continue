@@ -208,20 +208,20 @@ export function BlogYonetimiSayfasi() {
         <BildirimKutusu mesaj="Görünüm ayarlarında kaydedilmemiş değişiklik var." tur="bilgi" />
       )}
 
-      <BlogGorunumPanel ayarlar={blogAyarlari} onDegistir={blogAyarlariGuncelle} />
-
       {yukleniyor ? (
         <YukleniyorDurumu mesaj="Blog yazıları yükleniyor..." />
       ) : (
-        <>
-          <div className="ap-stat-grid">
+        <div className="ap-blog-yonetim">
+          <div className="ap-stat-grid ap-blog-stat-grid">
             <AdminIstatistikKarti etiket="Toplam" deger={istatistik.toplam} ikon="📰" vurgu="mavi" />
             <AdminIstatistikKarti etiket="Yayında" deger={istatistik.yayinda} ikon="✅" vurgu="yesil" />
             <AdminIstatistikKarti etiket="Taslak" deger={istatistik.taslak} ikon="📝" vurgu="amber" />
             <AdminIstatistikKarti etiket="Öne Çıkan" deger={istatistik.oneCikan} ikon="⭐" vurgu="gri" />
           </div>
 
-          <div className="ap-split-layout">
+          <BlogGorunumPanel ayarlar={blogAyarlari} onDegistir={blogAyarlariGuncelle} />
+
+          <div className="ap-split-layout ap-blog-split">
             <BlogListesi
               bloglar={bloglar}
               seciliId={seciliId}
@@ -234,7 +234,7 @@ export function BlogYonetimiSayfasi() {
             />
             <BlogDuzenleFormu form={form} seciliId={seciliId} onChange={setForm} />
           </div>
-        </>
+        </div>
       )}
     </AdminModulKabuk>
   );

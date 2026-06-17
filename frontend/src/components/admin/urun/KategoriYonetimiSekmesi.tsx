@@ -247,7 +247,8 @@ export function KategoriYonetimiSekmesi() {
 
         <div className="space-y-4">
           <div className="ap-arama flex-1 min-w-[200px] !p-0">
-              <span className="ap-arama-ikon !top-1/2 !-translate-y-1/2">🔍</span>
+            <div className="ap-arama-input-wrap">
+              <span className="ap-arama-ikon">🔍</span>
               <input
                 className={`${formInputSinifi} ap-arama-input`}
                 placeholder="Alt kategori ara..."
@@ -255,6 +256,7 @@ export function KategoriYonetimiSekmesi() {
                 onChange={(e) => setArama(e.target.value)}
               />
             </div>
+          </div>
 
           <div className="ap-urun-kategori-grid">
             {altKategoriler.length === 0 ? (
