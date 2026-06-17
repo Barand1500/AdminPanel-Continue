@@ -136,7 +136,7 @@ model Sayfa {
 
   @@unique([siteId, slug])
   @@index([siteId, yayinda, sira])
-  @@index([siteId, ustSayfaId])
+  @@index([siteId, ustSayfaId, sira])
   @@map("sayfalar")
 }
 

@@ -5,6 +5,7 @@ import {
   adminBildirimleriTumunuOkundu,
   type AdminBildirim,
 } from '@/features/admin/bildirimApi';
+import { useAdminUyariBildirim } from '@/contexts/AdminUyariBildirimContext';
 import { AltPanel, AltPanelBos, AltPanelOge, AltPanelYukleniyor } from './ortak/AltPanel';
 
 interface BildirimPaneliProps {
@@ -15,6 +16,7 @@ interface BildirimPaneliProps {
 
 export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProps) {
   const navigate = useNavigate();
+  const { uyariBildirimleri } = useAdminUyariBildirim();
   const [bildirimler, setBildirimler] = useState<AdminBildirim[]>([]);
   const [yukleniyor, setYukleniyor] = useState(false);
   const [islemMesaji, setIslemMesaji] = useState<string | null>(null);
@@ -48,6 +50,8 @@ export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProp
     }
   }
 
+  const toplamBos = !yukleniyor && bildirimler.length === 0 && uyariBildirimleri.length === 0;
+
   function tikla(b: AdminBildirim) {
     if (b.link) navigate(b.link);
     onKapat();
@@ -66,7 +70,17 @@ export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProp
     >
       {islemMesaji && <p className="ap-alt-panel-hata px-1 pb-2">{islemMesaji}</p>}
       {yukleniyor && <AltPanelYukleniyor />}
-      {!yukleniyor && bildirimler.length === 0 && <AltPanelBos mesaj="Henüz bildirim yok." />}
+      {uyariBildirimleri.map((u) => (
+        <AltPanelOge
+          key={`uyari-${u.id}`}
+          baslik={u.baslik}
+          alt={u.mesaj}
+          zaman={u.olusturma}
+          okunmamis
+          sinif="ap-alt-panel-uyari"
+        />
+      ))}
+      {toplamBos && <AltPanelBos mesaj="Henüz bildirim yok." />}
       {bildirimler.map((b) => (
         <AltPanelOge
           key={b.id}
@@ -83,6 +97,7 @@ export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProp
 
 export function useBildirimSayaci(pollingMs = 60_000) {
   const [okunmamisSayi, setOkunmamisSayi] = useState(0);
+  const { uyariSayisi } = useAdminUyariBildirim();
 
   const yenile = useCallback(async () => {
     try {
@@ -99,5 +114,5 @@ export function useBildirimSayaci(pollingMs = 60_000) {
     return () => clearInterval(timer);
   }, [yenile, pollingMs]);
 
-  return { okunmamisSayi, yenile };
+  return { okunmamisSayi: okunmamisSayi + uyariSayisi, yenile };
 }

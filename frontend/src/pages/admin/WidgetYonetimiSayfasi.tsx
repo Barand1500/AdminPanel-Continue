@@ -14,6 +14,7 @@ import {
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import { widgetGuncelle, widgetOlustur, widgetSil, widgetlariGetir } from '@/features/admin/widgetApi';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
+import { sonrakiWidgetSira, siraCakismasiBul } from '@/utils/widgetSiraYardimci';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
 
 function kaydetHazirMi(form: WidgetFormDegeri) {
@@ -57,6 +58,18 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
   useEffect(() => {
     void listeYukle();
   }, [varsayilanTip]);
+
+  useEffect(() => {
+    if (seciliId != null) return;
+    setForm((onceki) => {
+      const sonraki = sonrakiWidgetSira(widgetlar);
+      const cakisma = siraCakismasiBul(widgetlar, onceki.sira);
+      const varsayilanCakisma =
+        widgetlar.length > 0 && onceki.sira === 1 && sonraki > 1;
+      if (!cakisma && !varsayilanCakisma) return onceki;
+      return onceki.sira === sonraki ? onceki : { ...onceki, sira: sonraki };
+    });
+  }, [widgetlar, seciliId]);
 
   useEffect(() => {
     setOnizlemeHazir(Boolean(form.tip && (seciliId || yeniMod)));

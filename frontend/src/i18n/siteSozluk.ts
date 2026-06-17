@@ -61,15 +61,38 @@ export function sayfaCeviriAnahtar(slug: string) {
   return `sayfa.${slug}`;
 }
 
+/** Bilinen sayfa slug → site.* çeviri anahtarı */
+export const SLUG_SITE_ANAHTAR: Record<string, string> = {
+  'ana-sayfa': 'site.anaSayfa',
+  urunler: 'site.urunler',
+  blog: 'site.blog',
+  hakkimizda: 'site.hakkimizda',
+  iletisim: 'site.iletisim',
+};
+
 export function siteCeviriBirlestir(
   dilKodu: string,
   ozel?: Record<string, string> | null,
-  sayfaBasliklari?: { slug: string; baslik: string }[]
+  sayfaBasliklari?: { slug: string; baslik: string }[],
+  varsayilanDil = 'TR'
 ): Record<string, string> {
   const varsayilan = SITE_VARSAYILAN_CEVIRILER[dilKodu] ?? SITE_VARSAYILAN_CEVIRILER.TR ?? {};
-  const sayfaCeviri: Record<string, string> = {};
+  const sonuc: Record<string, string> = { ...varsayilan, ...(ozel ?? {}) };
+
   for (const s of sayfaBasliklari ?? []) {
-    sayfaCeviri[sayfaCeviriAnahtar(s.slug)] = s.baslik;
+    const sayfaKey = sayfaCeviriAnahtar(s.slug);
+    if (sonuc[sayfaKey]) continue;
+
+    const siteKey = SLUG_SITE_ANAHTAR[s.slug];
+    if (siteKey && sonuc[siteKey]) {
+      sonuc[sayfaKey] = sonuc[siteKey];
+      continue;
+    }
+
+    if (dilKodu === varsayilanDil) {
+      sonuc[sayfaKey] = s.baslik;
+    }
   }
-  return { ...sayfaCeviri, ...varsayilan, ...(ozel ?? {}) };
+
+  return sonuc;
 }

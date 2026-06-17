@@ -102,8 +102,7 @@ export function WidgetListesiPanel({ widgetlar, seciliId, tipFiltre, onSec }: Wi
     <aside className="ap-sidebar-panel ap-widget-sidebar">
       <div className="ap-sidebar-baslik">
         <h2 className="ap-heading text-sm font-semibold">Widgetlar</h2>
-        <p className="ap-muted text-xs">{widgetlar.length} kayıt</p>
-        <div className="ap-sidebar-arama mt-3">
+        <div className="mt-3">
           <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Widget ara..." />
         </div>
       </div>
@@ -237,7 +236,7 @@ export function WidgetEditorPanel({
                 <WidgetTipSecici
                   seciliTip={form.tip}
                   onSec={(tip) => {
-                    onChange(tipDegistir(form, tip));
+                    onChange(tipDegistir(form, tip, tumWidgetlar));
                     onTipSecildi?.(tip);
                   }}
                 />
@@ -260,7 +259,7 @@ export function WidgetEditorPanel({
                       className={formSelectSinifi}
                       value={form.tip}
                       onChange={(e) => {
-                        onChange(tipDegistir(form, e.target.value));
+                        onChange(tipDegistir(form, e.target.value, tumWidgetlar));
                         onTipSecildi?.(e.target.value);
                       }}
                     >

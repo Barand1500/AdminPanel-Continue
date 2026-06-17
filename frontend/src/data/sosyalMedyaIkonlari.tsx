@@ -337,7 +337,7 @@ export interface SosyalMedyaOgesi {
 function ogeKayittanOlustur(pid: string, sosyal: Record<string, string>): SosyalMedyaOgesi | null {
   const platform = SOSYAL_PLATFORMLAR.find((p) => p.id === pid);
   const url = sosyal[pid] ?? '';
-  const ikonHam = sosyal[sosyalIkonAnahtar(pid)] ?? 'solid';
+  const ikonHam = sosyal[sosyalIkonAnahtar(pid)] ?? 'brand';
 
   if (platform) {
     return {

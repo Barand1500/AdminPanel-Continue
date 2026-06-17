@@ -42,6 +42,13 @@ export class SayfaRepository {
     return prisma.sayfa.findFirst({ where: { id, siteId } });
   }
 
+  async altSayfaVarMi(id: number, siteId: number) {
+    const sayi = await prisma.sayfa.count({
+      where: { ustSayfaId: id, siteId } as Prisma.SayfaWhereInput,
+    });
+    return sayi > 0;
+  }
+
   async createForSite(siteId: number, data: Omit<Prisma.SayfaUncheckedCreateInput, 'siteId'>) {
     return prisma.sayfa.create({ data: { ...data, siteId } });
   }

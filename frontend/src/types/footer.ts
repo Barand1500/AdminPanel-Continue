@@ -57,10 +57,20 @@ export const FOOTER_YUZUCU_TIP_ETIKET: Record<FooterYuzucuButonTip, string> = {
 
 export type FooterGorselKonum = 'sag' | 'sol' | 'ust' | 'alt';
 
+export type {
+  FooterMagazaBadge,
+  MagazaBadgeStili,
+  MagazaBadgeTipi,
+} from '@/data/footerMagazaBadgeleri';
+import { varsayilanMagazaBadgeleri, type FooterMagazaBadge } from '@/data/footerMagazaBadgeleri';
+
 export interface FooterGorselDekor {
   aktif: boolean;
   gorselUrl: string;
   konum: FooterGorselKonum;
+  link?: string;
+  yeniSekme?: boolean;
+  magazalar?: FooterMagazaBadge[];
 }
 
 export interface FooterAyarlari {
@@ -107,6 +117,21 @@ export const FOOTER_LINK_IKON_ETIKET: Record<FooterLinkIkon, string> = {
 
 export function yeniFooterId(): string {
   return crypto.randomUUID();
+}
+
+function magazaBadgeleriBirlestir(ham?: FooterMagazaBadge[] | null): FooterMagazaBadge[] {
+  const varsayilan = varsayilanMagazaBadgeleri();
+  if (!ham?.length) return varsayilan;
+  return varsayilan.map((v) => {
+    const kayit = ham.find((m) => m.tip === v.tip);
+    if (!kayit) return v;
+    return {
+      ...v,
+      ...kayit,
+      tip: v.tip,
+      stil: kayit.stil ?? v.stil,
+    };
+  });
 }
 
 function linkOlustur(ad: string, link: string, sira: number): FooterLink {
@@ -192,7 +217,14 @@ export function varsayilanFooterAyarlari(): FooterAyarlari {
   return {
     sema: 'dort-kolon',
     linkIkon: 'chevron',
-    gorselDekor: { aktif: false, gorselUrl: '', konum: 'sag' },
+    gorselDekor: {
+      aktif: false,
+      gorselUrl: '',
+      konum: 'sag',
+      link: '',
+      yeniSekme: true,
+      magazalar: varsayilanMagazaBadgeleri(),
+    },
     marka: {
       logoGoster: true,
       logoBoyutu: VARSAYILAN_LOGO_BOYUTU,
@@ -263,6 +295,9 @@ export function footerAyarlariBirlestir(
       aktif: ham.gorselDekor?.aktif ?? varsayilan.gorselDekor!.aktif,
       gorselUrl: ham.gorselDekor?.gorselUrl ?? varsayilan.gorselDekor!.gorselUrl,
       konum: ham.gorselDekor?.konum ?? varsayilan.gorselDekor!.konum,
+      link: ham.gorselDekor?.link ?? varsayilan.gorselDekor!.link ?? '',
+      yeniSekme: ham.gorselDekor?.yeniSekme ?? varsayilan.gorselDekor!.yeniSekme ?? true,
+      magazalar: magazaBadgeleriBirlestir(ham.gorselDekor?.magazalar),
     },
     marka: {
       logoGoster: ham.marka?.logoGoster ?? varsayilan.marka.logoGoster,

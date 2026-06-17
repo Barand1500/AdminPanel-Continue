@@ -120,6 +120,11 @@ export class SayfaService {
     const mevcut = await sayfaRepo.findByIdAndSiteId(sayfaId, siteId);
     if (!mevcut) throw new Error('Sayfa bulunamadi');
 
+    if (dto.ustSayfaId !== undefined && dto.ustSayfaId != null) {
+      if (dto.ustSayfaId === sayfaId) throw new Error('Sayfa kendi ust sayfasi olamaz');
+      await this.ustSayfaDogrula(siteId, dto.ustSayfaId, sayfaId);
+    }
+
     const data: Prisma.SayfaUpdateInput = {};
     if (dto.baslik !== undefined) data.baslik = dto.baslik;
 
@@ -195,6 +200,17 @@ export class SayfaService {
         const yeni = s.slug.replace(eskiPrefix, yeniPrefix);
         await sayfaRepo.updateForSite(s.id, { slug: yeni });
       }
+    }
+  }
+
+  private async ustSayfaDogrula(siteId: number, ustSayfaId: number, sayfaId?: number) {
+    const ust = await sayfaRepo.findByIdAndSiteId(ustSayfaId, siteId);
+    if (!ust) throw new Error('Ust sayfa bulunamadi');
+    const ustKayit = ust as typeof ust & { ustSayfaId?: number | null };
+    if (ustKayit.ustSayfaId != null) throw new Error('Alt sayfa baska bir alt sayfanin altina eklenemez');
+    if (sayfaId != null) {
+      const altSayfaVar = await sayfaRepo.altSayfaVarMi(sayfaId, siteId);
+      if (altSayfaVar) throw new Error('Alt sayfalari olan bir sayfa baska sayfanin altina tasinamaz');
     }
   }
 

@@ -50,19 +50,21 @@ export function AltPanelOge({
   zaman,
   okunmamis,
   onClick,
+  sinif,
 }: {
   baslik: string;
   alt: string;
   zaman?: string;
   okunmamis?: boolean;
   onClick?: () => void;
+  sinif?: string;
 }) {
   const Tag = onClick ? 'button' : 'div';
   return (
     <Tag
       type={onClick ? 'button' : undefined}
       onClick={onClick}
-      className={`ap-alt-panel-oge ${okunmamis ? 'ap-alt-panel-oge-okunmamis' : ''}`}
+      className={`ap-alt-panel-oge ${okunmamis ? 'ap-alt-panel-oge-okunmamis' : ''} ${sinif ?? ''}`}
     >
       <div className="flex items-center justify-between gap-2">
         <span className="ap-alt-panel-oge-baslik">{baslik}</span>

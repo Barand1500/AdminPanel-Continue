@@ -12,6 +12,7 @@ import {
 } from '@/components/admin/ortak/AdminBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import { sayfadanForm } from '@/components/admin/sayfa/SayfaBilesenleri';
+import { useKaydedilmemisBildirim } from '@/contexts/AdminUyariBildirimContext';
 import { adminMenuGuncelle, adminSayfaGuncelle, adminSayfaOlustur, adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
 import { adminSiteApi } from '@/features/site/adminSiteApi';
 import type { UstMenuOgesi } from '@/types/header';
@@ -57,6 +58,13 @@ export function MenuYonetimiSayfasi() {
   const sayfaKirli = !sayfaListesiEsit(sayfalar, kayitliSayfaRef.current);
   const ustMenuKirli = !ustMenuEsit(ustMenu, kayitliUstMenuRef.current);
   const kirli = sayfaKirli || ustMenuKirli;
+
+  useKaydedilmemisBildirim(
+    kirli && !kaydediliyor,
+    'Kaydedilmemiş menü değişiklikleri var.',
+    'Menü Yönetimi',
+    'menu'
+  );
 
   useEffect(() => {
     void (async () => {
@@ -203,9 +211,6 @@ export function MenuYonetimiSayfasi() {
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
-      {kirli && !kaydediliyor && (
-        <BildirimKutusu mesaj="Kaydedilmemiş menü değişiklikleri var." tur="bilgi" />
-      )}
 
       {yukleniyor ? (
         <YukleniyorDurumu mesaj="Menü verisi yükleniyor..." />

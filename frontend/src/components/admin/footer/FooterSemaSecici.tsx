@@ -9,6 +9,9 @@ import {
 } from '@/types/footer';
 import { formInputSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
+import { LinkYoluAlani } from '@/components/form/LinkYoluAlani';
+import { FooterMagazaBadgeAyar } from '@/components/admin/footer/FooterMagazaBadgeAyar';
+import { varsayilanMagazaBadgeleri } from '@/data/footerMagazaBadgeleri';
 
 const SEMALAR: FooterSema[] = ['dort-kolon', 'uc-kolon', 'iki-kolon', 'merkezi'];
 
@@ -61,7 +64,18 @@ interface FooterSemaSeciciProps {
 const GORSEL_KONUMLAR: FooterGorselKonum[] = ['sag', 'sol', 'ust', 'alt'];
 
 export function FooterSemaSecici({ footer, onDegistir }: FooterSemaSeciciProps) {
-  const dekor = footer.gorselDekor ?? { aktif: false, gorselUrl: '', konum: 'sag' as FooterGorselKonum };
+  const dekor = footer.gorselDekor ?? {
+    aktif: false,
+    gorselUrl: '',
+    konum: 'sag' as FooterGorselKonum,
+    link: '',
+    yeniSekme: true,
+    magazalar: varsayilanMagazaBadgeleri(),
+  };
+
+  const dekorGuncelle = (parcalar: Partial<typeof dekor>) => {
+    onDegistir({ ...footer, gorselDekor: { ...dekor, ...parcalar } });
+  };
 
   return (
     <div className="space-y-5">
@@ -115,12 +129,7 @@ export function FooterSemaSecici({ footer, onDegistir }: FooterSemaSeciciProps) 
             type="button"
             role="switch"
             aria-checked={dekor.aktif}
-            onClick={() =>
-              onDegistir({
-                ...footer,
-                gorselDekor: { ...dekor, aktif: !dekor.aktif },
-              })
-            }
+            onClick={() => dekorGuncelle({ aktif: !dekor.aktif })}
             className={`ap-toggle ${dekor.aktif ? 'ap-toggle-on' : ''}`}
           >
             <span className="ap-toggle-thumb" />
@@ -132,10 +141,24 @@ export function FooterSemaSecici({ footer, onDegistir }: FooterSemaSeciciProps) 
             <GorselAlan
               etiket="Görsel"
               deger={dekor.gorselUrl}
-              onChange={(gorselUrl) =>
-                onDegistir({ ...footer, gorselDekor: { ...dekor, gorselUrl } })
-              }
+              onChange={(gorselUrl) => dekorGuncelle({ gorselUrl })}
             />
+            <div>
+              <label className="ap-muted mb-1.5 block text-xs font-medium">Görsele tıklanınca açılacak link</label>
+              <LinkYoluAlani
+                deger={dekor.link ?? ''}
+                onChange={(link) => dekorGuncelle({ link })}
+                placeholder="https://... veya /sayfa-yolu"
+              />
+            </div>
+            <label className="flex cursor-pointer items-center gap-2 text-sm">
+              <input
+                type="checkbox"
+                checked={dekor.yeniSekme !== false}
+                onChange={(e) => dekorGuncelle({ yeniSekme: e.target.checked })}
+              />
+              <span className="ap-muted">Yeni sekmede aç</span>
+            </label>
             <div>
               <span className="ap-muted mb-2 block text-xs font-medium">Konum</span>
               <div className="flex flex-wrap gap-2">
@@ -143,9 +166,7 @@ export function FooterSemaSecici({ footer, onDegistir }: FooterSemaSeciciProps) 
                   <button
                     key={konum}
                     type="button"
-                    onClick={() =>
-                      onDegistir({ ...footer, gorselDekor: { ...dekor, konum } })
-                    }
+                    onClick={() => dekorGuncelle({ konum })}
                     className={`rounded-lg border px-3 py-2 text-sm font-medium transition ${
                       dekor.konum === konum
                         ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)] text-white'
@@ -157,6 +178,11 @@ export function FooterSemaSecici({ footer, onDegistir }: FooterSemaSeciciProps) 
                 ))}
               </div>
             </div>
+
+            <FooterMagazaBadgeAyar
+              magazalar={dekor.magazalar ?? varsayilanMagazaBadgeleri()}
+              onDegistir={(magazalar) => dekorGuncelle({ magazalar })}
+            />
           </div>
         )}
       </div>

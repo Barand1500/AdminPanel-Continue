@@ -15,7 +15,7 @@ export const sayfaOlusturSchema = z.object({
   menudeGoster: z.boolean().default(true),
   sira: z.number().int().default(0),
   acilisModu: sayfaAcilisModuSchema.default('normal'),
-  ustSayfaId: z.number().int().nullable().optional(),
+  ustSayfaId: z.number().int().positive().nullable().optional(),
   altMenuGorunum: altMenuGorunumSchema.optional(),
   altMenuTetikleyici: altMenuTetikleyiciSchema.optional(),
 });

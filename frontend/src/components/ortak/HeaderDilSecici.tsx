@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import type { DilDestegiAyarlari } from '@/types/header';
 import { aktifDiller, SITE_DIL_STORAGE } from '@/data/siteDilleri';
+import { useSiteDil } from '@/contexts/SiteDilContext';
 
 interface HeaderDilSeciciProps {
   ayar: DilDestegiAyarlari;
@@ -9,15 +10,9 @@ interface HeaderDilSeciciProps {
 
 export function HeaderDilSecici({ ayar, className = '' }: HeaderDilSeciciProps) {
   const diller = aktifDiller(ayar);
+  const { dilKodu, dilAyarla } = useSiteDil();
   const [acik, setAcik] = useState(false);
-  const [secili, setSecili] = useState(ayar.varsayilanDil);
   const kutuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const kayitli = localStorage.getItem(SITE_DIL_STORAGE);
-    if (kayitli) setSecili(kayitli);
-    else setSecili(ayar.varsayilanDil);
-  }, [ayar.varsayilanDil]);
 
   useEffect(() => {
     function disari(e: MouseEvent) {
@@ -29,12 +24,12 @@ export function HeaderDilSecici({ ayar, className = '' }: HeaderDilSeciciProps) 
 
   if (!ayar.aktif || diller.length === 0) return null;
 
-  const gecerliKod = diller.some((d) => d.kod === secili) ? secili : diller[0].kod;
+  const gecerliKod = diller.some((d) => d.kod === dilKodu) ? dilKodu : diller[0]?.kod ?? ayar.varsayilanDil;
   const aktifDil = diller.find((d) => d.kod === gecerliKod) ?? diller[0];
   const bayrakli = ayar.gorunum === 'bayrak';
 
   function dilSec(kod: string) {
-    setSecili(kod);
+    dilAyarla(kod);
     localStorage.setItem(SITE_DIL_STORAGE, kod);
     setAcik(false);
     window.dispatchEvent(new CustomEvent('site-dil-degisti', { detail: kod }));

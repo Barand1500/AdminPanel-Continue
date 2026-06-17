@@ -36,6 +36,7 @@ export const headerAyarlariSchema = z.object({
       telefonGoster: z.boolean(),
       emailGoster: z.boolean(),
       kurlarGoster: z.boolean(),
+      sosyalGoster: z.boolean().optional(),
     })
     .optional(),
   kurlar: z.array(paraBirimiKaydiSchema).optional(),
@@ -65,6 +66,23 @@ export const headerAyarlariSchema = z.object({
     .optional(),
   sonKurGuncelleme: z.string().nullable().optional(),
   ustMenu: z.array(ustMenuOgesiSchema).optional(),
+  dilDestegi: z
+    .object({
+      aktif: z.boolean(),
+      gorunum: z.enum(['bayrak', 'kod']),
+      varsayilanDil: z.string().min(2).max(8),
+      diller: z.array(
+        z.object({
+          kod: z.string().min(2).max(8),
+          ad: z.string().max(40),
+          bayrak: z.string().max(8),
+          aktif: z.boolean(),
+          sira: z.number().int().min(0),
+        })
+      ),
+      ceviriler: z.record(z.string(), z.record(z.string(), z.string())).optional(),
+    })
+    .optional(),
 });
 
 export type HeaderAyarlariDto = z.infer<typeof headerAyarlariSchema>;

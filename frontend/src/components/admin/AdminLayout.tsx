@@ -5,6 +5,7 @@ import { useAdminSekmeler } from '@/hooks/useAdminSekmeler';
 import { useAksiyonCubugu } from '@/hooks/useAksiyonCubugu';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import { AdminAksiyonProvider, useAdminAksiyon } from '@/contexts/AdminAksiyonContext';
+import { AdminUyariBildirimProvider } from '@/contexts/AdminUyariBildirimContext';
 import { SiteAyarlariProvider } from '@/contexts/SiteAyarlariContext';
 import { AdminTemaProvider, useAdminTema } from '@/contexts/AdminTemaContext';
 import { AdminHeader } from './AdminHeader';
@@ -283,9 +284,11 @@ export function AdminLayout() {
   return (
     <AdminTemaProvider>
       <AdminAksiyonProvider>
-        <PanelDilKabuk>
-          <AdminLayoutIcerik />
-        </PanelDilKabuk>
+        <AdminUyariBildirimProvider>
+          <PanelDilKabuk>
+            <AdminLayoutIcerik />
+          </PanelDilKabuk>
+        </AdminUyariBildirimProvider>
       </AdminAksiyonProvider>
     </AdminTemaProvider>
   );

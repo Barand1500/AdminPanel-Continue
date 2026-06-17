@@ -4,6 +4,7 @@ import { RolDuzenleModal } from '@/components/admin/rol/RolDuzenleModal';
 import { RolEkleModal } from '@/components/admin/rol/RolEkleModal';
 import { RolSilModal } from '@/components/admin/rol/RolSilModal';
 import { useAuth } from '@/contexts/AuthContext';
+import { useKaydedilmemisBildirim } from '@/contexts/AdminUyariBildirimContext';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import {
   adminRolleriGetir,
@@ -44,6 +45,13 @@ export function RollerSayfasi() {
   const yetkili = kullanici?.rol === 'SUPER_ADMIN' || kullanici?.rol === 'AJANS_ADMIN';
   const superAdminMi = kullanici?.rol === 'SUPER_ADMIN';
   const degisti = !rollerEsitMi(taslakRoller, kayitliRoller);
+
+  useKaydedilmemisBildirim(
+    superAdminMi && degisti && !kaydediliyor,
+    'Kaydedilmemiş değişiklikler var.',
+    'Roller ve Yetkiler',
+    'roller'
+  );
 
   const seciliRol = taslakRoller.find((r) => r.kod === seciliRolKod) ?? null;
   const silAktif = superAdminMi && !!seciliRol && rolSilinebilirMi(seciliRol);
@@ -172,9 +180,6 @@ export function RollerSayfasi() {
         Sistemdeki roller ve her role ait yetki matrisi. Kullanıcılara rol atamak için{' '}
         <strong className="text-slate-300">Kullanıcılar</strong> modülünü kullanın.
       </p>
-      {superAdminMi && degisti && (
-        <p className="mt-2 text-sm text-amber-400">Kaydedilmemiş değişiklikler var.</p>
-      )}
       {hata && <p className="mt-4 text-sm text-red-400">{hata}</p>}
       {kaydediliyor && <p className="mt-4 text-sm text-slate-400">Kaydediliyor...</p>}
 

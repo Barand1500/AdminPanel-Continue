@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { headerAyarlariBirlestir } from '@/types/header';
 import { aktifDiller, SITE_DIL_STORAGE } from '@/data/siteDilleri';
-import { sayfaCeviriAnahtar, siteCeviriBirlestir } from '@/i18n/siteSozluk';
+import { sayfaCeviriAnahtar, siteCeviriBirlestir, SLUG_SITE_ANAHTAR } from '@/i18n/siteSozluk';
 import type { SiteAyarlari, Sayfa } from '@/types/site';
 
 interface SiteDilContextDegeri {
@@ -50,18 +50,25 @@ export function SiteDilProvider({
       siteCeviriBirlestir(
         dilKodu,
         dilDestegi.ceviriler?.[dilKodu],
-        sayfalar?.map((s) => ({ slug: s.slug, baslik: s.baslik }))
+        sayfalar?.map((s) => ({ slug: s.slug, baslik: s.baslik })),
+        dilDestegi.varsayilanDil
       ),
-    [dilKodu, dilDestegi.ceviriler, sayfalar]
+    [dilKodu, dilDestegi.ceviriler, dilDestegi.varsayilanDil, sayfalar]
+  );
+
+  const sayfaBaslik = useCallback(
+    (slug: string, varsayilan: string) => {
+      const sayfaKey = sayfaCeviriAnahtar(slug);
+      if (sozluk[sayfaKey]) return sozluk[sayfaKey];
+      const siteKey = SLUG_SITE_ANAHTAR[slug];
+      if (siteKey && sozluk[siteKey]) return sozluk[siteKey];
+      return varsayilan;
+    },
+    [sozluk]
   );
 
   const cevir = useCallback(
     (anahtar: string, varsayilan = '') => sozluk[anahtar] ?? varsayilan,
-    [sozluk]
-  );
-
-  const sayfaBaslik = useCallback(
-    (slug: string, varsayilan: string) => sozluk[sayfaCeviriAnahtar(slug)] ?? varsayilan,
     [sozluk]
   );
 

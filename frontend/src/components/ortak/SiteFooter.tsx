@@ -7,14 +7,11 @@ import {
   footerSemaGridSinifi,
 } from '@/types/footer';
 import { FooterNavLink } from '@/components/ortak/FooterNavLink';
-import {
-  SosyalMedyaIkonGoster,
-  platformIkonDegeri,
-  sosyalMedyaLinkleri,
-} from '@/components/ortak/SosyalMedyaIkon';
+import { SosyalMedyaIkonSatirlari } from '@/components/ortak/SosyalMedyaIkon';
 import { SiteMarkaAlani } from '@/components/ortak/SiteMarkaAlani';
 import { siteLogoUrl } from '@/types/logo';
 import { whatsappFormatla } from '@/utils/telefonFormat';
+import { aktifMagazaBadgeleri, FooterMagazaBadgeGoster } from '@/components/ortak/FooterMagazaBadge';
 
 interface SiteFooterProps {
   siteAdi: string;
@@ -108,25 +105,8 @@ function FooterMarka({
         )}
       </ul>
 
-      {footer.marka.sosyalGoster && ayarlar?.sosyalMedyaJson && sosyalMedyaLinkleri(ayarlar.sosyalMedyaJson).length > 0 && (
-        <div className="mt-5 flex flex-wrap gap-2.5">
-          {sosyalMedyaLinkleri(ayarlar.sosyalMedyaJson).map(([platform, url]) => (
-            <a
-              key={platform}
-              href={url}
-              target="_blank"
-              rel="noreferrer"
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 transition hover:scale-105 hover:bg-primary/20"
-              title={platform}
-            >
-              <SosyalMedyaIkonGoster
-                platform={platform}
-                ikonDeger={platformIkonDegeri(ayarlar.sosyalMedyaJson!, platform)}
-                className="h-5 w-5"
-              />
-            </a>
-          ))}
-        </div>
+      {footer.marka.sosyalGoster && ayarlar?.sosyalMedyaJson && (
+        <SosyalMedyaIkonSatirlari sosyal={ayarlar.sosyalMedyaJson} className="mt-5" />
       )}
     </div>
   );
@@ -175,11 +155,50 @@ export function SiteFooter({ siteAdi, ayarlar }: SiteFooterProps) {
   const pazaryeriOgeleri = footer.pazaryeri.ogeler.filter((o) => o.aktif);
   const rozetler = footer.guvenBandi.rozetler.filter((r) => r.aktif);
   const dekor = footer.gorselDekor;
-  const dekorAktif = !!dekor?.aktif && !!dekor.gorselUrl?.trim();
+  const magazalar = aktifMagazaBadgeleri(dekor?.magazalar);
+  const dekorAktif =
+    !!dekor?.aktif && (!!dekor.gorselUrl?.trim() || magazalar.length > 0);
+
+  const gorselImg = dekor?.gorselUrl?.trim() ? (
+    <img src={dekor.gorselUrl} alt="" className="footer-dekor-gorsel-img" />
+  ) : null;
+
+  const gorselLink = dekor?.link?.trim();
+  const yeniSekme = dekor?.yeniSekme !== false;
+  const gorselIcerik =
+    gorselImg &&
+    (gorselLink ? (
+      <a
+        href={gorselLink}
+        target={yeniSekme ? '_blank' : undefined}
+        rel={yeniSekme ? 'noreferrer' : undefined}
+        className="footer-dekor-gorsel-link"
+      >
+        {gorselImg}
+      </a>
+    ) : (
+      gorselImg
+    ));
 
   const dekorGorsel = dekorAktif ? (
     <div className={`footer-dekor-gorsel footer-dekor-gorsel-${dekor!.konum}`}>
-      <img src={dekor!.gorselUrl} alt="" className="footer-dekor-gorsel-img" />
+      {gorselIcerik}
+      {magazalar.length > 0 && (
+        <div className="footer-magaza-badgeler">
+          {magazalar.map((badge) => (
+            <a
+              key={badge.tip}
+              href={badge.url.trim()}
+              target="_blank"
+              rel="noreferrer"
+              className="footer-magaza-badge-link"
+              title={badge.tip === 'appstore' ? 'App Store' : 'Google Play'}
+            >
+              <FooterMagazaBadgeGoster badge={badge} />
+            </a>
+          ))}
+        </div>
+      )}
     </div>
   ) : null;
 

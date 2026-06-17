@@ -187,6 +187,33 @@ body {
   @apply cursor-pointer hover:border-red-200 hover:text-red-600;
 }
 
+.site-sosyal-medya-satir {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.site-sosyal-medya-link {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  line-height: 0;
+  text-decoration: none;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.site-sosyal-medya-link:hover {
+  transform: scale(1.06);
+  opacity: 0.9;
+}
+
+.footer-sema-merkezi .site-sosyal-medya-satir {
+  justify-content: center;
+}
+
 .site-footer {
   background-color: var(--color-footer-bg);
   color: var(--color-footer-text);
@@ -254,7 +281,7 @@ body {
 }
 
 .footer-dekor-gorsel {
-  @apply flex shrink-0 items-center justify-center;
+  @apply flex shrink-0 flex-col items-center justify-center;
 }
 
 .footer-dekor-gorsel-sag,
@@ -269,6 +296,55 @@ body {
 
 .footer-dekor-gorsel-img {
   @apply max-h-52 w-auto max-w-full object-contain;
+}
+
+.footer-dekor-gorsel-link {
+  display: inline-block;
+  line-height: 0;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.footer-dekor-gorsel-link:hover {
+  opacity: 0.92;
+  transform: scale(1.02);
+}
+
+.footer-magaza-badgeler {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.footer-dekor-gorsel-ust .footer-magaza-badgeler,
+.footer-dekor-gorsel-alt .footer-magaza-badgeler {
+  justify-content: center;
+}
+
+.footer-magaza-badge-link {
+  display: inline-flex;
+  line-height: 0;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.footer-magaza-badge-link:hover {
+  transform: scale(1.04);
+  opacity: 0.92;
+}
+
+.footer-magaza-badge-img {
+  height: 2.5rem;
+  width: auto;
+  max-width: 140px;
+  object-fit: contain;
+}
+
+.footer-dekor-gorsel-sag .footer-magaza-badgeler,
+.footer-dekor-gorsel-sol .footer-magaza-badgeler {
+  flex-direction: column;
+  align-items: flex-start;
 }
 
 

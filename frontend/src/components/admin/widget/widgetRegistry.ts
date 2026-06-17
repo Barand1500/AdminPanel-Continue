@@ -127,10 +127,14 @@ export function varsayilanWidgetForm(
   };
 }
 
-export function tipDegistir(form: WidgetFormDegeri, yeniTip: string): WidgetFormDegeri {
+export function tipDegistir(
+  form: WidgetFormDegeri,
+  yeniTip: string,
+  widgetlar: AdminWidget[] = []
+): WidgetFormDegeri {
   if (!tipOlusturulabilirMi(yeniTip)) return form;
   return {
-    ...varsayilanWidgetForm(yeniTip),
+    ...varsayilanWidgetForm(yeniTip, widgetlar),
     ad: form.ad,
     sira: form.sira,
     aktif: form.aktif,

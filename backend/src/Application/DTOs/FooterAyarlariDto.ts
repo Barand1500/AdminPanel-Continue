@@ -58,6 +58,10 @@ export const footerAyarlariSchema = z.object({
     logoGoster: z.boolean(),
     logoBoyutu: z.enum(['kucuk', 'orta', 'buyuk']).optional(),
     sosyalGoster: z.boolean(),
+    adresGoster: z.boolean().optional(),
+    emailGoster: z.boolean().optional(),
+    telefonGoster: z.boolean().optional(),
+    whatsappGoster: z.boolean().optional(),
     bankaLinki: z.object({
       aktif: z.boolean(),
       ad: z.string().max(80),
@@ -82,6 +86,26 @@ export const footerAyarlariSchema = z.object({
     kurlarGoster: z.boolean(),
   }),
   yuzucuButonlar: eskiYuzucuButonlarSchema,
+  gorselDekor: z
+    .object({
+      aktif: z.boolean(),
+      gorselUrl: z.string().max(500),
+      konum: z.enum(['sag', 'sol', 'ust', 'alt']),
+      link: z.string().max(500).optional(),
+      yeniSekme: z.boolean().optional(),
+      magazalar: z
+        .array(
+          z.object({
+            tip: z.enum(['appstore', 'playstore']),
+            aktif: z.boolean(),
+            url: z.string().max(500),
+            stil: z.enum(['resmi-siyah', 'resmi-beyaz', 'renkli', 'minimal', 'ozel']),
+            ozelGorselUrl: z.string().max(500).optional(),
+          })
+        )
+        .optional(),
+    })
+    .optional(),
 });
 
 export type FooterAyarlariDto = z.infer<typeof footerAyarlariSchema>;

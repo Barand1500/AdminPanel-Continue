@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { BlogDuzenleFormu, BlogListesi } from '@/components/admin/blog/BlogBilesenleri';
 import { BlogGorunumPanel } from '@/components/admin/blog/BlogGorunumPanel';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
+import { useKaydedilmemisBildirim } from '@/contexts/AdminUyariBildirimContext';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import {
   AdminModulKabuk,
@@ -61,6 +62,13 @@ export function BlogYonetimiSayfasi() {
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [hata, setHata] = useState('');
   const [basari, setBasari] = useState('');
+
+  useKaydedilmemisBildirim(
+    kirli && !kaydediliyor,
+    'Görünüm ayarlarında kaydedilmemiş değişiklik var.',
+    'Blog / Haberler',
+    'blog-gorunum'
+  );
 
   const istatistik = useMemo(
     () => ({
@@ -204,9 +212,6 @@ export function BlogYonetimiSayfasi() {
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
-      {kirli && !kaydediliyor && (
-        <BildirimKutusu mesaj="Görünüm ayarlarında kaydedilmemiş değişiklik var." tur="bilgi" />
-      )}
 
       {yukleniyor ? (
         <YukleniyorDurumu mesaj="Blog yazıları yükleniyor..." />

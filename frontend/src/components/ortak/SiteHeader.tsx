@@ -13,11 +13,7 @@ import { MenuNavLink } from './MenuNavLink';
 import { MenuDropdown } from './MenuDropdown';
 import { SiteMarkaAlani } from './SiteMarkaAlani';
 import { HeaderDilSecici } from './HeaderDilSecici';
-import {
-  SosyalMedyaIkonGoster,
-  platformIkonDegeri,
-  sosyalMedyaLinkleri,
-} from './SosyalMedyaIkon';
+import { SosyalMedyaIkonSatirlari } from './SosyalMedyaIkon';
 
 interface SiteHeaderProps {
   siteAdi: string;
@@ -70,10 +66,10 @@ function MenuOgeGoster({
 
 export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
   const [menuAcik, setMenuAcik] = useState(false);
-  const { sayfaBaslik } = useSiteDil();
+  const { dilKodu, sayfaBaslik, cevir } = useSiteDil();
   const cevrilmisMenu = useMemo(
     () => menuOgeleriCevir(menuOgeleri, sayfaBaslik),
-    [menuOgeleri, sayfaBaslik]
+    [menuOgeleri, sayfaBaslik, dilKodu]
   );
   const header = headerAyarlariBirlestir(ayarlar);
   const ustBant = header.ustBant!;
@@ -102,24 +98,9 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
                 ✉️ {ayarlar.email}
               </a>
             )}
-            {ustBant.sosyalGoster &&
-              ayarlar?.sosyalMedyaJson &&
-              sosyalMedyaLinkleri(ayarlar.sosyalMedyaJson).map(([platform, url]) => (
-                <a
-                  key={platform}
-                  href={url}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex h-6 w-6 items-center justify-center rounded-full bg-white/15 transition hover:bg-white/25"
-                  title={platform}
-                >
-                  <SosyalMedyaIkonGoster
-                    platform={platform}
-                    ikonDeger={platformIkonDegeri(ayarlar.sosyalMedyaJson!, platform)}
-                    className="h-3.5 w-3.5"
-                  />
-                </a>
-              ))}
+            {ustBant.sosyalGoster && ayarlar?.sosyalMedyaJson && (
+              <SosyalMedyaIkonSatirlari sosyal={ayarlar.sosyalMedyaJson} ikonSinifi="h-5 w-5" />
+            )}
             {ustBant.kurlarGoster &&
               kurlar.map((kur, i) => (
                 <span key={kur.id} className="whitespace-nowrap">
@@ -162,7 +143,7 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
               to="/hesabim"
               className="rounded-full p-2 transition hover:bg-accent hover:text-primary"
               style={{ color: 'var(--color-text-muted)' }}
-              title="Hesabım"
+              title={cevir('site.hesabim', 'Hesabım')}
             >
               <HeaderIkon ikon={ikonlar.hesap} grup="hesap" />
             </Link>
@@ -226,13 +207,13 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
             >
               <TemaToggle tema={ikonlar.tema} />
               <Link to="/hesabim" onClick={() => setMenuAcik(false)} className="text-primary">
-                Hesabım
+                {cevir('site.hesabim', 'Hesabım')}
               </Link>
               <Link to="/favoriler" onClick={() => setMenuAcik(false)} className="text-primary">
-                Favoriler
+                {cevir('site.favoriler', 'Favoriler')}
               </Link>
               <Link to="/sepet" onClick={() => setMenuAcik(false)} className="text-primary">
-                Sepetim
+                {cevir('site.sepet', 'Sepetim')}
               </Link>
             </div>
           </nav>
