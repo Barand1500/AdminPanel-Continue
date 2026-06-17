@@ -546,6 +546,10 @@ body:has(.site-public)::-webkit-scrollbar,
   transition: transform 0.15s ease;
 }
 
+.site-menu-dropdown-ok-acik {
+  transform: rotate(180deg);
+}
+
 .site-menu-dropdown-acik .site-menu-dropdown-ok {
   transform: rotate(180deg);
 }
@@ -553,14 +557,30 @@ body:has(.site-public)::-webkit-scrollbar,
 .site-menu-dropdown-panel {
   position: absolute;
   left: 0;
-  top: calc(100% + 0.5rem);
+  top: 100%;
   z-index: 50;
   min-width: 220px;
-  border-radius: 0.5rem;
+  padding-top: 0.5rem;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s ease;
+}
+
+.site-menu-dropdown-panel-acik {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+.site-menu-dropdown-panel-icerik {
+  border-radius: 0.625rem;
   border: 1px solid var(--color-border);
   background: var(--color-surface-elevated);
   padding: 0.375rem 0;
-  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.14);
 }
 
 .site-menu-dropdown-ust-link {
@@ -589,28 +609,27 @@ body:has(.site-public)::-webkit-scrollbar,
   color: var(--color-primary);
 }
 
-.site-menu-dropdown-hover:hover .site-menu-dropdown-panel,
-.site-menu-dropdown-acik .site-menu-dropdown-panel {
-  display: block;
-}
-
-.site-menu-dropdown-panel-yatay {
+.site-menu-dropdown-panel-yatay .site-menu-dropdown-panel-icerik {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.25rem;
-  min-width: min(480px, 90vw);
+  gap: 0.35rem;
+  min-width: min(520px, 92vw);
   padding: 0.5rem;
 }
 
 .site-menu-dropdown-panel-yatay .site-menu-dropdown-alt-link {
-  border-radius: 0.375rem;
-  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  padding: 0.5rem 0.875rem;
   white-space: nowrap;
 }
 
 .site-menu-dropdown-yatay .site-menu-dropdown-panel {
   left: 50%;
-  transform: translateX(-50%);
+  transform: translateX(-50%) translateY(-4px);
+}
+
+.site-menu-dropdown-yatay .site-menu-dropdown-panel-acik {
+  transform: translateX(-50%) translateY(0);
 }
 
 .site-menu-dropdown-ic {

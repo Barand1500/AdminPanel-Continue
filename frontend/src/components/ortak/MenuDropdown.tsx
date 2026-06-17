@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import type { MenuOgesi } from '@/types/site';
 import { MenuNavLink } from './MenuNavLink';
@@ -14,13 +14,21 @@ interface MenuDropdownProps {
 export function MenuDropdown({ oge, className, linkClassName, style, onClick }: MenuDropdownProps) {
   const [acik, setAcik] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
+  const kapatTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const altOgeler = oge.altOgeler ?? [];
   const hoverMod = oge.altMenuTetikleyici !== 'tikla';
   const yatay = oge.altMenuGorunum === 'yatay';
   const icerikVar = oge.icerikVar === true;
+  const tiklaModu = !hoverMod;
 
   useEffect(() => {
-    if (!acik) return;
+    return () => {
+      if (kapatTimerRef.current) clearTimeout(kapatTimerRef.current);
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!acik || !tiklaModu) return;
     function disariTikla(e: MouseEvent) {
       if (wrapRef.current && !wrapRef.current.contains(e.target as Node)) {
         setAcik(false);
@@ -28,32 +36,56 @@ export function MenuDropdown({ oge, className, linkClassName, style, onClick }: 
     }
     document.addEventListener('mousedown', disariTikla);
     return () => document.removeEventListener('mousedown', disariTikla);
-  }, [acik]);
+  }, [acik, tiklaModu]);
 
   function panelAc() {
-    if (altOgeler.length > 0) setAcik(true);
+    if (!hoverMod || altOgeler.length === 0) return;
+    if (kapatTimerRef.current) {
+      clearTimeout(kapatTimerRef.current);
+      kapatTimerRef.current = null;
+    }
+    setAcik(true);
+  }
+
+  function panelKapatGecikmeli() {
+    if (!hoverMod) return;
+    if (kapatTimerRef.current) clearTimeout(kapatTimerRef.current);
+    kapatTimerRef.current = setTimeout(() => setAcik(false), 160);
   }
 
   function panelKapat() {
+    if (kapatTimerRef.current) {
+      clearTimeout(kapatTimerRef.current);
+      kapatTimerRef.current = null;
+    }
     setAcik(false);
   }
 
-  function tetikTikla() {
-    if (altOgeler.length === 0) return;
-    if (hoverMod) return;
-    setAcik((a) => !a);
+  function tetikTikla(e: ReactMouseEvent<HTMLButtonElement>) {
+    if (hoverMod || altOgeler.length === 0) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setAcik((v) => !v);
   }
 
   const tetikSinif = `site-menu-dropdown-tetik ${linkClassName} ${acik ? 'site-menu-dropdown-tetik-acik' : ''}`;
+  const panelGorunur = acik && altOgeler.length > 0;
+
+  const tetikIcerik = (
+    <>
+      <span>{oge.baslik}</span>
+      {altOgeler.length > 0 && <MenuOk acik={acik} />}
+    </>
+  );
 
   return (
     <div
       ref={wrapRef}
       className={`site-menu-dropdown ${className} ${acik ? 'site-menu-dropdown-acik' : ''} ${yatay ? 'site-menu-dropdown-yatay' : ''} ${hoverMod ? 'site-menu-dropdown-hover' : 'site-menu-dropdown-tikla'}`}
-      onMouseEnter={hoverMod ? panelAc : undefined}
-      onMouseLeave={hoverMod ? panelKapat : undefined}
+      onMouseEnter={panelAc}
+      onMouseLeave={panelKapatGecikmeli}
     >
-      {icerikVar ? (
+      {hoverMod && icerikVar ? (
         <Link
           to={oge.yol}
           className={tetikSinif}
@@ -63,8 +95,7 @@ export function MenuDropdown({ oge, className, linkClassName, style, onClick }: 
             panelKapat();
           }}
         >
-          <span>{oge.baslik}</span>
-          {altOgeler.length > 0 && <MenuOk />}
+          {tetikIcerik}
         </Link>
       ) : (
         <button
@@ -75,47 +106,68 @@ export function MenuDropdown({ oge, className, linkClassName, style, onClick }: 
           aria-haspopup="true"
           onClick={tetikTikla}
         >
-          <span>{oge.baslik}</span>
-          {altOgeler.length > 0 && <MenuOk />}
+          {tetikIcerik}
         </button>
       )}
 
-      {acik && altOgeler.length > 0 && (
+      {altOgeler.length > 0 && (
         <div
-          className={`site-menu-dropdown-panel ${yatay ? 'site-menu-dropdown-panel-yatay' : ''}`}
+          className={`site-menu-dropdown-panel ${yatay ? 'site-menu-dropdown-panel-yatay' : ''} ${panelGorunur ? 'site-menu-dropdown-panel-acik' : ''}`}
           role="menu"
+          onMouseEnter={panelAc}
+          onMouseLeave={panelKapatGecikmeli}
         >
-          {altOgeler.map((alt) =>
-            alt.altOgeler && alt.altOgeler.length > 0 ? (
-              <div key={alt.yol} className="site-menu-dropdown-ic-oge">
-                <MenuDropdown
-                  oge={alt}
-                  className="site-menu-dropdown-ic"
-                  linkClassName="site-menu-dropdown-alt-link"
-                  onClick={onClick}
+          <div className="site-menu-dropdown-panel-icerik">
+            {tiklaModu && icerikVar && (
+              <>
+                <MenuNavLink
+                  oge={oge}
+                  className="site-menu-dropdown-ust-link"
+                  onClick={() => {
+                    onClick?.();
+                    panelKapat();
+                  }}
                 />
-              </div>
-            ) : (
-              <MenuNavLink
-                key={alt.yol}
-                oge={alt}
-                className="site-menu-dropdown-alt-link"
-                onClick={() => {
-                  onClick?.();
-                  panelKapat();
-                }}
-              />
-            )
-          )}
+                <div className="site-menu-dropdown-ayrac" />
+              </>
+            )}
+            {altOgeler.map((alt) =>
+              alt.altOgeler && alt.altOgeler.length > 0 ? (
+                <div key={alt.yol} className="site-menu-dropdown-ic-oge">
+                  <MenuDropdown
+                    oge={alt}
+                    className="site-menu-dropdown-ic"
+                    linkClassName="site-menu-dropdown-alt-link"
+                    onClick={onClick}
+                  />
+                </div>
+              ) : (
+                <MenuNavLink
+                  key={alt.yol}
+                  oge={alt}
+                  className="site-menu-dropdown-alt-link"
+                  onClick={() => {
+                    onClick?.();
+                    panelKapat();
+                  }}
+                />
+              )
+            )}
+          </div>
         </div>
       )}
     </div>
   );
 }
 
-function MenuOk() {
+function MenuOk({ acik }: { acik: boolean }) {
   return (
-    <svg viewBox="0 0 20 20" className="site-menu-dropdown-ok" fill="currentColor" aria-hidden>
+    <svg
+      viewBox="0 0 20 20"
+      className={`site-menu-dropdown-ok ${acik ? 'site-menu-dropdown-ok-acik' : ''}`}
+      fill="currentColor"
+      aria-hidden
+    >
       <path
         fillRule="evenodd"
         d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"

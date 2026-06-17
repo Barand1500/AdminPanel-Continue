@@ -3,6 +3,10 @@ import { sayfaYolunuBul } from '@/data/bosSiteVerisi';
 import type { MenuOgesi, SayfaAcilisModu } from '@/types/site';
 import { idString } from '@/utils/idKarsilastir';
 
+export function sayfaIcerikVar(icerik?: string | null): boolean {
+  return Boolean(icerik?.replace(/<[^>]*>/g, '').trim());
+}
+
 export type AltMenuGorunum = 'dikey' | 'yatay';
 export type AltMenuTetikleyici = 'hover' | 'tikla';
 
@@ -73,7 +77,7 @@ function menuOgesiUret(sayfa: SayfaMenuKaynak, sayfalar: SayfaMenuKaynak[]): Men
   );
 
   const altOgeler = altKaynaklar.map((alt) => menuOgesiUret(alt, sayfalar));
-  const icerikVar = Boolean(sayfa.icerik?.trim());
+  const icerikVar = sayfaIcerikVar(sayfa.icerik);
 
   return {
     baslik: sayfa.baslik,
@@ -148,12 +152,13 @@ export function ustSayfaSecenekleri(
 }
 
 export function altSayfaSayisi(sayfalar: AdminSayfa[], ustId: string): number {
-  return sayfalar.filter((s) => s.ustSayfaId && idString(s.ustSayfaId) === idString(ustId)).length;
+  return dogrudanAltSayfalar(sayfalar, ustId).length;
 }
 
 export function dogrudanAltSayfalar(sayfalar: AdminSayfa[], ustId: string): AdminSayfa[] {
+  const duzeltildi = sayfaHiyerarsisiTamamla(sayfalar);
   return cocuklariSirala(
-    sayfalar.filter((s) => s.ustSayfaId && idString(s.ustSayfaId) === idString(ustId))
+    duzeltildi.filter((s) => s.ustSayfaId && idString(s.ustSayfaId) === idString(ustId))
   );
 }
 
@@ -163,8 +168,4 @@ export function ustSayfaBul(
 ): AdminSayfa | undefined {
   if (!ustSayfaId) return undefined;
   return sayfalar.find((s) => idString(s.id) === idString(ustSayfaId));
-}
-
-export function sayfaIcerikVar(icerik?: string | null): boolean {
-  return Boolean(icerik?.replace(/<[^>]*>/g, '').trim());
 }

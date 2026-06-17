@@ -239,7 +239,7 @@ export function SayfaEditorPanel({
   const altSayi = seciliId ? altSayfaSayisi(sayfalar, seciliId) : 0;
   const seciliSayfa = seciliId ? sayfalar.find((s) => s.id === seciliId) : undefined;
   const altSayfalar = seciliId ? dogrudanAltSayfalar(sayfalar, seciliId) : [];
-  const altMenuAyarlariGoster = !!seciliId && altSayi >= 2;
+  const altMenuAyarlariGoster = !!seciliId && !form.ustSayfaId && altSayi >= 1;
   const segmentSlug = form.ustSayfaId
     ? sayfaSegmentSlug(form.slug || slugUret(form.baslik))
     : form.slug;
@@ -347,47 +347,6 @@ export function SayfaEditorPanel({
               </FormAlani>
             </AdminFormBolumu>
 
-            {altMenuAyarlariGoster && (
-              <AdminFormBolumu
-                baslik="Alt Menü Görünümü"
-                aciklama="Bu sayfanın alt kategorileri sitede nasıl görünecek (2+ alt sayfa)"
-              >
-                <FormAlani etiket="Düzen">
-                  <div className="ap-sayfa-alt-menu-secim-grid">
-                    {ALT_MENU_GORUNUM.map((m) => (
-                      <button
-                        key={m.id}
-                        type="button"
-                        className={`ap-sayfa-alt-menu-secim ${form.altMenuGorunum === m.id ? 'ap-sayfa-alt-menu-secim-aktif' : ''}`}
-                        onClick={() => onChange({ ...form, altMenuGorunum: m.id })}
-                      >
-                        <span className="ap-sayfa-alt-menu-secim-baslik">{m.ad}</span>
-                        <span className="ap-muted text-xs">{m.aciklama}</span>
-                      </button>
-                    ))}
-                  </div>
-                </FormAlani>
-                <FormAlani etiket="Açılış tetikleyici">
-                  <div className="flex flex-wrap gap-2">
-                    {ALT_MENU_TETIK.map((m) => (
-                      <button
-                        key={m.id}
-                        type="button"
-                        className={`rounded-lg border px-3 py-2 text-sm ${
-                          form.altMenuTetikleyici === m.id
-                            ? 'border-blue-500 bg-blue-600/20 text-blue-400'
-                            : 'border-[var(--ap-border)] hover:bg-[var(--ap-hover)]'
-                        }`}
-                        onClick={() => onChange({ ...form, altMenuTetikleyici: m.id })}
-                      >
-                        {m.ad}
-                      </button>
-                    ))}
-                  </div>
-                </FormAlani>
-              </AdminFormBolumu>
-            )}
-
             <AdminFormBolumu baslik="İçerik" aciklama="Görsel editör veya HTML kodu ile sayfa içeriği oluşturun">
               <IcerikHtmlEditoru
                 deger={form.icerik}
@@ -433,7 +392,53 @@ export function SayfaEditorPanel({
         )}
 
         {sekme === 'ayarlar' && (
-          <AdminFormBolumu baslik="Yayın ve Menü">
+          <>
+            {altMenuAyarlariGoster && (
+              <AdminFormBolumu
+                baslik="Alt Menü Görünümü"
+                aciklama="Bu ana sayfanın alt kategorileri ziyaretçi sitesinde böyle açılır. Değiştirdikten sonra Kaydet'e basın."
+              >
+                <FormAlani etiket="Düzen">
+                  <div className="ap-sayfa-alt-menu-secim-grid">
+                    {ALT_MENU_GORUNUM.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        className={`ap-sayfa-alt-menu-secim ${form.altMenuGorunum === m.id ? 'ap-sayfa-alt-menu-secim-aktif' : ''}`}
+                        onClick={() => onChange({ ...form, altMenuGorunum: m.id })}
+                      >
+                        <span className="ap-sayfa-alt-menu-secim-baslik">{m.ad}</span>
+                        <span className="ap-muted text-xs">{m.aciklama}</span>
+                      </button>
+                    ))}
+                  </div>
+                </FormAlani>
+                <FormAlani etiket="Açılış tetikleyici">
+                  <div className="flex flex-wrap gap-2">
+                    {ALT_MENU_TETIK.map((m) => (
+                      <button
+                        key={m.id}
+                        type="button"
+                        className={`rounded-lg border px-3 py-2 text-sm ${
+                          form.altMenuTetikleyici === m.id
+                            ? 'border-blue-500 bg-blue-600/20 text-blue-400'
+                            : 'border-[var(--ap-border)] hover:bg-[var(--ap-hover)]'
+                        }`}
+                        onClick={() => onChange({ ...form, altMenuTetikleyici: m.id })}
+                      >
+                        {m.ad}
+                      </button>
+                    ))}
+                  </div>
+                </FormAlani>
+                <p className="ap-muted text-xs">
+                  Şu an: <strong>{form.altMenuGorunum === 'yatay' ? 'Yatay' : 'Dikey'}</strong> ·{' '}
+                  <strong>{form.altMenuTetikleyici === 'tikla' ? 'Tıklama' : 'Hover'}</strong>
+                </p>
+              </AdminFormBolumu>
+            )}
+
+            <AdminFormBolumu baslik="Yayın ve Menü">
             <FormAlani etiket="Sayfa Açılış Modu" aciklama="Menüden tıklandığında sayfanın nasıl açılacağı">
               <select
                 className={formSelectSinifi}
@@ -482,7 +487,8 @@ export function SayfaEditorPanel({
                 onChange={(e) => onChange({ ...form, sira: Number(e.target.value) })}
               />
             </FormAlani>
-          </AdminFormBolumu>
+            </AdminFormBolumu>
+          </>
         )}
 
         {sekme === 'alt-sayfa' && seciliSayfa && (
