@@ -1,15 +1,14 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { adminLogApi, type AdminLogKayit } from '@/features/admin/adminSistemApi';
 import { AltPanel, AltPanelBos, AltPanelOge, AltPanelYukleniyor } from './ortak/AltPanel';
 
 interface LogPaneliProps {
   acik: boolean;
   onKapat: () => void;
+  onModulAc?: (modulId: string) => void;
 }
 
-export function LogPaneli({ acik, onKapat }: LogPaneliProps) {
-  const navigate = useNavigate();
+export function LogPaneli({ acik, onKapat, onModulAc }: LogPaneliProps) {
   const [loglar, setLoglar] = useState<AdminLogKayit[]>([]);
   const [yukleniyor, setYukleniyor] = useState(false);
 
@@ -35,7 +34,14 @@ export function LogPaneli({ acik, onKapat }: LogPaneliProps) {
       onKapat={onKapat}
       baslik="Son Kayıtlar"
       ustAksiyon={
-        <button type="button" className="ap-alt-panel-link" onClick={() => { navigate('/gt-admin/loglar'); onKapat(); }}>
+        <button
+          type="button"
+          className="ap-alt-panel-link"
+          onClick={() => {
+            onModulAc?.('loglar');
+            onKapat();
+          }}
+        >
           Tümünü gör
         </button>
       }

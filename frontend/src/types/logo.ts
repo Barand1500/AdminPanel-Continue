@@ -30,9 +30,15 @@ export function logoBoyutSinifi(boyut: LogoBoyutu, yer: 'header' | 'footer'): st
   return `w-auto shrink-0 object-contain ${BOYUT_SINIFLARI[yer][boyut]}`;
 }
 
+export function headerLogoUrl(
+  ayarlar?: { logoUrl?: string | null; headerAyarlariJson?: { logoUrl?: string | null } | null } | null
+): string | null {
+  return ayarlar?.headerAyarlariJson?.logoUrl ?? ayarlar?.logoUrl ?? null;
+}
+
+/** Footer ve genel marka alanları — site logosu yoksa header logosuna düşer */
 export function siteLogoUrl(
   ayarlar?: { logoUrl?: string | null; headerAyarlariJson?: { logoUrl?: string | null } | null } | null
 ): string | null {
-  const jsonLogo = ayarlar?.headerAyarlariJson?.logoUrl;
-  return ayarlar?.logoUrl ?? jsonLogo ?? null;
+  return ayarlar?.logoUrl ?? ayarlar?.headerAyarlariJson?.logoUrl ?? null;
 }

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import { useSiteYonetimiAksiyonlari } from '@/hooks/useSiteYonetimiAksiyonlari';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
+import { GorselAlan } from '@/components/form/GorselAlan';
 import { LogoBoyutSecici } from '@/components/admin/site/LogoBoyutSecici';
 import { logoBoyutuNormalize } from '@/types/logo';
 import { IkonSecici } from '@/components/admin/header/IkonSecici';
@@ -9,6 +10,7 @@ import { ParaBirimiYonetimi } from '@/components/admin/header/ParaBirimiYonetimi
 import { AramaStilSecici } from '@/components/admin/header/AramaStilSecici';
 import { SiteOnizlemePaneli } from './SiteOnizlemePaneli';
 import type { HeaderAyarlari } from '@/types/header';
+import { headerMarkaMetni } from '@/types/header';
 import {
   AdminPanelKarti,
   BildirimKutusu,
@@ -64,7 +66,6 @@ export function HeaderYonetimiFormu() {
     yukleniyor,
     hata,
     kaydediliyor,
-    siteAdGuncelle,
     siteAd,
     headerGuncelle,
   } = useSiteAyarlariYonetimi();
@@ -88,7 +89,7 @@ export function HeaderYonetimiFormu() {
       <div className="space-y-5">
         <ModulBaslik
           baslik="Header Yönetimi"
-          aciklama="Üst bant, logo görünümü, kurlar, ikonlar, kategori menüsü ve arama alanını yönetin. Logo dosyası Site Ayarları'ndan yüklenir."
+          aciklama="Üst bant, header logosu, kurlar, ikonlar, kategori menüsü ve arama alanını yönetin."
         />
 
         {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
@@ -112,15 +113,20 @@ export function HeaderYonetimiFormu() {
         </div>
 
         {sekme === 'ust-bant' && (
-          <AdminPanelKarti baslik="Üst Bant" altBaslik="Slogan ve kur görünürlüğü">
+          <AdminPanelKarti baslik="Üst Bant" altBaslik="Header marka metni ve kur görünürlüğü">
             <div className="space-y-4">
-              <FormAlani etiket="Site Adı" aciklama="Logo yoksa navbar'da görünür">
+              <FormAlani
+                etiket="Header Marka Metni"
+                aciklama="Navbar'da logo yanında görünen yazı (tarayıcı sekmesi site adından bağımsız)"
+              >
                 <input
                   type="text"
-                  value={siteAd}
-                  onChange={(e) => siteAdGuncelle(e.target.value)}
+                  value={headerAyarlari.markaMetni ?? ''}
+                  onChange={(e) =>
+                    headerGuncelleParcali({ markaMetni: e.target.value || null })
+                  }
                   className={formInputSinifi}
-                  placeholder="Güzel Teknoloji"
+                  placeholder={siteAd || 'Güzel Teknoloji'}
                 />
               </FormAlani>
               <FormAlani etiket="Slogan" aciklama="Üst banttaki kısa metin">
@@ -146,12 +152,15 @@ export function HeaderYonetimiFormu() {
         )}
 
         {sekme === 'logo-gorunum' && (
-          <AdminPanelKarti baslik="Logo Görünümü" altBaslik="Header'daki logo boyutu">
+          <AdminPanelKarti baslik="Logo Görünümü" altBaslik="Header logosu ve boyutu">
             <div className="space-y-4">
-              <p className="ap-muted text-xs leading-relaxed">
-                Logo dosyası <strong className="text-[var(--ap-accent)]">Site Ayarları</strong> modülünden
-                yüklenir. Buradan yalnızca header&apos;daki görünüm boyutunu ayarlayın.
-              </p>
+              <GorselAlan
+                etiket="Header Logosu"
+                aciklama="Yalnızca header'da görünür"
+                deger={headerAyarlari.logoUrl ?? ''}
+                onChange={(v) => headerGuncelleParcali({ logoUrl: v || null })}
+                onizlemeSinifi="h-14 max-w-[180px] rounded-lg object-contain bg-[var(--ap-input-bg)] border border-[var(--ap-border)] p-1"
+              />
               <LogoBoyutSecici
                 etiket="Header logo boyutu"
                 deger={logoBoyutuNormalize(headerAyarlari.logoBoyutu)}
@@ -245,7 +254,7 @@ export function HeaderYonetimiFormu() {
 
       <SiteOnizlemePaneli
         tip="header"
-        siteAd={siteAd}
+        siteAd={headerMarkaMetni(headerAyarlari, siteAd)}
         headerAyarlari={headerAyarlari}
         iletisim={{ telefon: ayarlar.telefon, email: ayarlar.email }}
       />

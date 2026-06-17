@@ -11,6 +11,7 @@ import { useState } from 'react';
 interface AltAksiyonCubuguProps {
   aksiyonlar: AksiyonButonu[];
   onAksiyon?: (id: string) => void;
+  onModulAc?: (modulId: string) => void;
   focusModulId?: string;
   onRehberAc?: () => void;
 }
@@ -20,6 +21,7 @@ type AcikPanel = 'bildirim' | 'log' | 'yedek' | null;
 export function AltAksiyonCubugu({
   aksiyonlar,
   onAksiyon,
+  onModulAc,
   focusModulId = 'dashboard',
   onRehberAc,
 }: AltAksiyonCubuguProps) {
@@ -100,8 +102,16 @@ export function AltAksiyonCubugu({
           onKapat={() => setAcikPanel(null)}
           onGuncelle={yenile}
         />
-        <LogPaneli acik={acikPanel === 'log'} onKapat={() => setAcikPanel(null)} />
-        <YedeklemeHizliPaneli acik={acikPanel === 'yedek'} onKapat={() => setAcikPanel(null)} />
+        <LogPaneli
+          acik={acikPanel === 'log'}
+          onKapat={() => setAcikPanel(null)}
+          onModulAc={onModulAc}
+        />
+        <YedeklemeHizliPaneli
+          acik={acikPanel === 'yedek'}
+          onKapat={() => setAcikPanel(null)}
+          onModulAc={onModulAc}
+        />
         <SaatTakvimWidget />
       </div>
     </footer>

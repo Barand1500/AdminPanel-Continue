@@ -1,9 +1,9 @@
 import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
-import { headerAyarlariBirlestir } from '@/types/header';
+import { headerAyarlariBirlestir, headerMarkaMetni } from '@/types/header';
 import type { ParaBirimiKaydi } from '@/types/header';
-import { siteLogoUrl } from '@/types/logo';
+import { headerLogoUrl } from '@/types/logo';
 import { KategoriMenu } from './KategoriMenu';
 import { TemaToggle } from './TemaToggle';
 import { HeaderIkon } from './HeaderIkon';
@@ -39,7 +39,8 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
   const kurlar = (header.kurlar ?? []).filter((k) => k.kod !== 'TRY').sort((a, b) => a.sira - b.sira);
   const anaRenk = ayarlar?.anaRenk ?? '#7c3aed';
   const ikincilRenk = ayarlar?.ikincilRenk ?? '#a78bfa';
-  const logoUrl = siteLogoUrl(ayarlar);
+  const logoUrl = headerLogoUrl(ayarlar);
+  const markaMetni = headerMarkaMetni(header, siteAdi);
 
   return (
     <>
@@ -72,7 +73,7 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
       <header className="site-header sticky top-0 z-40 border-b shadow-sm">
         <div className="container-site flex h-16 items-center justify-between gap-4">
           <SiteMarkaAlani
-            siteAdi={siteAdi}
+            siteAdi={markaMetni}
             logoUrl={logoUrl}
             logoBoyutu={header.logoBoyutu}
             yer="header"

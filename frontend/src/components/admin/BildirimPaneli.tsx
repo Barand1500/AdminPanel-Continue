@@ -41,10 +41,8 @@ export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProp
   async function tumunuOkundu() {
     try {
       await adminBildirimleriTumunuOkundu();
-      setBildirimler((onceki) => onceki.map((b) => ({ ...b, okundu: true })));
-      setIslemMesaji('Tüm bildirimler okundu işaretlendi.');
+      setBildirimler([]);
       onGuncelle?.();
-      setTimeout(() => setIslemMesaji(null), 2500);
     } catch {
       setIslemMesaji('İşlem başarısız oldu.');
     }
@@ -66,7 +64,7 @@ export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProp
         </button>
       }
     >
-      {islemMesaji && <p className="ap-alt-panel-basari px-1 pb-2">{islemMesaji}</p>}
+      {islemMesaji && <p className="ap-alt-panel-hata px-1 pb-2">{islemMesaji}</p>}
       {yukleniyor && <AltPanelYukleniyor />}
       {!yukleniyor && bildirimler.length === 0 && <AltPanelBos mesaj="Henüz bildirim yok." />}
       {bildirimler.map((b) => (

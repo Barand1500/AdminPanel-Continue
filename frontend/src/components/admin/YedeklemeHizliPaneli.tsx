@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { adminYedekApi, type YedekKaydi } from '@/features/admin/adminSistemApi';
 import { AltPanel, AltPanelYukleniyor } from './ortak/AltPanel';
 
 interface YedeklemeHizliPaneliProps {
   acik: boolean;
   onKapat: () => void;
+  onModulAc?: (modulId: string) => void;
 }
 
 function tarihFormat(iso: string) {
@@ -18,8 +18,7 @@ function tarihFormat(iso: string) {
   });
 }
 
-export function YedeklemeHizliPaneli({ acik, onKapat }: YedeklemeHizliPaneliProps) {
-  const navigate = useNavigate();
+export function YedeklemeHizliPaneli({ acik, onKapat, onModulAc }: YedeklemeHizliPaneliProps) {
   const [sonKayit, setSonKayit] = useState<YedekKaydi | null>(null);
   const [yukleniyor, setYukleniyor] = useState(false);
   const [indiriliyor, setIndiriliyor] = useState(false);
@@ -94,7 +93,10 @@ export function YedeklemeHizliPaneli({ acik, onKapat }: YedeklemeHizliPaneliProp
           <button
             type="button"
             className="ap-alt-panel-btn-ikincil"
-            onClick={() => { navigate('/gt-admin/veri-yedekleme'); onKapat(); }}
+            onClick={() => {
+              onModulAc?.('veri-yedekleme');
+              onKapat();
+            }}
           >
             Tam ekrana git
           </button>

@@ -226,6 +226,7 @@ function AdminPanelGovde() {
       <AltAksiyonCubugu
         aksiyonlar={aksiyonlar}
         onAksiyon={(id) => void aksiyonHandler(id)}
+        onModulAc={modulSecHandler}
         focusModulId={focusModulId}
         onRehberAc={() => setRehberAcik(true)}
       />

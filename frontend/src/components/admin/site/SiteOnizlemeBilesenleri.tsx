@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
 import type { HeaderAyarlari, ParaBirimiKaydi } from '@/types/header';
-import { headerAyarlariBirlestir } from '@/types/header';
+import { headerAyarlariBirlestir, headerMarkaMetni } from '@/types/header';
 import { SiteMarkaAlani } from '@/components/ortak/SiteMarkaAlani';
-import { siteLogoUrl } from '@/types/logo';
+import { headerLogoUrl } from '@/types/logo';
 import { HeaderIkon } from '@/components/ortak/HeaderIkon';
 import { SiteFooter } from '@/components/ortak/SiteFooter';
 import { KategoriModuOnizleme } from './KategoriModuOnizleme';
@@ -46,6 +46,8 @@ export function SiteHeaderOnizleme({
   const email = iletisim?.email ?? ayarlar?.email;
   const kurlar = (header.kurlar ?? []).filter((k) => k.kod !== 'TRY').sort((a, b) => a.sira - b.sira);
   const [kategoriAcik, setKategoriAcik] = useState(false);
+  const markaMetni = headerMarkaMetni(header, siteAdi);
+  const logoUrl = headerProp ? header.logoUrl : headerLogoUrl(ayarlar);
 
   return (
     <div className="site-public min-w-0 p-2">
@@ -67,8 +69,8 @@ export function SiteHeaderOnizleme({
         <div className="flex items-center justify-between gap-2 border-b border-slate-100 px-3 py-2">
           <div className="min-w-0 flex-1 overflow-hidden">
             <SiteMarkaAlani
-              siteAdi={siteAdi}
-              logoUrl={siteLogoUrl(ayarlar)}
+              siteAdi={markaMetni}
+              logoUrl={logoUrl ?? header.logoUrl}
               logoBoyutu={header.logoBoyutu}
               yer="header"
               anaRenk={ayarlar?.anaRenk}

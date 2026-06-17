@@ -26,7 +26,8 @@ import {
 } from '@/types/temaAyarlari';
 
 export function SiteAyarlariSayfasi() {
-  const { site, siteAd, ayarlar, yukleniyor, hata, kaydediliyor, alanGuncelle } = useSiteAyarlariYonetimi();
+  const { site, siteAd, ayarlar, yukleniyor, hata, kaydediliyor, alanGuncelle, siteAdGuncelle } =
+    useSiteAyarlariYonetimi();
   useSiteYonetimiAksiyonlari();
 
   const whatsappGoster = ayarlar?.whatsapp ? whatsappFormatla(ayarlar.whatsapp) : '';
@@ -94,22 +95,27 @@ export function SiteAyarlariSayfasi() {
 
       <div className="mt-4 rounded-lg border border-dashed border-[var(--ap-border)] bg-[var(--ap-input-bg)] p-4">
         <p className="ap-muted text-xs leading-relaxed">
-          Slogan, kurlar ve header görünümü için{' '}
+          Header&apos;daki marka metni ve logo için{' '}
           <strong className="text-[var(--ap-accent)]">Header Yönetimi</strong> modülünü kullanın.
-          Logo boyutu ayarları Header ve Footer Yönetimi&apos;ndedir.
+          Footer logo boyutu Footer Yönetimi&apos;ndedir.
         </p>
       </div>
 
       <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <AdminPanelKarti baslik="Marka ve Tema" altBaslik="Logo, favicon, renk paleti ve gece modu şablonları">
+        <AdminPanelKarti baslik="Marka ve Tema" altBaslik="Site adı, favicon, renk paleti ve gece modu şablonları">
           <div className="space-y-5">
-            <GorselAlan
-              etiket="Logo"
-              aciklama="Header ve footer'da kullanılır — tek merkezi logo"
-              deger={ayarlar.logoUrl ?? ''}
-              onChange={(v) => alanGuncelle('logoUrl', v || null)}
-              onizlemeSinifi="h-14 max-w-[180px] rounded-lg object-contain bg-[var(--ap-input-bg)] border border-[var(--ap-border)] p-1"
-            />
+            <FormAlani
+              etiket="Site Adı"
+              aciklama="Tarayıcı sekmesinde ve panel başlıklarında görünür"
+            >
+              <input
+                type="text"
+                className={formInputSinifi}
+                value={siteAd}
+                onChange={(e) => siteAdGuncelle(e.target.value)}
+                placeholder="Güzel Teknoloji"
+              />
+            </FormAlani>
             <GorselAlan
               etiket="Favicon"
               aciklama="Tarayıcı sekmesindeki küçük ikon"

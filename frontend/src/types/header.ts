@@ -52,7 +52,8 @@ export interface UstMenuOgesi {
 
 export interface HeaderAyarlari {
   slogan?: string | null;
-  /** @deprecated Site Ayarları logoUrl kullanın */
+  /** Header marka alanında görünen metin (tarayıcı sekmesi site adından bağımsız) */
+  markaMetni?: string | null;
   logoUrl?: string | null;
   logoBoyutu?: LogoBoyutu;
   ustBant?: {
@@ -124,6 +125,7 @@ export function varsayilanHeaderAyarlari(
       mevcut?.slogan ??
       legacy?.slogan ??
       'Teknolojinin en güzel hali — güvenli, hızlı ve uygun fiyatlı.',
+    markaMetni: mevcut?.markaMetni ?? null,
     logoUrl: mevcut?.logoUrl ?? legacy?.logoUrl ?? null,
     logoBoyutu: logoBoyutuNormalize(mevcut?.logoBoyutu),
     ustBant: mevcut?.ustBant ?? {
@@ -189,7 +191,13 @@ export function headerAyarlariBirlestir(
   });
   return {
     ...birlestirilmis,
-    logoUrl: ayarlar?.logoUrl ?? json?.logoUrl ?? null,
+    markaMetni: json?.markaMetni ?? birlestirilmis.markaMetni ?? null,
+    logoUrl: json?.logoUrl ?? ayarlar?.logoUrl ?? null,
     logoBoyutu: logoBoyutuNormalize(json?.logoBoyutu ?? birlestirilmis.logoBoyutu),
   };
+}
+
+export function headerMarkaMetni(header: HeaderAyarlari, siteAdi: string): string {
+  const metin = header.markaMetni?.trim();
+  return metin || siteAdi;
 }
