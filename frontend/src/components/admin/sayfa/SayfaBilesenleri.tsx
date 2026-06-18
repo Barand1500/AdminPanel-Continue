@@ -42,6 +42,7 @@ import {
   ustSayfaBul,
   ustSayfaSecenekleri,
 } from '@/utils/sayfaAgaci';
+import { sayfaSiraCakismasiBul, sonrakiSayfaSira } from '@/utils/sayfaSiraYardimci';
 
 type EditorSekme = 'icerik' | 'seo' | 'ayarlar' | 'alt-sayfa';
 
@@ -354,6 +355,11 @@ export function SayfaEditorPanel({
     ? sayfaSegmentSlug(form.slug || slugUret(form.baslik))
     : form.slug;
 
+  const siraCakisma = useMemo(
+    () => sayfaSiraCakismasiBul(sayfalar, form.sira, form.ustSayfaId, seciliId ?? undefined),
+    [sayfalar, form.sira, form.ustSayfaId, seciliId]
+  );
+
   const sekmeler = useMemo((): { id: EditorSekme; etiket: string; ikon: string }[] => {
     const liste: { id: EditorSekme; etiket: string; ikon: string }[] = [
       { id: 'icerik', etiket: 'İçerik', ikon: '📝' },
@@ -398,6 +404,9 @@ export function SayfaEditorPanel({
       ...form,
       ustSayfaId: yeniUstId || null,
       slug: ust ? sayfaTamSlugOlustur(ust.slug, segment) : segment,
+      ...(!seciliId
+        ? { sira: sonrakiSayfaSira(sayfalar, yeniUstId || null) }
+        : {}),
     });
   }
 
@@ -628,6 +637,13 @@ export function SayfaEditorPanel({
                 value={form.sira}
                 onChange={(e) => onChange({ ...form, sira: Number(e.target.value) })}
               />
+              {siraCakisma && (
+                <div className="ap-sira-uyari" role="alert">
+                  <strong>⚠️ Sıra çakışması:</strong> Sıra <strong>{form.sira}</strong> zaten{' '}
+                  <strong>&quot;{siraCakisma.baslik}&quot;</strong> sayfasında kullanılıyor.
+                  Lütfen birinin sırasını değiştirin, aksi halde görüntüleme sırası belirsiz olur.
+                </div>
+              )}
             </FormAlani>
             </AdminFormBolumu>
           </>
@@ -721,21 +737,31 @@ export const bosSayfaForm: SayfaFormDegeri = {
   seoDesc: '',
   yayinda: false,
   menudeGoster: true,
-  sira: 0,
+  sira: 1,
   acilisModu: 'normal',
   ustSayfaId: null,
   altMenuGorunum: 'dikey',
   altMenuTetikleyici: 'hover',
 };
 
-export function altSayfaFormu(ustSayfa: AdminSayfa, mevcutAltSayi: number): SayfaFormDegeri {
+export function varsayilanSayfaForm(sayfalar: AdminSayfa[], ustSayfa?: AdminSayfa): SayfaFormDegeri {
+  const ustSayfaId = ustSayfa?.id ?? null;
   return {
     ...bosSayfaForm,
-    ustSayfaId: ustSayfa.id,
-    sira: mevcutAltSayi,
+    ustSayfaId,
+    sira: sonrakiSayfaSira(sayfalar, ustSayfaId),
     menudeGoster: true,
     yayinda: false,
-    altMenuGorunum: ustSayfa.altMenuGorunum ?? 'dikey',
-    altMenuTetikleyici: ustSayfa.altMenuTetikleyici ?? 'hover',
+    ...(ustSayfa
+      ? {
+          altMenuGorunum: ustSayfa.altMenuGorunum ?? 'dikey',
+          altMenuTetikleyici: ustSayfa.altMenuTetikleyici ?? 'hover',
+        }
+      : {}),
   };
+}
+
+/** @deprecated varsayilanSayfaForm kullanın */
+export function altSayfaFormu(ustSayfa: AdminSayfa, sayfalar: AdminSayfa[]): SayfaFormDegeri {
+  return varsayilanSayfaForm(sayfalar, ustSayfa);
 }

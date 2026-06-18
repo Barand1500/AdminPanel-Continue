@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import {
-  bosSayfaForm,
-  altSayfaFormu,
+  varsayilanSayfaForm,
   SayfaEditorPanel,
   SayfaListesiPanel,
   sayfadanForm,
@@ -21,11 +20,11 @@ import {
   type AdminSayfa,
   type SayfaFormDegeri,
 } from '@/features/admin/sayfaApi';
-import { altSayfaSayisi } from '@/utils/sayfaAgaci';
+import { sayfaSiraCakismasiBul, sonrakiSayfaSira } from '@/utils/sayfaSiraYardimci';
 
 export function SayfaYonetimiSayfasi() {
   const [sayfalar, setSayfalar] = useState<AdminSayfa[]>([]);
-  const [form, setForm] = useState<SayfaFormDegeri>(bosSayfaForm);
+  const [form, setForm] = useState<SayfaFormDegeri>(() => varsayilanSayfaForm([]));
   const [seciliId, setSeciliId] = useState<string | null>(null);
   const [slugManuel, setSlugManuel] = useState(false);
   const [yukleniyor, setYukleniyor] = useState(true);
@@ -48,18 +47,30 @@ export function SayfaYonetimiSayfasi() {
     void yukle();
   }, []);
 
+  useEffect(() => {
+    if (seciliId != null) return;
+    setForm((onceki) => {
+      const sonraki = sonrakiSayfaSira(sayfalar, onceki.ustSayfaId);
+      const cakisma = sayfaSiraCakismasiBul(sayfalar, onceki.sira, onceki.ustSayfaId);
+      const varsayilanCakisma =
+        sayfalar.length > 0 && onceki.sira === 1 && sonraki > 1;
+      if (!cakisma && !varsayilanCakisma) return onceki;
+      return onceki.sira === sonraki ? onceki : { ...onceki, sira: sonraki };
+    });
+  }, [sayfalar, seciliId]);
+
   const yeniBaslat = useCallback(() => {
     setSeciliId(null);
-    setForm(bosSayfaForm);
+    setForm(varsayilanSayfaForm(sayfalar));
     setSlugManuel(false);
     setBasari('');
     setHata('');
-  }, []);
+  }, [sayfalar]);
 
   const altSayfaBaslat = useCallback(
     (ustSayfa: AdminSayfa) => {
       setSeciliId(null);
-      setForm(altSayfaFormu(ustSayfa, altSayfaSayisi(sayfalar, ustSayfa.id)));
+      setForm(varsayilanSayfaForm(sayfalar, ustSayfa));
       setSlugManuel(false);
       setBasari('');
       setHata('');
