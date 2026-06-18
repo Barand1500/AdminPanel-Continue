@@ -5,6 +5,7 @@ import { modulRehberBul } from '@/data/adminModulRehberleri';
 import { BildirimPaneli, useBildirimSayaci } from './BildirimPaneli';
 import { LogPaneli } from './LogPaneli';
 import { YedeklemeHizliPaneli } from './YedeklemeHizliPaneli';
+import { useAdminAksiyon } from '@/contexts/AdminAksiyonContext';
 import { useState } from 'react';
 
 interface AltAksiyonCubuguProps {
@@ -27,6 +28,7 @@ export function AltAksiyonCubugu({
   const rehber = modulRehberBul(focusModulId);
   const [acikPanel, setAcikPanel] = useState<AcikPanel>(null);
   const { okunmamisSayi, yenile } = useBildirimSayaci();
+  const { aksiyonGeriBildirim } = useAdminAksiyon();
 
   function panelAc(panel: AcikPanel) {
     setAcikPanel((onceki) => (onceki === panel ? null : panel));
@@ -36,23 +38,33 @@ export function AltAksiyonCubugu({
   return (
     <footer className="ap-footer ap-gorev-cubugu flex h-12 shrink-0 items-center gap-2 border-t px-3">
       <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto">
-        {aksiyonlar.map((aksiyon) => (
-          <button
-            key={aksiyon.id}
-            type="button"
-            disabled={!aksiyon.aktif}
-            onClick={() => onAksiyon?.(aksiyon.id)}
-            className={`ap-aksiyon-btn shrink-0 rounded px-4 py-1.5 text-sm font-medium transition ${
-              !aksiyon.aktif
-                ? 'ap-aksiyon-pasif cursor-not-allowed opacity-40'
-                : aksiyon.birincil
-                  ? 'ap-aksiyon-birincil'
-                  : 'ap-aksiyon-aktif'
-            }`}
-          >
-            {aksiyon.etiket}
-          </button>
-        ))}
+        {aksiyonlar.map((aksiyon) => {
+          const geriBildirim =
+            aksiyonGeriBildirim?.aksiyonId === aksiyon.id ? aksiyonGeriBildirim : null;
+          const etiket = geriBildirim?.mesaj ?? aksiyon.etiket;
+
+          return (
+            <button
+              key={aksiyon.id}
+              type="button"
+              disabled={!aksiyon.aktif && !geriBildirim}
+              onClick={() => onAksiyon?.(aksiyon.id)}
+              className={`ap-aksiyon-btn shrink-0 rounded px-4 py-1.5 text-sm font-medium transition ${
+                geriBildirim?.tur === 'basari'
+                  ? 'ap-aksiyon-basari'
+                  : geriBildirim?.tur === 'hata'
+                    ? 'ap-aksiyon-hata'
+                    : !aksiyon.aktif
+                      ? 'ap-aksiyon-pasif cursor-not-allowed opacity-40'
+                      : aksiyon.birincil
+                        ? 'ap-aksiyon-birincil'
+                        : 'ap-aksiyon-aktif'
+              }`}
+            >
+              {etiket}
+            </button>
+          );
+        })}
       </div>
 
       <div className="flex shrink-0 items-center gap-2 border-l border-[var(--ap-border)] pl-3">

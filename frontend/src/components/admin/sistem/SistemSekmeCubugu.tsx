@@ -33,6 +33,7 @@ export function DurumAnahtari({
   onChange,
   renk = 'yesil',
   ikon,
+  devreDisi = false,
 }: {
   etiket: string;
   aciklama?: string;
@@ -40,10 +41,11 @@ export function DurumAnahtari({
   onChange: (v: boolean) => void;
   renk?: 'yesil' | 'turuncu' | 'mavi' | 'kirmizi';
   ikon?: string;
+  devreDisi?: boolean;
 }) {
   return (
     <div
-      className={`ap-sistem-toggle ap-sistem-toggle-${renk} ${acik ? 'ap-sistem-toggle-aktif' : ''}`}
+      className={`ap-sistem-toggle ap-sistem-toggle-${renk} ${acik ? 'ap-sistem-toggle-aktif' : ''} ${devreDisi ? 'opacity-60' : ''}`}
     >
       <div className="flex min-w-0 flex-1 items-start gap-3">
         {ikon && <span className="ap-sistem-toggle-ikon">{ikon}</span>}
@@ -57,8 +59,9 @@ export function DurumAnahtari({
         role="switch"
         aria-checked={acik}
         aria-label={etiket}
+        disabled={devreDisi}
         onClick={() => onChange(!acik)}
-        className={`ap-toggle ${acik ? 'ap-toggle-on' : ''} ${renk === 'turuncu' ? 'ap-toggle-turuncu' : ''}`}
+        className={`ap-toggle ${acik ? 'ap-toggle-on' : ''} ${renk === 'turuncu' ? 'ap-toggle-turuncu' : ''} ${devreDisi ? 'cursor-not-allowed' : ''}`}
       >
         <span className="ap-toggle-thumb" />
       </button>

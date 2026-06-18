@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
+import { useAdminAksiyon } from '@/contexts/AdminAksiyonContext';
 import { useAdminSayfaBildirimi } from '@/hooks/useAdminSayfaBildirimi';
 import { usePanelDil } from '@/contexts/PanelDilContext';
 import { SistemSekmeCubugu } from '@/components/admin/sistem/SistemSekmeCubugu';
@@ -16,7 +17,6 @@ import {
 import {
   AdminModulKabuk,
   AdminPanelKarti,
-  BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
 import { adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
@@ -27,6 +27,7 @@ import { siteVerisiGuncellendiYayinla } from '@/utils/siteVerisiOlaylari';
 export function SistemAyarlariSayfasi() {
   const { dilAyarla, cevirileriAyarla } = usePanelDil();
   const { basariBildir, hataBildir } = useAdminSayfaBildirimi();
+  const { aksiyonGeriBildirimiGoster } = useAdminAksiyon();
   const [form, setForm] = useState<SistemAyarlariForm>(bosSistemForm);
   const [sayfalar, setSayfalar] = useState<AdminSayfa[]>([]);
   const [siteAdi, setSiteAdi] = useState('');
@@ -66,6 +67,7 @@ export function SistemAyarlariSayfasi() {
       try {
         const veri = await sistemAyarlariGuncelle(guncel);
         basariBildir(aktif ? 'Site yayına alındı.' : 'Site kapatıldı. Ziyaretçiler erişemez.');
+        aksiyonGeriBildirimiGoster('kaydet');
         setSiteAdi(veri.site.ad);
         setSiteSlug(veri.site.slug);
         setSurum(veri.surum);
@@ -81,7 +83,7 @@ export function SistemAyarlariSayfasi() {
         setKaydediliyor(false);
       }
     },
-    [form, dilAyarla, cevirileriAyarla, basariBildir, hataBildir]
+    [form, dilAyarla, cevirileriAyarla, basariBildir, hataBildir, aksiyonGeriBildirimiGoster]
   );
 
   const bakimModuToggle = useCallback(async () => {
@@ -94,6 +96,7 @@ export function SistemAyarlariSayfasi() {
     try {
       const veri = await sistemAyarlariGuncelle(guncel);
       basariBildir(yeniBakim ? 'Bakım modu açıldı.' : 'Bakım modu kapatıldı.');
+      aksiyonGeriBildirimiGoster('kaydet');
       setSiteAdi(veri.site.ad);
       setSiteSlug(veri.site.slug);
       setSurum(veri.surum);
@@ -108,7 +111,7 @@ export function SistemAyarlariSayfasi() {
     } finally {
       setKaydediliyor(false);
     }
-  }, [form, dilAyarla, cevirileriAyarla, basariBildir, hataBildir]);
+  }, [form, dilAyarla, cevirileriAyarla, basariBildir, hataBildir, aksiyonGeriBildirimiGoster]);
 
   useEffect(() => {
     void (async () => {
@@ -136,7 +139,6 @@ export function SistemAyarlariSayfasi() {
 
   return (
     <AdminModulKabuk baslik="Sistem Ayarları" aciklama={`${siteAdi} — site durumu, bakım, 404 ve panel tercihleri`}>
-      {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
       <div className="ap-sistem-yonetimi">
         <div className="ap-sistem-layout">
@@ -164,7 +166,7 @@ export function SistemAyarlariSayfasi() {
                   form={form}
                   onChange={setForm}
                   onSiteAktifDegis={siteAktifToggle}
-                  siteAktifKaydediliyor={kaydediliyor}
+                  siteAktifIslemde={kaydediliyor}
                 />
               )}
               {sekme === 'bakim' && <SistemBakimSekme form={form} onChange={setForm} siteAdi={siteAdi} />}

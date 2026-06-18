@@ -207,23 +207,20 @@ export function SistemGenelSekme({
   form,
   onChange,
   onSiteAktifDegis,
-  siteAktifKaydediliyor,
+  siteAktifIslemde = false,
 }: {
   form: SistemAyarlariForm;
   onChange: (f: SistemAyarlariForm) => void;
   onSiteAktifDegis?: (aktif: boolean) => void;
-  siteAktifKaydediliyor?: boolean;
+  siteAktifIslemde?: boolean;
 }) {
   return (
     <div className="space-y-4">
       <DurumAnahtari
         etiket="Site Aktif"
-        aciklama={
-          siteAktifKaydediliyor
-            ? 'Kaydediliyor...'
-            : 'Kapalıyken ziyaretçiler siteye erişemez. Admin paneli etkilenmez.'
-        }
+        aciklama="Kapalıyken ziyaretçiler siteye erişemez. Admin paneli etkilenmez."
         acik={form.siteAktif}
+        devreDisi={siteAktifIslemde}
         onChange={(v) => {
           if (onSiteAktifDegis) {
             onSiteAktifDegis(v);
