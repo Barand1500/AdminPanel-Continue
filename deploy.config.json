@@ -1,0 +1,14 @@
+{
+  "projectName": "Güzel Teknoloji Admin Panel",
+  "gitBranch": "main",
+  "gitRemote": "https://github.com/Barand1500/AdminPanel-Continue.git",
+  "deployFrontendDir": "/home/guzelteknoloji-admin/htdocs/admin.guzelteknoloji.com/frontend",
+  "deployBackendDir": "/home/guzelteknoloji-admin/htdocs/admin.guzelteknoloji.com/backend",
+  "pm2AppName": "guzelteknoloji-api",
+  "backendPort": 3003,
+  "runMigrations": false,
+  "frontendEnv": {
+    "VITE_API_URL": "/api",
+    "VITE_SITE_SLUG": "demo"
+  }
+}

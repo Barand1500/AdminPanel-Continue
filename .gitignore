@@ -35,6 +35,3 @@ backend/prisma/migrations/**/migration_lock.toml
 backend/uploads/*
 !backend/uploads/.gitkeep
 
-# Vite
-frontend/.vite/
-
