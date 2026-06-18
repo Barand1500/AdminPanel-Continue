@@ -56,22 +56,6 @@ export interface Sayfa {
   altMenuTetikleyici?: AltMenuTetikleyici;
 }
 
-export interface Urun {
-  id: string;
-  ad: string;
-  slug: string;
-  aciklama?: string | null;
-  fiyat: number;
-  paraBirimi: string;
-  gorselUrl?: string | null;
-  kategori?: string | null;
-  yeni: boolean;
-  cokSatan: boolean;
-  stokta: boolean;
-  aktif?: boolean;
-  sira: number;
-}
-
 export interface SitePublicData {
   site: {
     id: string;
@@ -82,7 +66,6 @@ export interface SitePublicData {
   };
   sayfalar: Sayfa[];
   widgetlar: Widget[];
-  urunler: Urun[];
   bloglar: import('./blog').BlogYazisiOzet[];
   navKategoriler: import('./navKategori').NavKategoriKayit[];
 }

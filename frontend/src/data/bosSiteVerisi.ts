@@ -21,7 +21,6 @@ export const bosSiteVerisi: SitePublicData = {
   },
   sayfalar: [],
   widgetlar: [],
-  urunler: [],
   bloglar: [],
   navKategoriler: [],
 };
@@ -41,7 +40,6 @@ export function menuOgeleriOlustur(
 
   const varsayilan: { baslik: string; yol: string }[] = [
     { baslik: 'Ana Sayfa', yol: '/' },
-    { baslik: 'Ürünler', yol: '/urunler' },
   ];
 
   if (blogAyarlari?.headerMenu !== false) {

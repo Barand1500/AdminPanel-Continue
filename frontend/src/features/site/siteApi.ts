@@ -15,7 +15,6 @@ export async function siteVerisiGetir(signal?: AbortSignal): Promise<SitePublicD
       site: { ...bosSiteVerisi.site, ...veri.site },
       sayfalar: veri.sayfalar ?? [],
       widgetlar: veri.widgetlar ?? [],
-      urunler: veri.urunler ?? [],
       bloglar: veri.bloglar ?? [],
       navKategoriler: (veri.navKategoriler ?? []).map((k) => ({
         ...k,

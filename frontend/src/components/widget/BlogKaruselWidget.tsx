@@ -2,8 +2,10 @@ import { useState } from 'react';
 import type { Widget } from '@/types/site';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, gorselSinifi, medyaUrl } from './widgetHelpers';
+import { useSiteDil } from '@/contexts/SiteDilContext';
 
 export function BlogKaruselWidget({ widget }: { widget: Widget }) {
+  const { cevir } = useSiteDil();
   const cfg = configOkuFromWidget(widget);
   const kartlar = cfg.blogKartlari ?? [];
   const [aktif, setAktif] = useState(0);
@@ -15,7 +17,7 @@ export function BlogKaruselWidget({ widget }: { widget: Widget }) {
         {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold text-slate-900`}>{widget.baslik}</h2>}
         {cfg.tumunuGorLink && (
           <a href={cfg.tumunuGorLink} className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-500">
-            {cfg.tumunuGorMetin ?? 'Tümünü Gör'} —
+            {cfg.tumunuGorMetin ?? cevir('site.tumunuGor', 'Tümünü Gör')} —
           </a>
         )}
       </div>
@@ -27,7 +29,7 @@ export function BlogKaruselWidget({ widget }: { widget: Widget }) {
               <h3 className="font-semibold text-slate-900">{k.baslik}</h3>
               {k.link && (
                 <a href={k.link} className="mt-4 inline-block rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700">
-                  — {k.butonMetni || 'Daha Fazla Oku'}
+                  — {k.butonMetni || cevir('site.dahaFazlaOku', 'Daha Fazla Oku')}
                 </a>
               )}
             </div>

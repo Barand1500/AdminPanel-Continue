@@ -12,6 +12,8 @@ import { SiteMarkaAlani } from '@/components/ortak/SiteMarkaAlani';
 import { siteLogoUrl } from '@/types/logo';
 import { whatsappFormatla } from '@/utils/telefonFormat';
 import { aktifMagazaBadgeleri, FooterMagazaBadgeGoster } from '@/components/ortak/FooterMagazaBadge';
+import { useSiteDil } from '@/contexts/SiteDilContext';
+import { metinCevir } from '@/utils/menuYardimci';
 
 interface SiteFooterProps {
   siteAdi: string;
@@ -29,10 +31,12 @@ function FooterMarka({
   siteAdi,
   ayarlar,
   footer,
+  cevir,
 }: {
   siteAdi: string;
   ayarlar?: SiteAyarlari | null;
   footer: ReturnType<typeof footerAyarlariBirlestir>;
+  cevir: (anahtar: string, varsayilan?: string) => string;
 }) {
   const ikonlar = footer.marka.iletisimIkonlari;
   const banka = footer.marka.bankaLinki;
@@ -94,11 +98,12 @@ function FooterMarka({
                 link={{ id: 'banka', ad: banka.ad, link: banka.link, yeniSekme: false, aktif: true, sira: 0 }}
                 ikon={banka.ikon}
                 className="site-footer-link flex gap-2"
+                cevir={cevir}
               />
             ) : (
               <span className="flex gap-2">
                 <span className="text-primary">{banka.ikon}</span>
-                {banka.ad}
+                {metinCevir(cevir, banka.ad)}
               </span>
             )}
           </li>
@@ -114,8 +119,10 @@ function FooterMarka({
 
 function FooterKolonlar({
   footer,
+  cevir,
 }: {
   footer: ReturnType<typeof footerAyarlariBirlestir>;
+  cevir: (anahtar: string, varsayilan?: string) => string;
 }) {
   const linkIkon = footerLinkIkonGoster(footer.linkIkon);
   const aktifKolonlar = footer.kolonlar.filter((k) => k.aktif);
@@ -128,11 +135,11 @@ function FooterKolonlar({
           .sort((a, b) => a.sira - b.sira);
         return (
           <div key={kolon.id} className="footer-kolon">
-            <h4 className="site-footer-baslik">{kolon.baslik}</h4>
+            <h4 className="site-footer-baslik">{metinCevir(cevir, kolon.baslik)}</h4>
             <ul className="mt-4 space-y-2.5 text-sm">
               {linkler.map((l) => (
                 <li key={l.id}>
-                  <FooterNavLink link={l} ikon={linkIkon} />
+                  <FooterNavLink link={l} ikon={linkIkon} cevir={cevir} />
                 </li>
               ))}
             </ul>
@@ -144,6 +151,7 @@ function FooterKolonlar({
 }
 
 export function SiteFooter({ siteAdi, ayarlar }: SiteFooterProps) {
+  const { cevir } = useSiteDil();
   const header = headerAyarlariBirlestir(ayarlar);
   const footer = footerAyarlariBirlestir(ayarlar);
   const semaSinif = footerSemaGridSinifi(footer.sema);
@@ -192,7 +200,7 @@ export function SiteFooter({ siteAdi, ayarlar }: SiteFooterProps) {
               target="_blank"
               rel="noreferrer"
               className="footer-magaza-badge-link"
-              title={badge.tip === 'appstore' ? 'App Store' : 'Google Play'}
+              title={badge.tip === 'appstore' ? cevir('site.appStore', 'App Store') : cevir('site.googlePlay', 'Google Play')}
             >
               <FooterMagazaBadgeGoster badge={badge} />
             </a>
@@ -204,9 +212,9 @@ export function SiteFooter({ siteAdi, ayarlar }: SiteFooterProps) {
 
   const icerik = (
     <div className={`footer-icerik ${semaSinif}`}>
-      <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} />
+      <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} cevir={cevir} />
       <div className="footer-kolonlar">
-        <FooterKolonlar footer={footer} />
+        <FooterKolonlar footer={footer} cevir={cevir} />
       </div>
     </div>
   );
@@ -230,11 +238,11 @@ export function SiteFooter({ siteAdi, ayarlar }: SiteFooterProps) {
             {pazaryeriOgeleri.map((oge) =>
               oge.link ? (
                 <a key={oge.id} href={oge.link} className="hover:text-primary" target="_blank" rel="noreferrer">
-                  {oge.ad}
+                  {metinCevir(cevir, oge.ad)}
                 </a>
               ) : (
                 <span key={oge.id} className="hover:text-primary">
-                  {oge.ad}
+                  {metinCevir(cevir, oge.ad)}
                 </span>
               )
             )}
@@ -247,7 +255,7 @@ export function SiteFooter({ siteAdi, ayarlar }: SiteFooterProps) {
           <div className="container-site flex flex-wrap items-center justify-center gap-4 py-5 text-xs text-slate-500">
             {rozetler.map((r) => (
               <span key={r.id} className="rounded-lg border border-primary/20 bg-white px-3 py-1.5">
-                {r.ikon} {r.metin}
+                {r.ikon} {metinCevir(cevir, r.metin)}
               </span>
             ))}
             {footer.guvenBandi.kurlarGoster && kurlar.length > 0 && (
@@ -268,7 +276,8 @@ export function SiteFooter({ siteAdi, ayarlar }: SiteFooterProps) {
 
       <div className="border-t border-primary/10 bg-white/80">
         <div className="container-site py-4 text-center text-xs text-slate-500">
-          {ayarlar?.telifYazisi ?? `© Telif Hakkı 2016 - ${new Date().getFullYear()} ${siteAdi} — Tüm hakları saklıdır.`}
+          {ayarlar?.telifYazisi ??
+            `© Telif Hakkı 2016 - ${new Date().getFullYear()} ${siteAdi} — ${cevir('site.tumHaklariSaklidir', 'Tüm hakları saklıdır.')}`}
         </div>
       </div>
     </footer>

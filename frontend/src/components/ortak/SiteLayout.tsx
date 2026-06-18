@@ -57,7 +57,7 @@ function SiteLayoutIcerik() {
   }
 
   return (
-    <SiteDilProvider ayarlar={site.ayarlar} sayfalar={veri.sayfalar}>
+    <SiteDilProvider ayarlar={site.ayarlar} sayfalar={veri.sayfalar} navKategoriler={veri.navKategoriler}>
       <div className="site-public flex min-h-screen flex-col">
         {headerGoster && (
           <SiteHeader

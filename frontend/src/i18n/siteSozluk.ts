@@ -4,13 +4,18 @@ import type { DilDestegiAyarlari } from '@/types/header';
 /** Site (header/footer) çeviri anahtarları — panel çevirisi gibi JSON ile düzenlenir */
 export const SITE_CEVIRI_ANAHTARLARI = [
   'site.anaSayfa',
-  'site.urunler',
   'site.blog',
   'site.hakkimizda',
   'site.iletisim',
   'site.hesabim',
-  'site.sepet',
-  'site.favoriler',
+  'site.tumKategoriler',
+  'site.tumunuGor',
+  'site.dahaFazlaOku',
+  'site.detaylariGor',
+  'site.tumHaklariSaklidir',
+  'site.appStore',
+  'site.googlePlay',
+  'site.yukleniyor',
 ] as const;
 
 export type SiteCeviriAnahtar = (typeof SITE_CEVIRI_ANAHTARLARI)[number];
@@ -18,33 +23,48 @@ export type SiteCeviriAnahtar = (typeof SITE_CEVIRI_ANAHTARLARI)[number];
 export const SITE_VARSAYILAN_CEVIRILER: Record<string, Record<string, string>> = {
   TR: {
     'site.anaSayfa': 'Ana Sayfa',
-    'site.urunler': 'Ürünler',
     'site.blog': 'Blog',
     'site.hakkimizda': 'Hakkımızda',
     'site.iletisim': 'İletişim',
     'site.hesabim': 'Hesabım',
-    'site.sepet': 'Sepetim',
-    'site.favoriler': 'Favoriler',
+    'site.tumKategoriler': 'Tüm Kategoriler',
+    'site.tumunuGor': 'Tümünü Gör',
+    'site.dahaFazlaOku': 'Daha Fazla Oku',
+    'site.detaylariGor': 'Detayları Gör',
+    'site.tumHaklariSaklidir': 'Tüm hakları saklıdır.',
+    'site.appStore': 'App Store',
+    'site.googlePlay': 'Google Play',
+    'site.yukleniyor': 'Yükleniyor...',
   },
   EN: {
     'site.anaSayfa': 'Home',
-    'site.urunler': 'Products',
     'site.blog': 'Blog',
     'site.hakkimizda': 'About Us',
     'site.iletisim': 'Contact',
     'site.hesabim': 'My Account',
-    'site.sepet': 'Cart',
-    'site.favoriler': 'Favorites',
+    'site.tumKategoriler': 'All Categories',
+    'site.tumunuGor': 'View All',
+    'site.dahaFazlaOku': 'Read More',
+    'site.detaylariGor': 'View Details',
+    'site.tumHaklariSaklidir': 'All rights reserved.',
+    'site.appStore': 'App Store',
+    'site.googlePlay': 'Google Play',
+    'site.yukleniyor': 'Loading...',
   },
   DE: {
     'site.anaSayfa': 'Startseite',
-    'site.urunler': 'Produkte',
     'site.blog': 'Blog',
     'site.hakkimizda': 'Über uns',
     'site.iletisim': 'Kontakt',
     'site.hesabim': 'Mein Konto',
-    'site.sepet': 'Warenkorb',
-    'site.favoriler': 'Favoriten',
+    'site.tumKategoriler': 'Alle Kategorien',
+    'site.tumunuGor': 'Alle anzeigen',
+    'site.dahaFazlaOku': 'Mehr lesen',
+    'site.detaylariGor': 'Details anzeigen',
+    'site.tumHaklariSaklidir': 'Alle Rechte vorbehalten.',
+    'site.appStore': 'App Store',
+    'site.googlePlay': 'Google Play',
+    'site.yukleniyor': 'Wird geladen...',
   },
 };
 
@@ -87,10 +107,14 @@ export function sayfaSlugCeviriAnahtarlari(slug: string): string[] {
   return [...keys];
 }
 
+/** Nav kategori kaydı için çeviri anahtarı */
+export function kategoriCeviriAnahtar(id: string): string {
+  return `kategori.${id}`;
+}
+
 /** Bilinen sayfa slug → site.* çeviri anahtarı */
 export const SLUG_SITE_ANAHTAR: Record<string, string> = {
   'ana-sayfa': 'site.anaSayfa',
-  urunler: 'site.urunler',
   blog: 'site.blog',
   hakkimizda: 'site.hakkimizda',
   iletisim: 'site.iletisim',
@@ -220,7 +244,8 @@ export function siteCeviriBirlestir(
   sayfaBasliklari?: { slug: string; baslik: string }[],
   varsayilanDil = 'TR',
   menuMetinleri?: string[],
-  tumCeviriler?: Record<string, Record<string, string>> | null
+  tumCeviriler?: Record<string, Record<string, string>> | null,
+  kategoriKaynaklari?: { id: string; baslik: string }[]
 ): Record<string, string> {
   const varsayilan = SITE_VARSAYILAN_CEVIRILER[dilKodu] ?? SITE_VARSAYILAN_CEVIRILER.TR ?? {};
   const sonuc: Record<string, string> = { ...varsayilan, ...(ozel ?? {}) };
@@ -242,6 +267,11 @@ export function siteCeviriBirlestir(
     ceviriAnahtarDoldur(sonuc, menuKey, dilKodu, varsayilanDil, metin, '', ozel, tumCeviriler);
   }
 
+  for (const k of kategoriKaynaklari ?? []) {
+    const key = kategoriCeviriAnahtar(k.id);
+    ceviriAnahtarDoldur(sonuc, key, dilKodu, varsayilanDil, k.baslik, k.id, ozel, tumCeviriler);
+  }
+
   return sonuc;
 }
 
@@ -249,7 +279,8 @@ export function siteCeviriBirlestir(
 export function siteCevirileriSenkronize(
   dilDestegi: DilDestegiAyarlari,
   kaynaklar: { slug: string; baslik: string }[],
-  menuMetinleri: string[] = []
+  menuMetinleri: string[] = [],
+  kategoriKaynaklari: { id: string; baslik: string }[] = []
 ): Record<string, Record<string, string>> {
   const varsayilan = dilDestegi.varsayilanDil;
   const ceviriler: Record<string, Record<string, string>> = {};
@@ -292,6 +323,20 @@ export function siteCevirileriSenkronize(
       if (ceviriler[dil.kod][menuKey]) continue;
       const oneri = dilBaslikOner(dil.kod, menuKey.replace('menu.', ''), metin);
       if (oneri) ceviriler[dil.kod][menuKey] = oneri;
+    }
+  }
+
+  for (const k of kategoriKaynaklari) {
+    const key = kategoriCeviriAnahtar(k.id);
+    if (!ceviriler[varsayilan]) ceviriler[varsayilan] = {};
+    if (!ceviriler[varsayilan][key]) ceviriler[varsayilan][key] = k.baslik;
+
+    for (const dil of dilDestegi.diller) {
+      if (dil.kod === varsayilan) continue;
+      if (!ceviriler[dil.kod]) ceviriler[dil.kod] = {};
+      if (ceviriler[dil.kod][key]) continue;
+      const oneri = dilBaslikOner(dil.kod, k.id, k.baslik);
+      if (oneri) ceviriler[dil.kod][key] = oneri;
     }
   }
 

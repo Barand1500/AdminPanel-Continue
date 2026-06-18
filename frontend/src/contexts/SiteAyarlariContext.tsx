@@ -11,6 +11,8 @@ import { adminSiteApi, type AdminSiteBilgi } from '@/features/site/adminSiteApi'
 import type { SiteAyarlari } from '@/types/site';
 import type { HeaderAyarlari } from '@/types/header';
 import { headerAyarlariBirlestir } from '@/types/header';
+import { footerAyarlariBirlestir, footerMetinleriniTopla } from '@/types/footer';
+import { siteCevirileriSenkronize } from '@/i18n/siteSozluk';
 import { siteVerisiGuncellendiYayinla } from '@/utils/siteVerisiOlaylari';
 
 interface SiteAyarlariContextType {
@@ -95,6 +97,23 @@ export function SiteAyarlariProvider({ children }: { children: ReactNode }) {
     setKaydediliyor(true);
     setHata(null);
     try {
+      const headerMerged = headerAyarlariBirlestir(ayarlar);
+      let headerJson = ayarlar.headerAyarlariJson ?? null;
+      if (headerMerged.dilDestegi && headerJson) {
+        const footerMetinleri = footerMetinleriniTopla(footerAyarlariBirlestir(ayarlar));
+        headerJson = {
+          ...headerMerged,
+          dilDestegi: {
+            ...headerMerged.dilDestegi,
+            ceviriler: siteCevirileriSenkronize(
+              headerMerged.dilDestegi,
+              [],
+              footerMetinleri
+            ),
+          },
+        };
+      }
+
       const payload: Record<string, unknown> = {
         logoUrl: ayarlar.logoUrl ?? null,
         faviconUrl: ayarlar.faviconUrl ?? null,
@@ -107,7 +126,7 @@ export function SiteAyarlariProvider({ children }: { children: ReactNode }) {
         adres: ayarlar.adres ?? null,
         telifYazisi: ayarlar.telifYazisi ?? null,
         sosyalMedyaJson: ayarlar.sosyalMedyaJson ?? null,
-        headerAyarlariJson: ayarlar.headerAyarlariJson ?? null,
+        headerAyarlariJson: headerJson,
         heroJson: ayarlar.heroJson ?? null,
         footerAyarlariJson: ayarlar.footerAyarlariJson ?? null,
         blogAyarlariJson: ayarlar.blogAyarlariJson ?? null,

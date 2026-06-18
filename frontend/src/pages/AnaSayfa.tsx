@@ -3,7 +3,6 @@ import type { SitePublicData } from '@/types/site';
 import { blogAyarlariBirlestir, blogOnizlemeListesi } from '@/types/blog';
 import { HeroSlider } from '@/components/eticaret/HeroSlider';
 import { GuvenSerit } from '@/components/eticaret/GuvenSerit';
-import { UrunBolumu } from '@/components/eticaret/UrunBolumu';
 import { BlogBolumu } from '@/components/blog/BlogBolumu';
 import { BlogHizmetBolumu } from '@/components/blog/BlogHizmetBolumu';
 import { PopupWidgetlar, WidgetBolge } from '@/components/widget/WidgetBolge';
@@ -28,31 +27,14 @@ function AnaSayfaHizmetBlog({
 }
 
 export function AnaSayfa() {
-  const { widgetlar, urunler, site, bloglar } = useOutletContext<SitePublicData>();
+  const { widgetlar, site, bloglar } = useOutletContext<SitePublicData>();
   const blogAyarlari = blogAyarlariBirlestir(site.ayarlar);
   const blogOnizleme = blogOnizlemeListesi(bloglar, blogAyarlari.listeAdet);
-
-  const yeniUrunler = urunler.filter((u) => u.yeni);
-  const cokSatanlar = urunler.filter((u) => u.cokSatan);
 
   const blogBolumu =
     blogAyarlari.anaSayfa && blogOnizleme.length > 0 ? (
       <BlogBolumu bloglar={blogOnizleme} />
     ) : null;
-
-  const urunBloklari = (
-    <>
-      {yeniUrunler.length > 0 ? (
-        <UrunBolumu baslik="Yeni Ürünler" urunler={yeniUrunler} filtre="yeni" />
-      ) : null}
-      {cokSatanlar.length > 0 ? (
-        <UrunBolumu baslik="Çok Satanlar" urunler={cokSatanlar} filtre="cokSatan" />
-      ) : null}
-      {urunler.length > 0 && !yeniUrunler.length && !cokSatanlar.length && (
-        <UrunBolumu baslik="Ürünlerimiz" urunler={urunler} />
-      )}
-    </>
-  );
 
   return (
     <>
@@ -65,7 +47,6 @@ export function AnaSayfa() {
 
       {blogAyarlari.anaSayfaKonum === 'urunler-ustu' && blogBolumu}
       <WidgetBolge widgetlar={widgetlar} bolge="urunler_ustu" />
-      {urunBloklari}
       {blogAyarlari.anaSayfaKonum === 'widgetlar-ustu' && blogBolumu}
 
       <WidgetBolge widgetlar={widgetlar} bolge="urunler_alti" />

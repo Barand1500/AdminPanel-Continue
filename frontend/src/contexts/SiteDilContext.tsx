@@ -1,9 +1,16 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { headerAyarlariBirlestir } from '@/types/header';
+import { footerAyarlariBirlestir, footerMetinleriniTopla } from '@/types/footer';
 import { aktifDiller, SITE_DIL_STORAGE } from '@/data/siteDilleri';
-import { siteCeviriBirlestir, SLUG_SITE_ANAHTAR, sayfaSlugCeviriAnahtarlari, menuMetinCeviriAnahtar } from '@/i18n/siteSozluk';
+import {
+  siteCeviriBirlestir,
+  SLUG_SITE_ANAHTAR,
+  sayfaSlugCeviriAnahtarlari,
+  menuMetinCeviriAnahtar,
+} from '@/i18n/siteSozluk';
 import { sayfaSegmentSlug } from '@/utils/sayfaAgaci';
 import type { SiteAyarlari, Sayfa } from '@/types/site';
+import type { NavKategoriKayit } from '@/types/navKategori';
 
 interface SiteDilContextDegeri {
   dilKodu: string;
@@ -17,10 +24,12 @@ const SiteDilContext = createContext<SiteDilContextDegeri | null>(null);
 export function SiteDilProvider({
   ayarlar,
   sayfalar,
+  navKategoriler,
   children,
 }: {
   ayarlar?: SiteAyarlari | null;
   sayfalar?: Sayfa[];
+  navKategoriler?: NavKategoriKayit[];
   children: ReactNode;
 }) {
   const header = headerAyarlariBirlestir(ayarlar);
@@ -46,11 +55,29 @@ export function SiteDilProvider({
     return () => window.removeEventListener('site-dil-degisti', dinle);
   }, []);
 
+  const footerMetinleri = useMemo(() => {
+    const footer = footerAyarlariBirlestir(ayarlar);
+    return footerMetinleriniTopla(footer);
+  }, [ayarlar]);
+
+  const kategoriKaynaklari = useMemo(
+    () => (navKategoriler ?? []).map((k) => ({ id: String(k.id), baslik: k.baslik })),
+    [navKategoriler]
+  );
+
   const menuMetinleri = useMemo(() => {
     const fromMenu = (header.ustMenu ?? []).map((m) => m.ad);
     const fromSayfa = sayfalar?.filter((s) => s.menudeGoster !== false).map((s) => s.baslik) ?? [];
-    return [...new Set([...fromMenu, ...fromSayfa])];
-  }, [header.ustMenu, sayfalar]);
+    const kategoriBaslik = header.kategori?.baslikMetni?.trim();
+    return [
+      ...new Set([
+        ...fromMenu,
+        ...fromSayfa,
+        ...footerMetinleri,
+        ...(kategoriBaslik ? [kategoriBaslik] : []),
+      ]),
+    ];
+  }, [header.ustMenu, header.kategori?.baslikMetni, sayfalar, footerMetinleri]);
 
   const sozluk = useMemo(
     () =>
@@ -60,9 +87,10 @@ export function SiteDilProvider({
         sayfalar?.map((s) => ({ slug: s.slug, baslik: s.baslik })),
         dilDestegi.varsayilanDil,
         menuMetinleri,
-        dilDestegi.ceviriler
+        dilDestegi.ceviriler,
+        kategoriKaynaklari
       ),
-    [dilKodu, dilDestegi.ceviriler, dilDestegi.varsayilanDil, sayfalar, menuMetinleri]
+    [dilKodu, dilDestegi.ceviriler, dilDestegi.varsayilanDil, sayfalar, menuMetinleri, kategoriKaynaklari]
   );
 
   const sayfaBaslik = useCallback(

@@ -6,7 +6,8 @@ import type { MenuOgesi, Sayfa, SayfaAcilisModu, SiteAyarlari } from '@/types/si
 import { blogAyarlariBirlestir } from '@/types/blog';
 import { idKarsilastir, idString } from '@/utils/idKarsilastir';
 import { sayfaAltMenuOgeleriOlustur } from '@/utils/sayfaAgaci';
-import { menuMetinCeviriAnahtar, siteCevirileriSenkronize } from '@/i18n/siteSozluk';
+import { menuMetinCeviriAnahtar, siteCevirileriSenkronize, kategoriCeviriAnahtar } from '@/i18n/siteSozluk';
+import type { Kategori } from '@/data/kategoriler';
 
 export function yoldanSlug(yol: string): string | null {
   if (yol === '/') return 'ana-sayfa';
@@ -63,7 +64,6 @@ export function menuLinkGecerliMi(link: string): boolean {
 
 export const SABIT_HIZLI_LINKLER: { ad: string; link: string }[] = [
   { ad: 'Ana Sayfa', link: '/' },
-  { ad: 'Ürünler', link: '/urunler' },
   { ad: 'Blog', link: '/blog' },
   { ad: 'Hakkımızda', link: '/hakkimizda' },
   { ad: 'İletişim', link: '/iletisim' },
@@ -115,10 +115,47 @@ export function headerMenuOlustur(
   return menuOgeleriOlustur(sayfalar, blogAyarlariBirlestir(siteAyarlari));
 }
 
+export function metinCevir(
+  cevir: (anahtar: string, varsayilan?: string) => string,
+  metin: string
+): string {
+  const menuKey = menuMetinCeviriAnahtar(metin);
+  if (menuKey) {
+    const cevrilmis = cevir(menuKey, '');
+    if (cevrilmis) return cevrilmis;
+  }
+  return metin;
+}
+
+export function kategoriBaslikCevir(
+  cevir: (anahtar: string, varsayilan?: string) => string,
+  baslikMetni: string
+): string {
+  if (baslikMetni === 'Tüm Kategoriler') {
+    return cevir('site.tumKategoriler', baslikMetni);
+  }
+  return metinCevir(cevir, baslikMetni);
+}
+
+export function kategorileriCevir(
+  liste: Kategori[],
+  cevir: (anahtar: string, varsayilan?: string) => string
+): Kategori[] {
+  return liste.map((kat) => ({
+    ...kat,
+    baslik: cevir(kategoriCeviriAnahtar(kat.id), kat.baslik),
+    altKategoriler: kat.altKategoriler
+      ? kategorileriCevir(kat.altKategoriler, cevir)
+      : undefined,
+  }));
+}
+
 /** Header dil çevirilerine sayfa ve menü başlıklarını otomatik ekler */
 export function headerDilCevirileriSenkronize(
   header: HeaderAyarlari,
-  sayfalar: { slug: string; baslik: string; menudeGoster?: boolean }[]
+  sayfalar: { slug: string; baslik: string; menudeGoster?: boolean }[],
+  ekMenuMetinleri: string[] = [],
+  kategoriKaynaklari: { id: string; baslik: string }[] = []
 ): HeaderAyarlari {
   const dilDestegi = header.dilDestegi;
   if (!dilDestegi) return header;
@@ -129,13 +166,15 @@ export function headerDilCevirileriSenkronize(
   const menuMetinleri = [
     ...(header.ustMenu ?? []).map((m) => m.ad),
     ...kaynaklar.map((s) => s.baslik),
-  ];
+    header.kategori?.baslikMetni ?? '',
+    ...ekMenuMetinleri,
+  ].filter(Boolean);
 
   return {
     ...header,
     dilDestegi: {
       ...dilDestegi,
-      ceviriler: siteCevirileriSenkronize(dilDestegi, kaynaklar, menuMetinleri),
+      ceviriler: siteCevirileriSenkronize(dilDestegi, kaynaklar, menuMetinleri, kategoriKaynaklari),
     },
   };
 }

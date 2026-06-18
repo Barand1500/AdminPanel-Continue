@@ -73,7 +73,6 @@ export class SiteService {
       sayfalar,
       widgetlar,
       navKategoriler,
-      urunler: [],
       bloglar: bloglar.map((b) => ({
         ...b,
         olusturma: b.olusturma.toISOString(),

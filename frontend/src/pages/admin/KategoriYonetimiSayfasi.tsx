@@ -309,12 +309,12 @@ export function KategoriYonetimiSayfasi() {
                   placeholder="bilgisayar"
                 />
               </FormAlani>
-              <FormAlani etiket="Link (yol)" aciklama="Boşsa /urunler?k=slug kullanılır">
+              <FormAlani etiket="Link (yol)" aciklama="Boşsa /kategori-slug yolu kullanılır">
                 <input
                   className={formInputSinifi}
                   value={form.yol}
                   onChange={(e) => setForm({ ...form, yol: e.target.value })}
-                  placeholder="/urunler?k=bilgisayar"
+                  placeholder="/hizmetler"
                 />
               </FormAlani>
               <FormAlani etiket="Üst kategori">

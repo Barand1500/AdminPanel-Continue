@@ -3,11 +3,9 @@ export type DashboardDonem = 'bugun' | '7gun' | '30gun';
 export interface DashboardAnalitikVeri {
   ziyaret: number;
   sayfaGoruntulenme: number;
-  urunTiklama: number;
   ziyaretGrafik: { etiket: string; deger: number }[];
   ulkeler: { ulke: string; ziyaret: number }[];
   bloglar: { baslik: string; okuma: number }[];
-  urunler: { ad: string; tiklama: number }[];
   sayfalar: { ad: string; goruntulenme: number }[];
   butonlar: { ad: string; tiklama: number }[];
 }
@@ -16,7 +14,6 @@ const MOCK: Record<DashboardDonem, DashboardAnalitikVeri> = {
   bugun: {
     ziyaret: 124,
     sayfaGoruntulenme: 289,
-    urunTiklama: 47,
     ziyaretGrafik: [
       { etiket: '00', deger: 4 },
       { etiket: '04', deger: 2 },
@@ -41,16 +38,9 @@ const MOCK: Record<DashboardDonem, DashboardAnalitikVeri> = {
       { baslik: 'E-Ticaret Trendleri', okuma: 18 },
       { baslik: 'Mobil Uyumluluk Rehberi', okuma: 12 },
     ],
-    urunler: [
-      { ad: 'Kurumsal Web Paketi', tiklama: 19 },
-      { ad: 'E-Ticaret Çözümü', tiklama: 14 },
-      { ad: 'SEO Danışmanlığı', tiklama: 8 },
-      { ad: 'Bakım & Destek', tiklama: 6 },
-    ],
     sayfalar: [
       { ad: 'Anasayfa', goruntulenme: 96 },
       { ad: 'Hakkımızda', goruntulenme: 54 },
-      { ad: 'Ürünler', goruntulenme: 48 },
       { ad: 'İletişim', goruntulenme: 37 },
       { ad: 'Blog', goruntulenme: 54 },
     ],
@@ -64,7 +54,6 @@ const MOCK: Record<DashboardDonem, DashboardAnalitikVeri> = {
   '7gun': {
     ziyaret: 842,
     sayfaGoruntulenme: 1964,
-    urunTiklama: 312,
     ziyaretGrafik: [
       { etiket: 'Pzt', deger: 98 },
       { etiket: 'Sal', deger: 112 },
@@ -88,15 +77,8 @@ const MOCK: Record<DashboardDonem, DashboardAnalitikVeri> = {
       { baslik: 'E-Ticaret Trendleri', okuma: 167 },
       { baslik: 'Mobil Uyumluluk Rehberi', okuma: 98 },
     ],
-    urunler: [
-      { ad: 'Kurumsal Web Paketi', tiklama: 124 },
-      { ad: 'E-Ticaret Çözümü', tiklama: 89 },
-      { ad: 'SEO Danışmanlığı', tiklama: 56 },
-      { ad: 'Bakım & Destek', tiklama: 43 },
-    ],
     sayfalar: [
       { ad: 'Anasayfa', goruntulenme: 612 },
-      { ad: 'Ürünler', goruntulenme: 398 },
       { ad: 'Blog', goruntulenme: 356 },
       { ad: 'Hakkımızda', goruntulenme: 298 },
       { ad: 'İletişim', goruntulenme: 300 },
@@ -111,7 +93,6 @@ const MOCK: Record<DashboardDonem, DashboardAnalitikVeri> = {
   '30gun': {
     ziyaret: 3240,
     sayfaGoruntulenme: 7812,
-    urunTiklama: 1186,
     ziyaretGrafik: [
       { etiket: '1. Hf', deger: 712 },
       { etiket: '2. Hf', deger: 798 },
@@ -132,15 +113,8 @@ const MOCK: Record<DashboardDonem, DashboardAnalitikVeri> = {
       { baslik: 'E-Ticaret Trendleri', okuma: 654 },
       { baslik: 'Mobil Uyumluluk Rehberi', okuma: 421 },
     ],
-    urunler: [
-      { ad: 'Kurumsal Web Paketi', tiklama: 486 },
-      { ad: 'E-Ticaret Çözümü', tiklama: 342 },
-      { ad: 'SEO Danışmanlığı', tiklama: 218 },
-      { ad: 'Bakım & Destek', tiklama: 140 },
-    ],
     sayfalar: [
       { ad: 'Anasayfa', goruntulenme: 2412 },
-      { ad: 'Ürünler', goruntulenme: 1568 },
       { ad: 'Blog', goruntulenme: 1424 },
       { ad: 'Hakkımızda', goruntulenme: 1186 },
       { ad: 'İletişim', goruntulenme: 1222 },

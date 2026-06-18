@@ -85,7 +85,6 @@ export function DashboardSayfasi({ onModulAc }: DashboardSayfasiProps) {
           deger={formToplam.toLocaleString('tr-TR')}
           alt={formYeni > 0 ? `${formYeni} yeni` : 'Tümü okundu'}
         />
-        <KpiKart etiket="Ürün Tıklama" deger={analitik.urunTiklama.toLocaleString('tr-TR')} />
       </div>
 
       <div className="ap-dash-analitik-grid">
@@ -108,18 +107,13 @@ export function DashboardSayfasi({ onModulAc }: DashboardSayfasiProps) {
           satirlar={analitik.bloglar.map((b) => ({ birincil: b.baslik, ikincil: b.okuma }))}
         />
         <VeriTablosu
-          baslik="En Çok Tıklanan Ürünler"
-          sutunlar={['Ürün', 'Tıklama']}
-          satirlar={analitik.urunler.map((u) => ({ birincil: u.ad, ikincil: u.tiklama }))}
-        />
-      </div>
-
-      <div className="ap-dash-analitik-grid">
-        <VeriTablosu
           baslik="En Çok Görüntülenen Sayfalar"
           sutunlar={['Sayfa', 'Görüntüleme']}
           satirlar={analitik.sayfalar.map((s) => ({ birincil: s.ad, ikincil: s.goruntulenme }))}
         />
+      </div>
+
+      <div className="ap-dash-analitik-grid">
         <ButonTiklamaGrafik veriler={analitik.butonlar} />
       </div>
 

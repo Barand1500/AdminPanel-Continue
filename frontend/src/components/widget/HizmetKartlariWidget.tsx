@@ -1,6 +1,7 @@
 import type { Widget } from '@/types/site';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, gridStyle } from './widgetHelpers';
+import { useSiteDil } from '@/contexts/SiteDilContext';
 
 const eskiIkonHaritasi: Record<string, string> = {
   globe: '🌐',
@@ -22,6 +23,7 @@ interface HizmetKartlariWidgetProps {
 }
 
 export function HizmetKartlariWidget({ widget }: HizmetKartlariWidgetProps) {
+  const { cevir } = useSiteDil();
   const cfg = configOkuFromWidget(widget);
   const kartlar = cfg.kartlar ?? [];
   const kolon = cfg.gorunum?.kolonSayisi ?? 3;
@@ -54,7 +56,7 @@ export function HizmetKartlariWidget({ widget }: HizmetKartlariWidgetProps) {
                 href={kart.link}
                 className="mt-5 inline-block rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
               >
-                {kart.butonMetni || 'Detayları Gör'} →
+                {kart.butonMetni || cevir('site.detaylariGor', 'Detayları Gör')} →
               </a>
             )}
           </article>

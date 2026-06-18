@@ -5,13 +5,10 @@ import { AdminLayout } from '@/components/admin/AdminLayout';
 import { PublicCatchAll } from '@/components/ortak/PublicCatchAll';
 import { AnaSayfa } from '@/pages/AnaSayfa';
 import { HakkimizdaSayfasi } from '@/pages/HakkimizdaSayfasi';
-import { UrunlerSayfasi } from '@/pages/UrunlerSayfasi';
 import { IletisimSayfasi } from '@/pages/IletisimSayfasi';
 import { HesapGirisFormu } from '@/pages/hesap/HesapGirisFormu';
 import { HesapPanelSayfasi } from '@/pages/hesap/HesapPanelSayfasi';
 import { HesapProfilSayfasi, HesapSifreSayfasi } from '@/pages/hesap/HesapAltSayfalar';
-import { FavorilerSayfasi } from '@/pages/FavorilerSayfasi';
-import { SepetSayfasi } from '@/pages/SepetSayfasi';
 import { BlogSayfasi } from '@/pages/BlogSayfasi';
 import { BlogDetaySayfasi } from '@/pages/BlogDetaySayfasi';
 import { sayfaDetayGetir } from '@/features/site/sayfaApi';
@@ -50,8 +47,6 @@ export const siteRouter = createBrowserRouter([
         children: [
           { path: '/', element: <AnaSayfa /> },
           { path: '/hakkimizda', element: <HakkimizdaSayfasi /> },
-          { path: '/urunler', element: <UrunlerSayfasi /> },
-          { path: '/urunler-hizmetler', element: <UrunlerSayfasi /> },
           { path: '/iletisim', element: <IletisimSayfasi /> },
           { path: '/blog', element: <BlogSayfasi /> },
           { path: '/blog/:slug', element: <BlogDetaySayfasi /> },
@@ -59,8 +54,6 @@ export const siteRouter = createBrowserRouter([
           { path: '/hesabim/panel', element: <HesapPanelSayfasi /> },
           { path: '/hesabim/profil', element: <HesapProfilSayfasi /> },
           { path: '/hesabim/sifre', element: <HesapSifreSayfasi /> },
-          { path: '/favoriler', element: <FavorilerSayfasi /> },
-          { path: '/sepet', element: <SepetSayfasi /> },
           { path: '*', loader: dinamikSayfaLoader, element: <PublicCatchAll /> },
         ],
       },

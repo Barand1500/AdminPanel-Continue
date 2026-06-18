@@ -25,7 +25,7 @@ function mockConfig(tip: string): WidgetConfig {
             baslik: 'Teknolojinin En Güzel Hali',
             altBaslik: 'Güzel Teknoloji',
             butonMetni: 'Keşfet',
-            butonLink: '/urunler',
+            butonLink: '/blog',
             aktif: true,
           },
           {
@@ -71,7 +71,7 @@ function mockConfig(tip: string): WidgetConfig {
     case 'LINK_KARTLARI':
       return {
         linkler: [
-          { id: id(), metin: 'Ürünler', ikon: '📦', link: '/urunler' },
+          { id: id(), metin: 'Blog', ikon: '📰', link: '/blog' },
           { id: id(), metin: 'Hakkımızda', ikon: '🏢', link: '/hakkimizda' },
           { id: id(), metin: 'İletişim', ikon: '📞', link: '/iletisim' },
           { id: id(), metin: 'Blog', ikon: '📰', link: '/blog' },

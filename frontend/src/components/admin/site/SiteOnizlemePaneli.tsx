@@ -58,7 +58,7 @@ export function SiteOnizlemePaneli({ tip, siteAd, headerAyarlari, iletisim }: Si
                 ? menuOgeleri
                 : [
                     { baslik: 'Ana Sayfa', yol: '/' },
-                    { baslik: 'Ürünler', yol: '/urunler' },
+                    { baslik: 'Blog', yol: '/blog' },
                   ]
             }
           />

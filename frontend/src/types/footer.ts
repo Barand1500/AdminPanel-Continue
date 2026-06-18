@@ -238,13 +238,10 @@ export function varsayilanFooterAyarlari(): FooterAyarlari {
     },
     kolonlar: [
       kolonOlustur('Sık Kullanılanlar', 0, [
-        { ad: 'Tüm Kategoriler', link: '/urunler' },
-        { ad: 'Tüm Kampanyalar', link: '/urunler' },
-        { ad: 'Markalar', link: '/urunler' },
-        { ad: 'Çok Satanlar', link: '/urunler' },
-        { ad: 'Yeni Ürünler', link: '/urunler' },
         { ad: 'Ana Sayfa', link: '/' },
+        { ad: 'Blog', link: '/blog' },
         { ad: 'Hakkımızda', link: '/hakkimizda' },
+        { ad: 'İletişim', link: '/iletisim' },
       ]),
       kolonOlustur('Sözleşmeler', 1, [
         { ad: 'Üyelik Sözleşmesi', link: '/kvkk' },
@@ -353,4 +350,23 @@ export function footerSemaGridSinifi(sema: FooterSema): string {
     default:
       return 'footer-sema-dort';
   }
+}
+
+/** Footer kolon ve link metinlerini dil senkronu için toplar */
+export function footerMetinleriniTopla(footer: FooterAyarlari): string[] {
+  const metinler: string[] = [];
+  for (const kolon of footer.kolonlar) {
+    if (kolon.baslik.trim()) metinler.push(kolon.baslik);
+    for (const link of kolon.linkler) {
+      if (link.ad.trim()) metinler.push(link.ad);
+    }
+  }
+  if (footer.marka.bankaLinki?.ad?.trim()) metinler.push(footer.marka.bankaLinki.ad);
+  for (const oge of footer.pazaryeri.ogeler) {
+    if (oge.ad.trim()) metinler.push(oge.ad);
+  }
+  for (const rozet of footer.guvenBandi.rozetler) {
+    if (rozet.metin.trim()) metinler.push(rozet.metin);
+  }
+  return metinler;
 }

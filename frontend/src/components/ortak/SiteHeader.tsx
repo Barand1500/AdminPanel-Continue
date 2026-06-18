@@ -6,7 +6,7 @@ import { headerAyarlariBirlestir, headerMarkaMetni } from '@/types/header';
 import type { ParaBirimiKaydi } from '@/types/header';
 import { headerLogoUrl } from '@/types/logo';
 import { useSiteDil } from '@/contexts/SiteDilContext';
-import { menuOgeleriCevir } from '@/utils/menuYardimci';
+import { menuOgeleriCevir, kategorileriCevir, kategoriBaslikCevir } from '@/utils/menuYardimci';
 import { KategoriMenu } from './KategoriMenu';
 import { TemaToggle } from './TemaToggle';
 import { HeaderIkon } from './HeaderIkon';
@@ -73,10 +73,15 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri, kategoriler }: SiteH
     () => menuOgeleriCevir(menuOgeleri, sayfaBaslik, cevir),
     [menuOgeleri, sayfaBaslik, cevir, dilKodu]
   );
+  const cevrilmisKategoriler = useMemo(
+    () => (kategoriler ? kategorileriCevir(kategoriler, cevir) : undefined),
+    [kategoriler, cevir, dilKodu]
+  );
   const header = headerAyarlariBirlestir(ayarlar);
   const ustBant = header.ustBant!;
   const ikonlar = header.ikonlar!;
   const kategori = header.kategori!;
+  const kategoriBaslikMetni = kategoriBaslikCevir(cevir, kategori.baslikMetni);
   const arama = header.arama!;
   const kurlar = (header.kurlar ?? []).filter((k) => k.kod !== 'TRY').sort((a, b) => a.sira - b.sira);
   const anaRenk = ayarlar?.anaRenk ?? '#7c3aed';
@@ -171,9 +176,9 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri, kategoriler }: SiteH
         <div className="site-header-alt border-t py-3" style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface-elevated)' }}>
           <div className="container-site flex gap-3">
             <KategoriMenu
-              baslikMetni={kategori.baslikMetni}
+              baslikMetni={kategoriBaslikMetni}
               acilisModu={kategori.acilisModu}
-              kategoriler={kategoriler}
+              kategoriler={cevrilmisKategoriler}
             />
             <div className="relative flex-1">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary">
@@ -211,12 +216,6 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri, kategoriler }: SiteH
               <TemaToggle tema={ikonlar.tema} />
               <Link to="/hesabim" onClick={() => setMenuAcik(false)} className="text-primary">
                 {cevir('site.hesabim', 'Hesabım')}
-              </Link>
-              <Link to="/favoriler" onClick={() => setMenuAcik(false)} className="text-primary">
-                {cevir('site.favoriler', 'Favoriler')}
-              </Link>
-              <Link to="/sepet" onClick={() => setMenuAcik(false)} className="text-primary">
-                {cevir('site.sepet', 'Sepetim')}
               </Link>
             </div>
           </nav>
