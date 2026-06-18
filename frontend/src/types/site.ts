@@ -74,6 +74,7 @@ export interface SitePublicData {
 export interface MenuOgesi {
   baslik: string;
   yol: string;
+  ikon?: string | null;
   yeniSekme?: boolean;
   acilisModu?: SayfaAcilisModu;
   icerikVar?: boolean;

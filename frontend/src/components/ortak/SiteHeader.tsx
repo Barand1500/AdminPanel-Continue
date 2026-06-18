@@ -132,12 +132,12 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri, kategoriler }: SiteH
             className="max-w-[min(100%,280px)] sm:max-w-xs"
           />
 
-          <nav className="hidden items-center gap-5 lg:flex">
+          <nav className="site-header-nav hidden items-center gap-5 lg:flex">
             {cevrilmisMenu.map((oge, i) => (
               <MenuOgeGoster
                 key={`${oge.yol}-${i}`}
                 oge={oge}
-                linkClassName="text-sm font-medium transition hover:text-primary"
+                linkClassName="site-menu-nav-link text-sm font-medium transition hover:text-primary"
                 style={{ color: 'var(--color-text-muted)' }}
               />
             ))}

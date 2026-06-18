@@ -17,6 +17,19 @@ function acilisModuCoz(oge: MenuOgesi): SayfaAcilisModu {
   return 'normal';
 }
 
+export function MenuOgeMetin({ oge }: { oge: MenuOgesi }) {
+  return (
+    <span className="site-menu-oge-metin">
+      {oge.ikon && (
+        <span className="site-menu-oge-ikon" aria-hidden>
+          {oge.ikon}
+        </span>
+      )}
+      <span className="site-menu-oge-baslik">{oge.baslik}</span>
+    </span>
+  );
+}
+
 export function MenuNavLink({ oge, className, style, onClick }: MenuNavLinkProps) {
   const { modalAc } = useSayfaModal();
   const mod = acilisModuCoz(oge);
@@ -35,7 +48,7 @@ export function MenuNavLink({ oge, className, style, onClick }: MenuNavLinkProps
           if (slug) modalAc(slug);
         }}
       >
-        {oge.baslik}
+        <MenuOgeMetin oge={oge} />
       </button>
     );
   }
@@ -50,14 +63,14 @@ export function MenuNavLink({ oge, className, style, onClick }: MenuNavLinkProps
         target="_blank"
         rel="noopener noreferrer"
       >
-        {oge.baslik}
+        <MenuOgeMetin oge={oge} />
       </a>
     );
   }
 
   return (
     <Link to={oge.yol} className={className} style={style} onClick={onClick}>
-      {oge.baslik}
+      <MenuOgeMetin oge={oge} />
     </Link>
   );
 }

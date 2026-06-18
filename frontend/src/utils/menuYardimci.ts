@@ -82,6 +82,7 @@ export function ustMenuOgeleriOlustur(ustMenu: UstMenuOgesi[], sayfalar: Sayfa[]
       return {
         baslik: o.ad,
         yol: o.link,
+        ikon: sayfa?.ikon ?? null,
         yeniSekme: acilisModu === 'yeni_sekme',
         acilisModu,
         ...(altOgeler.length > 0 ? { altOgeler } : {}),

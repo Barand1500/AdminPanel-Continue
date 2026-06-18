@@ -20,6 +20,7 @@ interface SayfaMenuKaynak {
   baslik: string;
   slug: string;
   icerik?: string;
+  ikon?: string | null;
   sira?: number;
   menudeGoster?: boolean;
   acilisModu?: SayfaAcilisModu;
@@ -82,6 +83,7 @@ function menuOgesiUret(sayfa: SayfaMenuKaynak, sayfalar: SayfaMenuKaynak[]): Men
   return {
     baslik: sayfa.baslik,
     yol: sayfaYolunuBul(sayfa.slug),
+    ikon: sayfa.ikon ?? null,
     acilisModu: sayfa.acilisModu ?? 'normal',
     yeniSekme: sayfa.acilisModu === 'yeni_sekme',
     icerikVar,

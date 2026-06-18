@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type CSSProperties, type MouseEvent as ReactMouseEvent } from 'react';
 import { Link } from 'react-router-dom';
 import type { MenuOgesi } from '@/types/site';
-import { MenuNavLink } from './MenuNavLink';
+import { MenuNavLink, MenuOgeMetin } from './MenuNavLink';
 
 interface MenuDropdownProps {
   oge: MenuOgesi;
@@ -14,7 +14,6 @@ interface MenuDropdownProps {
 interface MenuIcGrupProps {
   oge: MenuOgesi;
   onClick?: () => void;
-  derinlik?: number;
   mobil?: boolean;
 }
 
@@ -81,8 +80,8 @@ export function MenuDropdown({ oge, className, linkClassName, style, onClick }: 
 
   const tetikIcerik = (
     <>
-      <span>{oge.baslik}</span>
-      {altOgeler.length > 0 && <MenuOk acik={acik} />}
+      <MenuOgeMetin oge={oge} />
+      {altOgeler.length > 0 && <MenuOkAsagi acik={acik} />}
     </>
   );
 
@@ -161,7 +160,7 @@ export function MenuDropdown({ oge, className, linkClassName, style, onClick }: 
   );
 }
 
-function MenuIcGrup({ oge, onClick, derinlik = 0, mobil = false }: MenuIcGrupProps) {
+function MenuIcGrup({ oge, onClick, mobil = false }: MenuIcGrupProps) {
   const [acik, setAcik] = useState(false);
   const kapatTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const altOgeler = oge.altOgeler ?? [];
@@ -200,15 +199,29 @@ function MenuIcGrup({ oge, onClick, derinlik = 0, mobil = false }: MenuIcGrupPro
   const tetikSinif = `site-menu-ic-grup-tetik site-menu-dropdown-alt-link ${acik ? 'site-menu-ic-grup-tetik-acik' : ''}`;
   const tetikIcerik = (
     <>
-      <span className="site-menu-ic-grup-baslik">{oge.baslik}</span>
-      <MenuOk acik={acik} />
+      <MenuOgeMetin oge={oge} />
+      {mobil ? <MenuOkAsagi acik={acik} /> : <MenuOkSaga />}
+    </>
+  );
+
+  const altListe = (
+    <>
+      {tiklaModu && icerikVar && (
+        <MenuNavLink oge={oge} className="site-menu-dropdown-alt-link site-menu-ic-grup-ust-link" onClick={onClick} />
+      )}
+      {altOgeler.map((alt) =>
+        alt.altOgeler && alt.altOgeler.length > 0 ? (
+          <MenuIcGrup key={alt.yol} oge={alt} onClick={onClick} mobil={mobil} />
+        ) : (
+          <MenuNavLink key={alt.yol} oge={alt} className="site-menu-dropdown-alt-link" onClick={onClick} />
+        )
+      )}
     </>
   );
 
   return (
     <div
-      className={`site-menu-ic-grup ${acik ? 'site-menu-ic-grup-acik' : ''} ${hoverMod ? 'site-menu-ic-grup-hover' : 'site-menu-ic-grup-tikla'}`}
-      style={{ '--menu-ic-derinlik': derinlik } as CSSProperties}
+      className={`site-menu-ic-grup ${acik ? 'site-menu-ic-grup-acik' : ''} ${mobil ? 'site-menu-ic-grup-mobil' : ''} ${hoverMod ? 'site-menu-ic-grup-hover' : 'site-menu-ic-grup-tikla'}`}
       onMouseEnter={grupAc}
       onMouseLeave={grupKapatGecikmeli}
     >
@@ -235,40 +248,45 @@ function MenuIcGrup({ oge, onClick, derinlik = 0, mobil = false }: MenuIcGrupPro
       )}
 
       {acik && altOgeler.length > 0 && (
-        <div className="site-menu-ic-grup-alt-liste" role="menu">
-          {tiklaModu && icerikVar && (
-            <MenuNavLink
-              oge={oge}
-              className="site-menu-dropdown-alt-link site-menu-ic-grup-ust-link"
-              onClick={onClick}
-            />
-          )}
-          {altOgeler.map((alt) =>
-            alt.altOgeler && alt.altOgeler.length > 0 ? (
-              <MenuIcGrup key={alt.yol} oge={alt} onClick={onClick} derinlik={derinlik + 1} mobil={mobil} />
-            ) : (
-              <MenuNavLink
-                key={alt.yol}
-                oge={alt}
-                className="site-menu-dropdown-alt-link"
-                onClick={onClick}
-              />
-            )
-          )}
-        </div>
+        mobil ? (
+          <div className="site-menu-ic-grup-alt-liste" role="menu">
+            {altListe}
+          </div>
+        ) : (
+          <div
+            className="site-menu-ic-grup-flyout"
+            role="menu"
+            onMouseEnter={grupAc}
+            onMouseLeave={grupKapatGecikmeli}
+          >
+            <div className="site-menu-dropdown-panel-icerik">{altListe}</div>
+          </div>
+        )
       )}
     </div>
   );
 }
 
-function MenuOk({ acik }: { acik: boolean }) {
+function MenuOkAsagi({ acik }: { acik: boolean }) {
   return (
     <svg
       viewBox="0 0 20 20"
-      className={`site-menu-dropdown-ok ${acik ? 'site-menu-dropdown-ok-acik' : ''}`}
+      className={`site-menu-dropdown-ok site-menu-dropdown-ok-asagi ${acik ? 'site-menu-dropdown-ok-acik' : ''}`}
       fill="currentColor"
       aria-hidden
     >
+      <path
+        fillRule="evenodd"
+        d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
+        clipRule="evenodd"
+      />
+    </svg>
+  );
+}
+
+function MenuOkSaga() {
+  return (
+    <svg viewBox="0 0 20 20" className="site-menu-dropdown-ok site-menu-dropdown-ok-saga" fill="currentColor" aria-hidden>
       <path
         fillRule="evenodd"
         d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.94a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z"
