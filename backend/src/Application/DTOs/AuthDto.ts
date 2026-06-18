@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import type { YetkiKodu } from './KullaniciDto.js';
 
 export const girisSchema = z.object({
   email: z.string().email('Geçerli bir e-posta girin'),
@@ -68,6 +69,7 @@ export interface AuthKullaniciDto {
   rol: string;
   siteId: string | null;
   tercihler: KullaniciTercihleriDto;
+  yetkiler?: YetkiKodu[];
 }
 
 export interface AuthYanitDto {

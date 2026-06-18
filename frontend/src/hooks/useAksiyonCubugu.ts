@@ -3,6 +3,8 @@ import { useAdminAksiyon } from '@/contexts/AdminAksiyonContext';
 import { usePanelDil } from '@/contexts/PanelDilContext';
 import type { AksiyonButonu } from '@/types/admin';
 import type { AksiyonId } from '@/contexts/AdminAksiyonContext';
+import { useYetkiler } from '@/hooks/useYetkiler';
+import type { YetkiKodu } from '@/features/admin/rolApi';
 
 const A = (id: AksiyonButonu['id'], etiket: string, aktif: boolean, birincil?: boolean): AksiyonButonu => ({
   id,
@@ -135,17 +137,44 @@ const varsayilanAksiyonlar: AksiyonButonu[] = [
   A('yayinla', 'Yayınla', false),
 ];
 
+const MODUL_AKSIYON_YETKI: Partial<Record<string, Partial<Record<AksiyonId, YetkiKodu>>>> = {
+  kullanicilar: {
+    kaydet: 'kullanici_yonetimi',
+    ekle: 'kullanici_yonetimi',
+    sil: 'kullanici_yonetimi',
+  },
+};
+
+const AKSIYON_YETKI: Partial<Record<AksiyonId, YetkiKodu>> = {
+  kaydet: 'duzenleme',
+  guncelle: 'duzenleme',
+  ekle: 'ekleme',
+  altEkle: 'ekleme',
+  sil: 'silme',
+  onizle: 'goruntuleme',
+  yayinla: 'duzenleme',
+};
+
 export function useAksiyonCubugu(modulId: string) {
   const { aksiyonDurumlari } = useAdminAksiyon();
   const { t } = usePanelDil();
+  const { yetkiler } = useYetkiler();
 
   return useMemo(() => {
     const temel = modulAksiyonlari[modulId] ?? varsayilanAksiyonlar;
+    const modulYetki = MODUL_AKSIYON_YETKI[modulId] ?? {};
+    const yetkiVar = (kod: YetkiKodu) => yetkiler.includes(kod);
+
     return temel.map((aksiyon) => {
       const dinamik = aksiyonDurumlari[aksiyon.id as AksiyonId];
       const etiket = t(`aksiyon.${aksiyon.id}`, aksiyon.etiket);
       const guncel = { ...aksiyon, etiket };
-      return dinamik !== undefined ? { ...guncel, aktif: dinamik } : guncel;
+
+      const yetkiKodu = modulYetki[aksiyon.id as AksiyonId] ?? AKSIYON_YETKI[aksiyon.id as AksiyonId];
+      const yetkiUygun = !yetkiKodu || yetkiVar(yetkiKodu);
+      const temelAktif = dinamik !== undefined ? dinamik : aksiyon.aktif;
+
+      return { ...guncel, aktif: temelAktif && yetkiUygun };
     });
-  }, [modulId, aksiyonDurumlari, t]);
+  }, [modulId, aksiyonDurumlari, t, yetkiler]);
 }

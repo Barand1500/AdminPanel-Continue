@@ -11,8 +11,6 @@ const kullaniciRepo = new KullaniciRepository();
 const siteRepo = new SiteRepository();
 const rolService = new RolService();
 
-const YONETICI_ROLLER: RolKodu[] = ['SUPER_ADMIN', 'AJANS_ADMIN'];
-
 function kullaniciDto(k: {
   id: number;
   email: string;
@@ -39,8 +37,9 @@ function kullaniciDto(k: {
 }
 
 export class KullaniciService {
-  private yetkiKontrol(cagiran: JwtPayload) {
-    if (!YONETICI_ROLLER.includes(cagiran.rol as RolKodu)) {
+  private async yetkiKontrol(cagiran: JwtPayload) {
+    const yetkiler = await rolService.kullaniciYetkileri(cagiran);
+    if (!yetkiler.includes('kullanici_yonetimi')) {
       throw new Error('Bu islem icin yetkiniz yok');
     }
   }
@@ -58,27 +57,27 @@ export class KullaniciService {
 
   private hedefKullaniciKontrol(cagiran: JwtPayload, hedefSiteId: number | null) {
     if (cagiran.rol === 'SUPER_ADMIN') return;
-    if (cagiran.rol === 'AJANS_ADMIN' && hedefSiteId === cagiran.siteId) return;
+    if (hedefSiteId === cagiran.siteId) return;
     throw new Error('Bu kullanici uzerinde islem yapma yetkiniz yok');
   }
 
   async listele(cagiran: JwtPayload, filtreSiteId?: string | number | null) {
-    this.yetkiKontrol(cagiran);
+    await this.yetkiKontrol(cagiran);
 
-    if (cagiran.rol === 'AJANS_ADMIN') {
-      const siteId = cagiran.siteId;
-      if (!siteId) throw new Error('Site baglantiniz bulunamadi');
-      const liste = await kullaniciRepo.listele(siteId);
+    if (cagiran.rol === 'SUPER_ADMIN') {
+      const siteId = opsiyonelSayisalId(filtreSiteId ?? undefined);
+      const liste = await kullaniciRepo.listele(siteId ?? undefined);
       return liste.map(kullaniciDto);
     }
 
-    const siteId = opsiyonelSayisalId(filtreSiteId ?? undefined);
-    const liste = await kullaniciRepo.listele(siteId ?? undefined);
+    const siteId = cagiran.siteId;
+    if (!siteId) throw new Error('Site baglantiniz bulunamadi');
+    const liste = await kullaniciRepo.listele(siteId);
     return liste.map(kullaniciDto);
   }
 
   async siteler(cagiran: JwtPayload) {
-    this.yetkiKontrol(cagiran);
+    await this.yetkiKontrol(cagiran);
     if (cagiran.rol !== 'SUPER_ADMIN') {
       if (!cagiran.siteId) return [];
       const site = await siteRepo.findById(cagiran.siteId);
@@ -88,7 +87,7 @@ export class KullaniciService {
   }
 
   async olustur(cagiran: JwtPayload, dto: KullaniciOlusturDto) {
-    this.yetkiKontrol(cagiran);
+    await this.yetkiKontrol(cagiran);
 
     const siteId =
       cagiran.rol === 'AJANS_ADMIN'
@@ -119,7 +118,7 @@ export class KullaniciService {
   }
 
   async guncelle(cagiran: JwtPayload, idHam: string | number, dto: KullaniciGuncelleDto) {
-    this.yetkiKontrol(cagiran);
+    await this.yetkiKontrol(cagiran);
     const id = sayisalId(idHam);
 
     const mevcut = await kullaniciRepo.findById(id);
@@ -157,7 +156,7 @@ export class KullaniciService {
   }
 
   async sil(cagiran: JwtPayload, idHam: string | number) {
-    this.yetkiKontrol(cagiran);
+    await this.yetkiKontrol(cagiran);
     const id = sayisalId(idHam);
 
     if (id === cagiran.kullaniciId) {

@@ -11,8 +11,10 @@ import type {
 import { config } from '../config/env.js';
 import { KullaniciRepository } from '../Infrastructure/repositories/KullaniciRepository.js';
 import type { Prisma } from '@prisma/client';
+import { RolService } from './RolService.js';
 
 const kullaniciRepo = new KullaniciRepository();
+const rolService = new RolService();
 
 export interface JwtPayload {
   kullaniciId: number;
@@ -51,7 +53,7 @@ export class AuthService {
 
     return {
       token,
-      kullanici: this.toDto(kullanici),
+      kullanici: await this.toDto(kullanici),
     };
   }
 
@@ -87,7 +89,7 @@ export class AuthService {
     }
 
     const guncel = await kullaniciRepo.guncelle(kullaniciId, guncelleme);
-    return this.toDto(guncel);
+    return await this.toDto(guncel);
   }
 
   async tercihlerGuncelle(kullaniciId: number, dto: TercihlerGuncelleDto): Promise<AuthKullaniciDto> {
@@ -103,7 +105,7 @@ export class AuthService {
         dashboardHizliErisim: dto.dashboardHizliErisim,
       } as Prisma.InputJsonValue,
     });
-    return this.toDto(guncel);
+    return await this.toDto(guncel);
   }
 
   tokenDogrula(token: string): JwtPayload {
@@ -121,14 +123,21 @@ export class AuthService {
     };
   }
 
-  private toDto(kullanici: {
+  private async toDto(kullanici: {
     id: number;
     email: string;
     ad: string;
     rol: string;
     siteId: number | null;
     tercihlerJson?: unknown;
-  }): AuthKullaniciDto {
+  }): Promise<AuthKullaniciDto> {
+    const yetkiler = await rolService.kullaniciYetkileri({
+      kullaniciId: kullanici.id,
+      email: kullanici.email,
+      rol: kullanici.rol,
+      siteId: kullanici.siteId,
+    });
+
     return {
       id: String(kullanici.id),
       email: kullanici.email,
@@ -136,6 +145,7 @@ export class AuthService {
       rol: kullanici.rol,
       siteId: kullanici.siteId !== null ? String(kullanici.siteId) : null,
       tercihler: this.tercihleriOku(kullanici.tercihlerJson),
+      yetkiler,
     };
   }
 }

@@ -9,6 +9,7 @@ export interface AuthKullanici {
   rol: string;
   siteId: string | null;
   tercihler?: KullaniciTercihleri;
+  yetkiler?: import('@/features/admin/rolApi').YetkiKodu[];
 }
 
 export interface AuthYanit {

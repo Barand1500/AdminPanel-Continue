@@ -105,6 +105,18 @@ export class RolService {
     return roller.some((r) => r.kod === rolKod);
   }
 
+  async kullaniciYetkileri(kullanici: JwtPayload): Promise<YetkiKodu[]> {
+    if (kullanici.rol === 'SUPER_ADMIN') return [...YETKILER];
+
+    const siteId = await cozulenSiteIdFromKullanici(kullanici);
+    const roller = await this.listeleSite(siteId);
+    const tanim = roller.find((r) => r.kod === kullanici.rol);
+    if (tanim) return [...tanim.yetkiler];
+
+    const varsayilan = ROL_TANIMLARI[kullanici.rol as RolKodu];
+    return varsayilan ? [...varsayilan.yetkiler] : ['goruntuleme'];
+  }
+
   async kaydet(kullanici: JwtPayload, dto: RolKaydetDto, explicitSiteId?: string | number | null) {
     if (kullanici.rol !== 'SUPER_ADMIN') {
       throw new Error('Rol tanimlarini yalnizca Super Admin duzenleyebilir');

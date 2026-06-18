@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { KullaniciDuzenleFormu, KullaniciListesi, type AtanabilirRol } from '@/components/admin/kullanici/KullaniciBilesenleri';
 import { useAuth } from '@/contexts/AuthContext';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
+import { useYetkiler } from '@/hooks/useYetkiler';
 import { adminRolleriGetir } from '@/features/admin/rolApi';
 import {
   adminKullaniciGuncelle,
@@ -37,6 +38,7 @@ function kullanicidanForm(k: AdminKullanici): KullaniciFormDegeri {
 
 export function KullanicilarSayfasi() {
   const { kullanici: oturum } = useAuth();
+  const { kullaniciYonetimiVar } = useYetkiler();
   const [kullanicilar, setKullanicilar] = useState<AdminKullanici[]>([]);
   const [siteler, setSiteler] = useState<AdminSiteOzet[]>([]);
   const [form, setForm] = useState<KullaniciFormDegeri>(bosForm);
@@ -48,7 +50,7 @@ export function KullanicilarSayfasi() {
   const [tumRoller, setTumRoller] = useState<AtanabilirRol[]>([]);
   const [rolBasliklari, setRolBasliklari] = useState<Record<string, string>>(VARSAYILAN_ROL_ETIKETLERI);
 
-  const yetkili = oturum?.rol === 'SUPER_ADMIN' || oturum?.rol === 'AJANS_ADMIN';
+  const yetkili = kullaniciYonetimiVar;
 
   const atanabilirRoller = tumRoller.filter((r) => {
     if (oturum?.rol === 'SUPER_ADMIN') return true;
@@ -141,7 +143,7 @@ export function KullanicilarSayfasi() {
         <p className="text-4xl">🔒</p>
         <h1 className="mt-4 text-xl font-bold text-white">Yetkisiz Erişim</h1>
         <p className="mt-2 text-sm text-slate-400">
-          Kullanıcı yönetimi için Super Admin veya Ajans Admin yetkisi gerekir.
+          Kullanıcı yönetimi için Kullanıcı Yönetimi yetkisi gerekir.
         </p>
       </div>
     );

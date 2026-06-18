@@ -44,6 +44,7 @@ import {
   navKategoriOlusturSchema,
 } from '../../Application/DTOs/NavKategoriDto.js';
 import { rolMiddleware } from '../middleware/rolMiddleware.js';
+import { yetkiMiddleware } from '../middleware/yetkiMiddleware.js';
 import { medyaYukle } from '../middleware/medyaYukle.js';
 import { yedekYukle } from '../middleware/yedekYukle.js';
 import { validateBySchema } from '../middleware/dogrulama.js';
@@ -69,6 +70,12 @@ const kisayolController = new KisayolController();
 const sekmeController = new SekmeController();
 const navKategoriController = new NavKategoriController();
 
+const yG = yetkiMiddleware('goruntuleme');
+const yE = yetkiMiddleware('ekleme');
+const yD = yetkiMiddleware('duzenleme');
+const yS = yetkiMiddleware('silme');
+const yK = yetkiMiddleware('kullanici_yonetimi');
+
 router.post('/auth/giris', validateBySchema(girisSchema), (req, res) => authController.giris(req, res));
 router.get('/auth/ben', authMiddleware, (req, res) => authController.ben(req, res));
 router.patch('/auth/profil', authMiddleware, validateBySchema(adminProfilGuncelleSchema), (req, res) =>
@@ -78,110 +85,110 @@ router.patch('/auth/tercihler', authMiddleware, validateBySchema(tercihlerGuncel
   authController.tercihlerGuncelle(req, res)
 );
 
-router.get('/dashboard', authMiddleware, (req, res) => dashboardController.ozet(req, res));
+router.get('/dashboard', authMiddleware, yG, (req, res) => dashboardController.ozet(req, res));
 
-router.get('/bildirimler', authMiddleware, (req, res) => bildirimController.listele(req, res));
-router.patch('/bildirimler/tumu-okundu', authMiddleware, (req, res) => bildirimController.tumunuOkundu(req, res));
+router.get('/bildirimler', authMiddleware, yG, (req, res) => bildirimController.listele(req, res));
+router.patch('/bildirimler/tumu-okundu', authMiddleware, yG, (req, res) => bildirimController.tumunuOkundu(req, res));
 
-router.get('/widgetlar', authMiddleware, (req, res) => widgetController.listele(req, res));
-router.post('/widgetlar', authMiddleware, validateBySchema(widgetOlusturSchema), (req, res) => widgetController.olustur(req, res));
-router.put('/widgetlar/:id', authMiddleware, validateBySchema(widgetGuncelleSchema), (req, res) => widgetController.guncelle(req, res));
-router.delete('/widgetlar/:id', authMiddleware, (req, res) => widgetController.sil(req, res));
+router.get('/widgetlar', authMiddleware, yG, (req, res) => widgetController.listele(req, res));
+router.post('/widgetlar', authMiddleware, yE, validateBySchema(widgetOlusturSchema), (req, res) => widgetController.olustur(req, res));
+router.put('/widgetlar/:id', authMiddleware, yD, validateBySchema(widgetGuncelleSchema), (req, res) => widgetController.guncelle(req, res));
+router.delete('/widgetlar/:id', authMiddleware, yS, (req, res) => widgetController.sil(req, res));
 
-router.get('/site-ayarlari', authMiddleware, (req, res) => siteAyarlariController.getir(req, res));
-router.put('/site-ayarlari', authMiddleware, validateBySchema(siteAyarlariGuncelleSchema), (req, res) => siteAyarlariController.guncelle(req, res));
-router.get('/site/ayarlar', authMiddleware, (req, res) => siteAyarlariController.getir(req, res));
-router.patch('/site/ayarlar', authMiddleware, validateBySchema(siteAyarlariGuncelleSchema), (req, res) => siteAyarlariController.guncelle(req, res));
+router.get('/site-ayarlari', authMiddleware, yG, (req, res) => siteAyarlariController.getir(req, res));
+router.put('/site-ayarlari', authMiddleware, yD, validateBySchema(siteAyarlariGuncelleSchema), (req, res) => siteAyarlariController.guncelle(req, res));
+router.get('/site/ayarlar', authMiddleware, yG, (req, res) => siteAyarlariController.getir(req, res));
+router.patch('/site/ayarlar', authMiddleware, yD, validateBySchema(siteAyarlariGuncelleSchema), (req, res) => siteAyarlariController.guncelle(req, res));
 
-router.get('/kur/tcmb-onizle', authMiddleware, (req, res) => kurController.tcmbOnizle(req, res));
+router.get('/kur/tcmb-onizle', authMiddleware, yG, (req, res) => kurController.tcmbOnizle(req, res));
 
-router.get('/kisayollar', authMiddleware, (req, res) => kisayolController.listele(req, res));
-router.post('/kisayollar', authMiddleware, validateBySchema(kisayolOlusturSchema), (req, res) =>
+router.get('/kisayollar', authMiddleware, yG, (req, res) => kisayolController.listele(req, res));
+router.post('/kisayollar', authMiddleware, yE, validateBySchema(kisayolOlusturSchema), (req, res) =>
   kisayolController.olustur(req, res)
 );
-router.put('/kisayollar/:id', authMiddleware, validateBySchema(kisayolGuncelleSchema), (req, res) =>
+router.put('/kisayollar/:id', authMiddleware, yD, validateBySchema(kisayolGuncelleSchema), (req, res) =>
   kisayolController.guncelle(req, res)
 );
-router.delete('/kisayollar/:id', authMiddleware, (req, res) => kisayolController.sil(req, res));
+router.delete('/kisayollar/:id', authMiddleware, yS, (req, res) => kisayolController.sil(req, res));
 
-router.get('/sekmeler', authMiddleware, (req, res) => sekmeController.listele(req, res));
-router.post('/sekmeler', authMiddleware, validateBySchema(sekmeOlusturSchema), (req, res) =>
+router.get('/sekmeler', authMiddleware, yG, (req, res) => sekmeController.listele(req, res));
+router.post('/sekmeler', authMiddleware, yE, validateBySchema(sekmeOlusturSchema), (req, res) =>
   sekmeController.olustur(req, res)
 );
-router.put('/sekmeler/:id', authMiddleware, validateBySchema(sekmeGuncelleSchema), (req, res) =>
+router.put('/sekmeler/:id', authMiddleware, yD, validateBySchema(sekmeGuncelleSchema), (req, res) =>
   sekmeController.guncelle(req, res)
 );
-router.delete('/sekmeler/:id', authMiddleware, (req, res) => sekmeController.sil(req, res));
+router.delete('/sekmeler/:id', authMiddleware, yS, (req, res) => sekmeController.sil(req, res));
 
-router.get('/sayfalar', authMiddleware, (req, res) => sayfaController.listele(req, res));
-router.post('/sayfalar', authMiddleware, validateBySchema(sayfaOlusturSchema), (req, res) => sayfaController.olustur(req, res));
-router.put('/sayfalar/:id/tasi', authMiddleware, validateBySchema(sayfaTasiSchema), (req, res) => sayfaController.tasi(req, res));
-router.put('/sayfalar/:id', authMiddleware, validateBySchema(sayfaGuncelleSchema), (req, res) => sayfaController.guncelle(req, res));
-router.delete('/sayfalar/:id', authMiddleware, (req, res) => sayfaController.sil(req, res));
-router.put('/menu', authMiddleware, validateBySchema(menuGuncelleSchema), (req, res) => sayfaController.menuGuncelle(req, res));
+router.get('/sayfalar', authMiddleware, yG, (req, res) => sayfaController.listele(req, res));
+router.post('/sayfalar', authMiddleware, yE, validateBySchema(sayfaOlusturSchema), (req, res) => sayfaController.olustur(req, res));
+router.put('/sayfalar/:id/tasi', authMiddleware, yD, validateBySchema(sayfaTasiSchema), (req, res) => sayfaController.tasi(req, res));
+router.put('/sayfalar/:id', authMiddleware, yD, validateBySchema(sayfaGuncelleSchema), (req, res) => sayfaController.guncelle(req, res));
+router.delete('/sayfalar/:id', authMiddleware, yS, (req, res) => sayfaController.sil(req, res));
+router.put('/menu', authMiddleware, yD, validateBySchema(menuGuncelleSchema), (req, res) => sayfaController.menuGuncelle(req, res));
 
-router.get('/nav-kategoriler', authMiddleware, (req, res) => navKategoriController.listele(req, res));
-router.post('/nav-kategoriler', authMiddleware, validateBySchema(navKategoriOlusturSchema), (req, res) =>
+router.get('/nav-kategoriler', authMiddleware, yG, (req, res) => navKategoriController.listele(req, res));
+router.post('/nav-kategoriler', authMiddleware, yE, validateBySchema(navKategoriOlusturSchema), (req, res) =>
   navKategoriController.olustur(req, res)
 );
-router.put('/nav-kategoriler/:id', authMiddleware, validateBySchema(navKategoriGuncelleSchema), (req, res) =>
+router.put('/nav-kategoriler/:id', authMiddleware, yD, validateBySchema(navKategoriGuncelleSchema), (req, res) =>
   navKategoriController.guncelle(req, res)
 );
-router.delete('/nav-kategoriler/:id', authMiddleware, (req, res) => navKategoriController.sil(req, res));
+router.delete('/nav-kategoriler/:id', authMiddleware, yS, (req, res) => navKategoriController.sil(req, res));
 
-router.get('/medya', authMiddleware, (req, res) => medyaController.listele(req, res));
-router.post('/medya', authMiddleware, validateBySchema(medyaOlusturSchema), (req, res) => medyaController.olustur(req, res));
-router.post('/medya/yukle', authMiddleware, medyaYukle.single('dosya'), (req, res) => medyaController.yukle(req, res));
-router.delete('/medya/:id', authMiddleware, (req, res) => medyaController.sil(req, res));
-router.delete('/medya', authMiddleware, validateBySchema(medyaTopluSilSchema), (req, res) =>
+router.get('/medya', authMiddleware, yG, (req, res) => medyaController.listele(req, res));
+router.post('/medya', authMiddleware, yE, validateBySchema(medyaOlusturSchema), (req, res) => medyaController.olustur(req, res));
+router.post('/medya/yukle', authMiddleware, yE, medyaYukle.single('dosya'), (req, res) => medyaController.yukle(req, res));
+router.delete('/medya/:id', authMiddleware, yS, (req, res) => medyaController.sil(req, res));
+router.delete('/medya', authMiddleware, yS, validateBySchema(medyaTopluSilSchema), (req, res) =>
   medyaController.topluSil(req, res)
 );
 
-router.get('/seo', authMiddleware, (req, res) => seoController.ozet(req, res));
-router.put('/seo/genel', authMiddleware, validateBySchema(seoGenelGuncelleSchema), (req, res) => seoController.genelGuncelle(req, res));
-router.put('/seo/sayfa/:id', authMiddleware, validateBySchema(seoSayfaGuncelleSchema), (req, res) => seoController.sayfaGuncelle(req, res));
+router.get('/seo', authMiddleware, yG, (req, res) => seoController.ozet(req, res));
+router.put('/seo/genel', authMiddleware, yD, validateBySchema(seoGenelGuncelleSchema), (req, res) => seoController.genelGuncelle(req, res));
+router.put('/seo/sayfa/:id', authMiddleware, yD, validateBySchema(seoSayfaGuncelleSchema), (req, res) => seoController.sayfaGuncelle(req, res));
 
-router.get('/blog', authMiddleware, (req, res) => blogController.listele(req, res));
-router.post('/blog', authMiddleware, validateBySchema(blogOlusturSchema), (req, res) => blogController.olustur(req, res));
-router.put('/blog/:id', authMiddleware, validateBySchema(blogGuncelleSchema), (req, res) => blogController.guncelle(req, res));
-router.delete('/blog/:id', authMiddleware, (req, res) => blogController.sil(req, res));
+router.get('/blog', authMiddleware, yG, (req, res) => blogController.listele(req, res));
+router.post('/blog', authMiddleware, yE, validateBySchema(blogOlusturSchema), (req, res) => blogController.olustur(req, res));
+router.put('/blog/:id', authMiddleware, yD, validateBySchema(blogGuncelleSchema), (req, res) => blogController.guncelle(req, res));
+router.delete('/blog/:id', authMiddleware, yS, (req, res) => blogController.sil(req, res));
 
-router.get('/formlar', authMiddleware, (req, res) => formController.listele(req, res));
-router.get('/formlar/:id', authMiddleware, (req, res) => formController.detay(req, res));
-router.post('/formlar', authMiddleware, validateBySchema(formOlusturSchema), (req, res) => formController.olustur(req, res));
-router.put('/formlar/:id', authMiddleware, validateBySchema(formGuncelleSchema), (req, res) => formController.guncelle(req, res));
-router.delete('/formlar/:id', authMiddleware, (req, res) => formController.sil(req, res));
-router.get('/formlar/:id/gonderimler', authMiddleware, (req, res) => formController.gonderimler(req, res));
-router.patch('/formlar/:id/gonderimler/:gonderimId/okundu', authMiddleware, (req, res) => formController.gonderimOkundu(req, res));
-router.delete('/formlar/:id/gonderimler/:gonderimId', authMiddleware, (req, res) => formController.gonderimSil(req, res));
+router.get('/formlar', authMiddleware, yG, (req, res) => formController.listele(req, res));
+router.get('/formlar/:id', authMiddleware, yG, (req, res) => formController.detay(req, res));
+router.post('/formlar', authMiddleware, yE, validateBySchema(formOlusturSchema), (req, res) => formController.olustur(req, res));
+router.put('/formlar/:id', authMiddleware, yD, validateBySchema(formGuncelleSchema), (req, res) => formController.guncelle(req, res));
+router.delete('/formlar/:id', authMiddleware, yS, (req, res) => formController.sil(req, res));
+router.get('/formlar/:id/gonderimler', authMiddleware, yG, (req, res) => formController.gonderimler(req, res));
+router.patch('/formlar/:id/gonderimler/:gonderimId/okundu', authMiddleware, yD, (req, res) => formController.gonderimOkundu(req, res));
+router.delete('/formlar/:id/gonderimler/:gonderimId', authMiddleware, yS, (req, res) => formController.gonderimSil(req, res));
 
-router.get('/loglar', authMiddleware, (req, res) => logController.listele(req, res));
-router.post('/loglar', authMiddleware, (req, res) => logController.kaydet(req, res));
-router.delete('/loglar/temizle', authMiddleware, (req, res) => logController.temizle(req, res));
+router.get('/loglar', authMiddleware, yG, (req, res) => logController.listele(req, res));
+router.post('/loglar', authMiddleware, yG, (req, res) => logController.kaydet(req, res));
+router.delete('/loglar/temizle', authMiddleware, yS, (req, res) => logController.temizle(req, res));
 
-router.get('/yedek/varsayilan-dosya-adi', authMiddleware, (req, res) => yedeklemeController.varsayilanDosyaAdi(req, res));
-router.get('/yedek/gecmis', authMiddleware, (req, res) => yedeklemeController.gecmis(req, res));
-router.post('/yedek/indir', authMiddleware, (req, res) => yedeklemeController.indir(req, res));
-router.post('/yedek/geri-yukle', authMiddleware, yedekYukle.single('dosya'), (req, res) => yedeklemeController.geriYukle(req, res));
+router.get('/yedek/varsayilan-dosya-adi', authMiddleware, yG, (req, res) => yedeklemeController.varsayilanDosyaAdi(req, res));
+router.get('/yedek/gecmis', authMiddleware, yG, (req, res) => yedeklemeController.gecmis(req, res));
+router.post('/yedek/indir', authMiddleware, yD, (req, res) => yedeklemeController.indir(req, res));
+router.post('/yedek/geri-yukle', authMiddleware, yD, yedekYukle.single('dosya'), (req, res) => yedeklemeController.geriYukle(req, res));
 
-router.get('/sistem-ayarlari', authMiddleware, (req, res) => sistemAyarlariController.getir(req, res));
-router.put('/sistem-ayarlari', authMiddleware, validateBySchema(sistemAyarlariGuncelleSchema), (req, res) =>
+router.get('/sistem-ayarlari', authMiddleware, yG, (req, res) => sistemAyarlariController.getir(req, res));
+router.put('/sistem-ayarlari', authMiddleware, yD, validateBySchema(sistemAyarlariGuncelleSchema), (req, res) =>
   sistemAyarlariController.guncelle(req, res)
 );
 
-router.get('/kullanicilar', authMiddleware, rolMiddleware('SUPER_ADMIN', 'AJANS_ADMIN'), (req, res) =>
+router.get('/kullanicilar', authMiddleware, yK, (req, res) =>
   kullaniciController.listele(req, res)
 );
-router.get('/kullanicilar/siteler', authMiddleware, rolMiddleware('SUPER_ADMIN', 'AJANS_ADMIN'), (req, res) =>
+router.get('/kullanicilar/siteler', authMiddleware, yK, (req, res) =>
   kullaniciController.siteler(req, res)
 );
-router.post('/kullanicilar', authMiddleware, rolMiddleware('SUPER_ADMIN', 'AJANS_ADMIN'), validateBySchema(kullaniciOlusturSchema), (req, res) =>
+router.post('/kullanicilar', authMiddleware, yK, validateBySchema(kullaniciOlusturSchema), (req, res) =>
   kullaniciController.olustur(req, res)
 );
-router.put('/kullanicilar/:id', authMiddleware, rolMiddleware('SUPER_ADMIN', 'AJANS_ADMIN'), validateBySchema(kullaniciGuncelleSchema), (req, res) =>
+router.put('/kullanicilar/:id', authMiddleware, yK, validateBySchema(kullaniciGuncelleSchema), (req, res) =>
   kullaniciController.guncelle(req, res)
 );
-router.delete('/kullanicilar/:id', authMiddleware, rolMiddleware('SUPER_ADMIN', 'AJANS_ADMIN'), (req, res) =>
+router.delete('/kullanicilar/:id', authMiddleware, yK, (req, res) =>
   kullaniciController.sil(req, res)
 );
 
