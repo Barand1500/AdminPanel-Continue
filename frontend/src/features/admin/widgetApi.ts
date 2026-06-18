@@ -64,6 +64,7 @@ function payloadHazirla(form: WidgetFormDegeri, guncelleme = false) {
     mobilGoster: form.mobilGoster,
     masaustuGoster: form.masaustuGoster,
     configJson,
+    sayfaId: form.sayfaId.trim() ? form.sayfaId.trim() : null,
   };
 }
 

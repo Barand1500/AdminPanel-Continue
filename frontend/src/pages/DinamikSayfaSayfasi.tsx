@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useNavigation, useLoaderData, useOutletContext, Link } from 'react-router-dom';
 import type { PublicSayfa } from '@/features/site/sayfaApi';
 import { SayfaShadowIcerik } from '@/components/ortak/SayfaShadowIcerik';
@@ -7,6 +8,8 @@ import type { SitePublicData } from '@/types/site';
 import { sayfaYolunuBul } from '@/data/bosSiteVerisi';
 import { sayfaHiyerarsisiTamamla, sayfaIcerikVar } from '@/utils/sayfaAgaci';
 import { idString } from '@/utils/idKarsilastir';
+import { WidgetBolge } from '@/components/widget/WidgetBolge';
+import { sayfaWidgetlari } from '@/utils/widgetYerlesim';
 
 export interface DinamikSayfaLoaderVerisi {
   bulunamadi: boolean;
@@ -15,9 +18,13 @@ export interface DinamikSayfaLoaderVerisi {
 
 export function DinamikSayfaSayfasi() {
   const { sayfa } = useLoaderData() as DinamikSayfaLoaderVerisi;
-  const { sayfalar } = useOutletContext<SitePublicData>();
+  const { sayfalar, widgetlar } = useOutletContext<SitePublicData>();
   const navigation = useNavigation();
   const yukleniyor = navigation.state === 'loading';
+  const sayfaWidgetlar = useMemo(
+    () => (sayfa ? sayfaWidgetlari(widgetlar, sayfa.id) : []),
+    [widgetlar, sayfa]
+  );
 
   if (yukleniyor) {
     return (
@@ -37,7 +44,9 @@ export function DinamikSayfaSayfasi() {
   const baslikGoster = icerikVar || sayfa.ikon || altSayfalar.length > 0;
 
   return (
-    <section className="py-12 sm:py-16">
+    <>
+      <WidgetBolge widgetlar={sayfaWidgetlar} bolge="sayfa_ustu" />
+      <section className="py-12 sm:py-16">
       <div className="container-site">
         {baslikGoster && (
           <div className="mx-auto max-w-2xl text-center">
@@ -78,5 +87,7 @@ export function DinamikSayfaSayfasi() {
         )}
       </div>
     </section>
+      <WidgetBolge widgetlar={sayfaWidgetlar} bolge="sayfa_alti" />
+    </>
   );
 }

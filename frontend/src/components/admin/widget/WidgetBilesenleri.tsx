@@ -27,8 +27,10 @@ import {
   WIDGET_TIP_KATEGORILERI,
 } from './widgetRegistry';
 import { WidgetTipSecici } from './WidgetTipSecici';
-import { yerlesimEtiketi, yerlesimOku } from '@/utils/widgetYerlesim';
+import { yerlesimEtiketi, yerlesimOku, widgetSayfaFiltrele, widgetSayfaFiltreOgeleri } from '@/utils/widgetYerlesim';
 import { siraCakismasiBul } from '@/utils/widgetSiraYardimci';
+import type { AdminSayfa } from '@/features/admin/sayfaApi';
+import { idString } from '@/utils/idKarsilastir';
 
 export {
   WIDGET_TIPLERI,
@@ -62,6 +64,7 @@ export function widgettenForma(widget: AdminWidget): WidgetFormDegeri {
     mobilGoster: widget.mobilGoster,
     masaustuGoster: widget.masaustuGoster,
     configJsonMetin: JSON.stringify(cfg, null, 2),
+    sayfaId: widget.sayfaId ?? '',
   };
 }
 
@@ -69,15 +72,34 @@ interface WidgetListesiPanelProps {
   widgetlar: AdminWidget[];
   seciliId: string | null;
   tipFiltre?: string;
+  sayfalar?: AdminSayfa[];
   onSec: (widget: AdminWidget) => void;
 }
 
-export function WidgetListesiPanel({ widgetlar, seciliId, tipFiltre, onSec }: WidgetListesiPanelProps) {
+export function WidgetListesiPanel({
+  widgetlar,
+  seciliId,
+  tipFiltre,
+  sayfalar = [],
+  onSec,
+}: WidgetListesiPanelProps) {
   const [arama, setArama] = useState('');
+  const [sayfaFiltre, setSayfaFiltre] = useState<string | null>(null);
+
+  const sayfaAdlari = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const s of sayfalar) map.set(idString(s.id), s.baslik);
+    return map;
+  }, [sayfalar]);
+
+  const sayfaRozetleri = useMemo(
+    () => widgetSayfaFiltreOgeleri(widgetlar, sayfaAdlari),
+    [widgetlar, sayfaAdlari]
+  );
 
   const gruplu = useMemo(() => {
     const q = arama.toLowerCase().trim();
-    let liste = widgetlar;
+    let liste = widgetSayfaFiltrele(widgetlar, sayfaFiltre) as AdminWidget[];
     if (tipFiltre) liste = liste.filter((w) => w.tip === tipFiltre);
     if (q) {
       liste = liste.filter(
@@ -96,13 +118,34 @@ export function WidgetListesiPanel({ widgetlar, seciliId, tipFiltre, onSec }: Wi
       gruplar.get(grup)!.push(w);
     }
     return [...gruplar.entries()];
-  }, [widgetlar, arama, tipFiltre]);
+  }, [widgetlar, arama, tipFiltre, sayfaFiltre]);
+
+  function sayfaEtiketi(sayfaId?: string | null) {
+    if (!sayfaId) return 'Ana Sayfa';
+    return sayfaAdlari.get(idString(sayfaId)) ?? 'Sayfa';
+  }
 
   return (
     <aside className="ap-sidebar-panel ap-widget-sidebar">
       <div className="ap-sidebar-baslik ap-sidebar-baslik-dikey">
         <h2 className="ap-heading text-sm font-semibold">Widgetlar</h2>
         <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Widget ara..." />
+        {sayfaRozetleri.length > 0 && (
+          <div className="ap-widget-sayfa-filtreler" role="tablist" aria-label="Sayfaya göre filtre">
+            {sayfaRozetleri.map((rozet) => (
+              <button
+                key={rozet.id}
+                type="button"
+                role="tab"
+                aria-selected={sayfaFiltre === rozet.id}
+                onClick={() => setSayfaFiltre((onceki) => (onceki === rozet.id ? null : rozet.id))}
+                className={`ap-widget-sayfa-filtre ${sayfaFiltre === rozet.id ? 'ap-widget-sayfa-filtre-aktif' : ''}`}
+              >
+                {rozet.etiket}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
       <div className="ap-scroll ap-sidebar-icerik ap-widget-sidebar-icerik">
         {gruplu.length === 0 ? (
@@ -123,7 +166,7 @@ export function WidgetListesiPanel({ widgetlar, seciliId, tipFiltre, onSec }: Wi
                     <div className="min-w-0 flex-1">
                       <p className="ap-liste-oge-baslik truncate">{w.ad}</p>
                       <p className="ap-liste-oge-alt">
-                        {tipEtiketi(w.tip)} · {tipKategoriEtiketi(w.tip)} · {yerlesimEtiketi(yerlesimOku(w))} · Sıra {w.sira}
+                        {sayfaEtiketi(w.sayfaId)} · {tipEtiketi(w.tip)} · {yerlesimEtiketi(yerlesimOku(w))} · Sıra {w.sira}
                       </p>
                       <div className="ap-liste-oge-etiketler">
                         {w.aktif ? (
@@ -157,6 +200,7 @@ interface WidgetEditorPanelProps {
   hata: string;
   varsayilanTip?: string;
   tumWidgetlar?: AdminWidget[];
+  sayfalar?: AdminSayfa[];
   onChange: (form: WidgetFormDegeri) => void;
   onKaydetTetikleyici?: (fn: () => Promise<void>) => void;
   onKaydet: (deger: WidgetFormDegeri, widgetId?: string) => Promise<void>;
@@ -171,6 +215,7 @@ export function WidgetEditorPanel({
   hata,
   varsayilanTip: _varsayilanTip,
   tumWidgetlar = [],
+  sayfalar = [],
   onChange,
   onKaydetTetikleyici,
   onKaydet,
@@ -301,6 +346,7 @@ export function WidgetEditorPanel({
               onChange={onChange}
               digerWidgetlar={tumWidgetlar}
               mevcutWidgetId={seciliWidget?.id}
+              sayfalar={sayfalar}
             />
           </>
         )}

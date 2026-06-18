@@ -63,9 +63,10 @@ export type GirisAnimasyonu = 'yok' | 'fade' | 'slide';
 export type WidgetYerlesimBolge =
   | 'header_alti'
   | 'slider_alti'
-  | 'urunler_ustu'
-  | 'urunler_alti'
-  | 'footer_ustu';
+  | 'icerik_alani'
+  | 'footer_ustu'
+  | 'sayfa_ustu'
+  | 'sayfa_alti';
 
 export interface WidgetYerlesim {
   bolge: WidgetYerlesimBolge;
@@ -363,7 +364,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     baslikBoyutu: 'lg',
   };
   const ek: WidgetEkAyarlar = { girisAnimasyonu: 'yok' };
-  const yerlesim: WidgetYerlesim = { bolge: 'urunler_alti' };
+  const yerlesim: WidgetYerlesim = { bolge: 'icerik_alani' };
 
   switch (tip) {
     case 'BASLIK_METIN':

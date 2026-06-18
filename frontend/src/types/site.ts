@@ -36,6 +36,7 @@ export interface Widget {
   mobilGoster?: boolean;
   masaustuGoster?: boolean;
   configJson?: Record<string, unknown> | null;
+  sayfaId?: string | null;
 }
 
 export type SayfaAcilisModu = 'normal' | 'modal' | 'yeni_sekme';

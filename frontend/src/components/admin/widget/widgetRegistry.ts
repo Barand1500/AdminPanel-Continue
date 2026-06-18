@@ -124,6 +124,7 @@ export function varsayilanWidgetForm(
     mobilGoster: true,
     masaustuGoster: true,
     configJsonMetin: JSON.stringify(varsayilanConfig(safeTip), null, 2),
+    sayfaId: '',
   };
 }
 
@@ -140,6 +141,7 @@ export function tipDegistir(
     aktif: form.aktif,
     mobilGoster: form.mobilGoster,
     masaustuGoster: form.masaustuGoster,
+    sayfaId: form.sayfaId,
   };
 }
 

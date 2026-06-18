@@ -80,4 +80,5 @@ export interface WidgetFormDegeri {
   mobilGoster: boolean;
   masaustuGoster: boolean;
   configJsonMetin: string;
+  sayfaId: string;
 }

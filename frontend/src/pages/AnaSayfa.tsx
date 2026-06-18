@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import type { SitePublicData } from '@/types/site';
 import { blogAyarlariBirlestir, blogOnizlemeListesi } from '@/types/blog';
@@ -6,6 +7,7 @@ import { GuvenSerit } from '@/components/eticaret/GuvenSerit';
 import { BlogBolumu } from '@/components/blog/BlogBolumu';
 import { BlogHizmetBolumu } from '@/components/blog/BlogHizmetBolumu';
 import { PopupWidgetlar, WidgetBolge } from '@/components/widget/WidgetBolge';
+import { anaSayfaWidgetlari } from '@/utils/widgetYerlesim';
 
 function AnaSayfaHizmetBlog({
   widgetlar,
@@ -30,6 +32,7 @@ export function AnaSayfa() {
   const { widgetlar, site, bloglar } = useOutletContext<SitePublicData>();
   const blogAyarlari = blogAyarlariBirlestir(site.ayarlar);
   const blogOnizleme = blogOnizlemeListesi(bloglar, blogAyarlari.listeAdet);
+  const anaWidgetlar = useMemo(() => anaSayfaWidgetlari(widgetlar), [widgetlar]);
 
   const blogBolumu =
     blogAyarlari.anaSayfa && blogOnizleme.length > 0 ? (
@@ -38,28 +41,27 @@ export function AnaSayfa() {
 
   return (
     <>
-      <WidgetBolge widgetlar={widgetlar} bolge="header_alti" />
+      <WidgetBolge widgetlar={anaWidgetlar} bolge="header_alti" />
 
       <HeroSlider heroJson={site.ayarlar?.heroJson} />
       <GuvenSerit heroJson={site.ayarlar?.heroJson} />
 
-      <WidgetBolge widgetlar={widgetlar} bolge="slider_alti" />
+      <WidgetBolge widgetlar={anaWidgetlar} bolge="slider_alti" />
 
       {blogAyarlari.anaSayfaKonum === 'urunler-ustu' && blogBolumu}
-      <WidgetBolge widgetlar={widgetlar} bolge="urunler_ustu" />
       {blogAyarlari.anaSayfaKonum === 'widgetlar-ustu' && blogBolumu}
 
-      <WidgetBolge widgetlar={widgetlar} bolge="urunler_alti" />
+      <WidgetBolge widgetlar={anaWidgetlar} bolge="icerik_alani" />
       <AnaSayfaHizmetBlog
-        widgetlar={widgetlar}
+        widgetlar={anaWidgetlar}
         blogOnizleme={blogOnizleme}
         hizmetlerAlani={blogAyarlari.hizmetlerAlani}
       />
 
       {blogAyarlari.anaSayfaKonum === 'widgetlar-alti' && blogBolumu}
-      <WidgetBolge widgetlar={widgetlar} bolge="footer_ustu" />
+      <WidgetBolge widgetlar={anaWidgetlar} bolge="footer_ustu" />
 
-      <PopupWidgetlar widgetlar={widgetlar} />
+      <PopupWidgetlar widgetlar={anaWidgetlar} />
     </>
   );
 }

@@ -13,6 +13,7 @@ import {
 } from '@/components/admin/ortak/AdminBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import { widgetGuncelle, widgetOlustur, widgetSil, widgetlariGetir } from '@/features/admin/widgetApi';
+import { adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 import { sonrakiWidgetSira, siraCakismasiBul } from '@/utils/widgetSiraYardimci';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
@@ -30,6 +31,7 @@ interface WidgetYonetimiSayfasiProps {
 
 export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiProps) {
   const [widgetlar, setWidgetlar] = useState<AdminWidget[]>([]);
+  const [sayfalar, setSayfalar] = useState<AdminSayfa[]>([]);
   const [form, setForm] = useState<WidgetFormDegeri>(varsayilanWidgetForm(varsayilanTip ?? 'SLIDER'));
   const [yukleniyor, setYukleniyor] = useState(true);
   const [kaydediliyor, setKaydediliyor] = useState(false);
@@ -46,8 +48,12 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
     setHata('');
     setYukleniyor(true);
     try {
-      const liste = await widgetlariGetir(varsayilanTip);
+      const [liste, sayfaListesi] = await Promise.all([
+        widgetlariGetir(varsayilanTip),
+        adminSayfalariGetir(),
+      ]);
       setWidgetlar(liste);
+      setSayfalar(sayfaListesi);
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Widget listesi alınamadı');
     } finally {
@@ -176,7 +182,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
 
   const aciklama = varsayilanTip
     ? `${baslik} — anasayfa bileşenlerini düzenleyin`
-    : 'Anasayfa ve site bölümlerini oluşturan widget bileşenlerini yönetin';
+    : 'Anasayfa ve tüm sayfalardaki widget bileşenlerini yönetin';
 
   return (
     <AdminModulKabuk baslik={baslik} aciklama={aciklama}>
@@ -192,6 +198,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
               widgetlar={widgetlar}
               seciliId={seciliId}
               tipFiltre={varsayilanTip}
+              sayfalar={sayfalar}
               onSec={widgetSec}
             />
             <WidgetEditorPanel
@@ -202,6 +209,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
               hata={hata}
               varsayilanTip={varsayilanTip}
               tumWidgetlar={widgetlar}
+              sayfalar={sayfalar}
               onChange={setForm}
               onKaydet={kaydet}
               onKaydetTetikleyici={onKaydetTetikleyici}
