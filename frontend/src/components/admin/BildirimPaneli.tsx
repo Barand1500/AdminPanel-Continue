@@ -15,9 +15,16 @@ interface BildirimPaneliProps {
   onGuncelle?: () => void;
 }
 
+function islemSinifi(tur: string) {
+  if (tur === 'hata') return 'ap-alt-panel-hata-oge';
+  if (tur === 'basari') return 'ap-alt-panel-basari-oge';
+  return '';
+}
+
 export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProps) {
   const navigate = useNavigate();
-  const { uyariBildirimleri, tumUyarilariTemizle } = useAdminUyariBildirim();
+  const { uyariBildirimleri, islemBildirimleri, tumPanelBildirimleriniTemizle } =
+    useAdminUyariBildirim();
   const [bildirimler, setBildirimler] = useState<AdminBildirim[]>([]);
   const [yukleniyor, setYukleniyor] = useState(false);
   const [islemMesaji, setIslemMesaji] = useState<string | null>(null);
@@ -45,7 +52,7 @@ export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProp
     try {
       await adminBildirimleriTumunuOkundu();
       setBildirimler([]);
-      tumUyarilariTemizle();
+      tumPanelBildirimleriniTemizle();
       onGuncelle?.();
       adminBildirimleriYenile();
     } catch {
@@ -53,7 +60,11 @@ export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProp
     }
   }
 
-  const toplamBos = !yukleniyor && bildirimler.length === 0 && uyariBildirimleri.length === 0;
+  const toplamBos =
+    !yukleniyor &&
+    bildirimler.length === 0 &&
+    uyariBildirimleri.length === 0 &&
+    islemBildirimleri.length === 0;
 
   function tikla(b: AdminBildirim) {
     if (b.link) navigate(b.link);
@@ -73,6 +84,16 @@ export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProp
     >
       {islemMesaji && <p className="ap-alt-panel-hata px-1 pb-2">{islemMesaji}</p>}
       {yukleniyor && <AltPanelYukleniyor />}
+      {islemBildirimleri.map((b) => (
+        <AltPanelOge
+          key={b.id}
+          baslik={b.baslik}
+          alt={b.mesaj}
+          zaman={b.olusturma}
+          okunmamis={b.tur !== 'bilgi'}
+          sinif={islemSinifi(b.tur)}
+        />
+      ))}
       {uyariBildirimleri.map((u) => (
         <AltPanelOge
           key={`uyari-${u.id}`}
@@ -83,7 +104,6 @@ export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProp
           sinif="ap-alt-panel-uyari"
         />
       ))}
-      {toplamBos && <AltPanelBos mesaj="Henüz bildirim yok." />}
       {bildirimler.map((b) => (
         <AltPanelOge
           key={b.id}
@@ -94,13 +114,14 @@ export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProp
           onClick={() => tikla(b)}
         />
       ))}
+      {toplamBos && <AltPanelBos mesaj="Henüz bildirim yok." />}
     </AltPanel>
   );
 }
 
 export function useBildirimSayaci(pollingMs = 60_000) {
   const [okunmamisSayi, setOkunmamisSayi] = useState(0);
-  const { uyariSayisi } = useAdminUyariBildirim();
+  const { uyariSayisi, islemBildirimSayisi } = useAdminUyariBildirim();
 
   const yenile = useCallback(async () => {
     try {
@@ -124,5 +145,8 @@ export function useBildirimSayaci(pollingMs = 60_000) {
     };
   }, [yenile, pollingMs]);
 
-  return { okunmamisSayi: okunmamisSayi + uyariSayisi, yenile };
+  return {
+    okunmamisSayi: okunmamisSayi + uyariSayisi + islemBildirimSayisi,
+    yenile,
+  };
 }

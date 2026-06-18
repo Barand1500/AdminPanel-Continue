@@ -1,5 +1,7 @@
 import type { ReactNode } from 'react';
+import { useEffect, useRef } from 'react';
 import { AdminSiteOnizleLink } from '@/components/admin/AdminHeader';
+import { adminIslemBildirimi } from '@/utils/adminBildirimOlaylari';
 
 interface AdminModulKabukProps {
   baslik: string;
@@ -82,12 +84,25 @@ export function BildirimKutusu({
   mesaj: string;
   tur: 'hata' | 'bilgi' | 'basari';
 }) {
-  const sinif = {
-    hata: 'ap-bildirim-hata',
-    bilgi: 'ap-bildirim-bilgi',
-    basari: 'ap-bildirim-basari',
-  }[tur];
-  return <div className={`ap-bildirim rounded-lg px-3 py-2 text-sm ${sinif}`}>{mesaj}</div>;
+  const sonMesajRef = useRef('');
+
+  useEffect(() => {
+    if (!mesaj || tur === 'bilgi') return;
+    const anahtar = `${tur}:${mesaj}`;
+    if (sonMesajRef.current === anahtar) return;
+    sonMesajRef.current = anahtar;
+    adminIslemBildirimi(mesaj, tur === 'hata' ? 'hata' : 'basari');
+  }, [mesaj, tur]);
+
+  if (tur === 'bilgi') {
+    return (
+      <div className="ap-bildirim ap-bildirim-bilgi mb-4 rounded-lg px-3 py-2 text-sm">
+        {mesaj}
+      </div>
+    );
+  }
+
+  return null;
 }
 
 export function ModulBaslik({ baslik, aciklama }: { baslik: string; aciklama: string }) {

@@ -7,25 +7,73 @@ import {
   useState,
   type ReactNode,
 } from 'react';
+import {
+  ADMIN_ISLEM_BILDIRIMI,
+  type AdminIslemBildirimDetay,
+  type AdminIslemBildirimTur,
+} from '@/utils/adminBildirimOlaylari';
 
 export interface AdminUyariBildirim {
   id: string;
   baslik: string;
   mesaj: string;
   olusturma: string;
+  tur?: 'uyari';
+}
+
+export interface AdminIslemBildirim {
+  id: string;
+  baslik: string;
+  mesaj: string;
+  olusturma: string;
+  tur: AdminIslemBildirimTur;
 }
 
 interface AdminUyariBildirimContextType {
   uyariBildirimleri: AdminUyariBildirim[];
+  islemBildirimleri: AdminIslemBildirim[];
   uyariSayisi: number;
+  islemBildirimSayisi: number;
   uyariAyarla: (anahtar: string, bildirim: { baslik: string; mesaj: string } | null) => void;
-  tumUyarilariTemizle: () => void;
+  islemBildirimiEkle: (baslik: string, mesaj: string, tur?: AdminIslemBildirimTur) => void;
+  tumPanelBildirimleriniTemizle: () => void;
 }
 
 const AdminUyariBildirimContext = createContext<AdminUyariBildirimContextType | null>(null);
 
+const MAX_ISLEM_BILDIRIM = 40;
+
 export function AdminUyariBildirimProvider({ children }: { children: ReactNode }) {
   const [uyarilar, setUyarilar] = useState<Record<string, AdminUyariBildirim>>({});
+  const [islemBildirimleri, setIslemBildirimleri] = useState<AdminIslemBildirim[]>([]);
+
+  const islemBildirimiEkle = useCallback(
+    (baslik: string, mesaj: string, tur: AdminIslemBildirimTur = 'basari') => {
+      setIslemBildirimleri((onceki) =>
+        [
+          {
+            id: crypto.randomUUID(),
+            baslik,
+            mesaj,
+            tur,
+            olusturma: new Date().toISOString(),
+          },
+          ...onceki,
+        ].slice(0, MAX_ISLEM_BILDIRIM)
+      );
+    },
+    []
+  );
+
+  useEffect(() => {
+    function dinle(e: Event) {
+      const detay = (e as CustomEvent<AdminIslemBildirimDetay>).detail;
+      if (!detay?.mesaj) return;
+      islemBildirimiEkle(detay.baslik, detay.mesaj, detay.tur);
+    }
+    window.addEventListener(ADMIN_ISLEM_BILDIRIMI, dinle);
+    return () => window.removeEventListener(ADMIN_ISLEM_BILDIRIMI, dinle);
+  }, [islemBildirimiEkle]);
 
   const uyariAyarla = useCallback(
     (anahtar: string, bildirim: { baslik: string; mesaj: string } | null) => {
@@ -46,6 +94,7 @@ export function AdminUyariBildirimProvider({ children }: { children: ReactNode }
             baslik: bildirim.baslik,
             mesaj: bildirim.mesaj,
             olusturma: new Date().toISOString(),
+            tur: 'uyari',
           },
         };
       });
@@ -53,7 +102,10 @@ export function AdminUyariBildirimProvider({ children }: { children: ReactNode }
     []
   );
 
-  const tumUyarilariTemizle = useCallback(() => setUyarilar({}), []);
+  const tumPanelBildirimleriniTemizle = useCallback(() => {
+    setUyarilar({});
+    setIslemBildirimleri([]);
+  }, []);
 
   const uyariBildirimleri = useMemo(
     () =>
@@ -66,11 +118,20 @@ export function AdminUyariBildirimProvider({ children }: { children: ReactNode }
   const deger = useMemo(
     () => ({
       uyariBildirimleri,
+      islemBildirimleri,
       uyariSayisi: uyariBildirimleri.length,
+      islemBildirimSayisi: islemBildirimleri.length,
       uyariAyarla,
-      tumUyarilariTemizle,
+      islemBildirimiEkle,
+      tumPanelBildirimleriniTemizle,
     }),
-    [uyariBildirimleri, uyariAyarla, tumUyarilariTemizle]
+    [
+      uyariBildirimleri,
+      islemBildirimleri,
+      uyariAyarla,
+      islemBildirimiEkle,
+      tumPanelBildirimleriniTemizle,
+    ]
   );
 
   return (
@@ -83,15 +144,18 @@ export function useAdminUyariBildirim() {
   if (!ctx) {
     return {
       uyariBildirimleri: [] as AdminUyariBildirim[],
+      islemBildirimleri: [] as AdminIslemBildirim[],
       uyariSayisi: 0,
+      islemBildirimSayisi: 0,
       uyariAyarla: () => {},
-      tumUyarilariTemizle: () => {},
+      islemBildirimiEkle: () => {},
+      tumPanelBildirimleriniTemizle: () => {},
     };
   }
   return ctx;
 }
 
-/** Kaydedilmemiş değişiklik uyarısını sayfa içi banner yerine bildirim paneline yazar */
+/** Kaydedilmemiş değişiklik uyarısını bildirim paneline yazar */
 export function useKaydedilmemisBildirim(
   aktif: boolean,
   mesaj: string,

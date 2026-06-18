@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
+import { useAdminSayfaBildirimi } from '@/hooks/useAdminSayfaBildirimi';
 import { usePanelDil } from '@/contexts/PanelDilContext';
 import { SistemSekmeCubugu } from '@/components/admin/sistem/SistemSekmeCubugu';
 import {
@@ -25,6 +26,7 @@ import { siteVerisiGuncellendiYayinla } from '@/utils/siteVerisiOlaylari';
 
 export function SistemAyarlariSayfasi() {
   const { dilAyarla, cevirileriAyarla } = usePanelDil();
+  const { basariBildir, hataBildir } = useAdminSayfaBildirimi();
   const [form, setForm] = useState<SistemAyarlariForm>(bosSistemForm);
   const [sayfalar, setSayfalar] = useState<AdminSayfa[]>([]);
   const [siteAdi, setSiteAdi] = useState('');
@@ -33,16 +35,12 @@ export function SistemAyarlariSayfasi() {
   const [sekme, setSekme] = useState<SistemSekmeId>('genel');
   const [yukleniyor, setYukleniyor] = useState(true);
   const [kaydediliyor, setKaydediliyor] = useState(false);
-  const [hata, setHata] = useState('');
-  const [basari, setBasari] = useState('');
 
   const kaydet = useCallback(async () => {
     setKaydediliyor(true);
-    setHata('');
-    setBasari('');
     try {
       const veri = await sistemAyarlariGuncelle(form);
-      setBasari('Sistem ayarları kaydedildi.');
+      basariBildir('Sistem ayarları kaydedildi.');
       setSiteAdi(veri.site.ad);
       setSiteSlug(veri.site.slug);
       setSurum(veri.surum);
@@ -52,11 +50,11 @@ export function SistemAyarlariSayfasi() {
       cevirileriAyarla(yeniForm.panelCeviriler);
       siteVerisiGuncellendiYayinla();
     } catch (err) {
-      setHata(err instanceof Error ? err.message : 'Kayıt başarısız');
+      hataBildir(err instanceof Error ? err.message : 'Kayıt başarısız');
     } finally {
       setKaydediliyor(false);
     }
-  }, [form, dilAyarla, cevirileriAyarla]);
+  }, [form, dilAyarla, cevirileriAyarla, basariBildir, hataBildir]);
 
   const siteAktifToggle = useCallback(
     async (aktif: boolean) => {
@@ -65,11 +63,9 @@ export function SistemAyarlariSayfasi() {
       setForm(guncel);
 
       setKaydediliyor(true);
-      setHata('');
-      setBasari('');
       try {
         const veri = await sistemAyarlariGuncelle(guncel);
-        setBasari(aktif ? 'Site yayına alındı.' : 'Site kapatıldı. Ziyaretçiler erişemez.');
+        basariBildir(aktif ? 'Site yayına alındı.' : 'Site kapatıldı. Ziyaretçiler erişemez.');
         setSiteAdi(veri.site.ad);
         setSiteSlug(veri.site.slug);
         setSurum(veri.surum);
@@ -80,12 +76,12 @@ export function SistemAyarlariSayfasi() {
         siteVerisiGuncellendiYayinla();
       } catch (err) {
         setForm(onceki);
-        setHata(err instanceof Error ? err.message : 'Site durumu güncellenemedi');
+        hataBildir(err instanceof Error ? err.message : 'Site durumu güncellenemedi');
       } finally {
         setKaydediliyor(false);
       }
     },
-    [form, dilAyarla, cevirileriAyarla]
+    [form, dilAyarla, cevirileriAyarla, basariBildir, hataBildir]
   );
 
   const bakimModuToggle = useCallback(async () => {
@@ -95,11 +91,9 @@ export function SistemAyarlariSayfasi() {
     if (yeniBakim) setSekme('bakim');
 
     setKaydediliyor(true);
-    setHata('');
-    setBasari('');
     try {
       const veri = await sistemAyarlariGuncelle(guncel);
-      setBasari(yeniBakim ? 'Bakım modu açıldı.' : 'Bakım modu kapatıldı.');
+      basariBildir(yeniBakim ? 'Bakım modu açıldı.' : 'Bakım modu kapatıldı.');
       setSiteAdi(veri.site.ad);
       setSiteSlug(veri.site.slug);
       setSurum(veri.surum);
@@ -110,11 +104,11 @@ export function SistemAyarlariSayfasi() {
       siteVerisiGuncellendiYayinla();
     } catch (err) {
       setForm(form);
-      setHata(err instanceof Error ? err.message : 'Bakım modu güncellenemedi');
+      hataBildir(err instanceof Error ? err.message : 'Bakım modu güncellenemedi');
     } finally {
       setKaydediliyor(false);
     }
-  }, [form, dilAyarla, cevirileriAyarla]);
+  }, [form, dilAyarla, cevirileriAyarla, basariBildir, hataBildir]);
 
   useEffect(() => {
     void (async () => {
@@ -129,12 +123,12 @@ export function SistemAyarlariSayfasi() {
         dilAyarla(yuklenen.panelDili);
         cevirileriAyarla(yuklenen.panelCeviriler);
       } catch (err) {
-        setHata(err instanceof Error ? err.message : 'Ayarlar alınamadı');
+        hataBildir(err instanceof Error ? err.message : 'Ayarlar alınamadı');
       } finally {
         setYukleniyor(false);
       }
     })();
-  }, [dilAyarla, cevirileriAyarla]);
+  }, [dilAyarla, cevirileriAyarla, hataBildir]);
 
   useModulAksiyonlari({ kaydet }, { kaydet: !kaydediliyor });
 
@@ -142,8 +136,6 @@ export function SistemAyarlariSayfasi() {
 
   return (
     <AdminModulKabuk baslik="Sistem Ayarları" aciklama={`${siteAdi} — site durumu, bakım, 404 ve panel tercihleri`}>
-      {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
-      {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
       <div className="ap-sistem-yonetimi">
