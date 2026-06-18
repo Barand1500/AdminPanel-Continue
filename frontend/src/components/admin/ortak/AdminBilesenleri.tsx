@@ -94,14 +94,6 @@ export function BildirimKutusu({
     adminIslemBildirimi(mesaj, tur === 'hata' ? 'hata' : 'basari');
   }, [mesaj, tur]);
 
-  if (tur === 'bilgi') {
-    return (
-      <div className="ap-bildirim ap-bildirim-bilgi mb-4 rounded-lg px-3 py-2 text-sm">
-        {mesaj}
-      </div>
-    );
-  }
-
   return null;
 }
 
