@@ -44,16 +44,15 @@ function FooterMarka({
 
   return (
     <div className="footer-marka">
-      {footer.marka.logoGoster && (
-        <SiteMarkaAlani
-          siteAdi={siteAdi}
-          logoUrl={logoUrl}
-          logoBoyutu={footer.marka.logoBoyutu}
-          yer="footer"
-          anaRenk={ayarlar?.anaRenk}
-          ikincilRenk={ayarlar?.ikincilRenk}
-        />
-      )}
+      <SiteMarkaAlani
+        siteAdi={siteAdi}
+        logoUrl={logoUrl}
+        logoBoyutu={footer.marka.logoBoyutu}
+        yer="footer"
+        anaRenk={ayarlar?.anaRenk}
+        ikincilRenk={ayarlar?.ikincilRenk}
+        gorunum={footer.marka.logoGoster ? 'sadece-logo' : 'sadece-metin'}
+      />
 
       <ul className="mt-5 space-y-3 text-sm" style={{ color: 'var(--color-footer-text)' }}>
         {footer.marka.adresGoster && ayarlar?.adres && (

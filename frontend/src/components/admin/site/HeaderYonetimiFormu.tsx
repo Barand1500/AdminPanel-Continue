@@ -130,7 +130,7 @@ export function HeaderYonetimiFormu() {
                     headerGuncelleParcali({ markaMetni: e.target.value || null })
                   }
                   className={formInputSinifi}
-                  placeholder="Örn. Güzel Teknoloji veya Baran"
+                  placeholder="Örn. Güzel Teknoloji"
                 />
               </FormAlani>
               <FormAlani etiket="Slogan" aciklama="Üst banttaki kısa metin">

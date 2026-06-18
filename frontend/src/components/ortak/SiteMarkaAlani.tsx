@@ -14,6 +14,8 @@ interface SiteMarkaAlaniProps {
   ikincilRenk?: string;
   to?: string;
   className?: string;
+  /** tam: logo + metin (varsayılan), sadece-logo: yalnızca logo, sadece-metin: yalnızca yazı */
+  gorunum?: 'tam' | 'sadece-logo' | 'sadece-metin';
 }
 
 function markaMetni(siteAdi: string, yer: 'header' | 'footer') {
@@ -75,33 +77,42 @@ export function SiteMarkaAlani({
   ikincilRenk = '#a78bfa',
   to = '/',
   className = '',
+  gorunum = 'tam',
 }: SiteMarkaAlaniProps) {
   const boyut = logoBoyutuNormalize(logoBoyutu);
   const metin = siteAdi.trim();
+  const logoGoster = gorunum !== 'sadece-metin';
+  const metinGoster = gorunum !== 'sadece-logo';
+
   const icerik = (
     <>
-      {logoUrl ? (
-        <img
-          src={logoUrl}
-          alt=""
-          className={logoBoyutSinifi(boyut, yer)}
-          aria-hidden
-        />
-      ) : metin ? (
-        <div
-          className={`flex shrink-0 items-center justify-center rounded-xl font-black text-white shadow-md ${
-            yer === 'header' ? 'h-10 w-10 text-lg' : 'h-10 w-10 text-lg'
-          }`}
-          style={{
-            background: `linear-gradient(135deg, ${anaRenk}, ${ikincilRenk})`,
-          }}
-        >
-          {metin.charAt(0).toUpperCase()}
-        </div>
-      ) : null}
-      {markaMetni(siteAdi, yer)}
+      {logoGoster &&
+        (logoUrl ? (
+          <img
+            src={logoUrl}
+            alt=""
+            className={logoBoyutSinifi(boyut, yer)}
+            aria-hidden
+          />
+        ) : metin ? (
+          <div
+            className={`flex shrink-0 items-center justify-center rounded-xl font-black text-white shadow-md ${
+              yer === 'header' ? 'h-10 w-10 text-lg' : 'h-10 w-10 text-lg'
+            }`}
+            style={{
+              background: `linear-gradient(135deg, ${anaRenk}, ${ikincilRenk})`,
+            }}
+          >
+            {metin.charAt(0).toUpperCase()}
+          </div>
+        ) : null)}
+      {metinGoster && markaMetni(siteAdi, yer)}
     </>
   );
+
+  if (!logoGoster && !metinGoster) return null;
+  if (logoGoster && !metinGoster && !logoUrl && !metin) return null;
+  if (!logoGoster && metinGoster && !metin) return null;
 
   return (
     <Link

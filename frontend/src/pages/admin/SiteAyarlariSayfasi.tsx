@@ -9,7 +9,6 @@ import { TelefonInput } from '@/components/form/TelefonInput';
 import { EmailInput } from '@/components/form/EmailInput';
 import { WhatsAppInput } from '@/components/form/WhatsAppInput';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
-import { SosyalMedyaAlani } from '@/components/form/SosyalMedyaAlani';
 import {
   AdminPanelKarti,
   BildirimKutusu,
@@ -106,7 +105,7 @@ export function SiteAyarlariSayfasi() {
           <Link to="/gt-admin/footer" className="font-semibold text-[var(--ap-accent)] hover:underline">
             Footer Yönetimi
           </Link>{' '}
-          modülünü kullanın. İletişim ve sosyal medya bilgileri yalnızca burada düzenlenir.
+          modülünü kullanın. İletişim bilgileri yalnızca burada düzenlenir; sosyal medya Footer Yönetimi&apos;ndedir.
         </p>
       </div>
 
@@ -179,16 +178,6 @@ export function SiteAyarlariSayfasi() {
               />
             </FormAlani>
           </div>
-        </AdminPanelKarti>
-
-        <AdminPanelKarti
-          baslik="Sosyal Medya"
-          altBaslik="Header üst bant ve footer'da görünen platform linkleri"
-        >
-          <SosyalMedyaAlani
-            sosyal={ayarlar.sosyalMedyaJson ?? {}}
-            onGuncelle={(sosyalMedyaJson) => alanGuncelle('sosyalMedyaJson', sosyalMedyaJson)}
-          />
         </AdminPanelKarti>
 
         <AdminPanelKarti baslik="Önizleme" altBaslik="Gündüz ve gece modu canlı önizleme">

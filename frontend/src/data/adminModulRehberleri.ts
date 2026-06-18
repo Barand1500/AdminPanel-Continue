@@ -75,7 +75,7 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
 
   'site-ayarlari': {
     baslik: 'Site Ayarları Rehberi',
-    altBaslik: 'Marka, iletişim ve sosyal medya',
+    altBaslik: 'Marka, tema ve iletişim',
     bolumBaslik: 'Site Ayarları',
     kartlar: [
       {
@@ -95,12 +95,6 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
         baslik: 'İletişim Alanları',
         aciklama: 'Telefon, e-posta ve WhatsApp otomatik formatlanır. Footer ve iletişim sayfasında kullanılır.',
         renk: 'yesil',
-      },
-      {
-        ikon: '📱',
-        baslik: 'Sosyal Medya',
-        aciklama: 'Her platform için 3 hazır ikon veya özel yükleme seçeneği vardır. Profil linkini eklemeyi unutmayın.',
-        renk: 'camgobegi',
       },
     ],
     ipucu: 'Değişiklikleri alt bardaki Kaydet ile kaydedin; Önizle ile public siteyi yeni sekmede açın.',
@@ -322,6 +316,12 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
     altBaslik: 'Alt bilgi alanı',
     bolumBaslik: 'Footer Yönetimi',
     kartlar: [
+      {
+        ikon: '📱',
+        baslik: 'Sosyal Medya',
+        aciklama: 'Platform linklerini Marka & Görünüm sekmesinden ekleyin; footer ve header görünürlüğünü ayrı ayrı yönetin.',
+        renk: 'camgobegi',
+      },
       {
         ikon: '📍',
         baslik: 'İletişim Görünürlüğü',

@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import { useSiteYonetimiAksiyonlari } from '@/hooks/useSiteYonetimiAksiyonlari';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
+import { SosyalMedyaAlani } from '@/components/form/SosyalMedyaAlani';
 import { FooterSemaSecici } from '@/components/admin/footer/FooterSemaSecici';
 import { FooterKolonPanel } from '@/components/admin/footer/FooterKolonPanel';
 import { FooterAltBantPanel } from '@/components/admin/footer/FooterAltBantPanel';
@@ -91,7 +92,7 @@ export function FooterYonetimiFormu() {
       <div className="space-y-5">
         <ModulBaslik
           baslik="Footer Yönetimi"
-          aciklama="Footer düzeni, link kolonları ve görünüm ayarları. İletişim ve sosyal medya verileri Site Ayarları'ndan gelir."
+          aciklama="Footer düzeni, link kolonları, sosyal medya ve görünüm ayarları. İletişim verileri Site Ayarları'ndan gelir."
         />
 
         {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
@@ -126,6 +127,7 @@ export function FooterYonetimiFormu() {
               <div className="space-y-3">
                 <ToggleSatir
                   etiket="Logo göster"
+                  aciklama="Açıkken yalnızca logo görünür; kapalıyken marka yazısı görünür."
                   acik={footer.marka.logoGoster}
                   onDegistir={(logoGoster) =>
                     footerGuncelle({ ...footer, marka: { ...footer.marka, logoGoster } })
@@ -141,14 +143,6 @@ export function FooterYonetimiFormu() {
                     }
                   />
                 )}
-                <ToggleSatir
-                  etiket="Sosyal medya ikonları"
-                  aciklama="Linkler Site Ayarları'ndan yönetilir"
-                  acik={footer.marka.sosyalGoster}
-                  onDegistir={(sosyalGoster) =>
-                    footerGuncelle({ ...footer, marka: { ...footer.marka, sosyalGoster } })
-                  }
-                />
                 <ToggleSatir
                   etiket="Banka hesapları linki"
                   acik={footer.marka.bankaLinki.aktif}
@@ -217,6 +211,26 @@ export function FooterYonetimiFormu() {
                     </div>
                   </div>
                 )}
+              </div>
+            </AdminPanelKarti>
+
+            <AdminPanelKarti
+              baslik="Sosyal Medya"
+              altBaslik="Platform linkleri ve footer'da görünürlük"
+            >
+              <div className="space-y-4">
+                <SosyalMedyaAlani
+                  sosyal={ayarlar.sosyalMedyaJson ?? {}}
+                  onGuncelle={(sosyalMedyaJson) => alanGuncelle('sosyalMedyaJson', sosyalMedyaJson)}
+                />
+                <ToggleSatir
+                  etiket="Footer'da sosyal medya ikonları"
+                  aciklama="Header üst bant görünürlüğü Header Yönetimi'nden ayarlanır."
+                  acik={footer.marka.sosyalGoster}
+                  onDegistir={(sosyalGoster) =>
+                    footerGuncelle({ ...footer, marka: { ...footer.marka, sosyalGoster } })
+                  }
+                />
               </div>
             </AdminPanelKarti>
 
