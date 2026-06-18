@@ -81,6 +81,9 @@ export function SiteHeader({ siteAdi: _siteAdi, ayarlar, menuOgeleri, kategorile
   const ustBant = header.ustBant!;
   const ikonlar = header.ikonlar!;
   const kategori = header.kategori!;
+  const kategoriMenuGoster =
+    kategori.menuGoster !== false &&
+    Boolean(cevrilmisKategoriler?.length);
   const kategoriBaslikMetni = kategoriBaslikCevir(cevir, kategori.baslikMetni);
   const arama = header.arama!;
   const kurlar = (header.kurlar ?? []).filter((k) => k.kod !== 'TRY').sort((a, b) => a.sira - b.sira);
@@ -175,11 +178,13 @@ export function SiteHeader({ siteAdi: _siteAdi, ayarlar, menuOgeleri, kategorile
 
         <div className="site-header-alt border-t py-3" style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface-elevated)' }}>
           <div className="container-site flex gap-3">
-            <KategoriMenu
-              baslikMetni={kategoriBaslikMetni}
-              acilisModu={kategori.acilisModu}
-              kategoriler={cevrilmisKategoriler}
-            />
+            {kategoriMenuGoster && (
+              <KategoriMenu
+                baslikMetni={kategoriBaslikMetni}
+                acilisModu={kategori.acilisModu}
+                kategoriler={cevrilmisKategoriler}
+              />
+            )}
             <div className="relative flex-1">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary">
                 <HeaderIkon ikon={arama.ikon} grup="arama" className="h-5 w-5" />

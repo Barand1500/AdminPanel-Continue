@@ -27,7 +27,7 @@ interface SiteAyarlariContextType {
   alanGuncelle: <K extends keyof SiteAyarlari>(alan: K, deger: SiteAyarlari[K]) => void;
   headerGuncelle: (header: HeaderAyarlari) => void;
   siteAdGuncelle: (ad: string) => void;
-  kaydet: () => Promise<void>;
+  kaydet: (opts?: { header?: HeaderAyarlari }) => Promise<void>;
   yenile: () => Promise<void>;
 }
 
@@ -92,13 +92,13 @@ export function SiteAyarlariProvider({ children }: { children: ReactNode }) {
     setSiteAd(ad);
   }, []);
 
-  const kaydet = useCallback(async () => {
+  const kaydet = useCallback(async (opts?: { header?: HeaderAyarlari }) => {
     if (!ayarlar) return;
     setKaydediliyor(true);
     setHata(null);
     try {
-      const headerMerged = headerAyarlariBirlestir(ayarlar);
-      let headerJson = ayarlar.headerAyarlariJson ?? null;
+      const headerMerged = opts?.header ?? headerAyarlariBirlestir(ayarlar);
+      let headerJson = opts?.header ?? ayarlar.headerAyarlariJson ?? null;
       if (headerMerged.dilDestegi && headerJson) {
         const footerMetinleri = footerMetinleriniTopla(footerAyarlariBirlestir(ayarlar));
         headerJson = {
@@ -142,7 +142,9 @@ export function SiteAyarlariProvider({ children }: { children: ReactNode }) {
       setOrijinal(JSON.stringify(veri.ayarlar ?? {}));
       siteVerisiGuncellendiYayinla();
     } catch (err) {
-      setHata(err instanceof Error ? err.message : 'Kayit basarisiz');
+      const mesaj = err instanceof Error ? err.message : 'Kayit basarisiz';
+      setHata(mesaj);
+      throw err;
     } finally {
       setKaydediliyor(false);
     }

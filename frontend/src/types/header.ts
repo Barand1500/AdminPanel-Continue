@@ -90,6 +90,8 @@ export interface HeaderAyarlari {
   kategori?: {
     acilisModu: KategoriAcilisModu;
     baslikMetni: string;
+    /** false ise header'da Tüm Kategoriler menüsü gizlenir */
+    menuGoster?: boolean;
   };
   arama?: {
     placeholder: string;
@@ -194,6 +196,7 @@ export function varsayilanHeaderAyarlari(
     kategori: {
       acilisModu: kategoriAcilisModuNormalize(mevcut?.kategori?.acilisModu),
       baslikMetni: mevcut?.kategori?.baslikMetni ?? 'Tüm Kategoriler',
+      menuGoster: mevcut?.kategori?.menuGoster ?? true,
     },
     arama: mevcut?.arama ?? {
       placeholder: 'Ürün Ara...',

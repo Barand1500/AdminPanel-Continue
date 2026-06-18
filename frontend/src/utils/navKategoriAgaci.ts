@@ -1,5 +1,6 @@
 import type { NavKategoriAgacDugumu, NavKategoriKayit } from '@/types/navKategori';
-import type { Kategori } from '@/data/kategoriler';import { idString } from '@/utils/idKarsilastir';
+import type { Kategori } from '@/data/kategoriler';
+import { idString } from '@/utils/idKarsilastir';
 
 function sirala<T extends { sira: number; baslik: string }>(liste: T[]): T[] {
   return [...liste].sort((a, b) => a.sira - b.sira || a.baslik.localeCompare(b.baslik, 'tr'));

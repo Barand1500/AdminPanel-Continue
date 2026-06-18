@@ -792,6 +792,47 @@ html:has(.admin-panel[data-tema='acik']) body {
   background: linear-gradient(to right, var(--ap-border), transparent);
 }
 
+/* Kategori yönetimi formu */
+.ap-kategori-yonetim-layout .ap-editor-panel.ap-kategori-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: transparent;
+  border: none;
+}
+
+.ap-kategori-yonetim-layout .ap-kategori-editor > .ap-form-bolum {
+  margin-top: 0;
+}
+
+.ap-kategori-form-grid {
+  display: grid;
+  gap: 1rem;
+  align-items: end;
+}
+
+@media (min-width: 768px) {
+  .ap-kategori-form-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: 1rem;
+    row-gap: 1.25rem;
+  }
+}
+
+.ap-kategori-form-tam {
+  grid-column: 1 / -1;
+}
+
+.ap-kategori-form-tam .ap-gorsel-alan {
+  align-items: center;
+}
+
+.ap-kategori-form-grid .ap-input,
+.ap-kategori-form-grid select.ap-input {
+  min-height: 2.5rem;
+}
+
 /* Icerik yonetimi ortak layout */
 .ap-split-layout {
   display: grid;

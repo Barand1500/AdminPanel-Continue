@@ -954,6 +954,50 @@ html[data-site-tema='koyu'] .phone-input-alan {
   color: var(--color-text);
 }
 
+/* Kategori mega menü — gece modunda panel her zaman açık/okunabilir tema */
+html[data-site-tema='koyu'] .kategori-menu-panel {
+  background-color: #ffffff;
+  color: #334155;
+  border-color: #e2e8f0;
+}
+
+html[data-site-tema='koyu'] .kategori-menu-panel .text-slate-900 {
+  color: #0f172a !important;
+}
+
+html[data-site-tema='koyu'] .kategori-menu-panel .text-slate-800 {
+  color: #1e293b !important;
+}
+
+html[data-site-tema='koyu'] .kategori-menu-panel .text-slate-600 {
+  color: #475569 !important;
+}
+
+html[data-site-tema='koyu'] .kategori-menu-panel .text-slate-500 {
+  color: #64748b !important;
+}
+
+html[data-site-tema='koyu'] .kategori-menu-panel .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+html[data-site-tema='koyu'] .kategori-menu-panel .bg-white {
+  background-color: #ffffff !important;
+}
+
+html[data-site-tema='koyu'] .kategori-menu-panel .bg-slate-50 {
+  background-color: #f8fafc !important;
+}
+
+html[data-site-tema='koyu'] .kategori-menu-panel .border-slate-100,
+html[data-site-tema='koyu'] .kategori-menu-panel .border-slate-200 {
+  border-color: #e2e8f0 !important;
+}
+
+html[data-site-tema='koyu'] .kategori-menu-panel a:hover {
+  color: var(--color-primary) !important;
+}
+
 /* Dinamik sayfa — ham HTML içerik */
 .sayfa-icerik-html h1,
 .sayfa-icerik-html h2,

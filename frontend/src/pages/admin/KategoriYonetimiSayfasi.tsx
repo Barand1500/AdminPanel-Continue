@@ -119,8 +119,9 @@ function KategoriAgacListesi({
 }
 
 export function KategoriYonetimiSayfasi() {
-  const { headerAyarlari } = useSiteAyarlariYonetimi();
+  const { headerAyarlari, headerGuncelle, kaydet: siteAyarlariKaydet, kaydediliyor: siteKaydediliyor } = useSiteAyarlariYonetimi();
   const header = headerAyarlariBirlestir(headerAyarlari ? { headerAyarlariJson: headerAyarlari } : null);
+  const kategoriMenuAcik = header.kategori?.menuGoster !== false;
 
   const [kategoriler, setKategoriler] = useState<NavKategoriKayit[]>([]);
   const [form, setForm] = useState<NavKategoriFormDegeri>(bosForm);
@@ -252,6 +253,27 @@ export function KategoriYonetimiSayfasi() {
 
   const ustSecenekleri = navKategoriUstSecenekleri(kategoriler, seciliId ?? undefined);
 
+  const kategoriMenuToggle = useCallback(
+    async (acik: boolean) => {
+      const yeniHeader = {
+        ...headerAyarlari,
+        kategori: {
+          ...headerAyarlari.kategori!,
+          menuGoster: acik,
+        },
+      };
+      headerGuncelle(yeniHeader);
+      setHata('');
+      try {
+        await siteAyarlariKaydet({ header: yeniHeader });
+        setBasari(acik ? 'Tüm Kategoriler menüsü açıldı.' : 'Tüm Kategoriler menüsü kapatıldı.');
+      } catch (err) {
+        setHata(err instanceof Error ? err.message : 'Menü ayarı kaydedilemedi');
+      }
+    },
+    [headerAyarlari, headerGuncelle, siteAyarlariKaydet]
+  );
+
   if (yukleniyor) return <YukleniyorDurumu mesaj="Kategoriler yükleniyor..." />;
 
   return (
@@ -287,12 +309,24 @@ export function KategoriYonetimiSayfasi() {
           </div>
         </aside>
 
-        <div className="ap-editor-panel">
+        <div className="ap-editor-panel ap-kategori-editor">
+          <AdminFormBolumu
+            baslik="Tüm Kategoriler Menüsü"
+            aciklama="Kapalıyken header'da kategori butonu görünmez. Açıkken yalnızca aktif kategoriler listelenir."
+          >
+            <AdminAnahtarDugme
+              etiket="Tüm Kategoriler menüsünü göster"
+              acik={kategoriMenuAcik}
+              onDegistir={(v) => void kategoriMenuToggle(v)}
+            />
+            {siteKaydediliyor && <p className="ap-muted text-xs">Menü ayarı kaydediliyor…</p>}
+          </AdminFormBolumu>
+
           <AdminFormBolumu
             baslik={seciliId ? 'Kategori Düzenle' : form.ustKategoriId ? 'Yeni Alt Kategori' : 'Yeni Kategori'}
             aciklama="Kaydet ile veritabanına yazılır. Pasif kategoriler sitede görünmez."
           >
-            <div className="grid gap-4 md:grid-cols-2">
+            <div className="ap-kategori-form-grid">
               <FormAlani etiket="Kategori Adı">
                 <input
                   className={formInputSinifi}
@@ -351,11 +385,13 @@ export function KategoriYonetimiSayfasi() {
                 />
               </FormAlani>
             </div>
-            <GorselAlan
-              etiket="Kategori Görseli"
-              deger={form.gorselUrl}
-              onChange={(v) => setForm({ ...form, gorselUrl: v })}
-            />
+            <div className="ap-kategori-form-tam">
+              <GorselAlan
+                etiket="Kategori Görseli"
+                deger={form.gorselUrl}
+                onChange={(v) => setForm({ ...form, gorselUrl: v })}
+              />
+            </div>
             <AdminAnahtarDugme
               etiket="Aktif (sitede göster)"
               acik={form.aktif}
@@ -365,13 +401,23 @@ export function KategoriYonetimiSayfasi() {
 
           <AdminFormBolumu
             baslik="Menü Önizleme"
-            aciklama={`Header’daki “${header.kategori?.baslikMetni ?? 'Tüm Kategoriler'}” menüsü böyle görünür. Açılış modu Header Yönetimi’nden değişir.`}
+            aciklama={
+              !kategoriMenuAcik
+                ? 'Menü kapalı — sitede Tüm Kategoriler butonu görünmez.'
+                : `Header’daki “${header.kategori?.baslikMetni ?? 'Tüm Kategoriler'}” menüsü böyle görünür. Açılış modu Header Yönetimi’nden değişir.`
+            }
           >
-            <KategoriMenuOnizleme
-              kategoriler={onizlemeAgaci}
-              baslikMetni={header.kategori?.baslikMetni}
-              acilisModu={kategoriAcilisModuNormalize(header.kategori?.acilisModu)}
-            />
+            {!kategoriMenuAcik ? (
+              <div className="ap-kategori-onizleme-bos rounded-xl border border-dashed border-[var(--ap-border)] p-6 text-center">
+                <p className="ap-muted text-sm">Kategori menüsü kapalı.</p>
+              </div>
+            ) : (
+              <KategoriMenuOnizleme
+                kategoriler={onizlemeAgaci}
+                baslikMetni={header.kategori?.baslikMetni}
+                acilisModu={kategoriAcilisModuNormalize(header.kategori?.acilisModu)}
+              />
+            )}
           </AdminFormBolumu>
         </div>
       </div>
