@@ -38,6 +38,11 @@ import { RolController } from '../controllers/RolController.js';
 import { KurController } from '../controllers/KurController.js';
 import { KisayolController } from '../controllers/KisayolController.js';
 import { SekmeController } from '../controllers/SekmeController.js';
+import { NavKategoriController } from '../controllers/NavKategoriController.js';
+import {
+  navKategoriGuncelleSchema,
+  navKategoriOlusturSchema,
+} from '../../Application/DTOs/NavKategoriDto.js';
 import { rolMiddleware } from '../middleware/rolMiddleware.js';
 import { medyaYukle } from '../middleware/medyaYukle.js';
 import { yedekYukle } from '../middleware/yedekYukle.js';
@@ -62,6 +67,7 @@ const rolController = new RolController();
 const kurController = new KurController();
 const kisayolController = new KisayolController();
 const sekmeController = new SekmeController();
+const navKategoriController = new NavKategoriController();
 
 router.post('/auth/giris', validateBySchema(girisSchema), (req, res) => authController.giris(req, res));
 router.get('/auth/ben', authMiddleware, (req, res) => authController.ben(req, res));
@@ -113,6 +119,15 @@ router.put('/sayfalar/:id/tasi', authMiddleware, validateBySchema(sayfaTasiSchem
 router.put('/sayfalar/:id', authMiddleware, validateBySchema(sayfaGuncelleSchema), (req, res) => sayfaController.guncelle(req, res));
 router.delete('/sayfalar/:id', authMiddleware, (req, res) => sayfaController.sil(req, res));
 router.put('/menu', authMiddleware, validateBySchema(menuGuncelleSchema), (req, res) => sayfaController.menuGuncelle(req, res));
+
+router.get('/nav-kategoriler', authMiddleware, (req, res) => navKategoriController.listele(req, res));
+router.post('/nav-kategoriler', authMiddleware, validateBySchema(navKategoriOlusturSchema), (req, res) =>
+  navKategoriController.olustur(req, res)
+);
+router.put('/nav-kategoriler/:id', authMiddleware, validateBySchema(navKategoriGuncelleSchema), (req, res) =>
+  navKategoriController.guncelle(req, res)
+);
+router.delete('/nav-kategoriler/:id', authMiddleware, (req, res) => navKategoriController.sil(req, res));
 
 router.get('/medya', authMiddleware, (req, res) => medyaController.listele(req, res));
 router.post('/medya', authMiddleware, validateBySchema(medyaOlusturSchema), (req, res) => medyaController.olustur(req, res));

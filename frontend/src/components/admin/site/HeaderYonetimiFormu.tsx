@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import { useSiteYonetimiAksiyonlari } from '@/hooks/useSiteYonetimiAksiyonlari';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
@@ -247,6 +248,19 @@ export function HeaderYonetimiFormu() {
         {sekme === 'kategori-arama' && (
           <AdminPanelKarti baslik="Kategori & Arama" altBaslik="Kategori menüsü ve arama alanı">
             <div className="space-y-5">
+              <div className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface-elevated)] p-4">
+                <p className="ap-heading text-sm font-semibold">Kategori listesi</p>
+                <p className="ap-muted mt-1 text-xs leading-relaxed">
+                  Menüde görünen kategoriler (ana → alt → alt-alt) Kategori Yönetimi modülünden düzenlenir.
+                  Buradan yalnızca başlık metni ve açılış modunu ayarlarsınız.
+                </p>
+                <Link
+                  to="/gt-admin/kategoriler"
+                  className="mt-3 inline-flex text-sm font-semibold text-[var(--ap-accent)] hover:underline"
+                >
+                  Kategori Yönetimi&apos;ne git →
+                </Link>
+              </div>
               <FormAlani etiket="Kategori başlığı">
                 <input
                   className={formInputSinifi}

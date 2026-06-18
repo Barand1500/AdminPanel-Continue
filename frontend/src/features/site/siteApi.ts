@@ -17,6 +17,11 @@ export async function siteVerisiGetir(signal?: AbortSignal): Promise<SitePublicD
       widgetlar: veri.widgetlar ?? [],
       urunler: veri.urunler ?? [],
       bloglar: veri.bloglar ?? [],
+      navKategoriler: (veri.navKategoriler ?? []).map((k) => ({
+        ...k,
+        id: String(k.id),
+        ustKategoriId: k.ustKategoriId != null ? String(k.ustKategoriId) : null,
+      })),
     };
   } catch {
     return bosSiteVerisi;

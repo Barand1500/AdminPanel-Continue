@@ -21,7 +21,7 @@ import { kisayolAyarlariOku, klavyeOlayiEslesir } from '@/utils/kisayolAyarlari'
 import type { AdminModul, AdminSekme } from '@/types/admin';
 import '@/styles/adminTema.css';
 
-const SITE_YONETIMI_MODULLERI = new Set(['header', 'hero', 'footer']);
+const SITE_YONETIMI_MODULLERI = new Set(['header', 'kategoriler', 'hero', 'footer']);
 
 interface AyriPencere {
   sekmeId: string;

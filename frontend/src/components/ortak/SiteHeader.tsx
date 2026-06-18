@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useMemo, useState, type CSSProperties } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
+import type { Kategori } from '@/data/kategoriler';
 import { headerAyarlariBirlestir, headerMarkaMetni } from '@/types/header';
 import type { ParaBirimiKaydi } from '@/types/header';
 import { headerLogoUrl } from '@/types/logo';
@@ -19,6 +20,7 @@ interface SiteHeaderProps {
   siteAdi: string;
   ayarlar?: SiteAyarlari | null;
   menuOgeleri: MenuOgesi[];
+  kategoriler?: Kategori[];
 }
 
 function kurDegeri(k: ParaBirimiKaydi): string {
@@ -64,7 +66,7 @@ function MenuOgeGoster({
   );
 }
 
-export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
+export function SiteHeader({ siteAdi, ayarlar, menuOgeleri, kategoriler }: SiteHeaderProps) {
   const [menuAcik, setMenuAcik] = useState(false);
   const { dilKodu, sayfaBaslik, cevir } = useSiteDil();
   const cevrilmisMenu = useMemo(
@@ -171,6 +173,7 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
             <KategoriMenu
               baslikMetni={kategori.baslikMetni}
               acilisModu={kategori.acilisModu}
+              kategoriler={kategoriler}
             />
             <div className="relative flex-1">
               <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary">

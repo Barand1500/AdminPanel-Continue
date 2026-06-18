@@ -84,6 +84,7 @@ export interface SitePublicData {
   widgetlar: Widget[];
   urunler: Urun[];
   bloglar: import('./blog').BlogYazisiOzet[];
+  navKategoriler: import('./navKategori').NavKategoriKayit[];
 }
 
 export interface MenuOgesi {

@@ -5,6 +5,7 @@ import { SiteRepository } from '../Infrastructure/repositories/SiteRepository.js
 import { SistemAyariRepository } from '../Infrastructure/repositories/SistemAyariRepository.js';
 import { WidgetRepository } from '../Infrastructure/repositories/WidgetRepository.js';
 import { BlogRepository } from '../Infrastructure/repositories/BlogRepository.js';
+import { NavKategoriRepository } from '../Infrastructure/repositories/NavKategoriRepository.js';
 import {
   sistemAyariSatirdanJson,
   sistemAyarlariJsonCozKayit,
@@ -16,6 +17,7 @@ const sayfaRepo = new SayfaRepository();
 const sayfaService = new SayfaService();
 const widgetRepo = new WidgetRepository();
 const blogRepo = new BlogRepository();
+const navKategoriRepo = new NavKategoriRepository();
 const sistemAyariRepo = new SistemAyariRepository();
 
 function publicSistemAyarlari(
@@ -42,10 +44,11 @@ export class SiteService {
 
     await sayfaService.hiyerarsiOnar(site.id);
 
-    const [sayfalar, widgetlar, bloglar, sistemSatiri] = await Promise.all([
+    const [sayfalar, widgetlar, bloglar, navKategoriler, sistemSatiri] = await Promise.all([
       sayfaRepo.findBySiteId(site.id),
       widgetRepo.findBySiteId(site.id),
       blogRepo.findPublicBySiteId(site.id),
+      navKategoriRepo.findPublicBySiteId(site.id),
       sistemAyariRepo.findBySiteId(site.id),
     ]);
 
@@ -69,6 +72,7 @@ export class SiteService {
       },
       sayfalar,
       widgetlar,
+      navKategoriler,
       urunler: [],
       bloglar: bloglar.map((b) => ({
         ...b,

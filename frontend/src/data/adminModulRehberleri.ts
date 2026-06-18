@@ -247,6 +247,49 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
     ipucu: 'Site adını kaydettikten sonra Önizle ile navbar görünümünü kontrol edin.',
   },
 
+  kategoriler: {
+    baslik: 'Kategori Yönetimi Rehberi',
+    altBaslik: 'Header mega menü kategorileri',
+    bolumBaslik: 'Kategori Yönetimi',
+    kartlar: [
+      {
+        ikon: '➕',
+        baslik: 'Yeni Kategori',
+        aciklama:
+          'Alt bardaki Yeni Ekle ile ana kategori oluşturun. Bir kategori seçip Alt Ekle ile alt ve alt-alt kategori ekleyebilirsiniz (en fazla 3 seviye).',
+        renk: 'mor',
+      },
+      {
+        ikon: '✏️',
+        baslik: 'Düzenleme',
+        aciklama:
+          'Listeden kategori seçin; ad, slug, link, sıra ve görseli değiştirip Kaydet ile güncelleyin. Slug boş bırakılırsa başlıktan otomatik üretilir.',
+        renk: 'turuncu',
+      },
+      {
+        ikon: '👁️',
+        baslik: 'Aktif / Pasif',
+        aciklama: 'Pasif kategoriler sitede görünmez; silmeden geçici olarak gizlemek için kullanın.',
+        renk: 'mavi',
+      },
+      {
+        ikon: '🖥️',
+        baslik: 'Önizleme',
+        aciklama:
+          'Sağ paneldeki menü önizlemesi, Header Yönetimi’ndeki açılış modunu (dropdown, sidebar, liste) yansıtır.',
+        renk: 'camgobegi',
+      },
+      {
+        ikon: '🔝',
+        baslik: 'Header Bağlantısı',
+        aciklama:
+          '“Tüm Kategoriler” buton metni ve menü açılış stili Header Yönetimi → Kategori & Arama sekmesinden ayarlanır.',
+        renk: 'sari',
+      },
+    ],
+    ipucu: 'Kategoriler kaydedildikten sonra public sitede header altındaki menüde görünür.',
+  },
+
   hero: {
     baslik: 'Hero Rehberi',
     altBaslik: 'Ana sayfa slider ve güven kartları',

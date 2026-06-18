@@ -1,12 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useRef, useState } from 'react';
-import { kategoriler, type Kategori } from '@/data/kategoriler';
+import { kategoriler as varsayilanKategoriler, type Kategori } from '@/data/kategoriler';
 import type { KategoriAcilisModu } from '@/types/header';
 import { kategoriAcilisModuNormalize } from '@/types/header';
 
 interface KategoriMenuProps {
   baslikMetni?: string;
   acilisModu?: KategoriAcilisModu | string;
+  kategoriler?: Kategori[];
 }
 
 function AltKategoriListesi({
@@ -47,13 +48,18 @@ function AltKategoriListesi({
 export function KategoriMenu({
   baslikMetni = 'Tüm Kategoriler',
   acilisModu: acilisModuProp = 'dropdown',
+  kategoriler: kategoriListesi = varsayilanKategoriler,
 }: KategoriMenuProps) {
   const acilisModu = kategoriAcilisModuNormalize(acilisModuProp);
   const [acik, setAcik] = useState(false);
-  const [aktifKat, setAktifKat] = useState(kategoriler[0]?.id ?? '');
+  const [aktifKat, setAktifKat] = useState(kategoriListesi[0]?.id ?? '');
   const ref = useRef<HTMLDivElement>(null);
 
-  const secili = kategoriler.find((k) => k.id === aktifKat);
+  const secili = kategoriListesi.find((k) => k.id === aktifKat);
+
+  useEffect(() => {
+    setAktifKat(kategoriListesi[0]?.id ?? '');
+  }, [kategoriListesi]);
 
   useEffect(() => {
     setAcik(false);
@@ -128,7 +134,7 @@ export function KategoriMenu({
                 </button>
               </div>
               <div className="scrollbar-hide flex-1 overflow-y-auto p-4">
-                {kategoriler.map((kat) => (
+                {kategoriListesi.map((kat) => (
                   <div key={kat.id} className="mb-4">
                     <p className="mb-2 text-xs font-bold uppercase tracking-wider text-primary">{kat.baslik}</p>
                     {kat.altKategoriler && (
@@ -154,7 +160,7 @@ export function KategoriMenu({
               {baslikMetni}
             </div>
             <div className="scrollbar-hide max-h-[min(420px,60vh)] overflow-y-auto p-2">
-              {kategoriler.map((kat) => (
+              {kategoriListesi.map((kat) => (
                 <div key={kat.id} className="border-b border-slate-50 py-2 last:border-0">
                   <p className="px-2 text-xs font-bold uppercase tracking-wide text-primary">{kat.baslik}</p>
                   {kat.altKategoriler && (
@@ -177,7 +183,7 @@ export function KategoriMenu({
         <div className="absolute left-0 top-full z-50 mt-2 w-[min(720px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10">
           <div className="grid sm:grid-cols-[200px_1fr]">
             <div className="border-r border-slate-100 bg-slate-50/80 p-2">
-              {kategoriler.map((kat) => (
+              {kategoriListesi.map((kat) => (
                 <button
                   key={kat.id}
                   type="button"

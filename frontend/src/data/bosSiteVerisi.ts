@@ -23,6 +23,7 @@ export const bosSiteVerisi: SitePublicData = {
   widgetlar: [],
   urunler: [],
   bloglar: [],
+  navKategoriler: [],
 };
 
 export function sayfaYolunuBul(slug: string): string {

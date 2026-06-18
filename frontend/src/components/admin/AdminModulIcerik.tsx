@@ -15,6 +15,7 @@ import { SistemAyarlariSayfasi } from '@/pages/admin/SistemAyarlariSayfasi';
 import { KullanicilarSayfasi } from '@/pages/admin/KullanicilarSayfasi';
 import { RollerSayfasi } from '@/pages/admin/RollerSayfasi';
 import { SekmeYonetimiSayfasi } from '@/pages/admin/SekmeYonetimiSayfasi';
+import { KategoriYonetimiSayfasi } from '@/pages/admin/KategoriYonetimiSayfasi';
 import { KisayolAyarlariSayfasi } from '@/pages/admin/KisayolAyarlariSayfasi';
 import { ModulKabuk } from '@/contexts/ModulKabukContext';
 
@@ -37,6 +38,8 @@ function AdminModulGovde({ modulId, onModulAc }: AdminModulIcerikProps) {
       return <DashboardSayfasi onModulAc={onModulAc} />;
     case 'header':
       return <HeaderYonetimiFormu />;
+    case 'kategoriler':
+      return <KategoriYonetimiSayfasi />;
     case 'hero':
       return <HeroYonetimiFormu />;
     case 'footer':

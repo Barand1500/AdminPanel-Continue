@@ -1,3 +1,4 @@
+import { useMemo } from 'react';
 import { Outlet, useMatches } from 'react-router-dom';
 import { SayfaModalProvider } from '@/contexts/SayfaModalContext';
 import { SiteDilProvider } from '@/contexts/SiteDilContext';
@@ -14,6 +15,7 @@ import { headerAyarlariBirlestir } from '@/types/header';
 import { headerMenuOlustur } from '@/utils/menuYardimci';
 import { varsayilanSayfa404 } from '@/types/sistemAyarlari';
 import { bakimModuAktifMi, siteKapaliMi, sistemAyarlariCoz } from '@/utils/sistemAyarlariYardimci';
+import { navKategorileriMenuyeCevir } from '@/utils/navKategoriAgaci';
 
 function SiteLayoutIcerik() {
   const { veri, yukleniyor } = useSiteVerisi();
@@ -25,6 +27,10 @@ function SiteLayoutIcerik() {
   const dinamikMatch = [...matches].reverse().find((m) => typeof m.data?.bulunamadi === 'boolean');
   const is404 = dinamikMatch?.data?.bulunamadi === true;
   const menuTipi = { ...varsayilanSayfa404, ...sistem?.sayfa404 }.menuTipi;
+  const menuKategoriler = useMemo(
+    () => navKategorileriMenuyeCevir(veri.navKategoriler),
+    [veri.navKategoriler]
+  );
 
   useSiteTemaUygula(site.ayarlar, site.ad);
 
@@ -53,7 +59,14 @@ function SiteLayoutIcerik() {
   return (
     <SiteDilProvider ayarlar={site.ayarlar} sayfalar={veri.sayfalar}>
       <div className="site-public flex min-h-screen flex-col">
-        {headerGoster && <SiteHeader siteAdi={site.ad} ayarlar={site.ayarlar} menuOgeleri={menuOgeleri} />}
+        {headerGoster && (
+          <SiteHeader
+            siteAdi={site.ad}
+            ayarlar={site.ayarlar}
+            menuOgeleri={menuOgeleri}
+            kategoriler={menuKategoriler}
+          />
+        )}
         <main className="flex-1">
           <Outlet context={veri} />
         </main>

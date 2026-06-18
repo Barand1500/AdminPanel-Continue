@@ -31,6 +31,7 @@ model Site {
   sistemAyari        SistemAyari?
   adminLoglari       AdminLog[]
   yedekKayitlari     YedekKaydi[]
+  navKategoriler     NavKategori[]
 
   @@map("siteler")
 }
@@ -237,6 +238,28 @@ model BlogYazisi {
   @@unique([siteId, slug])
   @@index([siteId, yayinda])
   @@map("blog_yazilari")
+}
+
+model NavKategori {
+  id            Int           @id @default(autoincrement())
+  siteId        Int
+  site          Site          @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  ustKategoriId Int?
+  ustKategori   NavKategori?  @relation("NavKategoriAgaci", fields: [ustKategoriId], references: [id], onDelete: Cascade)
+  altKategoriler NavKategori[] @relation("NavKategoriAgaci")
+  baslik        String
+  slug          String
+  yol           String?
+  gorselUrl     String?
+  ikon          String?
+  aktif         Boolean       @default(true)
+  sira          Int           @default(0)
+  olusturma     DateTime      @default(now())
+  guncelleme    DateTime      @updatedAt
+
+  @@unique([siteId, slug])
+  @@index([siteId, ustKategoriId, sira])
+  @@map("nav_kategoriler")
 }
 
 model FormTanimi {
