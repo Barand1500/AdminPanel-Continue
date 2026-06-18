@@ -93,21 +93,16 @@ export function useAdminSekmeler() {
     if (kaynakId === hedefId) return;
 
     setDurum((onceki) => {
-      const kaynakIdx = onceki.sekmeler.findIndex((s) => s.id === kaynakId);
-      const hedefIdx = onceki.sekmeler.findIndex((s) => s.id === hedefId);
+      let liste = [...onceki.sekmeler];
+      const kaynakIdx = liste.findIndex((s) => s.id === kaynakId);
+      const hedefIdx = liste.findIndex((s) => s.id === hedefId);
       if (kaynakIdx < 0 || hedefIdx < 0) return onceki;
 
-      const kaynak = onceki.sekmeler[kaynakIdx];
-      const hedef = onceki.sekmeler[hedefIdx];
+      const kaynak = liste[kaynakIdx];
+      const hedef = liste[hedefIdx];
 
-      let liste = [...onceki.sekmeler];
-
-      // Grup içinden çıkarılıp başka alana bırakılırsa yan yana görünümü kapat
-      if (kaynak.grupId && kaynak.grupId === hedef.grupId) {
-        const grupId = kaynak.grupId;
-        liste = liste.map((s) => (s.grupId === grupId ? { ...s, grupId: undefined } : s));
-      } else if (kaynak.grupId) {
-        liste = liste.map((s) => (s.id === kaynakId ? { ...s, grupId: undefined } : s));
+      if (kaynak.grupId && kaynak.grupId !== hedef.grupId) {
+        liste[kaynakIdx] = { ...kaynak, grupId: undefined };
       }
 
       const guncelKaynakIdx = liste.findIndex((s) => s.id === kaynakId);
@@ -115,6 +110,15 @@ export function useAdminSekmeler() {
       let yeniHedefIdx = liste.findIndex((s) => s.id === hedefId);
       if (mod === 'sonra') yeniHedefIdx += 1;
       liste.splice(yeniHedefIdx, 0, tasinan);
+
+      if (tasinan.grupId) {
+        const gruptakiler = liste.filter((s) => s.grupId === tasinan.grupId);
+        if (gruptakiler.length === 1) {
+          liste = liste.map((s) =>
+            s.grupId === tasinan.grupId ? { ...s, grupId: undefined } : s
+          );
+        }
+      }
 
       return { ...onceki, sekmeler: liste };
     });

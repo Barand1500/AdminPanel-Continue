@@ -1,5 +1,4 @@
 export type SekmeYukseklik = 'kucuk' | 'orta' | 'buyuk';
-export type BirlestirmeModu = 'otomatik' | 'manuel';
 export type VarsayilanAcilis = 'tek-sekme' | 'yeni-sekme';
 export type GrupDavranisi = 'ustuste' | 'yan-yana';
 export type SekmeGorunumModu = 'isim' | 'ikon' | 'ikon-isim';
@@ -9,7 +8,6 @@ export type SekmeAramaGorunum = 'ikon' | 'input';
 export interface SekmePanelAyarlari {
   sekmeYukseklik: SekmeYukseklik;
   hoverOnizleme: boolean;
-  birlestirmeModu: BirlestirmeModu;
   varsayilanAcilis: VarsayilanAcilis;
   yanYanaAcilabilir: boolean;
   surukleAyirPencere: boolean;
@@ -22,7 +20,6 @@ export interface SekmePanelAyarlari {
 export const VARSAYILAN_SEKME_AYARLARI: SekmePanelAyarlari = {
   sekmeYukseklik: 'orta',
   hoverOnizleme: true,
-  birlestirmeModu: 'otomatik',
   varsayilanAcilis: 'yeni-sekme',
   yanYanaAcilabilir: true,
   surukleAyirPencere: true,

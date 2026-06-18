@@ -579,7 +579,28 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 .ap-sekme-onizleme-alan {
   min-height: 3rem;
-  overflow: hidden;
+  overflow: visible;
+}
+
+.ap-sekme-tab {
+  position: relative;
+}
+
+.ap-sekme-drop-once {
+  box-shadow: inset 3px 0 0 var(--ap-accent);
+}
+
+.ap-sekme-drop-sonra {
+  box-shadow: inset -3px 0 0 var(--ap-accent);
+}
+
+.ap-sekme-drop-grup {
+  box-shadow: inset 0 -3px 0 var(--ap-accent);
+  background: color-mix(in srgb, var(--ap-accent) 12%, var(--ap-tab-idle));
+}
+
+.ap-sekme-grup {
+  gap: 0.125rem;
 }
 
 /* Modul kabuk ve kartlar */

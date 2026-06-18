@@ -65,7 +65,7 @@ function AdminPanelGovde() {
     if (!sekmeAyarlari.yanYanaAcilabilir || sekmeAyarlari.grupDavranisi !== 'yan-yana') return null;
     if (!aktifSekme?.grupId) return null;
     const gruptakiler = sekmeler.filter((s) => s.grupId === aktifSekme.grupId);
-    return gruptakiler.length >= 2 ? gruptakiler.slice(0, 2) : null;
+    return gruptakiler.length >= 2 ? gruptakiler : null;
   }, [sekmeler, aktifSekme, sekmeAyarlari]);
 
   useEffect(() => {
