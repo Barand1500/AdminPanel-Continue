@@ -17,8 +17,26 @@ interface SiteMarkaAlaniProps {
 }
 
 function markaMetni(siteAdi: string, yer: 'header' | 'footer') {
-  const ilk = siteAdi.split(' ')[0]?.toLowerCase() ?? siteAdi;
-  const geriKalan = siteAdi.split(' ').slice(1).join(' ') || 'Teknoloji';
+  const metin = siteAdi.trim();
+  if (!metin) return null;
+
+  const parcalar = metin.split(/\s+/).filter(Boolean);
+  const geriKalan = parcalar.slice(1).join(' ');
+
+  if (!geriKalan) {
+    return (
+      <div className="min-w-0 leading-none">
+        <span
+          className={`block truncate font-black tracking-tight ${yer === 'header' ? 'text-xl' : 'text-lg'}`}
+          style={{ color: 'var(--color-text)' }}
+        >
+          {metin}
+        </span>
+      </div>
+    );
+  }
+
+  const ilk = parcalar[0];
 
   if (yer === 'header') {
     return (
@@ -59,6 +77,7 @@ export function SiteMarkaAlani({
   className = '',
 }: SiteMarkaAlaniProps) {
   const boyut = logoBoyutuNormalize(logoBoyutu);
+  const metin = siteAdi.trim();
   const icerik = (
     <>
       {logoUrl ? (
@@ -68,7 +87,7 @@ export function SiteMarkaAlani({
           className={logoBoyutSinifi(boyut, yer)}
           aria-hidden
         />
-      ) : (
+      ) : metin ? (
         <div
           className={`flex shrink-0 items-center justify-center rounded-xl font-black text-white shadow-md ${
             yer === 'header' ? 'h-10 w-10 text-lg' : 'h-10 w-10 text-lg'
@@ -77,9 +96,9 @@ export function SiteMarkaAlani({
             background: `linear-gradient(135deg, ${anaRenk}, ${ikincilRenk})`,
           }}
         >
-          {siteAdi.charAt(0).toUpperCase()}
+          {metin.charAt(0).toUpperCase()}
         </div>
-      )}
+      ) : null}
       {markaMetni(siteAdi, yer)}
     </>
   );

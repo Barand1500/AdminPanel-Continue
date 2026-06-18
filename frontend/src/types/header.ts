@@ -222,7 +222,6 @@ export function headerAyarlariBirlestir(
   };
 }
 
-export function headerMarkaMetni(header: HeaderAyarlari, siteAdi: string): string {
-  const metin = header.markaMetni?.trim();
-  return metin || siteAdi;
+export function headerMarkaMetni(header: HeaderAyarlari): string {
+  return header.markaMetni?.trim() ?? '';
 }

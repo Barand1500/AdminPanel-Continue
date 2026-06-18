@@ -121,7 +121,7 @@ export function HeaderYonetimiFormu() {
             <div className="space-y-4">
               <FormAlani
                 etiket="Header Marka Metni"
-                aciklama="Navbar'da logo yanında görünen yazı (tarayıcı sekmesi site adından bağımsız)"
+                aciklama="Navbar'da logo yanında görünen yazı. Boş bırakırsanız marka metni gösterilmez."
               >
                 <input
                   type="text"
@@ -130,7 +130,7 @@ export function HeaderYonetimiFormu() {
                     headerGuncelleParcali({ markaMetni: e.target.value || null })
                   }
                   className={formInputSinifi}
-                  placeholder={siteAd || 'Güzel Teknoloji'}
+                  placeholder="Örn. Güzel Teknoloji veya Baran"
                 />
               </FormAlani>
               <FormAlani etiket="Slogan" aciklama="Üst banttaki kısa metin">

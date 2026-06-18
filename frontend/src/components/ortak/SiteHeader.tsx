@@ -66,7 +66,7 @@ function MenuOgeGoster({
   );
 }
 
-export function SiteHeader({ siteAdi, ayarlar, menuOgeleri, kategoriler }: SiteHeaderProps) {
+export function SiteHeader({ siteAdi: _siteAdi, ayarlar, menuOgeleri, kategoriler }: SiteHeaderProps) {
   const [menuAcik, setMenuAcik] = useState(false);
   const { dilKodu, sayfaBaslik, cevir } = useSiteDil();
   const cevrilmisMenu = useMemo(
@@ -87,7 +87,7 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri, kategoriler }: SiteH
   const anaRenk = ayarlar?.anaRenk ?? '#7c3aed';
   const ikincilRenk = ayarlar?.ikincilRenk ?? '#a78bfa';
   const logoUrl = headerLogoUrl(ayarlar);
-  const markaMetni = headerMarkaMetni(header, siteAdi);
+  const markaMetni = headerMarkaMetni(header);
 
   return (
     <>
