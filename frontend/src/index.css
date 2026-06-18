@@ -692,6 +692,16 @@ body:has(.site-public)::-webkit-scrollbar,
   color: var(--color-text);
 }
 
+.sayfa-alt-kart-ikon {
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.sayfa-baslik-ikon {
+  font-size: 1.15em;
+  line-height: 1;
+}
+
 .sayfa-alt-kart-yol {
   font-size: 0.75rem;
   color: var(--color-text-muted);

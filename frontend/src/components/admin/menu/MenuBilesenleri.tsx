@@ -142,7 +142,10 @@ export function MenuDuzenlemePanel({
             <span className="ap-menu-sira-no">{index + 1}</span>
 
             <div className="min-w-0 flex-1">
-              <p className="ap-heading truncate text-sm font-medium">{s.baslik}</p>
+              <p className="ap-heading truncate text-sm font-medium">
+                {s.ikon && <span className="mr-1">{s.ikon}</span>}
+                {s.baslik}
+              </p>
               <p className="ap-muted text-xs">/{s.slug}</p>
               <div className="mt-1 flex flex-wrap gap-1">
                 {ustMenuSayfaIdleri.has(s.id) && (

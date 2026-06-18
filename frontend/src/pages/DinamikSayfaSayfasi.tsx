@@ -1,7 +1,7 @@
 import { useNavigation, useLoaderData, useOutletContext, Link } from 'react-router-dom';
-import { medyaTamUrl } from '@/features/admin/medyaApi';
 import type { PublicSayfa } from '@/features/site/sayfaApi';
 import { SayfaShadowIcerik } from '@/components/ortak/SayfaShadowIcerik';
+import { SayfaBaslikGosterimi } from '@/components/ortak/SayfaBaslikGosterimi';
 import { SayfaBulunamadi } from '@/pages/SayfaBulunamadi';
 import type { SitePublicData } from '@/types/site';
 import { sayfaYolunuBul } from '@/data/bosSiteVerisi';
@@ -34,31 +34,19 @@ export function DinamikSayfaSayfasi() {
   );
 
   const icerikVar = sayfaIcerikVar(sayfa.icerik);
-  const gorsel = sayfa.kapakGorsel ? medyaTamUrl(sayfa.kapakGorsel) : null;
+  const baslikGoster = icerikVar || sayfa.ikon || altSayfalar.length > 0;
 
   return (
     <section className="py-12 sm:py-16">
       <div className="container-site">
-        {(icerikVar || gorsel) && (
+        {baslikGoster && (
           <div className="mx-auto max-w-2xl text-center">
-            <h1 className="section-title text-3xl">{sayfa.baslik}</h1>
-          </div>
-        )}
-
-        {!icerikVar && !gorsel && altSayfalar.length > 0 && (
-          <div className="mx-auto max-w-2xl text-center">
-            <h1 className="section-title text-3xl">{sayfa.baslik}</h1>
-            <p className="mt-3 text-sm text-slate-500">Alt bölümlerden birini seçin</p>
-          </div>
-        )}
-
-        {gorsel && (
-          <div className="mx-auto mt-8 max-w-4xl">
-            <img
-              src={gorsel}
-              alt={sayfa.baslik}
-              className="w-full rounded-2xl border border-slate-200 object-cover shadow-sm"
-            />
+            <h1 className="section-title text-3xl">
+              <SayfaBaslikGosterimi baslik={sayfa.baslik} ikon={sayfa.ikon} />
+            </h1>
+            {!icerikVar && altSayfalar.length > 0 && (
+              <p className="mt-3 text-sm text-slate-500">Alt bölümlerden birini seçin</p>
+            )}
           </div>
         )}
 
@@ -69,7 +57,7 @@ export function DinamikSayfaSayfasi() {
         )}
 
         {altSayfalar.length > 0 && (
-          <div className={`mx-auto mt-12 max-w-5xl ${!icerikVar && !gorsel ? 'mt-8' : ''}`}>
+          <div className={`mx-auto mt-12 max-w-5xl ${!icerikVar ? 'mt-8' : ''}`}>
             <div className="sayfa-alt-kart-grid">
               {altSayfalar.map((alt) => (
                 <Link
@@ -77,6 +65,7 @@ export function DinamikSayfaSayfasi() {
                   to={sayfaYolunuBul(alt.slug)}
                   className="sayfa-alt-kart group"
                 >
+                  {alt.ikon && <span className="sayfa-alt-kart-ikon">{alt.ikon}</span>}
                   <span className="sayfa-alt-kart-baslik">{alt.baslik}</span>
                   <span className="sayfa-alt-kart-yol">/{alt.slug}</span>
                   <span className="sayfa-alt-kart-ok" aria-hidden>

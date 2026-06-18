@@ -9,6 +9,7 @@ export const sayfaOlusturSchema = z.object({
   slug: z.string().optional(),
   icerik: z.string().default(''),
   kapakGorsel: z.string().nullable().optional(),
+  ikon: z.string().max(32).nullable().optional(),
   seoTitle: z.string().nullable().optional(),
   seoDesc: z.string().nullable().optional(),
   yayinda: z.boolean().default(false),

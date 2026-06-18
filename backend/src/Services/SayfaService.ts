@@ -104,6 +104,7 @@ export class SayfaService {
       slug,
       icerik: dto.icerik ?? '',
       kapakGorsel: dto.kapakGorsel,
+      ikon: dto.ikon ?? null,
       seoTitle: dto.seoTitle,
       seoDesc: dto.seoDesc,
       yayinda: dto.yayinda,
@@ -175,6 +176,7 @@ export class SayfaService {
 
     if (dto.icerik !== undefined) data.icerik = dto.icerik;
     if (dto.kapakGorsel !== undefined) data.kapakGorsel = dto.kapakGorsel;
+    if (dto.ikon !== undefined) data.ikon = dto.ikon;
     if (dto.seoTitle !== undefined) data.seoTitle = dto.seoTitle;
     if (dto.seoDesc !== undefined) data.seoDesc = dto.seoDesc;
     if (dto.yayinda !== undefined) data.yayinda = dto.yayinda;

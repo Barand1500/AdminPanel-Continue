@@ -1150,6 +1150,120 @@ html:has(.admin-panel[data-tema='acik']) body {
   margin-right: 0.125rem;
 }
 
+.ap-sayfa-liste-ikon {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.ap-sayfa-ikon-secici {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ap-sayfa-ikon-onizleme {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid var(--ap-border);
+  background: color-mix(in srgb, var(--ap-input-bg) 60%, transparent);
+}
+
+.ap-sayfa-ikon-onizleme-buyuk {
+  display: flex;
+  height: 3.5rem;
+  width: 3.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.75rem;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-surface);
+  font-size: 1.75rem;
+  line-height: 1;
+}
+
+.ap-sayfa-ikon-temizle {
+  flex-shrink: 0;
+  border: none;
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ap-text-muted);
+  cursor: pointer;
+}
+
+.ap-sayfa-ikon-temizle:hover {
+  color: var(--ap-heading);
+}
+
+.ap-sayfa-ikon-kategori-sekmeler {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+}
+
+.ap-sayfa-ikon-kategori-sekmeler button {
+  border: 1px solid var(--ap-border);
+  border-radius: 999px;
+  background: var(--ap-surface);
+  padding: 0.3rem 0.7rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--ap-text-muted);
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+
+.ap-sayfa-ikon-kategori-sekmeler button:hover {
+  color: var(--ap-heading);
+}
+
+.ap-sayfa-ikon-kategori-aktif {
+  border-color: var(--ap-accent) !important;
+  background: color-mix(in srgb, var(--ap-accent) 10%, var(--ap-surface)) !important;
+  color: var(--ap-accent) !important;
+}
+
+.ap-sayfa-ikon-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(2.5rem, 1fr));
+  gap: 0.35rem;
+  max-height: 11rem;
+  overflow-y: auto;
+  padding: 0.25rem;
+  border-radius: 0.625rem;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-surface);
+}
+
+.ap-sayfa-ikon-oge,
+.ap-sayfa-ikon-oge-secili {
+  display: flex;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.5rem;
+  border: 1px solid transparent;
+  background: var(--ap-hover);
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+
+.ap-sayfa-ikon-oge:hover {
+  border-color: color-mix(in srgb, var(--ap-accent) 35%, var(--ap-border));
+  transform: scale(1.04);
+}
+
+.ap-sayfa-ikon-oge-secili {
+  border-color: var(--ap-accent);
+  background: color-mix(in srgb, var(--ap-accent) 12%, var(--ap-surface));
+}
+
 .ap-sayfa-alt-oge .ap-liste-oge-baslik {
   font-size: 0.8125rem;
 }

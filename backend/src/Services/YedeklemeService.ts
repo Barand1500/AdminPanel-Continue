@@ -114,6 +114,7 @@ async function siteVeriYukle(payload: YedekPayload) {
           slug: s.slug,
           icerik: s.icerik,
           kapakGorsel: s.kapakGorsel,
+          ikon: s.ikon,
           seoTitle: s.seoTitle,
           seoDesc: s.seoDesc,
           yayinda: s.yayinda,

@@ -20,8 +20,8 @@ const ALT_MENU_TETIK: { id: AltMenuTetikleyici; ad: string }[] = [
 
 import type { AdminSayfa, SayfaFormDegeri } from '@/features/admin/sayfaApi';
 import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
-import { GorselAlan } from '@/components/form/GorselAlan';
 import { IcerikHtmlEditoru } from '@/components/form/IcerikHtmlEditoru';
+import { SayfaIkonSecici } from '@/components/admin/sayfa/SayfaIkonSecici';
 import {
   AdminAnahtarDugme,
   AdminAramaKutusu,
@@ -134,6 +134,11 @@ function SayfaListeSatiri({
         >
           <div className="flex items-center gap-1.5 min-w-0">
             {altSayfa && <span className="ap-sayfa-alt-cizgi shrink-0" aria-hidden />}
+            {sayfa.ikon && (
+              <span className="ap-sayfa-liste-ikon shrink-0" aria-hidden>
+                {sayfa.ikon}
+              </span>
+            )}
             <p className="ap-liste-oge-baslik truncate">{sayfa.baslik}</p>
           </div>
           <p className="ap-liste-oge-alt truncate">/{sayfa.slug}</p>
@@ -476,12 +481,16 @@ export function SayfaEditorPanel({
               )}
             </AdminFormBolumu>
 
-            <GorselAlan
-              etiket="Kapak Görseli"
-              aciklama="Opsiyonel üst görsel — URL veya bilgisayardan yükleyin"
-              deger={form.kapakGorsel}
-              onChange={(v) => onChange({ ...form, kapakGorsel: v })}
-            />
+            <AdminFormBolumu
+              baslik="Sayfa İkonu"
+              aciklama="Opsiyonel — sayfa listesinde ve ziyaretçi sitesinde başlığın yanında görünür"
+            >
+              <SayfaIkonSecici
+                ikon={form.ikon}
+                baslikOnizleme={form.baslik.trim() || 'Sayfa adı'}
+                onChange={(ikon) => onChange({ ...form, ikon })}
+              />
+            </AdminFormBolumu>
           </>
         )}
 
@@ -651,7 +660,10 @@ export function SayfaEditorPanel({
                         className="ap-sayfa-alt-liste-oge min-w-0 flex-1 text-left"
                         onClick={() => onSayfaSec?.(alt)}
                       >
-                        <span className="ap-heading text-sm font-medium">{alt.baslik}</span>
+                        <span className="ap-heading text-sm font-medium">
+                          {alt.ikon && <span className="mr-1">{alt.ikon}</span>}
+                          {alt.baslik}
+                        </span>
                         <span className="ap-muted block text-xs">/{alt.slug}</span>
                         <div className="mt-1 flex flex-wrap gap-1">
                           {alt.yayinda ? (
@@ -687,7 +699,7 @@ export function sayfadanForm(s: AdminSayfa): SayfaFormDegeri {
     baslik: s.baslik,
     slug: s.slug,
     icerik: s.icerik,
-    kapakGorsel: s.kapakGorsel ?? '',
+    ikon: s.ikon ?? '',
     seoTitle: s.seoTitle ?? '',
     seoDesc: s.seoDesc ?? '',
     yayinda: s.yayinda,
@@ -704,7 +716,7 @@ export const bosSayfaForm: SayfaFormDegeri = {
   baslik: '',
   slug: '',
   icerik: '',
-  kapakGorsel: '',
+  ikon: '',
   seoTitle: '',
   seoDesc: '',
   yayinda: false,

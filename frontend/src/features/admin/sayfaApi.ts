@@ -10,6 +10,7 @@ export interface AdminSayfa {
   slug: string;
   icerik: string;
   kapakGorsel?: string | null;
+  ikon?: string | null;
   seoTitle?: string | null;
   seoDesc?: string | null;
   yayinda: boolean;
@@ -25,7 +26,7 @@ export interface SayfaFormDegeri {
   baslik: string;
   slug: string;
   icerik: string;
-  kapakGorsel: string;
+  ikon: string;
   seoTitle: string;
   seoDesc: string;
   yayinda: boolean;
@@ -69,7 +70,7 @@ function sayfaFormuOlustur(s: AdminSayfa): SayfaFormDegeri {
     baslik: s.baslik,
     slug: s.slug,
     icerik: s.icerik,
-    kapakGorsel: s.kapakGorsel ?? '',
+    ikon: s.ikon ?? '',
     seoTitle: s.seoTitle ?? '',
     seoDesc: s.seoDesc ?? '',
     yayinda: s.yayinda,
@@ -140,7 +141,7 @@ function payloadHazirla(form: SayfaFormDegeri) {
     baslik: form.baslik.trim(),
     slug: form.slug.trim() || undefined,
     icerik: form.icerik,
-    kapakGorsel: form.kapakGorsel.trim() || null,
+    ikon: form.ikon.trim() || null,
     seoTitle: form.seoTitle.trim() || null,
     seoDesc: form.seoDesc.trim() || null,
     yayinda: form.yayinda,

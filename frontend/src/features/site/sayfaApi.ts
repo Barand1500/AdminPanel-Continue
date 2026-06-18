@@ -9,6 +9,7 @@ export interface PublicSayfa {
   slug: string;
   icerik: string;
   kapakGorsel?: string | null;
+  ikon?: string | null;
   seoTitle?: string | null;
   seoDesc?: string | null;
   acilisModu?: SayfaAcilisModu;

@@ -118,6 +118,7 @@ model Sayfa {
   slug               String
   icerik             String   @db.Text
   kapakGorsel        String?
+  ikon               String?  @db.VarChar(32)
   seoTitle           String?
   seoDesc            String?
   yayinda            Boolean  @default(false)

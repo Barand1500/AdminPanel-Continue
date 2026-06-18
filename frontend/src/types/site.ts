@@ -48,6 +48,7 @@ export interface Sayfa {
   slug: string;
   icerik: string;
   kapakGorsel?: string | null;
+  ikon?: string | null;
   menudeGoster?: boolean;
   sira?: number;
   acilisModu?: SayfaAcilisModu;

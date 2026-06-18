@@ -1,7 +1,7 @@
 import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from 'react';
 import { sayfaDetayGetir, type PublicSayfa } from '@/features/site/sayfaApi';
 import { SayfaShadowIcerik } from '@/components/ortak/SayfaShadowIcerik';
-import { medyaTamUrl } from '@/features/admin/medyaApi';
+import { SayfaBaslikGosterimi } from '@/components/ortak/SayfaBaslikGosterimi';
 
 interface SayfaModalContextDeger {
   acik: boolean;
@@ -47,7 +47,13 @@ export function SayfaModalProvider({ children }: { children: ReactNode }) {
           <button type="button" className="sayfa-modal-backdrop" aria-label="Kapat" onClick={modalKapat} />
           <div className="sayfa-modal-kart">
             <div className="sayfa-modal-baslik">
-              <h2 className="text-lg font-bold text-slate-900">{sayfa?.baslik ?? 'Sayfa'}</h2>
+              <h2 className="text-lg font-bold text-slate-900">
+                {sayfa ? (
+                  <SayfaBaslikGosterimi baslik={sayfa.baslik} ikon={sayfa.ikon} />
+                ) : (
+                  'Sayfa'
+                )}
+              </h2>
               <button type="button" className="sayfa-modal-kapat" onClick={modalKapat} aria-label="Kapat">
                 ✕
               </button>
@@ -56,16 +62,9 @@ export function SayfaModalProvider({ children }: { children: ReactNode }) {
               {yukleniyor ? (
                 <p className="text-sm text-slate-500">Yükleniyor...</p>
               ) : sayfa ? (
-                <>
-                  {sayfa.kapakGorsel && (
-                    <img
-                      src={medyaTamUrl(sayfa.kapakGorsel)}
-                      alt={sayfa.baslik}
-                      className="mb-4 w-full rounded-xl object-cover"
-                    />
-                  )}
-                  {sayfa.icerik.trim() && <SayfaShadowIcerik html={sayfa.icerik} />}
-                </>
+                sayfa.icerik.trim() ? <SayfaShadowIcerik html={sayfa.icerik} /> : (
+                  <p className="text-sm text-slate-500">Bu sayfada içerik yok.</p>
+                )
               ) : null}
             </div>
           </div>
