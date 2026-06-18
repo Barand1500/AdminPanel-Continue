@@ -268,7 +268,7 @@ export function SayfaListesiPanel({
   }
 
   return (
-    <aside className="ap-sidebar-panel">
+    <aside className="ap-sidebar-panel ap-sayfa-liste-panel">
       <div className="ap-sidebar-baslik">
         <div>
           <h2 className="ap-heading text-sm font-semibold">Sayfa Listesi</h2>
@@ -290,7 +290,7 @@ export function SayfaListesiPanel({
         </p>
       )}
       <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Başlık veya slug ara..." />
-      <div className="ap-scroll ap-sidebar-icerik">
+      <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
         {filtreliAgac.length === 0 ? (
           <AdminBosDurum
             ikon="📄"
