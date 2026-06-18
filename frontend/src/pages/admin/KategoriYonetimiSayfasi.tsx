@@ -136,7 +136,12 @@ export function KategoriYonetimiSayfasi() {
     try {
       setKategoriler(await navKategorileriGetir());
     } catch (err) {
-      setHata(err instanceof Error ? err.message : 'Kategoriler alınamadı');
+      const mesaj = err instanceof Error ? err.message : 'Kategoriler alınamadı';
+      setHata(
+        mesaj === 'Endpoint bulunamadi'
+          ? 'Sunucudaki backend henüz güncellenmemiş. nav-kategoriler API’si deploy edilmeden bu modül çalışmaz — backend’i yeniden build edip sunucuya yükleyin, ardından PM2’yi yeniden başlatın.'
+          : mesaj
+      );
     } finally {
       setYukleniyor(false);
     }
