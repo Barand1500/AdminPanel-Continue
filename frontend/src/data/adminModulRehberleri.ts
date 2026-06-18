@@ -324,20 +324,20 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
     kartlar: [
       {
         ikon: '📍',
-        baslik: 'İletişim Bilgileri',
-        aciklama: "Adres, telefon, e-posta ve WhatsApp footer'da görünür.",
+        baslik: 'İletişim Görünürlüğü',
+        aciklama: "İletişim verileri Site Ayarları'ndan gelir; burada yalnızca footer'da göster/gizle ayarlanır.",
         renk: 'yesil',
       },
       {
-        ikon: '©️',
-        baslik: 'Telif Yazısı',
-        aciklama: 'Alt satırdaki telif metnini özelleştirin.',
+        ikon: '🔗',
+        baslik: 'Link Kolonları',
+        aciklama: 'Footer menü kolonlarını ve linklerini bu modülden yönetin.',
         renk: 'mavi',
       },
       {
         ikon: '👁️',
         baslik: 'Önizleme',
-        aciklama: 'Sağ panelde footer önizlemesini kontrol edin.',
+        aciklama: 'Sayfa altındaki footer önizlemesini kontrol edin.',
         renk: 'mor',
       },
     ],

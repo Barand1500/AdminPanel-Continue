@@ -9,6 +9,7 @@ import { TelefonInput } from '@/components/form/TelefonInput';
 import { EmailInput } from '@/components/form/EmailInput';
 import { WhatsAppInput } from '@/components/form/WhatsAppInput';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
+import { SosyalMedyaAlani } from '@/components/form/SosyalMedyaAlani';
 import {
   AdminPanelKarti,
   BildirimKutusu,
@@ -100,12 +101,12 @@ export function SiteAyarlariSayfasi() {
           Header&apos;daki marka metni ve logo için{' '}
           <Link to="/gt-admin/header" className="font-semibold text-[var(--ap-accent)] hover:underline">
             Header Yönetimi
-          </Link>{' '}
-          modülünü kullanın. Footer logo boyutu{' '}
+          </Link>
+          , footer düzeni ve görünürlük ayarları için{' '}
           <Link to="/gt-admin/footer" className="font-semibold text-[var(--ap-accent)] hover:underline">
             Footer Yönetimi
-          </Link>
-          &apos;ndedir.
+          </Link>{' '}
+          modülünü kullanın. İletişim ve sosyal medya bilgileri yalnızca burada düzenlenir.
         </p>
       </div>
 
@@ -152,7 +153,7 @@ export function SiteAyarlariSayfasi() {
           <FontSecici deger={ayarlar.font ?? 'Inter'} onChange={(v) => alanGuncelle('font', v)} />
         </AdminPanelKarti>
 
-        <AdminPanelKarti baslik="İletişim Bilgileri" altBaslik="Footer, üst bant ve iletişim sayfasında kullanılır">
+        <AdminPanelKarti baslik="İletişim Bilgileri" altBaslik="Footer, header üst bant ve iletişim sayfasında kullanılır">
           <div className="space-y-4">
             <TelefonInput
               deger={ayarlar.telefon ? telefonFormatla(ayarlar.telefon) : ''}
@@ -178,6 +179,16 @@ export function SiteAyarlariSayfasi() {
               />
             </FormAlani>
           </div>
+        </AdminPanelKarti>
+
+        <AdminPanelKarti
+          baslik="Sosyal Medya"
+          altBaslik="Header üst bant ve footer'da görünen platform linkleri"
+        >
+          <SosyalMedyaAlani
+            sosyal={ayarlar.sosyalMedyaJson ?? {}}
+            onGuncelle={(sosyalMedyaJson) => alanGuncelle('sosyalMedyaJson', sosyalMedyaJson)}
+          />
         </AdminPanelKarti>
 
         <AdminPanelKarti baslik="Önizleme" altBaslik="Gündüz ve gece modu canlı önizleme">

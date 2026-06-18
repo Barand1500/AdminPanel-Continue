@@ -2,9 +2,6 @@ import { useMemo, useState } from 'react';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import { useSiteYonetimiAksiyonlari } from '@/hooks/useSiteYonetimiAksiyonlari';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
-import { TelefonInput } from '@/components/form/TelefonInput';
-import { EmailInput } from '@/components/form/EmailInput';
-import { WhatsAppInput } from '@/components/form/WhatsAppInput';
 import { FooterSemaSecici } from '@/components/admin/footer/FooterSemaSecici';
 import { FooterKolonPanel } from '@/components/admin/footer/FooterKolonPanel';
 import { FooterAltBantPanel } from '@/components/admin/footer/FooterAltBantPanel';
@@ -12,8 +9,11 @@ import { FooterOnizleme } from '@/components/admin/footer/FooterOnizleme';
 import { FooterYuzucuPanel } from '@/components/admin/footer/FooterYuzucuPanel';
 import { LogoBoyutSecici } from '@/components/admin/site/LogoBoyutSecici';
 import { EmojiIkonSecici } from '@/components/admin/footer/EmojiIkonSecici';
+import {
+  IletisimOzetSatirlari,
+  SiteVerisiYonlendirme,
+} from '@/components/admin/site/SiteVerisiYonlendirme';
 import { logoBoyutuNormalize } from '@/types/logo';
-import { SosyalMedyaAlani } from '@/components/form/SosyalMedyaAlani';
 import {
   AdminPanelKarti,
   BildirimKutusu,
@@ -26,8 +26,7 @@ import { telefonFormatla, whatsappFormatla } from '@/utils/telefonFormat';
 
 const SEKMELER = [
   { id: 'sema', ad: 'Şema & Görünüm' },
-  { id: 'marka', ad: 'Marka & İletişim' },
-  { id: 'sosyal', ad: 'Sosyal Medya' },
+  { id: 'marka', ad: 'Marka & Görünüm' },
   { id: 'kolonlar', ad: 'Link Kolonları' },
   { id: 'alt-bant', ad: 'Alt Bantlar' },
   { id: 'yuzucu', ad: 'Yüzen Butonlar' },
@@ -80,18 +79,19 @@ export function FooterYonetimiFormu() {
   if (yukleniyor) return <YukleniyorDurumu mesaj="Footer ayarları yükleniyor..." />;
   if (!ayarlar) return <HataDurumu mesaj={hata ?? 'Ayarlar yüklenemedi'} />;
 
-  const whatsappGorunen = ayarlar.whatsapp
+  const telefonGoster = ayarlar.telefon ? telefonFormatla(ayarlar.telefon) : null;
+  const whatsappGoster = ayarlar.whatsapp
     ? ayarlar.whatsapp.includes('+')
       ? ayarlar.whatsapp
       : whatsappFormatla(ayarlar.whatsapp)
-    : '';
+    : null;
 
   return (
     <div className="space-y-6">
       <div className="space-y-5">
         <ModulBaslik
           baslik="Footer Yönetimi"
-          aciklama="Footer şeması, link kolonları, alt bantlar ve yüzen butonları yönetin."
+          aciklama="Footer düzeni, link kolonları ve görünüm ayarları. İletişim ve sosyal medya verileri Site Ayarları'ndan gelir."
         />
 
         {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
@@ -143,6 +143,7 @@ export function FooterYonetimiFormu() {
                 )}
                 <ToggleSatir
                   etiket="Sosyal medya ikonları"
+                  aciklama="Linkler Site Ayarları'ndan yönetilir"
                   acik={footer.marka.sosyalGoster}
                   onDegistir={(sosyalGoster) =>
                     footerGuncelle({ ...footer, marka: { ...footer.marka, sosyalGoster } })
@@ -219,8 +220,14 @@ export function FooterYonetimiFormu() {
               </div>
             </AdminPanelKarti>
 
-            <AdminPanelKarti baslik="İletişim Bilgileri" altBaslik="Footer sol sütununda görünür">
+            <AdminPanelKarti
+              baslik="İletişim Görünürlüğü"
+              altBaslik="Footer'da hangi iletişim satırlarının görüneceğini seçin"
+            >
               <div className="space-y-4">
+                <SiteVerisiYonlendirme
+                  aciklama="Adres, telefon, e-posta ve WhatsApp değerleri Site Ayarları'nda tek yerden düzenlenir. Burada yalnızca footer'da gösterilip gösterilmeyeceğini belirlersiniz."
+                />
                 <div className="grid gap-2 sm:grid-cols-2">
                   <ToggleSatir
                     etiket="Adres göster"
@@ -251,26 +258,11 @@ export function FooterYonetimiFormu() {
                     }
                   />
                 </div>
-                <FormAlani etiket="Adres">
-                  <textarea
-                    rows={3}
-                    value={ayarlar.adres ?? ''}
-                    onChange={(e) => alanGuncelle('adres', e.target.value || null)}
-                    className={formInputSinifi}
-                    placeholder="Mahalle, sokak, ilçe, il..."
-                  />
-                </FormAlani>
-                <TelefonInput
-                  deger={ayarlar.telefon ? telefonFormatla(ayarlar.telefon) : ''}
-                  onChange={(v) => alanGuncelle('telefon', v || null)}
-                />
-                <EmailInput
-                  deger={ayarlar.email ?? ''}
-                  onChange={(v) => alanGuncelle('email', v || null)}
-                />
-                <WhatsAppInput
-                  deger={whatsappGorunen}
-                  onChange={(v) => alanGuncelle('whatsapp', v || null)}
+                <IletisimOzetSatirlari
+                  adres={ayarlar.adres}
+                  telefon={telefonGoster}
+                  email={ayarlar.email}
+                  whatsapp={whatsappGoster}
                 />
               </div>
             </AdminPanelKarti>
@@ -307,28 +299,7 @@ export function FooterYonetimiFormu() {
                 ))}
               </div>
             </AdminPanelKarti>
-
-            <AdminPanelKarti baslik="Telif Yazısı">
-              <FormAlani etiket="Telif metni">
-                <input
-                  type="text"
-                  value={ayarlar.telifYazisi ?? ''}
-                  onChange={(e) => alanGuncelle('telifYazisi', e.target.value || null)}
-                  className={formInputSinifi}
-                  placeholder={`© ${new Date().getFullYear()} ${siteAd}. Tüm hakları saklıdır.`}
-                />
-              </FormAlani>
-            </AdminPanelKarti>
           </>
-        )}
-
-        {sekme === 'sosyal' && (
-          <AdminPanelKarti baslik="Sosyal Medya" altBaslik="Footer'da görünecek platform linkleri ve ikonları">
-            <SosyalMedyaAlani
-              sosyal={ayarlar.sosyalMedyaJson ?? {}}
-              onGuncelle={(sosyalMedyaJson) => alanGuncelle('sosyalMedyaJson', sosyalMedyaJson)}
-            />
-          </AdminPanelKarti>
         )}
 
         {sekme === 'kolonlar' && (
