@@ -97,7 +97,27 @@ export function BildirimKutusu({
   return null;
 }
 
-export function ModulBaslik({ baslik, aciklama }: { baslik: string; aciklama: string }) {
+export function ModulBaslik({
+  baslik,
+  aciklama,
+  onizleGoster = false,
+}: {
+  baslik: string;
+  aciklama: string;
+  onizleGoster?: boolean;
+}) {
+  if (onizleGoster) {
+    return (
+      <div className="ap-modul-baslik">
+        <div>
+          <h1 className="ap-heading text-xl font-bold">{baslik}</h1>
+          <p className="ap-muted mt-1 text-sm">{aciklama}</p>
+        </div>
+        <AdminSiteOnizleLink />
+      </div>
+    );
+  }
+
   return (
     <div>
       <h1 className="ap-heading text-xl font-bold">{baslik}</h1>

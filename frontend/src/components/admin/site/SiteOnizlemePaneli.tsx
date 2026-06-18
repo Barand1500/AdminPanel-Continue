@@ -1,10 +1,8 @@
-import type { CSSProperties } from 'react';
-import { Link } from 'react-router-dom';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import type { HeaderAyarlari } from '@/types/header';
-import { ustMenuOgeleriOlustur } from '@/utils/menuYardimci';
 import { SiteFooterOnizleme, SiteHeaderOnizleme } from './SiteOnizlemeBilesenleri';
 import { AdminPanelKarti } from '@/components/admin/ortak/AdminBilesenleri';
+import { siteOnizlemeCssStili } from '@/utils/siteOnizlemeStili';
 
 interface SiteOnizlemePaneliProps {
   tip: 'gorunum' | 'header' | 'footer';
@@ -14,32 +12,15 @@ interface SiteOnizlemePaneliProps {
 }
 
 export function SiteOnizlemePaneli({ tip, siteAd, headerAyarlari, iletisim }: SiteOnizlemePaneliProps) {
-  const { ayarlar, site, headerAyarlari: ctxHeader } = useSiteAyarlariYonetimi();
-  const ad = siteAd ?? site?.ad ?? 'Güzel Teknoloji';
+  const { ayarlar, site, siteAd: ctxSiteAd, headerAyarlari: ctxHeader } = useSiteAyarlariYonetimi();
+  const ad = siteAd ?? ctxSiteAd ?? site?.ad ?? 'Güzel Teknoloji';
   const header = headerAyarlari ?? ctxHeader;
-  const menuOgeleri = ustMenuOgeleriOlustur(header.ustMenu ?? []);
-
-  const onizlemeStili = {
-    '--color-primary': ayarlar?.anaRenk ?? '#7c3aed',
-    '--color-primary-light': ayarlar?.ikincilRenk ?? '#a78bfa',
-    '--color-primary-dark': ayarlar?.anaRenk ?? '#7c3aed',
-    '--color-accent': `${ayarlar?.ikincilRenk ?? '#a78bfa'}22`,
-    fontFamily: ayarlar?.font ?? 'Inter',
-  } as CSSProperties;
+  const onizlemeStili = siteOnizlemeCssStili(ayarlar);
 
   return (
     <AdminPanelKarti
       baslik="Canlı Önizleme"
       altBaslik="Form değişiklikleri anında yansır — Kaydet ile public site güncellenir"
-      ustAksiyon={
-        <Link
-          to="/"
-          target="_blank"
-          className="text-xs text-blue-400 hover:underline"
-        >
-          Public siteyi aç →
-        </Link>
-      }
     >
       <div
         className={`site-public rounded-lg border border-[var(--ap-border)] ${
@@ -51,16 +32,8 @@ export function SiteOnizlemePaneli({ tip, siteAd, headerAyarlari, iletisim }: Si
           <SiteHeaderOnizleme
             siteAdi={ad}
             ayarlar={ayarlar}
-            headerAyarlari={headerAyarlari}
+            headerAyarlari={header}
             iletisim={iletisim}
-            menuOgeleri={
-              menuOgeleri.length > 0
-                ? menuOgeleri
-                : [
-                    { baslik: 'Ana Sayfa', yol: '/' },
-                    { baslik: 'Blog', yol: '/blog' },
-                  ]
-            }
           />
         )}
 
