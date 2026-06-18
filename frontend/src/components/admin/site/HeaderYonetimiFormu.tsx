@@ -11,7 +11,6 @@ import { ParaBirimiYonetimi } from '@/components/admin/header/ParaBirimiYonetimi
 import { AramaStilSecici } from '@/components/admin/header/AramaStilSecici';
 import { SiteOnizlemePaneli } from './SiteOnizlemePaneli';
 import type { HeaderAyarlari } from '@/types/header';
-import { headerMarkaMetni } from '@/types/header';
 import { HeaderDilYonetimi } from '@/components/admin/header/HeaderDilYonetimi';
 import {
   AdminPanelKarti,
@@ -94,6 +93,7 @@ export function HeaderYonetimiFormu() {
         <ModulBaslik
           baslik="Header Yönetimi"
           aciklama="Üst bant, header logosu, kurlar, ikonlar, kategori menüsü ve arama alanını yönetin."
+          onizleGoster
         />
 
         {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
@@ -299,7 +299,7 @@ export function HeaderYonetimiFormu() {
 
       <SiteOnizlemePaneli
         tip="header"
-        siteAd={headerMarkaMetni(headerAyarlari, siteAd)}
+        siteAd={siteAd}
         headerAyarlari={headerAyarlari}
         iletisim={{ telefon: ayarlar.telefon, email: ayarlar.email }}
       />
