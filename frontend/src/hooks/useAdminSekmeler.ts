@@ -132,9 +132,12 @@ export function useAdminSekmeler() {
       const hedef = onceki.sekmeler.find((s) => s.id === hedefId);
       if (!kaynak || !hedef) return onceki;
 
-      const grupId = hedef.grupId ?? `grup-${Date.now()}`;
-      const guncellenmis = onceki.sekmeler.map((s) => {
+      const grupId = hedef.grupId ?? kaynak.grupId ?? `grup-${Date.now()}`;
+      let guncellenmis = onceki.sekmeler.map((s) => {
         if (s.id === kaynakId || s.id === hedefId) return { ...s, grupId };
+        if (kaynak.grupId && s.grupId === kaynak.grupId && s.id !== kaynakId) {
+          return { ...s, grupId };
+        }
         return s;
       });
 

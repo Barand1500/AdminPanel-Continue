@@ -17,7 +17,7 @@ import { adminBildirimleriYenile } from '@/utils/adminBildirimOlaylari';
 import { GirisSayfasi } from '@/pages/admin/GirisSayfasi';
 import { ModulRehberSistemi } from '@/components/admin/ortak/ModulRehberSistemi';
 import { PanelDilKabuk } from '@/components/admin/PanelDilKabuk';
-import { sekmeAyarlariOku } from '@/utils/sekmePanelAyarlari';
+import { sekmeAyarlariOku, splitSekmeleriHesapla } from '@/utils/sekmePanelAyarlari';
 import { kisayolAyarlariOku, klavyeOlayiEslesir } from '@/utils/kisayolAyarlari';
 import type { AdminModul, AdminSekme } from '@/types/admin';
 import '@/styles/adminTema.css';
@@ -61,12 +61,10 @@ function AdminPanelGovde() {
   }, []);
 
   const aktifSekme = sekmeler.find((s) => s.id === aktifSekmeId);
-  const splitSekmeler = useMemo(() => {
-    if (!sekmeAyarlari.yanYanaAcilabilir || sekmeAyarlari.grupDavranisi !== 'yan-yana') return null;
-    if (!aktifSekme?.grupId) return null;
-    const gruptakiler = sekmeler.filter((s) => s.grupId === aktifSekme.grupId);
-    return gruptakiler.length >= 2 ? gruptakiler : null;
-  }, [sekmeler, aktifSekme, sekmeAyarlari]);
+  const splitSekmeler = useMemo(
+    () => splitSekmeleriHesapla(sekmeler, aktifSekme, sekmeAyarlari.yanYanaAcilabilir),
+    [sekmeler, aktifSekme, sekmeAyarlari.yanYanaAcilabilir]
+  );
 
   useEffect(() => {
     if (aktifModul?.id) setFocusModulId(aktifModul.id);
@@ -226,15 +224,27 @@ function AdminPanelGovde() {
     pencereKapat(sekmeId);
   }
 
-  function icerikPanel(sekme: AdminSekme, odakli: boolean) {
+  function icerikPanel(sekme: AdminSekme, odakli: boolean, split = false) {
     return (
       <div
         key={sekme.id}
-        className={`ap-modul-panel min-h-0 flex-1 overflow-y-auto p-6 ${odakli ? 'ap-modul-panel-odak' : ''}`}
-        onMouseDown={() => setFocusModulId(sekme.modulId)}
-        onFocusCapture={() => setFocusModulId(sekme.modulId)}
+        className={`ap-sekme-split-pane flex min-h-0 min-w-0 flex-1 flex-col ${odakli ? 'ap-modul-panel-odak' : ''}`}
       >
-        <AdminModulIcerik modulId={sekme.modulId} onModulAc={modulSecHandler} />
+        {split && (
+          <div
+            className="ap-sekme-split-baslik flex shrink-0 items-center border-b px-4 py-2 text-xs font-semibold"
+            style={{ borderColor: 'var(--ap-border)', background: 'var(--ap-surface)', color: 'var(--ap-heading)' }}
+          >
+            {sekme.baslik}
+          </div>
+        )}
+        <div
+          className="ap-modul-panel min-h-0 flex-1 overflow-y-auto p-6"
+          onMouseDown={() => setFocusModulId(sekme.modulId)}
+          onFocusCapture={() => setFocusModulId(sekme.modulId)}
+        >
+          <AdminModulIcerik modulId={sekme.modulId} onModulAc={modulSecHandler} />
+        </div>
       </div>
     );
   }
@@ -260,10 +270,8 @@ function AdminPanelGovde() {
 
       <main className="ap-scroll flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden bg-[var(--ap-bg)]">
         {splitSekmeler ? (
-          <div className="flex min-h-0 flex-1 divide-x divide-[var(--ap-border)]">
-            {splitSekmeler.map((sekme) =>
-              icerikPanel(sekme, focusModulId === sekme.modulId)
-            )}
+          <div className="ap-sekme-split-alan flex min-h-0 flex-1">
+            {splitSekmeler.map((sekme) => icerikPanel(sekme, focusModulId === sekme.modulId, true))}
           </div>
         ) : (
           aktifModul &&

@@ -603,6 +603,29 @@ html:has(.admin-panel[data-tema='acik']) body {
   gap: 0.125rem;
 }
 
+.ap-sekme-split-alan {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  background: var(--ap-bg);
+}
+
+.ap-sekme-split-pane {
+  border-right: 1px solid var(--ap-border);
+}
+
+.ap-sekme-split-pane:last-child {
+  border-right: none;
+}
+
+.ap-sekme-split-baslik {
+  user-select: none;
+}
+
+.ap-modul-panel-odak {
+  box-shadow: inset 0 3px 0 var(--ap-accent);
+}
+
 /* Modul kabuk ve kartlar */
 .ap-modul-kabuk {
   width: 100%;

@@ -124,8 +124,8 @@ export function SekmeYonetimiSayfasi() {
         <AdminPanelKarti baslik="Sekme Ayarları" altBaslik="Değişiklikler Kaydet ile uygulanır">
           <div className="space-y-4">
             <p className="ap-muted rounded-lg border border-dashed border-[var(--ap-border)] px-3 py-2 text-xs leading-relaxed">
-              Sekmeleri sürükleyerek sıralayın. Bir sekmeyi başka sekmenin <strong>ortasına</strong> bırakınca
-              birleşir; <strong>kenarına</strong> bırakınca yan yana dizilir. Birleşmiş sekmeden dışarı sürükleyerek
+              İki sekmeyi birleştirmek için birini diğerinin <strong>ortasına</strong> sürükleyin — Chrome
+              gibi yan yana split açılır. Kenarına bırakırsanız yalnızca sıralama değişir; dışarı sürükleyerek
               ayırabilirsiniz.
             </p>
 
@@ -199,8 +199,8 @@ export function SekmeYonetimiSayfasi() {
               onDegistir={(hoverOnizleme) => setAyarlar((a) => ({ ...a, hoverOnizleme }))}
             />
             <ToggleSatir
-              etiket="Yan yana açılabilir"
-              aciklama="Birleştirilmiş sekmeler içerik alanında yan yana gösterilir"
+              etiket="Yan yana split (Chrome)"
+              aciklama="İki sekmeyi birleştirince içerik alanı ikiye bölünür"
               acik={ayarlar.yanYanaAcilabilir}
               onDegistir={(yanYanaAcilabilir) => setAyarlar((a) => ({ ...a, yanYanaAcilabilir }))}
             />
@@ -244,23 +244,6 @@ export function SekmeYonetimiSayfasi() {
                 </div>
               </div>
             )}
-
-            <div>
-              <p className="ap-heading mb-2 text-sm font-medium">Grup davranışı</p>
-              <select
-                className="w-full rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] px-3 py-2 text-sm"
-                value={ayarlar.grupDavranisi}
-                onChange={(e) =>
-                  setAyarlar((a) => ({
-                    ...a,
-                    grupDavranisi: e.target.value as SekmePanelAyarlari['grupDavranisi'],
-                  }))
-                }
-              >
-                <option value="yan-yana">Yan yana (split)</option>
-                <option value="ustuste">Üst üste (sekme grubu)</option>
-              </select>
-            </div>
 
             <button
               type="button"
@@ -308,8 +291,8 @@ export function SekmeYonetimiSayfasi() {
           <p className="ap-muted mt-3 text-xs">
             Boyut: <strong>{ayarlar.sekmeYukseklik}</strong> · Görünüm:{' '}
             <strong>{ayarlar.sekmeGorunumModu}</strong> · Önizleme:{' '}
-            <strong>{ayarlar.hoverOnizleme ? 'Açık' : 'Kapalı'}</strong> · Grup:{' '}
-            <strong>{ayarlar.grupDavranisi}</strong>
+            <strong>{ayarlar.hoverOnizleme ? 'Açık' : 'Kapalı'}</strong> · Split:{' '}
+            <strong>{ayarlar.yanYanaAcilabilir ? 'Açık' : 'Kapalı'}</strong>
           </p>
         </AdminPanelKarti>
       </div>
