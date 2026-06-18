@@ -6,6 +6,7 @@ import { BildirimPaneli, useBildirimSayaci } from './BildirimPaneli';
 import { LogPaneli } from './LogPaneli';
 import { YedeklemeHizliPaneli } from './YedeklemeHizliPaneli';
 import { useAdminAksiyon } from '@/contexts/AdminAksiyonContext';
+import { kisayolAyarlariOku } from '@/utils/kisayolAyarlari';
 import { useState } from 'react';
 
 interface AltAksiyonCubuguProps {
@@ -26,6 +27,7 @@ export function AltAksiyonCubugu({
   onRehberAc,
 }: AltAksiyonCubuguProps) {
   const rehber = modulRehberBul(focusModulId);
+  const rehberKisayolu = kisayolAyarlariOku().rehber;
   const [acikPanel, setAcikPanel] = useState<AcikPanel>(null);
   const { okunmamisSayi, yenile } = useBildirimSayaci();
   const { aksiyonGeriBildirim } = useAdminAksiyon();
@@ -72,7 +74,7 @@ export function AltAksiyonCubugu({
           type="button"
           onClick={onRehberAc}
           className="ap-rehber-cubuk-btn"
-          title={`${rehber.baslik} — Rehber (F1)`}
+          title={`${rehber.baslik} — Rehber (${rehberKisayolu})`}
           aria-label="Sayfa rehberini aç"
         >
           ?

@@ -71,16 +71,18 @@ function AdminPanelGovde() {
   }, [aktifModul?.id, setFocusModulId]);
 
   useEffect(() => {
-    const harita = kisayolAyarlariOku();
     function tusHandler(e: KeyboardEvent) {
+      const harita = kisayolAyarlariOku();
       const hedef = e.target as HTMLElement;
-      if (hedef.tagName === 'INPUT' || hedef.tagName === 'TEXTAREA' || hedef.isContentEditable) {
-        if (!e.ctrlKey && !e.metaKey && e.key !== 'F1') return;
-      }
+      const inputIcinde =
+        hedef.tagName === 'INPUT' || hedef.tagName === 'TEXTAREA' || hedef.isContentEditable;
+      const rehberTusu = klavyeOlayiEslesir(e, harita.rehber);
 
-      if (klavyeOlayiEslesir(e, harita.rehber)) {
+      if (inputIcinde && !e.ctrlKey && !e.metaKey && !rehberTusu) return;
+
+      if (rehberTusu) {
         e.preventDefault();
-        setRehberAcik((a) => !a);
+        setRehberAcik(true);
         return;
       }
       if (klavyeOlayiEslesir(e, harita.kaydet)) {

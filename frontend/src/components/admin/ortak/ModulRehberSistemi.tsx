@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { AdminRehberModal } from './AdminRehberModal';
 import { modulRehberBul } from '@/data/adminModulRehberleri';
-import { kisayolAyarlariOku, klavyeOlayiEslesir } from '@/utils/kisayolAyarlari';
+import { kisayolAyarlariOku } from '@/utils/kisayolAyarlari';
 
 interface ModulRehberSistemiProps {
   modulId: string;
@@ -24,14 +24,6 @@ export function ModulRehberSistemi({ modulId, zorlaAcik, onAcikDegisti, gizliBut
     onAcikDegisti?.(false);
   }, [onAcikDegisti]);
 
-  const toggle = useCallback(() => {
-    setAcik((o) => {
-      const yeni = !o;
-      onAcikDegisti?.(yeni);
-      return yeni;
-    });
-  }, [onAcikDegisti]);
-
   useEffect(() => {
     if (zorlaAcik !== undefined) setAcik(zorlaAcik);
   }, [zorlaAcik]);
@@ -41,18 +33,6 @@ export function ModulRehberSistemi({ modulId, zorlaAcik, onAcikDegisti, gizliBut
     onAcikDegisti?.(false);
   }, [modulId, onAcikDegisti]);
 
-  useEffect(() => {
-    function tusHandler(e: KeyboardEvent) {
-      const harita = kisayolAyarlariOku();
-      if (!klavyeOlayiEslesir(e, harita.rehber) && e.key !== 'F1') return;
-      e.preventDefault();
-      toggle();
-    }
-
-    document.addEventListener('keydown', tusHandler);
-    return () => document.removeEventListener('keydown', tusHandler);
-  }, [toggle]);
-
   return (
     <>
       {!gizliButon && (
@@ -60,7 +40,7 @@ export function ModulRehberSistemi({ modulId, zorlaAcik, onAcikDegisti, gizliBut
           type="button"
           onClick={ac}
           className="ap-rehber-float"
-          title="Rehber (F1)"
+          title={`Rehber (${kisayolAyarlariOku().rehber})`}
           aria-label="Sayfa rehberini aç"
         >
           ?

@@ -49,9 +49,15 @@ export function KisayolAyarlariSayfasi() {
         setDinlenen(null);
         return;
       }
-      setHarita((h) => ({ ...h, [islem]: komb }));
+      setHarita((h) => {
+        const yeni = { ...h, [islem]: komb };
+        kisayolAyarlariKaydet(yeni);
+        window.dispatchEvent(new CustomEvent('ap-kisayol-ayarlari-guncellendi'));
+        return yeni;
+      });
       setDinlenen(null);
       setHata('');
+      setBasari(`"${KISAYOL_ISLEMLERI.find((k) => k.id === islem)?.etiket}" kısayolu güncellendi.`);
     }
     window.addEventListener('keydown', tusDinle, true);
     return () => window.removeEventListener('keydown', tusDinle, true);

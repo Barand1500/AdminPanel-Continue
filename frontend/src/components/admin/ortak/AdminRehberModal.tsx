@@ -98,7 +98,7 @@ export function AdminRehberModal({
 
         <footer className="ap-rehber-footer">
           <p className="ap-rehber-kisayol">
-            <kbd className="ap-rehber-kbd">F1</kbd> veya <kbd className="ap-rehber-kbd">ESC</kbd> ile kapat
+            <kbd className="ap-rehber-kbd">ESC</kbd> veya ✕ ile kapat
           </p>
           <button type="button" className="ap-rehber-tamam" onClick={kapat}>
             Anladım ✓
