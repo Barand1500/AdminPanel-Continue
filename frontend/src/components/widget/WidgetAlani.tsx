@@ -24,7 +24,7 @@ import { GeriSayimWidget } from './GeriSayimWidget';
 import { VideoBannerWidget } from './VideoBannerWidget';
 import { OncesiSonrasiWidget } from './OncesiSonrasiWidget';
 import { BultenKayitWidget } from './BultenKayitWidget';
-import { configOkuFromWidget, widgetSectionClass, widgetSectionStyle } from './widgetHelpers';
+import { configOkuFromWidget, haritaEmbedUrl, widgetSectionClass, widgetSectionStyle } from './widgetHelpers';
 
 interface WidgetRenderProps {
   widget: Widget;
@@ -89,14 +89,12 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
         return <BultenKayitWidget widget={widget} />;
       case 'HARITA': {
         const cfg = configOkuFromWidget(widget);
-        const src = cfg.haritaUrl || (cfg.haritaLat && cfg.haritaLng
-          ? `https://maps.google.com/maps?q=${cfg.haritaLat},${cfg.haritaLng}&z=${cfg.haritaZoom ?? 14}&output=embed`
-          : '');
+        const src = haritaEmbedUrl(cfg.haritaUrl, cfg.haritaLat, cfg.haritaLng, cfg.haritaZoom ?? 14);
         if (!src) return null;
         return (
           <section className={widgetSectionClass(widget, 'py-8')} style={widgetSectionStyle(widget)}>
             <div className="container-site">
-              <iframe title="Harita" src={src} className="h-80 w-full rounded-xl border-0" loading="lazy" />
+              <iframe title="Harita" src={src} className="h-80 w-full rounded-xl border-0" loading="lazy" allowFullScreen referrerPolicy="no-referrer-when-downgrade" />
             </div>
           </section>
         );

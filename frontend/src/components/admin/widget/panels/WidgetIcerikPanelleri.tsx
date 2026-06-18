@@ -374,10 +374,16 @@ export function LinkKartlariIcerik({ form, onChange }: WidgetPanelProps) {
         yeniEkle={() => ({ id: uid(), metin: '', ikon: '👤', link: '' })}
         renderOge={(l, i) => (
           <div className="grid gap-2 sm:grid-cols-3">
-            <input className={formInputSinifi} placeholder="İkon (emoji)" value={l.ikon} onChange={(e) => {
-              const kopya = [...linkler]; kopya[i] = { ...l, ikon: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, linkler: kopya })));
-            }} />
+            <EmojiSecici
+              deger={l.ikon}
+              sadeceSecim
+              placeholder="İkon seç"
+              onChange={(emoji) => {
+                const kopya = [...linkler];
+                kopya[i] = { ...l, ikon: emoji };
+                onChange(configGuncelle(form, (c) => ({ ...c, linkler: kopya })));
+              }}
+            />
             <input className={formInputSinifi} placeholder="Metin" value={l.metin} onChange={(e) => {
               const kopya = [...linkler]; kopya[i] = { ...l, metin: e.target.value };
               onChange(configGuncelle(form, (c) => ({ ...c, linkler: kopya })));
@@ -457,8 +463,8 @@ export function HaritaIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   return (
     <AdminFormBolumu baslik="Harita">
-      <FormAlani etiket="Embed URL">
-        <input className={formInputSinifi} value={cfg.haritaUrl ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, haritaUrl: e.target.value })))} placeholder="https://maps.google.com/..." />
+      <FormAlani etiket="Harita linki veya adres" aciklama="Google Maps paylaşım linki, adres veya embed URL yapıştırın. www.google.com gibi genel linkler çalışmaz.">
+        <input className={formInputSinifi} value={cfg.haritaUrl ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, haritaUrl: e.target.value })))} placeholder="Adres, maps linki veya embed URL" />
       </FormAlani>
       <div className="grid gap-3 sm:grid-cols-3">
         <FormAlani etiket="Enlem">

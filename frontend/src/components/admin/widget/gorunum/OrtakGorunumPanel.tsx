@@ -21,6 +21,7 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
   const gridGoster = WIDGET_GORUNUM_GRID_TIPLERI.has(tip);
   const metinGoster = WIDGET_GORUNUM_METIN_TIPLERI.has(tip);
   const karuselEk = tip === 'BLOG_KARUSEL';
+  const karsilastirmaEk = tip === 'KARSILASTIRMA_TABLOSU';
 
   return (
     <>
@@ -31,6 +32,13 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
           <>
             <RenkSecici etiket="Başlık rengi" deger={g.baslikRengi ?? ''} varsayilan="#0f172a" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, baslikRengi: v } })))} />
             <RenkSecici etiket="Metin rengi" deger={g.metinRengi ?? ''} varsayilan="#475569" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, metinRengi: v } })))} />
+          </>
+        )}
+        {karsilastirmaEk && (
+          <>
+            <RenkSecici etiket="Tablo kenar rengi" deger={g.tabloKenarRengi ?? ''} varsayilan="#e2e8f0" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, tabloKenarRengi: v } })))} />
+            <RenkSecici etiket="Tablo başlık arka planı" deger={g.tabloBaslikArkaPlan ?? ''} varsayilan="#f8fafc" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, tabloBaslikArkaPlan: v } })))} />
+            <RenkSecici etiket="Vurgu rengi (fiyat / öne çıkan)" deger={g.vurguRengi ?? ''} varsayilan="#7c3aed" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, vurguRengi: v } })))} />
           </>
         )}
         <SecimAlani

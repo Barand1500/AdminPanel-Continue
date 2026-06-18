@@ -56,9 +56,11 @@ interface EmojiSeciciProps {
   deger: string;
   onChange: (emoji: string) => void;
   placeholder?: string;
+  /** true ise yalnızca panelden seçim; metin yazılamaz */
+  sadeceSecim?: boolean;
 }
 
-export function EmojiSecici({ deger, onChange, placeholder = 'Emoji seçin veya yazın' }: EmojiSeciciProps) {
+export function EmojiSecici({ deger, onChange, placeholder = 'Emoji seçin', sadeceSecim = false }: EmojiSeciciProps) {
   const [acik, setAcik] = useState(false);
   const [aktifKategori, setAktifKategori] = useState(0);
   const kapsayiciRef = useRef<HTMLDivElement>(null);
@@ -80,9 +82,10 @@ export function EmojiSecici({ deger, onChange, placeholder = 'Emoji seçin veya 
         <input
           className={formInputSinifi}
           value={deger}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e) => !sadeceSecim && onChange(e.target.value)}
           placeholder={placeholder}
-          maxLength={8}
+          maxLength={sadeceSecim ? 4 : 8}
+          readOnly={sadeceSecim}
         />
         <button
           type="button"

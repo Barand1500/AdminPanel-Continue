@@ -99,6 +99,7 @@ export const WIDGET_GORUNUM_GRID_TIPLERI = new Set([
   'SAYAC_BLOK',
   'YORUM_KARUSEL',
   'FIYATLANDIRMA',
+  'KARSILASTIRMA_TABLOSU',
 ]);
 
 export const WIDGET_GORUNUM_METIN_TIPLERI = new Set([
@@ -108,6 +109,7 @@ export const WIDGET_GORUNUM_METIN_TIPLERI = new Set([
   'ILETISIM_FORMU',
   'HIZMET_KARTLARI',
   'POPUP',
+  'KARSILASTIRMA_TABLOSU',
 ]);
 
 export interface WidgetGorunumAyarlari {
@@ -126,6 +128,9 @@ export interface WidgetGorunumAyarlari {
   icerikDuzeni?: IcerikDuzeni;
   noktaRengi?: string;
   ctaStil?: 'dolu' | 'cerceve' | 'hayalet';
+  tabloBaslikArkaPlan?: string;
+  tabloKenarRengi?: string;
+  vurguRengi?: string;
 }
 
 export interface WidgetEkAyarlar {
