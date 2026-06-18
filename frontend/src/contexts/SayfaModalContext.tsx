@@ -77,6 +77,14 @@ export function SayfaModalProvider({ children }: { children: ReactNode }) {
 
 export function useSayfaModal() {
   const ctx = useContext(SayfaModalContext);
-  if (!ctx) throw new Error('useSayfaModal SiteLayout içinde kullanılmalı');
+  if (!ctx) {
+    return {
+      acik: false,
+      yukleniyor: false,
+      sayfa: null,
+      modalAc: () => {},
+      modalKapat: () => {},
+    };
+  }
   return ctx;
 }

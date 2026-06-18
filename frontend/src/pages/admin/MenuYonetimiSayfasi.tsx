@@ -23,6 +23,7 @@ import {
   ustMenuEsit,
   ustMenuSayfaSenkronize,
   ustMenuSilinenSayfaGuncelle,
+  headerDilCevirileriSenkronize,
 } from '@/utils/menuYardimci';
 import { idKarsilastir } from '@/utils/idKarsilastir';
 import { siteVerisiGuncellendiYayinla } from '@/utils/siteVerisiOlaylari';
@@ -175,7 +176,8 @@ export function MenuYonetimiSayfasi() {
       );
 
       if (headerJson) {
-        const yeniHeader = { ...headerJson, ustMenu: guncelUstMenu };
+        const senkronHeader = headerDilCevirileriSenkronize(headerJson, guncelSayfalar);
+        const yeniHeader = { ...senkronHeader, ustMenu: guncelUstMenu };
         const veri = await adminSiteApi.ayarlariGuncelle({ headerAyarlariJson: yeniHeader });
         const header = headerAyarlariBirlestir(veri.ayarlar);
         setHeaderJson(header);

@@ -114,7 +114,7 @@ function SekmeButonu({
       <button
         type="button"
         onClick={() => onSekmeSec(sekme.id)}
-        className="flex min-h-[inherit] items-center gap-1 truncate px-3 py-1.5"
+        className="flex min-h-[inherit] min-w-0 flex-1 items-center gap-1 truncate px-3 py-1.5"
       >
         {sekme.kaydedilmedi && (
           <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" title="Kaydedilmemiş değişiklik" />
@@ -130,7 +130,7 @@ function SekmeButonu({
             e.stopPropagation();
             onSekmeKapat(sekme.id);
           }}
-          className="mr-1 rounded px-1 opacity-0 transition hover:bg-[var(--ap-hover)] group-hover:opacity-100"
+          className="mr-1 shrink-0 rounded px-1 text-sm leading-none opacity-60 transition hover:bg-[var(--ap-hover)] hover:opacity-100 group-hover:opacity-100"
           aria-label="Sekmeyi kapat"
         >
           ×

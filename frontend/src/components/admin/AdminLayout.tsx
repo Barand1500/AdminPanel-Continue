@@ -1,5 +1,5 @@
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminSekmeler } from '@/hooks/useAdminSekmeler';
 import { useAksiyonCubugu } from '@/hooks/useAksiyonCubugu';
@@ -50,6 +50,8 @@ function AdminPanelGovde() {
   const [sekmeAyarlari, setSekmeAyarlari] = useState(sekmeAyarlariOku);
   const [ayriPencereler, setAyriPencereler] = useState<AyriPencere[]>([]);
   const [rehberAcik, setRehberAcik] = useState(false);
+  /** Kapatılan sekmenin modülü — URL gecikince useEffect'in sekmeyi yeniden açmasını engeller */
+  const sonKapatilanModulRef = useRef<string | null>(null);
 
   useEffect(() => {
     const handler = () => setSekmeAyarlari(sekmeAyarlariOku());
@@ -119,6 +121,36 @@ function AdminPanelGovde() {
     if (modul) modulAcHandler(modul);
   }
 
+  function sekmeKapatHandler(sekmeId: string) {
+    if (sekmeler.length <= 1) return;
+
+    const kapatilan = sekmeler.find((s) => s.id === sekmeId);
+    if (!kapatilan) return;
+
+    const kapatildiAktif = aktifSekmeId === sekmeId;
+    const mevcutPathModul = modulYolundanBul(location.pathname);
+    const urlKapaliModulleEslesiyor = mevcutPathModul?.id === kapatilan.modulId;
+
+    let hedefModul: AdminModul | undefined;
+    if (kapatildiAktif) {
+      const idx = sekmeler.findIndex((s) => s.id === sekmeId);
+      const komşu = sekmeler[idx + 1] ?? sekmeler[idx - 1];
+      hedefModul = komşu ? modulBul(komşu.modulId) : undefined;
+    } else if (urlKapaliModulleEslesiyor) {
+      const aktifKalan = sekmeler.find((s) => s.id === aktifSekmeId && s.id !== sekmeId);
+      hedefModul = aktifKalan ? modulBul(aktifKalan.modulId) : undefined;
+    }
+
+    sonKapatilanModulRef.current = kapatilan.modulId;
+
+    if ((kapatildiAktif || urlKapaliModulleEslesiyor) && hedefModul) {
+      const hedef = hedefModul.yol.replace(/\/+$/, '') || '/gt-admin';
+      navigate(hedef, { replace: true });
+    }
+
+    sekmeKapat(sekmeId);
+  }
+
   function sekmeSecHandler(sekmeId: string) {
     setAktifSekmeId(sekmeId);
     const sekme = sekmeler.find((s) => s.id === sekmeId);
@@ -132,10 +164,23 @@ function AdminPanelGovde() {
   useEffect(() => {
     const modul = modulYolundanBul(location.pathname);
     if (!modul) return;
+
+    if (sonKapatilanModulRef.current) {
+      if (sonKapatilanModulRef.current === modul.id) return;
+      sonKapatilanModulRef.current = null;
+    }
+
     const aktifModulId = sekmeler.find((s) => s.id === aktifSekmeId)?.modulId;
     if (aktifModulId === modul.id) return;
+
+    const mevcutSekme = sekmeler.find((s) => s.modulId === modul.id);
+    if (mevcutSekme) {
+      setAktifSekmeId(mevcutSekme.id);
+      return;
+    }
+
     sekmeAc(modul);
-  }, [location.pathname, aktifSekmeId, sekmeler, sekmeAc]);
+  }, [location.pathname, aktifSekmeId, sekmeler, sekmeAc, setAktifSekmeId]);
 
   async function logKaydet(islem: string, modulId?: string, aksiyonId?: string) {
     try {
@@ -198,7 +243,7 @@ function AdminPanelGovde() {
         sekmeler={sekmeler}
         aktifSekmeId={aktifSekmeId}
         onSekmeSec={sekmeSecHandler}
-        onSekmeKapat={sekmeKapat}
+        onSekmeKapat={sekmeKapatHandler}
         onSekmeTasi={sekmeTasi}
         onSekmeBirlestir={sekmeBirlestir}
         onModulSec={modulAcHandler}

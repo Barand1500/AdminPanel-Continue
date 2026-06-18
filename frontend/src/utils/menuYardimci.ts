@@ -6,6 +6,7 @@ import type { MenuOgesi, Sayfa, SayfaAcilisModu, SiteAyarlari } from '@/types/si
 import { blogAyarlariBirlestir } from '@/types/blog';
 import { idKarsilastir, idString } from '@/utils/idKarsilastir';
 import { sayfaAltMenuOgeleriOlustur } from '@/utils/sayfaAgaci';
+import { menuMetinCeviriAnahtar, siteCevirileriSenkronize } from '@/i18n/siteSozluk';
 
 export function yoldanSlug(yol: string): string | null {
   if (yol === '/') return 'ana-sayfa';
@@ -15,15 +16,26 @@ export function yoldanSlug(yol: string): string | null {
 
 export function menuOgeleriCevir(
   ogeler: MenuOgesi[],
-  sayfaBaslik: (slug: string, varsayilan: string) => string
+  sayfaBaslik: (slug: string, varsayilan: string) => string,
+  cevir?: (anahtar: string, varsayilan?: string) => string
 ): MenuOgesi[] {
+  const c = cevir ?? ((_k, v) => v ?? '');
   return ogeler.map((o) => {
-    const slug = yoldanSlug(o.yol);
+    const slug = linktenSlugCikar(o.yol);
+    let baslik = o.baslik;
+    if (slug) baslik = sayfaBaslik(slug, baslik);
+
+    const menuKey = menuMetinCeviriAnahtar(o.baslik);
+    if (menuKey) {
+      const menuCeviri = c(menuKey, '');
+      if (menuCeviri) baslik = menuCeviri;
+    }
+
     return {
       ...o,
-      baslik: slug ? sayfaBaslik(slug, o.baslik) : o.baslik,
+      baslik,
       altOgeler: o.altOgeler
-        ? menuOgeleriCevir(o.altOgeler, sayfaBaslik)
+        ? menuOgeleriCevir(o.altOgeler, sayfaBaslik, cevir)
         : undefined,
     };
   });
@@ -93,10 +105,39 @@ export function sayfaMenudenUstMenuAktar(sayfalar: AdminSayfa[]): UstMenuOgesi[]
 
 export function headerMenuOlustur(
   sayfalar: Sayfa[],
-  _headerAyarlari?: HeaderAyarlari | null,
+  headerAyarlari?: HeaderAyarlari | null,
   siteAyarlari?: SiteAyarlari | null
 ): MenuOgesi[] {
+  const ustMenu = headerAyarlari?.ustMenu ?? [];
+  if (ustMenu.length > 0) {
+    return ustMenuOgeleriOlustur(ustMenu, sayfalar);
+  }
   return menuOgeleriOlustur(sayfalar, blogAyarlariBirlestir(siteAyarlari));
+}
+
+/** Header dil çevirilerine sayfa ve menü başlıklarını otomatik ekler */
+export function headerDilCevirileriSenkronize(
+  header: HeaderAyarlari,
+  sayfalar: { slug: string; baslik: string; menudeGoster?: boolean }[]
+): HeaderAyarlari {
+  const dilDestegi = header.dilDestegi;
+  if (!dilDestegi) return header;
+
+  const kaynaklar = sayfalar
+    .filter((s) => s.menudeGoster !== false)
+    .map((s) => ({ slug: s.slug, baslik: s.baslik }));
+  const menuMetinleri = [
+    ...(header.ustMenu ?? []).map((m) => m.ad),
+    ...kaynaklar.map((s) => s.baslik),
+  ];
+
+  return {
+    ...header,
+    dilDestegi: {
+      ...dilDestegi,
+      ceviriler: siteCevirileriSenkronize(dilDestegi, kaynaklar, menuMetinleri),
+    },
+  };
 }
 
 export function ustMenuEsit(a: UstMenuOgesi[], b: UstMenuOgesi[]): boolean {

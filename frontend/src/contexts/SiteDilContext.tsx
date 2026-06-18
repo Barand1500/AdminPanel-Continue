@@ -1,7 +1,8 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { headerAyarlariBirlestir } from '@/types/header';
 import { aktifDiller, SITE_DIL_STORAGE } from '@/data/siteDilleri';
-import { sayfaCeviriAnahtar, siteCeviriBirlestir, SLUG_SITE_ANAHTAR } from '@/i18n/siteSozluk';
+import { siteCeviriBirlestir, SLUG_SITE_ANAHTAR, sayfaSlugCeviriAnahtarlari, menuMetinCeviriAnahtar } from '@/i18n/siteSozluk';
+import { sayfaSegmentSlug } from '@/utils/sayfaAgaci';
 import type { SiteAyarlari, Sayfa } from '@/types/site';
 
 interface SiteDilContextDegeri {
@@ -45,23 +46,35 @@ export function SiteDilProvider({
     return () => window.removeEventListener('site-dil-degisti', dinle);
   }, []);
 
+  const menuMetinleri = useMemo(() => {
+    const fromMenu = (header.ustMenu ?? []).map((m) => m.ad);
+    const fromSayfa = sayfalar?.filter((s) => s.menudeGoster !== false).map((s) => s.baslik) ?? [];
+    return [...new Set([...fromMenu, ...fromSayfa])];
+  }, [header.ustMenu, sayfalar]);
+
   const sozluk = useMemo(
     () =>
       siteCeviriBirlestir(
         dilKodu,
         dilDestegi.ceviriler?.[dilKodu],
         sayfalar?.map((s) => ({ slug: s.slug, baslik: s.baslik })),
-        dilDestegi.varsayilanDil
+        dilDestegi.varsayilanDil,
+        menuMetinleri,
+        dilDestegi.ceviriler
       ),
-    [dilKodu, dilDestegi.ceviriler, dilDestegi.varsayilanDil, sayfalar]
+    [dilKodu, dilDestegi.ceviriler, dilDestegi.varsayilanDil, sayfalar, menuMetinleri]
   );
 
   const sayfaBaslik = useCallback(
     (slug: string, varsayilan: string) => {
-      const sayfaKey = sayfaCeviriAnahtar(slug);
-      if (sozluk[sayfaKey]) return sozluk[sayfaKey];
-      const siteKey = SLUG_SITE_ANAHTAR[slug];
+      const temiz = slug.replace(/^\/+|\/+$/g, '');
+      for (const key of sayfaSlugCeviriAnahtarlari(temiz)) {
+        if (sozluk[key]) return sozluk[key];
+      }
+      const siteKey = SLUG_SITE_ANAHTAR[temiz] ?? SLUG_SITE_ANAHTAR[sayfaSegmentSlug(temiz)];
       if (siteKey && sozluk[siteKey]) return sozluk[siteKey];
+      const menuKey = menuMetinCeviriAnahtar(varsayilan);
+      if (menuKey && sozluk[menuKey]) return sozluk[menuKey];
       return varsayilan;
     },
     [sozluk]

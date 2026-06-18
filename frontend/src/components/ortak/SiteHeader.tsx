@@ -68,8 +68,8 @@ export function SiteHeader({ siteAdi, ayarlar, menuOgeleri }: SiteHeaderProps) {
   const [menuAcik, setMenuAcik] = useState(false);
   const { dilKodu, sayfaBaslik, cevir } = useSiteDil();
   const cevrilmisMenu = useMemo(
-    () => menuOgeleriCevir(menuOgeleri, sayfaBaslik),
-    [menuOgeleri, sayfaBaslik, dilKodu]
+    () => menuOgeleriCevir(menuOgeleri, sayfaBaslik, cevir),
+    [menuOgeleri, sayfaBaslik, cevir, dilKodu]
   );
   const header = headerAyarlariBirlestir(ayarlar);
   const ustBant = header.ustBant!;
