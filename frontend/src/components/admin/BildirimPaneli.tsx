@@ -7,6 +7,7 @@ import {
 } from '@/features/admin/bildirimApi';
 import { useAdminUyariBildirim } from '@/contexts/AdminUyariBildirimContext';
 import { AltPanel, AltPanelBos, AltPanelOge, AltPanelYukleniyor } from './ortak/AltPanel';
+import { ADMIN_BILDIRIM_YENILE, adminBildirimleriYenile } from '@/utils/adminBildirimOlaylari';
 
 interface BildirimPaneliProps {
   acik: boolean;
@@ -16,7 +17,7 @@ interface BildirimPaneliProps {
 
 export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProps) {
   const navigate = useNavigate();
-  const { uyariBildirimleri } = useAdminUyariBildirim();
+  const { uyariBildirimleri, tumUyarilariTemizle } = useAdminUyariBildirim();
   const [bildirimler, setBildirimler] = useState<AdminBildirim[]>([]);
   const [yukleniyor, setYukleniyor] = useState(false);
   const [islemMesaji, setIslemMesaji] = useState<string | null>(null);
@@ -44,7 +45,9 @@ export function BildirimPaneli({ acik, onKapat, onGuncelle }: BildirimPaneliProp
     try {
       await adminBildirimleriTumunuOkundu();
       setBildirimler([]);
+      tumUyarilariTemizle();
       onGuncelle?.();
+      adminBildirimleriYenile();
     } catch {
       setIslemMesaji('İşlem başarısız oldu.');
     }
@@ -111,7 +114,14 @@ export function useBildirimSayaci(pollingMs = 60_000) {
   useEffect(() => {
     void yenile();
     const timer = setInterval(() => void yenile(), pollingMs);
-    return () => clearInterval(timer);
+    function dinle() {
+      void yenile();
+    }
+    window.addEventListener(ADMIN_BILDIRIM_YENILE, dinle);
+    return () => {
+      clearInterval(timer);
+      window.removeEventListener(ADMIN_BILDIRIM_YENILE, dinle);
+    };
   }, [yenile, pollingMs]);
 
   return { okunmamisSayi: okunmamisSayi + uyariSayisi, yenile };

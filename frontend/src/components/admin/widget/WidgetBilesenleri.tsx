@@ -100,11 +100,9 @@ export function WidgetListesiPanel({ widgetlar, seciliId, tipFiltre, onSec }: Wi
 
   return (
     <aside className="ap-sidebar-panel ap-widget-sidebar">
-      <div className="ap-sidebar-baslik">
+      <div className="ap-sidebar-baslik ap-sidebar-baslik-dikey">
         <h2 className="ap-heading text-sm font-semibold">Widgetlar</h2>
-        <div className="mt-3">
-          <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Widget ara..." />
-        </div>
+        <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Widget ara..." />
       </div>
       <div className="ap-scroll ap-sidebar-icerik ap-widget-sidebar-icerik">
         {gruplu.length === 0 ? (

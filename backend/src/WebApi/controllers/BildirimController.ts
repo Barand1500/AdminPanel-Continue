@@ -7,9 +7,10 @@ const service = new BildirimService();
 export class BildirimController {
   async listele(req: Request, res: Response) {
     try {
+      if (!req.kullanici) return res.status(401).json({ mesaj: 'Yetkilendirme gerekli' });
       const siteId = cozulenSiteId(req);
       if (!siteId) return res.status(400).json({ mesaj: 'Site secimi gerekli' });
-      const veri = await service.listele(siteId);
+      const veri = await service.listele(siteId, req.kullanici.kullaniciId);
       return res.json(veri);
     } catch (err) {
       const mesaj = err instanceof Error ? err.message : 'Bildirimler alinamadi';
@@ -19,9 +20,10 @@ export class BildirimController {
 
   async tumunuOkundu(req: Request, res: Response) {
     try {
+      if (!req.kullanici) return res.status(401).json({ mesaj: 'Yetkilendirme gerekli' });
       const siteId = cozulenSiteId(req);
       if (!siteId) return res.status(400).json({ mesaj: 'Site secimi gerekli' });
-      await service.tumunuOkundu(siteId);
+      await service.tumunuOkundu(siteId, req.kullanici.kullaniciId);
       return res.json({ mesaj: 'Tum bildirimler okundu olarak isaretlendi' });
     } catch (err) {
       const mesaj = err instanceof Error ? err.message : 'Islem basarisiz';

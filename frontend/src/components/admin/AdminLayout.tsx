@@ -13,6 +13,7 @@ import { AltAksiyonCubugu } from './AltAksiyonCubugu';
 import { modulBul, modulYolundanBul } from '@/data/adminMenuYapisi';
 import { AdminModulIcerik } from './AdminModulIcerik';
 import { adminLogApi } from '@/features/admin/adminSistemApi';
+import { adminBildirimleriYenile } from '@/utils/adminBildirimOlaylari';
 import { GirisSayfasi } from '@/pages/admin/GirisSayfasi';
 import { ModulRehberSistemi } from '@/components/admin/ortak/ModulRehberSistemi';
 import { PanelDilKabuk } from '@/components/admin/PanelDilKabuk';
@@ -185,6 +186,7 @@ function AdminPanelGovde() {
   async function logKaydet(islem: string, modulId?: string, aksiyonId?: string) {
     try {
       await adminLogApi.kaydet({ islem, modulId, aksiyonId });
+      adminBildirimleriYenile();
     } catch {
       // log hatasi paneli bloke etmesin
     }
