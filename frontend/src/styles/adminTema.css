@@ -2408,6 +2408,11 @@ html:has(.admin-panel[data-tema='acik']) body {
   transition: border-color 0.15s, background-color 0.15s;
 }
 
+.ap-sosyal-ikon-btn svg {
+  display: block;
+  flex-shrink: 0;
+}
+
 .ap-sosyal-ikon-btn:hover {
   border-color: color-mix(in srgb, var(--ap-accent) 45%, var(--ap-border));
 }

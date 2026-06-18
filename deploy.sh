@@ -33,8 +33,9 @@ if [ ! -d "$SITE/repo/.git" ]; then
 fi
 
 cd "$SITE/repo"
-git pull origin "$GIT_BRANCH"
-echo "[1/5] Git pull tamam"
+git fetch origin "$GIT_BRANCH"
+git reset --hard "origin/$GIT_BRANCH"
+echo "[1/5] Git guncellendi (origin/$GIT_BRANCH)"
 
 cd "$SITE/repo"
 npm install
