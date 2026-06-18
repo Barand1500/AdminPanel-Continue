@@ -11,6 +11,13 @@ interface MenuDropdownProps {
   onClick?: () => void;
 }
 
+interface MenuIcGrupProps {
+  oge: MenuOgesi;
+  onClick?: () => void;
+  derinlik?: number;
+  mobil?: boolean;
+}
+
 export function MenuDropdown({ oge, className, linkClassName, style, onClick }: MenuDropdownProps) {
   const [acik, setAcik] = useState(false);
   const wrapRef = useRef<HTMLDivElement>(null);
@@ -68,6 +75,7 @@ export function MenuDropdown({ oge, className, linkClassName, style, onClick }: 
     setAcik((v) => !v);
   }
 
+  const mobil = className.includes('mobil');
   const tetikSinif = `site-menu-dropdown-tetik ${linkClassName} ${acik ? 'site-menu-dropdown-tetik-acik' : ''}`;
   const panelGorunur = acik && altOgeler.length > 0;
 
@@ -133,14 +141,7 @@ export function MenuDropdown({ oge, className, linkClassName, style, onClick }: 
             )}
             {altOgeler.map((alt) =>
               alt.altOgeler && alt.altOgeler.length > 0 ? (
-                <div key={alt.yol} className="site-menu-dropdown-ic-oge">
-                  <MenuDropdown
-                    oge={alt}
-                    className="site-menu-dropdown-ic"
-                    linkClassName="site-menu-dropdown-alt-link"
-                    onClick={onClick}
-                  />
-                </div>
+                <MenuIcGrup key={alt.yol} oge={alt} onClick={onClick} mobil={mobil} />
               ) : (
                 <MenuNavLink
                   key={alt.yol}
@@ -154,6 +155,106 @@ export function MenuDropdown({ oge, className, linkClassName, style, onClick }: 
               )
             )}
           </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+function MenuIcGrup({ oge, onClick, derinlik = 0, mobil = false }: MenuIcGrupProps) {
+  const [acik, setAcik] = useState(false);
+  const kapatTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const altOgeler = oge.altOgeler ?? [];
+  const hoverMod = !mobil && oge.altMenuTetikleyici !== 'tikla';
+  const tiklaModu = !hoverMod;
+  const icerikVar = oge.icerikVar === true;
+
+  useEffect(() => {
+    return () => {
+      if (kapatTimerRef.current) clearTimeout(kapatTimerRef.current);
+    };
+  }, []);
+
+  function grupAc() {
+    if (!hoverMod) return;
+    if (kapatTimerRef.current) {
+      clearTimeout(kapatTimerRef.current);
+      kapatTimerRef.current = null;
+    }
+    setAcik(true);
+  }
+
+  function grupKapatGecikmeli() {
+    if (!hoverMod) return;
+    if (kapatTimerRef.current) clearTimeout(kapatTimerRef.current);
+    kapatTimerRef.current = setTimeout(() => setAcik(false), 160);
+  }
+
+  function tetikTikla(e: ReactMouseEvent<HTMLButtonElement>) {
+    if (hoverMod) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setAcik((v) => !v);
+  }
+
+  const tetikSinif = `site-menu-ic-grup-tetik site-menu-dropdown-alt-link ${acik ? 'site-menu-ic-grup-tetik-acik' : ''}`;
+  const tetikIcerik = (
+    <>
+      <span className="site-menu-ic-grup-baslik">{oge.baslik}</span>
+      <MenuOk acik={acik} />
+    </>
+  );
+
+  return (
+    <div
+      className={`site-menu-ic-grup ${acik ? 'site-menu-ic-grup-acik' : ''} ${hoverMod ? 'site-menu-ic-grup-hover' : 'site-menu-ic-grup-tikla'}`}
+      style={{ '--menu-ic-derinlik': derinlik } as CSSProperties}
+      onMouseEnter={grupAc}
+      onMouseLeave={grupKapatGecikmeli}
+    >
+      {hoverMod && icerikVar ? (
+        <Link
+          to={oge.yol}
+          className={tetikSinif}
+          onClick={() => {
+            onClick?.();
+          }}
+        >
+          {tetikIcerik}
+        </Link>
+      ) : (
+        <button
+          type="button"
+          className={tetikSinif}
+          aria-expanded={acik}
+          aria-haspopup="true"
+          onClick={tetikTikla}
+        >
+          {tetikIcerik}
+        </button>
+      )}
+
+      {acik && altOgeler.length > 0 && (
+        <div className="site-menu-ic-grup-alt-liste" role="menu">
+          {tiklaModu && icerikVar && (
+            <MenuNavLink
+              oge={oge}
+              className="site-menu-dropdown-alt-link site-menu-ic-grup-ust-link"
+              onClick={onClick}
+            />
+          )}
+          {altOgeler.map((alt) =>
+            alt.altOgeler && alt.altOgeler.length > 0 ? (
+              <MenuIcGrup key={alt.yol} oge={alt} onClick={onClick} derinlik={derinlik + 1} mobil={mobil} />
+            ) : (
+              <MenuNavLink
+                key={alt.yol}
+                oge={alt}
+                className="site-menu-dropdown-alt-link"
+                onClick={onClick}
+              />
+            )
+          )}
         </div>
       )}
     </div>
