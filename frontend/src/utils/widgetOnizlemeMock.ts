@@ -382,6 +382,30 @@ function mockConfig(tip: string): WidgetConfig {
           pazarKapanis: 'Kapalı',
         },
       };
+    case 'BLOK_OLUSTURUCU':
+      return {
+        olusturucu: {
+          parcaSayisi: 2,
+          duzen: 'yan_yana',
+          hucreler: [
+            {
+              id: id(),
+              bloklar: [
+                { id: id(), tip: 'baslik', metin: 'Örnek Başlık' },
+                { id: id(), tip: 'metin', metin: 'Grid parçalarıyla oluşturulmuş örnek widget.' },
+                { id: id(), tip: 'buton', butonMetni: 'Detay', butonLink: '#' },
+              ],
+            },
+            {
+              id: id(),
+              bloklar: [
+                { id: id(), tip: 'gorsel', gorselUrl: ONIZLEME_GORSEL, metin: 'Görsel' },
+                { id: id(), tip: 'yildiz', yildiz: 5 },
+              ],
+            },
+          ],
+        },
+      };
     default:
       return {};
   }

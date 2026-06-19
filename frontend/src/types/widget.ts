@@ -1,6 +1,7 @@
 import type { CSSProperties } from 'react';
 import type { WidgetFormDegeri } from '@/types/admin';
 import type { Widget } from '@/types/site';
+import type { BlokOlusturucuConfig } from '@/types/blokOlusturucu';
 import type {
   GorselKonumu,
   KartStili,
@@ -49,6 +50,7 @@ export const MODERN_WIDGET_TIPLERI = [
   'VIDEO_BANNER',
   'ONCESI_SONRASI',
   'BULTEN_KAYIT',
+  'BLOK_OLUSTURUCU',
   ...HABER_PORTAL_WIDGET_TIPLERI,
 ] as const;
 
@@ -118,6 +120,7 @@ export const WIDGET_GORUNUM_GRID_TIPLERI = new Set([
   'SAYAC_BLOK',
   'YORUM_KARUSEL',
   'FIYATLANDIRMA',
+  'BLOK_OLUSTURUCU',
   'KARSILASTIRMA_TABLOSU',
   ...HABER_PORTAL_WIDGET_TIPLERI,
 ]);
@@ -161,6 +164,10 @@ export interface WidgetGorunumAyarlari {
   baslikCizgi?: boolean;
   /** Bölüm başlık ikonu (emoji) */
   baslikIkon?: string;
+  yildizGoster?: boolean;
+  yildizRengi?: string;
+  kartFooterArkaPlan?: string;
+  kartGolge?: boolean;
 }
 
 export interface WidgetEkAyarlar {
@@ -254,6 +261,7 @@ export interface WidgetYorum {
   ad: string;
   firma: string;
   gorselUrl?: string;
+  yildiz?: number;
 }
 
 export interface WidgetFiyatOzellik {
@@ -379,6 +387,7 @@ export interface WidgetConfig {
   kriptoKaynak?: 'api' | 'manuel';
   kriptoLimit?: number;
   kriptoSemboller?: string[];
+  olusturucu?: BlokOlusturucuConfig;
 }
 
 export function uid() {
@@ -538,6 +547,13 @@ export function varsayilanConfig(tip: string): WidgetConfig {
       };
     case 'HABER_MAGAZIN':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3 }, ek, haberKartlari: [], tumunuGorMetin: '+ Tümünü Görüntüle', tumunuGorLink: '#' };
+    case 'BLOK_OLUSTURUCU':
+      return {
+        yerlesim,
+        gorunum: { ...gorunum, kolonSayisi: 2, padding: 'normal', borderRadius: 12 },
+        ek,
+        olusturucu: { parcaSayisi: 0, duzen: 'yan_yana', hucreler: [] },
+      };
     default:
       return { yerlesim, gorunum, ek };
   }

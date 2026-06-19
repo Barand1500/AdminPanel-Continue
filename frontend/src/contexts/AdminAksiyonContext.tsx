@@ -9,10 +9,11 @@ import {
 } from 'react';
 import { adminIslemBildirimi } from '@/utils/adminBildirimOlaylari';
 
-export type AksiyonId = 'kaydet' | 'guncelle' | 'ekle' | 'altEkle' | 'sil' | 'onizle' | 'yayinla';
+export type AksiyonId = 'kaydet' | 'hizliKaydet' | 'guncelle' | 'ekle' | 'altEkle' | 'sil' | 'onizle' | 'yayinla';
 
 export interface AksiyonHandlerlar {
   kaydet?: () => Promise<void> | void;
+  hizliKaydet?: () => Promise<void> | void;
   guncelle?: () => Promise<void> | void;
   ekle?: () => void;
   altEkle?: () => void;
@@ -31,6 +32,7 @@ export interface AksiyonGeriBildirim {
 
 const AKSİYON_BASARI: Partial<Record<AksiyonId, string>> = {
   kaydet: 'Kaydedildi',
+  hizliKaydet: 'Siteye eklendi',
   guncelle: 'Güncellendi',
   ekle: 'Eklendi',
   sil: 'Silindi',
@@ -126,6 +128,7 @@ export function AdminAksiyonProvider({ children }: { children: ReactNode }) {
 
       try {
         if (id === 'kaydet' && handlers.kaydet) await handlers.kaydet();
+        else if (id === 'hizliKaydet' && handlers.hizliKaydet) await handlers.hizliKaydet();
         else if (id === 'guncelle' && handlers.guncelle) await handlers.guncelle();
         else if (id === 'ekle' && handlers.ekle) handlers.ekle();
         else if (id === 'altEkle' && handlers.altEkle) handlers.altEkle();

@@ -37,6 +37,7 @@ import {
   SekmeliHaberWidget,
   VideoGalerisiWidget,
 } from './haber/HaberPortalWidgetleri';
+import { BlokOlusturucuWidget } from './BlokOlusturucuWidget';
 import { configOkuFromWidget, haritaEmbedUrl, widgetSectionClass, widgetSectionStyle } from './widgetHelpers';
 
 interface WidgetRenderProps {
@@ -122,6 +123,8 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
         return <SirketGirisCikisWidget widget={widget} />;
       case 'HABER_MAGAZIN':
         return <HaberMagazinWidget widget={widget} />;
+      case 'BLOK_OLUSTURUCU':
+        return <BlokOlusturucuWidget widget={widget} />;
       case 'HARITA': {
         const cfg = configOkuFromWidget(widget);
         const src = haritaEmbedUrl(cfg.haritaUrl, cfg.haritaLat, cfg.haritaLng, cfg.haritaZoom ?? 14);

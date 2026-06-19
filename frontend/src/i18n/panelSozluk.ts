@@ -35,6 +35,7 @@ export const PANEL_SOZLUK_TR: Record<string, string> = {
 
   // Aksiyonlar
   'aksiyon.kaydet': 'Kaydet',
+  'aksiyon.hizliKaydet': 'Hızlı Kaydet',
   'aksiyon.sil': 'Sil',
   'aksiyon.ekle': 'Yeni Ekle',
   'aksiyon.guncelle': 'Güncelle',
@@ -106,6 +107,7 @@ export const PANEL_SOZLUK_EN: Record<string, string> = {
   'footer.logTakibi': 'View Logs',
 
   'aksiyon.kaydet': 'Save',
+  'aksiyon.hizliKaydet': 'Quick Save',
   'aksiyon.sil': 'Delete',
   'aksiyon.ekle': 'Add New',
   'aksiyon.guncelle': 'Update',

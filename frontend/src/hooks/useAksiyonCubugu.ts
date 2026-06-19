@@ -59,6 +59,7 @@ const modulAksiyonlari: Record<string, AksiyonButonu[]> = {
   ],
   'widget-yonetimi': [
     A('kaydet', 'Kaydet', true),
+    A('hizliKaydet', 'Hızlı Kaydet', true),
     A('ekle', 'Yeni Ekle', true, true),
     A('sil', 'Sil', true),
     A('onizle', 'Önizle', true),
@@ -147,6 +148,7 @@ const MODUL_AKSIYON_YETKI: Partial<Record<string, Partial<Record<AksiyonId, Yetk
 
 const AKSIYON_YETKI: Partial<Record<AksiyonId, YetkiKodu>> = {
   kaydet: 'duzenleme',
+  hizliKaydet: 'duzenleme',
   guncelle: 'duzenleme',
   ekle: 'ekleme',
   altEkle: 'ekleme',

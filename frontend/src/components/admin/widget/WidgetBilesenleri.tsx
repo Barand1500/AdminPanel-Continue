@@ -190,7 +190,9 @@ export function WidgetListesiPanel({
   );
 }
 
-type EditorSekme = 'genel' | 'icerik' | 'gorunum' | 'gelismis';
+import { WidgetEklemePanel } from './olusturucu/WidgetEklemePanel';
+
+type EditorSekme = 'genel' | 'icerik' | 'gorunum' | 'gelismis' | 'widgetEkleme';
 
 interface WidgetEditorPanelProps {
   form: WidgetFormDegeri;
@@ -234,6 +236,18 @@ export function WidgetEditorPanel({
   useEffect(() => {
     onOtomatikDoldurChange?.(otomatikDoldur);
   }, [otomatikDoldur, onOtomatikDoldurChange]);
+
+  useEffect(() => {
+    if (yeniMod && form.tip === 'BLOK_OLUSTURUCU') {
+      setSekme('widgetEkleme');
+    }
+  }, [yeniMod, form.tip, widgetAnahtar]);
+
+  useEffect(() => {
+    if (form.tip === 'BLOK_OLUSTURUCU' && sekme === 'icerik') {
+      setSekme('widgetEkleme');
+    }
+  }, [form.tip, sekme]);
 
   useEffect(() => {
     if (oncekiAnahtarRef.current === widgetAnahtar) return;
@@ -327,11 +341,14 @@ export function WidgetEditorPanel({
             { id: 'icerik', etiket: 'İçerik', ikon: '📝' },
             { id: 'gorunum', etiket: 'Görünüm', ikon: '🎨' },
             { id: 'gelismis', etiket: 'Ek Ayarlar', ikon: '🔧' },
+            ...(form.tip === 'BLOK_OLUSTURUCU'
+              ? [{ id: 'widgetEkleme' as const, etiket: 'Widget Ekleme', ikon: '➕' }]
+              : []),
           ]}
         />
       </div>
 
-      <div className="ap-editor-icerik">
+      <div className={`ap-editor-icerik${sekme === 'widgetEkleme' ? ' ap-editor-icerik-ekleme' : ''}`}>
         {sekme === 'genel' && (
           <>
             {yeniMod && (
@@ -434,6 +451,15 @@ export function WidgetEditorPanel({
         {sekme === 'gorunum' && <OrtakGorunumPanel form={form} onChange={onChange} />}
 
         {sekme === 'gelismis' && <EkAyarlarPanel form={form} onChange={onChange} />}
+
+        {sekme === 'widgetEkleme' && form.tip === 'BLOK_OLUSTURUCU' && (
+          <WidgetEklemePanel
+            form={form}
+            onChange={onChange}
+            tumWidgetlar={tumWidgetlar}
+            onGenelSekmesi={() => setSekme('genel')}
+          />
+        )}
 
         {hata && <p className="text-sm text-red-400">{hata}</p>}
         {kaydediliyor && <p className="ap-muted text-sm">Kaydediliyor...</p>}

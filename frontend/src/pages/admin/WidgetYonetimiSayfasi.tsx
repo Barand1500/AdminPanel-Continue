@@ -16,13 +16,28 @@ import { widgetGuncelle, widgetOlustur, widgetSil, widgetlariGetir } from '@/fea
 import { adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 import { sonrakiWidgetSira, siraCakismasiBul } from '@/utils/widgetSiraYardimci';
+import { configOku } from '@/types/widget';
+import { olusturucuOku } from '@/types/blokOlusturucu';
+import { olusturucuDoluMu } from '@/components/admin/widget/olusturucu/blokOlusturucuYardimci';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
+
+const YENI_WIDGET_TIPI = 'BLOK_OLUSTURUCU';
+
+function varsayilanYeniTip(filtre?: string) {
+  return filtre ?? YENI_WIDGET_TIPI;
+}
 
 function kaydetHazirMi(form: WidgetFormDegeri) {
   return Boolean(
     form.tip &&
     (form.ad.trim() || form.baslik.trim() || tipEtiketi(form.tip))
   );
+}
+
+function hizliKaydetHazirMi(form: WidgetFormDegeri) {
+  if (form.tip !== 'BLOK_OLUSTURUCU') return false;
+  const cfg = configOku(form);
+  return kaydetHazirMi(form) && olusturucuDoluMu(olusturucuOku(cfg));
 }
 
 interface WidgetYonetimiSayfasiProps {
@@ -32,7 +47,7 @@ interface WidgetYonetimiSayfasiProps {
 export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiProps) {
   const [widgetlar, setWidgetlar] = useState<AdminWidget[]>([]);
   const [sayfalar, setSayfalar] = useState<AdminSayfa[]>([]);
-  const [form, setForm] = useState<WidgetFormDegeri>(varsayilanWidgetForm(varsayilanTip ?? 'SLIDER'));
+  const [form, setForm] = useState<WidgetFormDegeri>(varsayilanWidgetForm(varsayilanYeniTip(varsayilanTip)));
   const [yukleniyor, setYukleniyor] = useState(true);
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [hata, setHata] = useState('');
@@ -84,7 +99,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
 
   const yeniBaslat = useCallback(() => {
     setSeciliId(null);
-    setForm(varsayilanWidgetForm(varsayilanTip ?? 'SLIDER', widgetlar));
+    setForm(varsayilanWidgetForm(varsayilanYeniTip(varsayilanTip), widgetlar));
     setBasari('');
     setHata('');
     setOnizlemeHazir(true);
@@ -112,7 +127,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
       const kalan = widgetlar.filter((w) => w.id !== seciliId);
       setWidgetlar(kalan);
       setSeciliId(null);
-      setForm(varsayilanWidgetForm(varsayilanTip ?? 'SLIDER', kalan));
+      setForm(varsayilanWidgetForm(varsayilanYeniTip(varsayilanTip), kalan));
       setBasari('Widget silindi.');
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Silme başarısız');
@@ -121,15 +136,26 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
     }
   }, [seciliId, varsayilanTip]);
 
+  const hizliKaydetFooter = useCallback(async () => {
+    setHata('');
+    try {
+      await kaydet(form, seciliId ?? undefined, { hizli: true });
+    } catch (err) {
+      setHata(err instanceof Error ? err.message : 'Hızlı kayıt başarısız');
+    }
+  }, [form, seciliId, widgetlar]);
+
   useModulAksiyonlari(
     {
       kaydet: kaydetFooter,
+      hizliKaydet: hizliKaydetFooter,
       ekle: yeniBaslat,
       sil: silHandler,
       onizle: () => setOnizlemeAcik(true),
     },
     {
       kaydet: !kaydediliyor && kaydetHazirMi(form),
+      hizliKaydet: !kaydediliyor && hizliKaydetHazirMi(form),
       ekle: true,
       sil: !!seciliId && !kaydediliyor,
       onizle: onizlemeHazir && !kaydediliyor,
@@ -141,26 +167,29 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
     [widgetlar, seciliId]
   );
 
-  async function kaydet(deger: WidgetFormDegeri, widgetId?: string) {
+  async function kaydet(deger: WidgetFormDegeri, widgetId?: string, opts?: { hizli?: boolean }) {
     const ad = deger.ad.trim() || deger.baslik.trim() || tipEtiketi(deger.tip);
     if (!ad) {
       setHata('Widget adı veya içerik başlığı gerekli');
       throw new Error('Widget adı veya içerik başlığı gerekli');
     }
-    const kayitDegeri = deger.ad.trim() ? deger : { ...deger, ad };
+    let kayitDegeri = deger.ad.trim() ? deger : { ...deger, ad };
+    if (deger.tip === 'BLOK_OLUSTURUCU') {
+      kayitDegeri = { ...kayitDegeri, aktif: Boolean(opts?.hizli) };
+    }
     setKaydediliyor(true);
     setHata('');
     try {
       if (widgetId) {
         const guncel = await widgetGuncelle(widgetId, kayitDegeri);
         setWidgetlar((onceki) => onceki.map((w) => (w.id === guncel.id ? guncel : w)));
-        setBasari('Widget güncellendi.');
+        setBasari(opts?.hizli ? 'Widget siteye eklendi.' : 'Widget güncellendi.');
       } else {
         const yeni = await widgetOlustur(kayitDegeri);
         setWidgetlar((onceki) => [yeni, ...onceki]);
         setSeciliId(yeni.id);
         setForm(widgettenForma(yeni));
-        setBasari('Yeni widget oluşturuldu.');
+        setBasari(opts?.hizli ? 'Widget siteye eklendi.' : 'Yeni widget oluşturuldu (pasif).');
       }
     } finally {
       setKaydediliyor(false);
