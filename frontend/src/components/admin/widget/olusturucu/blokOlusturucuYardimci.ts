@@ -1,5 +1,6 @@
+import type { CSSProperties } from 'react';
 import type { BlokHucre, BlokOlusturucuConfig, BlokTipi, WidgetBlok } from '@/types/blokOlusturucu';
-import { bosOlusturucu, olusturucuOku } from '@/types/blokOlusturucu';
+import { VARSAYILAN_GORSEL_YUKSEKLIK, bosOlusturucu, olusturucuOku } from '@/types/blokOlusturucu';
 import { uid } from '@/types/widget';
 
 export { bosOlusturucu, olusturucuOku };
@@ -18,6 +19,10 @@ export function olusturucuDoluMu(olusturucu?: BlokOlusturucuConfig | null) {
   return olusturucu.hucreler.some(hucreDoluMu);
 }
 
+function gorselDefaults(): Pick<WidgetBlok, 'gorselYukseklikPx' | 'gorselGenislik'> {
+  return { gorselYukseklikPx: VARSAYILAN_GORSEL_YUKSEKLIK, gorselGenislik: 'tam' };
+}
+
 export function varsayilanBlok(tip: BlokTipi): WidgetBlok {
   const id = uid();
   switch (tip) {
@@ -26,7 +31,7 @@ export function varsayilanBlok(tip: BlokTipi): WidgetBlok {
     case 'metin':
       return { id, tip, metin: 'Paragraf metni buraya yazılır.' };
     case 'gorsel':
-      return { id, tip, gorselUrl: '', metin: 'Görsel' };
+      return { id, tip, gorselUrl: '', metin: 'Görsel', ...gorselDefaults() };
     case 'tarih':
       return { id, tip, tarih: new Date().toISOString().slice(0, 10) };
     case 'buton':
@@ -63,8 +68,69 @@ export function varsayilanBlok(tip: BlokTipi): WidgetBlok {
         kartMetin: 'Kısa açıklama metni buraya gelir.',
         kartGorselUrl: '',
         kartLink: '#',
+        ...gorselDefaults(),
+      };
+    case 'video':
+      return {
+        id,
+        tip,
+        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        videoKapakUrl: '',
+        metin: 'Video başlığı',
+        ...gorselDefaults(),
+      };
+    case 'sayac':
+      return { id, tip, sayacDeger: 250, sayacSonEk: '+', sayacEtiket: 'Mutlu Müşteri' };
+    case 'fiyat':
+      return {
+        id,
+        tip,
+        paketAd: 'Standart Paket',
+        fiyatMetin: '₺999',
+        ozellikler: ['Özellik 1', 'Özellik 2', 'Özellik 3'],
+        butonMetni: 'Satın Al',
+        butonLink: '#',
+      };
+    case 'yorum_tek':
+      return {
+        id,
+        tip,
+        yorumMetin: 'Harika bir deneyimdi, kesinlikle tavsiye ederim.',
+        yorumAd: 'Ayşe Y.',
+        yorumFirma: 'Müşteri',
+        yildiz: 5,
+      };
+    case 'link_satir':
+      return { id, tip, linkIkon: '🔗', linkMetin: 'Detaylı bilgi', linkUrl: '#' };
+    case 'badge':
+      return { id, tip, badgeMetin: 'Yeni' };
+    case 'ayirici':
+      return { id, tip };
+    case 'liste':
+      return {
+        id,
+        tip,
+        listeSatirlari: ['Madde bir', 'Madde iki', 'Madde üç'],
+      };
+    case 'cta_serit':
+      return {
+        id,
+        tip,
+        ctaMetin: 'Hemen başlayın, farkı görün.',
+        butonMetni: 'İletişime Geç',
+        butonLink: '#',
       };
     default:
       return { id, tip: 'metin', metin: '' };
   }
+}
+
+export function gorselBlokStili(blok: WidgetBlok): CSSProperties {
+  const genislikMap = { tam: '100%', yari: '50%', uc_ceyrek: '75%' } as const;
+  return {
+    height: blok.gorselYukseklikPx ?? VARSAYILAN_GORSEL_YUKSEKLIK,
+    width: genislikMap[blok.gorselGenislik ?? 'tam'],
+    maxWidth: '100%',
+    objectFit: 'cover',
+  };
 }

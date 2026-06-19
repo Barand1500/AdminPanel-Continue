@@ -244,12 +244,6 @@ export function WidgetEditorPanel({
   }, [yeniMod, form.tip, widgetAnahtar]);
 
   useEffect(() => {
-    if (form.tip === 'BLOK_OLUSTURUCU' && sekme === 'icerik') {
-      setSekme('widgetEkleme');
-    }
-  }, [form.tip, sekme]);
-
-  useEffect(() => {
     if (oncekiAnahtarRef.current === widgetAnahtar) return;
     oncekiAnahtarRef.current = widgetAnahtar;
     oncekiTipRef.current = form.tip;

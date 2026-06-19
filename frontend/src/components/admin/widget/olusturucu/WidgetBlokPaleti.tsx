@@ -1,4 +1,11 @@
-import { BLOK_PALET, type BlokIkonOgesi, type BlokTipi, type WidgetBlok } from '@/types/blokOlusturucu';
+import {
+  BLOK_PALET,
+  BLOK_PALET_KATEGORILERI,
+  type BlokGorselGenislik,
+  type BlokIkonOgesi,
+  type BlokTipi,
+  type WidgetBlok,
+} from '@/types/blokOlusturucu';
 import { uid } from '@/types/widget';
 import { formInputSinifi } from '@/components/form/FormAlani';
 
@@ -7,6 +14,44 @@ interface WidgetBlokPaletiProps {
   hucreSecili: boolean;
   onParcaEkle: (tip: BlokTipi) => void;
   onBlokGuncelle: (blok: WidgetBlok) => void;
+}
+
+function GorselBoyutEditor({
+  blok,
+  onBlokGuncelle,
+}: {
+  blok: WidgetBlok;
+  onBlokGuncelle: (blok: WidgetBlok) => void;
+}) {
+  return (
+    <>
+      <label className="ap-blok-alan">
+        <span className="ap-muted text-xs">Yükseklik (px)</span>
+        <input
+          type="number"
+          min={80}
+          max={600}
+          className={formInputSinifi}
+          value={blok.gorselYukseklikPx ?? 160}
+          onChange={(e) => onBlokGuncelle({ ...blok, gorselYukseklikPx: Number(e.target.value) })}
+        />
+      </label>
+      <label className="ap-blok-alan">
+        <span className="ap-muted text-xs">Genişlik</span>
+        <select
+          className={formInputSinifi}
+          value={blok.gorselGenislik ?? 'tam'}
+          onChange={(e) =>
+            onBlokGuncelle({ ...blok, gorselGenislik: e.target.value as BlokGorselGenislik })
+          }
+        >
+          <option value="tam">Tam</option>
+          <option value="uc_ceyrek">¾</option>
+          <option value="yari">Yarı</option>
+        </select>
+      </label>
+    </>
+  );
 }
 
 function IkonGrupEditor({
@@ -19,19 +64,7 @@ function IkonGrupEditor({
   const ikonlar = blok.ikonlar ?? [];
 
   function ikonGuncelle(index: number, parca: Partial<BlokIkonOgesi>) {
-    const liste = ikonlar.map((o, i) => (i === index ? { ...o, ...parca } : o));
-    onBlokGuncelle({ ...blok, ikonlar: liste });
-  }
-
-  function ikonEkle() {
-    onBlokGuncelle({
-      ...blok,
-      ikonlar: [...ikonlar, { id: uid(), ikon: '✨', etiket: 'Yeni ikon' }],
-    });
-  }
-
-  function ikonSil(index: number) {
-    onBlokGuncelle({ ...blok, ikonlar: ikonlar.filter((_, i) => i !== index) });
+    onBlokGuncelle({ ...blok, ikonlar: ikonlar.map((o, i) => (i === index ? { ...o, ...parca } : o)) });
   }
 
   return (
@@ -43,22 +76,310 @@ function IkonGrupEditor({
             value={o.ikon}
             onChange={(e) => ikonGuncelle(i, { ikon: e.target.value })}
             maxLength={4}
-            title="İkon (emoji)"
           />
           <input
             className={`${formInputSinifi} flex-1`}
             value={o.etiket}
             onChange={(e) => ikonGuncelle(i, { etiket: e.target.value })}
-            placeholder="Etiket"
           />
-          <button type="button" className="ap-olusturucu-blok-sil static" onClick={() => ikonSil(i)}>
+          <button
+            type="button"
+            className="ap-olusturucu-blok-sil static"
+            onClick={() => onBlokGuncelle({ ...blok, ikonlar: ikonlar.filter((_, j) => j !== i) })}
+          >
             ×
           </button>
         </div>
       ))}
-      <button type="button" className="ap-blok-mini-btn" onClick={ikonEkle}>
+      <button
+        type="button"
+        className="ap-blok-mini-btn"
+        onClick={() =>
+          onBlokGuncelle({ ...blok, ikonlar: [...ikonlar, { id: uid(), ikon: '✨', etiket: 'Yeni' }] })
+        }
+      >
         + İkon ekle
       </button>
+    </div>
+  );
+}
+
+function SatirListesiEditor({
+  blok,
+  alan,
+  onBlokGuncelle,
+}: {
+  blok: WidgetBlok;
+  alan: 'listeSatirlari' | 'ozellikler';
+  onBlokGuncelle: (blok: WidgetBlok) => void;
+}) {
+  const liste = (blok[alan] as string[] | undefined) ?? [];
+  return (
+    <label className="ap-blok-alan">
+      <span className="ap-muted text-xs">Her satır bir madde</span>
+      <textarea
+        className={`${formInputSinifi} min-h-[80px]`}
+        value={liste.join('\n')}
+        onChange={(e) =>
+          onBlokGuncelle({
+            ...blok,
+            [alan]: e.target.value.split('\n').map((s) => s.trim()).filter(Boolean),
+          })
+        }
+      />
+    </label>
+  );
+}
+
+function SeciliBlokEditor({
+  blok,
+  onBlokGuncelle,
+}: {
+  blok: WidgetBlok;
+  onBlokGuncelle: (blok: WidgetBlok) => void;
+}) {
+  const gorselBoyut = ['gorsel', 'kart', 'video'].includes(blok.tip);
+
+  return (
+    <div className="ap-blok-duzenle">
+      <p className="ap-blok-palet-baslik mt-4">Seçili parça</p>
+
+      {(blok.tip === 'baslik' || blok.tip === 'metin' || blok.tip === 'gorsel') && (
+        <label className="ap-blok-alan">
+          <span className="ap-muted text-xs">{blok.tip === 'gorsel' ? 'Alt metin' : 'Metin'}</span>
+          <textarea
+            className={`${formInputSinifi} min-h-[72px]`}
+            value={blok.metin ?? ''}
+            onChange={(e) => onBlokGuncelle({ ...blok, metin: e.target.value })}
+          />
+        </label>
+      )}
+
+      {blok.tip === 'gorsel' && (
+        <>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Görsel URL</span>
+            <input className={formInputSinifi} value={blok.gorselUrl ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, gorselUrl: e.target.value })} />
+          </label>
+          <GorselBoyutEditor blok={blok} onBlokGuncelle={onBlokGuncelle} />
+        </>
+      )}
+
+      {blok.tip === 'video' && (
+        <>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Video URL</span>
+            <input className={formInputSinifi} value={blok.videoUrl ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, videoUrl: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Kapak görsel URL</span>
+            <input className={formInputSinifi} value={blok.videoKapakUrl ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, videoKapakUrl: e.target.value })} />
+          </label>
+          <GorselBoyutEditor blok={blok} onBlokGuncelle={onBlokGuncelle} />
+        </>
+      )}
+
+      {blok.tip === 'kart' && (
+        <>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Kart başlığı</span>
+            <input className={formInputSinifi} value={blok.kartBaslik ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, kartBaslik: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Açıklama</span>
+            <textarea className={`${formInputSinifi} min-h-[60px]`} value={blok.kartMetin ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, kartMetin: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Görsel URL</span>
+            <input className={formInputSinifi} value={blok.kartGorselUrl ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, kartGorselUrl: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Link</span>
+            <input className={formInputSinifi} value={blok.kartLink ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, kartLink: e.target.value })} />
+          </label>
+          <GorselBoyutEditor blok={blok} onBlokGuncelle={onBlokGuncelle} />
+        </>
+      )}
+
+      {blok.tip === 'sayac' && (
+        <>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Değer</span>
+            <input type="number" className={formInputSinifi} value={blok.sayacDeger ?? 0} onChange={(e) => onBlokGuncelle({ ...blok, sayacDeger: Number(e.target.value) })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Son ek (+, % vb.)</span>
+            <input className={formInputSinifi} value={blok.sayacSonEk ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, sayacSonEk: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Etiket</span>
+            <input className={formInputSinifi} value={blok.sayacEtiket ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, sayacEtiket: e.target.value })} />
+          </label>
+        </>
+      )}
+
+      {blok.tip === 'fiyat' && (
+        <>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Paket adı</span>
+            <input className={formInputSinifi} value={blok.paketAd ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, paketAd: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Fiyat</span>
+            <input className={formInputSinifi} value={blok.fiyatMetin ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, fiyatMetin: e.target.value })} />
+          </label>
+          <SatirListesiEditor blok={blok} alan="ozellikler" onBlokGuncelle={onBlokGuncelle} />
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Buton metni</span>
+            <input className={formInputSinifi} value={blok.butonMetni ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, butonMetni: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Buton link</span>
+            <input className={formInputSinifi} value={blok.butonLink ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, butonLink: e.target.value })} />
+          </label>
+        </>
+      )}
+
+      {blok.tip === 'yorum_tek' && (
+        <>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Yorum</span>
+            <textarea className={`${formInputSinifi} min-h-[72px]`} value={blok.yorumMetin ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, yorumMetin: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Ad</span>
+            <input className={formInputSinifi} value={blok.yorumAd ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, yorumAd: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Firma / unvan</span>
+            <input className={formInputSinifi} value={blok.yorumFirma ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, yorumFirma: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Yıldız (1–5)</span>
+            <input type="number" min={1} max={5} className={formInputSinifi} value={blok.yildiz ?? 5} onChange={(e) => onBlokGuncelle({ ...blok, yildiz: Number(e.target.value) })} />
+          </label>
+        </>
+      )}
+
+      {blok.tip === 'link_satir' && (
+        <>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">İkon</span>
+            <input className={`${formInputSinifi} w-16`} value={blok.linkIkon ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, linkIkon: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Metin</span>
+            <input className={formInputSinifi} value={blok.linkMetin ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, linkMetin: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Link</span>
+            <input className={formInputSinifi} value={blok.linkUrl ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, linkUrl: e.target.value })} />
+          </label>
+        </>
+      )}
+
+      {blok.tip === 'badge' && (
+        <label className="ap-blok-alan">
+          <span className="ap-muted text-xs">Rozet metni</span>
+          <input className={formInputSinifi} value={blok.badgeMetin ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, badgeMetin: e.target.value })} />
+        </label>
+      )}
+
+      {blok.tip === 'liste' && <SatirListesiEditor blok={blok} alan="listeSatirlari" onBlokGuncelle={onBlokGuncelle} />}
+
+      {blok.tip === 'cta_serit' && (
+        <>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Metin</span>
+            <input className={formInputSinifi} value={blok.ctaMetin ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, ctaMetin: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Buton metni</span>
+            <input className={formInputSinifi} value={blok.butonMetni ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, butonMetni: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Buton link</span>
+            <input className={formInputSinifi} value={blok.butonLink ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, butonLink: e.target.value })} />
+          </label>
+        </>
+      )}
+
+      {blok.tip === 'ikon_grup' && <IkonGrupEditor blok={blok} onBlokGuncelle={onBlokGuncelle} />}
+
+      {blok.tip === 'combobox' && (
+        <>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Etiket</span>
+            <input className={formInputSinifi} value={blok.comboboxEtiket ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, comboboxEtiket: e.target.value })} />
+          </label>
+          <SatirListesiEditor
+            blok={{ ...blok, listeSatirlari: blok.secenekler }}
+            alan="listeSatirlari"
+            onBlokGuncelle={(g) =>
+              onBlokGuncelle({
+                ...blok,
+                secenekler: g.listeSatirlari,
+                seciliSecenek: g.listeSatirlari?.includes(blok.seciliSecenek ?? '') ? blok.seciliSecenek : g.listeSatirlari?.[0],
+              })
+            }
+          />
+        </>
+      )}
+
+      {blok.tip === 'toggle' && (
+        <>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Etiket</span>
+            <input className={formInputSinifi} value={blok.toggleEtiket ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, toggleEtiket: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan ap-blok-toggle-satir">
+            <span className="ap-muted text-xs">Varsayılan açık</span>
+            <input type="checkbox" checked={blok.toggleAcik ?? false} onChange={(e) => onBlokGuncelle({ ...blok, toggleAcik: e.target.checked })} />
+          </label>
+        </>
+      )}
+
+      {blok.tip === 'tarih' && (
+        <label className="ap-blok-alan">
+          <span className="ap-muted text-xs">Tarih</span>
+          <input type="date" className={formInputSinifi} value={blok.tarih ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, tarih: e.target.value })} />
+        </label>
+      )}
+
+      {blok.tip === 'buton' && (
+        <>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Buton metni</span>
+            <input className={formInputSinifi} value={blok.butonMetni ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, butonMetni: e.target.value })} />
+          </label>
+          <label className="ap-blok-alan">
+            <span className="ap-muted text-xs">Link</span>
+            <input className={formInputSinifi} value={blok.butonLink ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, butonLink: e.target.value })} />
+          </label>
+        </>
+      )}
+
+      {blok.tip === 'yildiz' && (
+        <label className="ap-blok-alan">
+          <span className="ap-muted text-xs">Yıldız (1–5)</span>
+          <input type="number" min={1} max={5} className={formInputSinifi} value={blok.yildiz ?? 5} onChange={(e) => onBlokGuncelle({ ...blok, yildiz: Number(e.target.value) })} />
+        </label>
+      )}
+
+      {blok.tip === 'bosluk' && (
+        <label className="ap-blok-alan">
+          <span className="ap-muted text-xs">Boşluk (px)</span>
+          <input type="number" min={4} max={120} className={formInputSinifi} value={blok.boslukPx ?? 16} onChange={(e) => onBlokGuncelle({ ...blok, boslukPx: Number(e.target.value) })} />
+        </label>
+      )}
+
+      {blok.tip === 'ayirici' && (
+        <p className="ap-muted text-xs">Yatay ayırıcı çizgi — ek ayar gerekmez.</p>
+      )}
+
+      {gorselBoyut && blok.tip !== 'gorsel' && blok.tip !== 'kart' && blok.tip !== 'video' && (
+        <GorselBoyutEditor blok={blok} onBlokGuncelle={onBlokGuncelle} />
+      )}
     </div>
   );
 }
@@ -75,208 +396,34 @@ export function WidgetBlokPaleti({
       <p className="ap-muted mb-3 text-xs">
         {hucreSecili ? 'Parçaya tıklayarak hücreye ekleyin.' : 'Önce ortadaki bir hücreyi seçin.'}
       </p>
-      <div className="ap-blok-palet-liste">
-        {BLOK_PALET.map((p) => (
-          <button
-            key={p.tip}
-            type="button"
-            className="ap-blok-palet-oge"
-            disabled={!hucreSecili}
-            onClick={() => onParcaEkle(p.tip)}
-          >
-            <span className="ap-blok-palet-ikon" aria-hidden>
-              {p.ikon}
-            </span>
-            <span>{p.etiket}</span>
-          </button>
-        ))}
-      </div>
 
-      {seciliBlok && (
-        <div className="ap-blok-duzenle">
-          <p className="ap-blok-palet-baslik mt-4">Seçili parça</p>
-          {(seciliBlok.tip === 'baslik' || seciliBlok.tip === 'metin' || seciliBlok.tip === 'gorsel') && (
-            <label className="ap-blok-alan">
-              <span className="ap-muted text-xs">{seciliBlok.tip === 'gorsel' ? 'Alt metin' : 'Metin'}</span>
-              <textarea
-                className={`${formInputSinifi} min-h-[72px]`}
-                value={seciliBlok.metin ?? ''}
-                onChange={(e) => onBlokGuncelle({ ...seciliBlok, metin: e.target.value })}
-              />
-            </label>
-          )}
-          {seciliBlok.tip === 'gorsel' && (
-            <label className="ap-blok-alan">
-              <span className="ap-muted text-xs">Görsel URL</span>
-              <input
-                className={formInputSinifi}
-                value={seciliBlok.gorselUrl ?? ''}
-                onChange={(e) => onBlokGuncelle({ ...seciliBlok, gorselUrl: e.target.value })}
-                placeholder="https://..."
-              />
-            </label>
-          )}
-          {seciliBlok.tip === 'kart' && (
-            <>
-              <label className="ap-blok-alan">
-                <span className="ap-muted text-xs">Kart başlığı</span>
-                <input
-                  className={formInputSinifi}
-                  value={seciliBlok.kartBaslik ?? ''}
-                  onChange={(e) => onBlokGuncelle({ ...seciliBlok, kartBaslik: e.target.value })}
-                />
-              </label>
-              <label className="ap-blok-alan">
-                <span className="ap-muted text-xs">Açıklama</span>
-                <textarea
-                  className={`${formInputSinifi} min-h-[60px]`}
-                  value={seciliBlok.kartMetin ?? ''}
-                  onChange={(e) => onBlokGuncelle({ ...seciliBlok, kartMetin: e.target.value })}
-                />
-              </label>
-              <label className="ap-blok-alan">
-                <span className="ap-muted text-xs">Görsel URL (opsiyonel)</span>
-                <input
-                  className={formInputSinifi}
-                  value={seciliBlok.kartGorselUrl ?? ''}
-                  onChange={(e) => onBlokGuncelle({ ...seciliBlok, kartGorselUrl: e.target.value })}
-                />
-              </label>
-              <label className="ap-blok-alan">
-                <span className="ap-muted text-xs">Link</span>
-                <input
-                  className={formInputSinifi}
-                  value={seciliBlok.kartLink ?? ''}
-                  onChange={(e) => onBlokGuncelle({ ...seciliBlok, kartLink: e.target.value })}
-                />
-              </label>
-            </>
-          )}
-          {seciliBlok.tip === 'ikon_grup' && (
-            <IkonGrupEditor blok={seciliBlok} onBlokGuncelle={onBlokGuncelle} />
-          )}
-          {seciliBlok.tip === 'combobox' && (
-            <>
-              <label className="ap-blok-alan">
-                <span className="ap-muted text-xs">Etiket</span>
-                <input
-                  className={formInputSinifi}
-                  value={seciliBlok.comboboxEtiket ?? ''}
-                  onChange={(e) => onBlokGuncelle({ ...seciliBlok, comboboxEtiket: e.target.value })}
-                />
-              </label>
-              <label className="ap-blok-alan">
-                <span className="ap-muted text-xs">Seçenekler (her satır bir seçenek)</span>
-                <textarea
-                  className={`${formInputSinifi} min-h-[80px]`}
-                  value={(seciliBlok.secenekler ?? []).join('\n')}
-                  onChange={(e) => {
-                    const secenekler = e.target.value.split('\n').map((s) => s.trim()).filter(Boolean);
-                    onBlokGuncelle({
-                      ...seciliBlok,
-                      secenekler,
-                      seciliSecenek: secenekler.includes(seciliBlok.seciliSecenek ?? '')
-                        ? seciliBlok.seciliSecenek
-                        : secenekler[0],
-                    });
-                  }}
-                />
-              </label>
-              <label className="ap-blok-alan">
-                <span className="ap-muted text-xs">Varsayılan seçim</span>
-                <select
-                  className={formInputSinifi}
-                  value={seciliBlok.seciliSecenek ?? ''}
-                  onChange={(e) => onBlokGuncelle({ ...seciliBlok, seciliSecenek: e.target.value })}
+      {BLOK_PALET_KATEGORILERI.map((kat) => {
+        const ogeler = BLOK_PALET.filter((p) => p.kategori === kat.id);
+        if (ogeler.length === 0) return null;
+        return (
+          <div key={kat.id} className="ap-blok-palet-kategori">
+            <p className="ap-blok-palet-kategori-baslik">{kat.etiket}</p>
+            <div className="ap-blok-palet-liste">
+              {ogeler.map((p) => (
+                <button
+                  key={p.tip}
+                  type="button"
+                  className="ap-blok-palet-oge"
+                  disabled={!hucreSecili}
+                  onClick={() => onParcaEkle(p.tip)}
                 >
-                  {(seciliBlok.secenekler ?? []).map((s) => (
-                    <option key={s} value={s}>
-                      {s}
-                    </option>
-                  ))}
-                </select>
-              </label>
-            </>
-          )}
-          {seciliBlok.tip === 'toggle' && (
-            <>
-              <label className="ap-blok-alan">
-                <span className="ap-muted text-xs">Etiket</span>
-                <input
-                  className={formInputSinifi}
-                  value={seciliBlok.toggleEtiket ?? ''}
-                  onChange={(e) => onBlokGuncelle({ ...seciliBlok, toggleEtiket: e.target.value })}
-                />
-              </label>
-              <label className="ap-blok-alan ap-blok-toggle-satir">
-                <span className="ap-muted text-xs">Varsayılan açık</span>
-                <input
-                  type="checkbox"
-                  checked={seciliBlok.toggleAcik ?? false}
-                  onChange={(e) => onBlokGuncelle({ ...seciliBlok, toggleAcik: e.target.checked })}
-                />
-              </label>
-            </>
-          )}
-          {seciliBlok.tip === 'tarih' && (
-            <label className="ap-blok-alan">
-              <span className="ap-muted text-xs">Tarih</span>
-              <input
-                type="date"
-                className={formInputSinifi}
-                value={seciliBlok.tarih ?? ''}
-                onChange={(e) => onBlokGuncelle({ ...seciliBlok, tarih: e.target.value })}
-              />
-            </label>
-          )}
-          {seciliBlok.tip === 'buton' && (
-            <>
-              <label className="ap-blok-alan">
-                <span className="ap-muted text-xs">Buton metni</span>
-                <input
-                  className={formInputSinifi}
-                  value={seciliBlok.butonMetni ?? ''}
-                  onChange={(e) => onBlokGuncelle({ ...seciliBlok, butonMetni: e.target.value })}
-                />
-              </label>
-              <label className="ap-blok-alan">
-                <span className="ap-muted text-xs">Link</span>
-                <input
-                  className={formInputSinifi}
-                  value={seciliBlok.butonLink ?? ''}
-                  onChange={(e) => onBlokGuncelle({ ...seciliBlok, butonLink: e.target.value })}
-                />
-              </label>
-            </>
-          )}
-          {seciliBlok.tip === 'yildiz' && (
-            <label className="ap-blok-alan">
-              <span className="ap-muted text-xs">Yıldız (1–5)</span>
-              <input
-                type="number"
-                min={1}
-                max={5}
-                className={formInputSinifi}
-                value={seciliBlok.yildiz ?? 5}
-                onChange={(e) => onBlokGuncelle({ ...seciliBlok, yildiz: Number(e.target.value) })}
-              />
-            </label>
-          )}
-          {seciliBlok.tip === 'bosluk' && (
-            <label className="ap-blok-alan">
-              <span className="ap-muted text-xs">Boşluk (px)</span>
-              <input
-                type="number"
-                min={4}
-                max={120}
-                className={formInputSinifi}
-                value={seciliBlok.boslukPx ?? 16}
-                onChange={(e) => onBlokGuncelle({ ...seciliBlok, boslukPx: Number(e.target.value) })}
-              />
-            </label>
-          )}
-        </div>
-      )}
+                  <span className="ap-blok-palet-ikon" aria-hidden>
+                    {p.ikon}
+                  </span>
+                  <span>{p.etiket}</span>
+                </button>
+              ))}
+            </div>
+          </div>
+        );
+      })}
+
+      {seciliBlok && <SeciliBlokEditor blok={seciliBlok} onBlokGuncelle={onBlokGuncelle} />}
     </aside>
   );
 }
