@@ -93,7 +93,7 @@ export function FooterOnizleme({
       }
     >
       {demoMod && (
-        <div className="mb-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200/90">
+        <div className="ap-onizleme-uyari mb-3">
           Bu önizleme sahte marka ve link verileri kullanır ({demo.siteAdi}). Gerçek logo, kolonlar ve iletişim bilgileriniz kayıttan sonra sitede görünür.
         </div>
       )}
