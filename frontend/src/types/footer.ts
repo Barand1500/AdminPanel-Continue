@@ -1,4 +1,11 @@
 import { logoBoyutuNormalize, VARSAYILAN_LOGO_BOYUTU, type LogoBoyutu } from './logo';
+import {
+  footerTipiNormalize,
+  footerTipEkBirlestir,
+  type FooterTipi,
+} from '@/data/footerTipleri';
+
+export type { FooterTipi };
 
 export type FooterSema = 'dort-kolon' | 'uc-kolon' | 'iki-kolon' | 'merkezi';
 export type FooterLinkIkon = 'chevron' | 'ok' | 'bullet' | 'yok';
@@ -73,7 +80,17 @@ export interface FooterGorselDekor {
   magazalar?: FooterMagazaBadge[];
 }
 
+export interface FooterTipEkAyarlari {
+  newsletterBaslik?: string;
+  newsletterPlaceholder?: string;
+  newsletterButon?: string;
+  kompaktKoyuTema?: boolean;
+  guvenVurgu?: boolean;
+}
+
 export interface FooterAyarlari {
+  footerTipi?: FooterTipi;
+  tipEk?: FooterTipEkAyarlari;
   sema: FooterSema;
   linkIkon: FooterLinkIkon;
   gorselDekor?: FooterGorselDekor;
@@ -214,7 +231,10 @@ function kolonOlustur(baslik: string, sira: number, linkler: { ad: string; link:
 }
 
 export function varsayilanFooterAyarlari(): FooterAyarlari {
+  const tip = footerTipiNormalize(undefined);
   return {
+    footerTipi: tip,
+    tipEk: footerTipEkBirlestir(tip),
     sema: 'dort-kolon',
     linkIkon: 'chevron',
     gorselDekor: {
@@ -285,7 +305,10 @@ export function footerAyarlariBirlestir(
   const ham = ayarlar?.footerAyarlariJson;
   if (!ham) return varsayilan;
 
+  const tip = footerTipiNormalize(ham.footerTipi);
   return {
+    footerTipi: tip,
+    tipEk: footerTipEkBirlestir(tip, ham.tipEk),
     sema: ham.sema ?? varsayilan.sema,
     linkIkon: ham.linkIkon ?? varsayilan.linkIkon,
     gorselDekor: {

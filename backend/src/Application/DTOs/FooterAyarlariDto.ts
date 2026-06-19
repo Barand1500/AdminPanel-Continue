@@ -52,6 +52,18 @@ const eskiYuzucuButonlarSchema = z.object({
 });
 
 export const footerAyarlariSchema = z.object({
+  footerTipi: z
+    .enum(['klasik', 'sade', 'kurumsal', 'magaza', 'merkezi', 'newsletter', 'kompakt', 'detayli'])
+    .optional(),
+  tipEk: z
+    .object({
+      newsletterBaslik: z.string().max(120).optional(),
+      newsletterPlaceholder: z.string().max(80).optional(),
+      newsletterButon: z.string().max(40).optional(),
+      kompaktKoyuTema: z.boolean().optional(),
+      guvenVurgu: z.boolean().optional(),
+    })
+    .optional(),
   sema: z.enum(['dort-kolon', 'uc-kolon', 'iki-kolon', 'merkezi']),
   linkIkon: z.enum(['chevron', 'ok', 'bullet', 'yok']),
   marka: z.object({

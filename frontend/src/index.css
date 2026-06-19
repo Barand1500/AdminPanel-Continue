@@ -232,6 +232,80 @@ body {
   @apply gap-10 py-12;
 }
 
+/* Footer tip varyantları */
+.footer-pazaryeri-band {
+  @apply border-t border-primary/10 bg-white/50;
+}
+
+.footer-pazaryeri-vurgulu {
+  @apply border-primary/20 bg-primary/5 py-1;
+}
+
+.footer-guven-band {
+  @apply border-t border-primary/10;
+}
+
+.footer-guven-vurgu {
+  @apply border-primary/25 bg-slate-50;
+}
+
+.footer-guven-vurgu .footer-guven-rozet {
+  @apply border-primary/30 bg-white px-4 py-2 text-sm font-medium shadow-sm;
+}
+
+.footer-guven-rozet {
+  @apply rounded-lg border border-primary/20 bg-white px-3 py-1.5;
+}
+
+.footer-telif-band {
+  @apply border-t border-primary/10 bg-white/80;
+}
+
+.footer-newsletter-cta {
+  @apply border-t border-primary/15 bg-primary/5;
+}
+
+.footer-newsletter-btn {
+  background-color: var(--color-primary);
+}
+
+.footer-kompakt-ic {
+  @apply text-sm;
+}
+
+.footer-kompakt-koyu {
+  background-color: #111111;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.footer-kompakt-koyu .site-footer-link {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.footer-kompakt-koyu .site-footer-link:hover {
+  color: #fff;
+}
+
+.site-footer--sade .footer-marka {
+  @apply text-center lg:text-left;
+}
+
+.site-footer--sade .site-sosyal-medya-satir {
+  @apply justify-center lg:justify-start;
+}
+
+.site-footer--detayli .footer-icerik {
+  @apply gap-12 py-16;
+}
+
+.site-footer--kompakt {
+  @apply p-0;
+}
+
+.site-footer--kompakt.site-footer {
+  background-color: transparent;
+}
+
 .footer-sema-dort {
   @apply grid lg:grid-cols-4 lg:gap-8;
 }

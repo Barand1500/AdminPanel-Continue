@@ -8,6 +8,8 @@ import { FooterKolonPanel } from '@/components/admin/footer/FooterKolonPanel';
 import { FooterAltBantPanel } from '@/components/admin/footer/FooterAltBantPanel';
 import { FooterOnizleme } from '@/components/admin/footer/FooterOnizleme';
 import { FooterYuzucuPanel } from '@/components/admin/footer/FooterYuzucuPanel';
+import { FooterTipIcerik } from '@/components/admin/footer/FooterTipIcerik';
+import { FooterTipEkAyarlariFormu } from '@/components/admin/footer/FooterTipEkAyarlariFormu';
 import { LogoBoyutSecici } from '@/components/admin/site/LogoBoyutSecici';
 import { EmojiIkonSecici } from '@/components/admin/footer/EmojiIkonSecici';
 import {
@@ -24,16 +26,21 @@ import {
 } from '@/components/admin/ortak/AdminBilesenleri';
 import { footerAyarlariBirlestir, type FooterAyarlari } from '@/types/footer';
 import { telefonFormatla, whatsappFormatla } from '@/utils/telefonFormat';
+import {
+  footerTipiNormalize,
+  footerTipTanimiBul,
+  footerTipEkBirlestir,
+  type FooterTipi,
+} from '@/data/footerTipleri';
 
-const SEKMELER = [
-  { id: 'sema', ad: 'Şema & Görünüm' },
-  { id: 'marka', ad: 'Marka & Görünüm' },
-  { id: 'kolonlar', ad: 'Link Kolonları' },
-  { id: 'alt-bant', ad: 'Alt Bantlar' },
-  { id: 'yuzucu', ad: 'Yüzen Butonlar' },
-] as const;
-
-type SekmeId = (typeof SEKMELER)[number]['id'];
+type SekmeId =
+  | 'footer-tipi'
+  | 'ek-ayarlar'
+  | 'sema'
+  | 'marka'
+  | 'kolonlar'
+  | 'alt-bant'
+  | 'yuzucu';
 
 function ToggleSatir({
   etiket,
@@ -69,12 +76,37 @@ export function FooterYonetimiFormu() {
   const { ayarlar, siteAd, yukleniyor, hata, kaydediliyor, alanGuncelle } =
     useSiteAyarlariYonetimi();
   useSiteYonetimiAksiyonlari();
-  const [sekme, setSekme] = useState<SekmeId>('sema');
+  const [sekme, setSekme] = useState<SekmeId>('footer-tipi');
 
-  const footer = useMemo(() => footerAyarlariBirlestir(ayarlar), [ayarlar]);
+  const footerHam = useMemo(() => footerAyarlariBirlestir(ayarlar), [ayarlar]);
+  const aktifTip = footerTipiNormalize(footerHam.footerTipi);
+  const tipTanim = footerTipTanimiBul(aktifTip);
+  const tipEk = footerTipEkBirlestir(aktifTip, footerHam.tipEk);
+  const footer = { ...footerHam, footerTipi: aktifTip, tipEk };
+
+  const sekmeler = useMemo(() => {
+    const liste: { id: SekmeId; ad: string }[] = [{ id: 'footer-tipi', ad: 'Footer Tipi' }];
+    if (tipTanim.semaGoster) liste.push({ id: 'sema', ad: 'Şema & Görünüm' });
+    liste.push({ id: 'marka', ad: 'Marka & Görünüm' });
+    if (tipTanim.kolonlar) liste.push({ id: 'kolonlar', ad: 'Link Kolonları' });
+    liste.push({ id: 'alt-bant', ad: 'Alt Bantlar' });
+    if (tipTanim.ekAyarlari) liste.push({ id: 'ek-ayarlar', ad: 'Ek Ayarlar' });
+    liste.push({ id: 'yuzucu', ad: 'Yüzen Butonlar' });
+    return liste;
+  }, [tipTanim]);
+
+  const gecerliSekme = sekmeler.some((s) => s.id === sekme) ? sekme : 'footer-tipi';
 
   const footerGuncelle = (guncel: FooterAyarlari) => {
     alanGuncelle('footerAyarlariJson', guncel);
+  };
+
+  const tipSec = (tip: FooterTipi) => {
+    footerGuncelle({
+      ...footer,
+      footerTipi: tip,
+      tipEk: footerTipEkBirlestir(tip, footer.tipEk),
+    });
   };
 
   if (yukleniyor) return <YukleniyorDurumu mesaj="Footer ayarları yükleniyor..." />;
@@ -99,13 +131,13 @@ export function FooterYonetimiFormu() {
         {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
         <div className="flex flex-wrap gap-2 border-b border-[var(--ap-border)] pb-2">
-          {SEKMELER.map((s) => (
+          {sekmeler.map((s) => (
             <button
               key={s.id}
               type="button"
               onClick={() => setSekme(s.id)}
               className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-                sekme === s.id
+                gecerliSekme === s.id
                   ? 'bg-[var(--ap-accent)] text-white'
                   : 'ap-muted hover:bg-[var(--ap-hover)]'
               }`}
@@ -115,13 +147,25 @@ export function FooterYonetimiFormu() {
           ))}
         </div>
 
-        {sekme === 'sema' && (
+        {gecerliSekme === 'footer-tipi' && (
+          <FooterTipIcerik secili={aktifTip} onSec={tipSec} />
+        )}
+
+        {gecerliSekme === 'ek-ayarlar' && (
+          <FooterTipEkAyarlariFormu
+            tip={aktifTip}
+            tipEk={tipEk}
+            onGuncelle={(parcalar) => footerGuncelle({ ...footer, ...parcalar })}
+          />
+        )}
+
+        {gecerliSekme === 'sema' && (
           <AdminPanelKarti baslik="Şema & Görünüm" altBaslik="Footer düzenini seçin; değişiklikler aşağıdaki önizlemede görünür">
             <FooterSemaSecici footer={footer} onDegistir={footerGuncelle} />
           </AdminPanelKarti>
         )}
 
-        {sekme === 'marka' && (
+        {gecerliSekme === 'marka' && (
           <>
             <AdminPanelKarti baslik="Marka Alanı">
               <div className="space-y-3">
@@ -316,26 +360,32 @@ export function FooterYonetimiFormu() {
           </>
         )}
 
-        {sekme === 'kolonlar' && (
+        {gecerliSekme === 'kolonlar' && (
           <AdminPanelKarti baslik="Link Kolonları" altBaslik="Kolon ekle, sırala ve linkleri yönetin">
             <FooterKolonPanel footer={footer} onDegistir={footerGuncelle} />
           </AdminPanelKarti>
         )}
 
-        {sekme === 'alt-bant' && (
+        {gecerliSekme === 'alt-bant' && (
           <AdminPanelKarti baslik="Alt Bantlar">
             <FooterAltBantPanel footer={footer} onDegistir={footerGuncelle} />
           </AdminPanelKarti>
         )}
 
-        {sekme === 'yuzucu' && (
+        {gecerliSekme === 'yuzucu' && (
           <AdminPanelKarti baslik="Yüzen Butonlar" altBaslik="Sağ alttaki sabit butonlar — ekle, düzenle, sırala">
             <FooterYuzucuPanel footer={footer} onDegistir={footerGuncelle} />
           </AdminPanelKarti>
         )}
       </div>
 
-      <FooterOnizleme siteAdi={siteAd} ayarlar={ayarlar} footer={footer} buyuk />
+      <FooterOnizleme
+        siteAdi={siteAd}
+        ayarlar={ayarlar}
+        footer={footer}
+        buyuk
+        demoMod={gecerliSekme === 'footer-tipi'}
+      />
     </div>
   );
 }
