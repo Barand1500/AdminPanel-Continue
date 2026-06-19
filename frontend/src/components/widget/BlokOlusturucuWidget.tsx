@@ -1,6 +1,12 @@
+import { type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { WidgetBlok } from '@/types/blokOlusturucu';
-import { blokGorselBoyutStili, olusturucuOku } from '@/types/blokOlusturucu';
+import {
+  blokGorselBoyutStili,
+  blokOnizlemeMedyaStili,
+  blokOnizlemeWrapperStili,
+  olusturucuOku,
+} from '@/types/blokOlusturucu';
 import type { WidgetConfig } from '@/types/widget';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
@@ -53,13 +59,25 @@ function ButonLink({
   );
 }
 
+function BlokKabuk({ blok, children }: { blok: WidgetBlok; children: ReactNode }) {
+  const wrap = blokOnizlemeWrapperStili(blok);
+  const boyutlu =
+    blok.blokGenislikPx != null ||
+    blok.gorselYukseklikPx != null ||
+    (blok.gorselGenislik != null && blok.gorselGenislik !== 'tam');
+  if (!boyutlu) return <>{children}</>;
+  return <div style={wrap}>{children}</div>;
+}
+
 function BlokRender({ blok, cfg }: { blok: WidgetBlok; cfg: WidgetConfig }) {
   const g = cfg.gorunum ?? {};
   const metinRenk = g.metinRengi ?? undefined;
   const baslikRenk = g.baslikRengi ?? undefined;
   const vurguRenk = g.vurguRengi ?? '#2563eb';
-  const imgStil = blokGorselBoyutStili(blok);
+  const imgStil = blokOnizlemeMedyaStili(blok);
+  const gorselStil = blokGorselBoyutStili(blok);
 
+  const icerik = (() => {
   switch (blok.tip) {
     case 'baslik':
       return (
@@ -77,18 +95,18 @@ function BlokRender({ blok, cfg }: { blok: WidgetBlok; cfg: WidgetConfig }) {
       const url = medyaUrl(blok.gorselUrl);
       if (!url) {
         return (
-          <div className="flex items-center justify-center rounded-lg bg-slate-100 text-sm text-slate-400" style={{ height: imgStil.height, width: imgStil.width }}>
+          <div className="flex items-center justify-center rounded-lg bg-slate-100 text-sm text-slate-400" style={{ height: imgStil.height, width: gorselStil.width }}>
             Görsel
           </div>
         );
       }
-      return <img src={url} alt={blok.metin || ''} className="rounded-lg" style={imgStil} />;
+      return <img src={url} alt={blok.metin || ''} className="rounded-lg" style={gorselStil} />;
     }
     case 'video': {
       const kapak = medyaUrl(blok.videoKapakUrl);
       const href = blok.videoUrl || '#';
       return (
-        <a href={href} target="_blank" rel="noreferrer" className="relative block overflow-hidden rounded-lg" style={{ width: imgStil.width, maxWidth: '100%' }}>
+        <a href={href} target="_blank" rel="noreferrer" className="relative block overflow-hidden rounded-lg" style={{ width: gorselStil.width, maxWidth: '100%' }}>
           {kapak ? (
             <img src={kapak} alt={blok.metin || 'Video'} className="w-full rounded-lg object-cover" style={{ height: imgStil.height }} />
           ) : (
@@ -245,6 +263,9 @@ function BlokRender({ blok, cfg }: { blok: WidgetBlok; cfg: WidgetConfig }) {
     default:
       return null;
   }
+  })();
+
+  return <BlokKabuk blok={blok}>{icerik}</BlokKabuk>;
 }
 
 export function BlokOlusturucuWidget({ widget }: { widget: Widget }) {

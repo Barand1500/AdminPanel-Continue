@@ -1,6 +1,8 @@
 import {
   BLOK_PALET,
   BLOK_PALET_KATEGORILERI,
+  blokMinYukseklik,
+  type BlokDuzen,
   type BlokGorselGenislik,
   type BlokIkonOgesi,
   type BlokTipi,
@@ -8,10 +10,16 @@ import {
 } from '@/types/blokOlusturucu';
 import { uid } from '@/types/widget';
 import { formInputSinifi } from '@/components/form/FormAlani';
+import { WidgetGridAltBar } from './WidgetGridAltBar';
 
 interface WidgetBlokPaletiProps {
   seciliBlok: WidgetBlok | null;
   hucreSecili: boolean;
+  parcaSayisi: 0 | 1 | 2 | 3 | 4;
+  duzen: BlokDuzen;
+  onParcaSayisi: (sayi: 1 | 2 | 3 | 4) => void;
+  onDuzen: (duzen: BlokDuzen) => void;
+  onOlusturucuSifirla: () => void;
   onParcaEkle: (tip: BlokTipi) => void;
   onBlokGuncelle: (blok: WidgetBlok) => void;
 }
@@ -23,26 +31,55 @@ function GorselBoyutEditor({
   blok: WidgetBlok;
   onBlokGuncelle: (blok: WidgetBlok) => void;
 }) {
+  const minH = blokMinYukseklik(blok.tip);
+
   return (
     <>
       <label className="ap-blok-alan">
         <span className="ap-muted text-xs">Yükseklik (px)</span>
         <input
           type="number"
-          min={80}
+          min={minH}
           max={600}
           className={formInputSinifi}
-          value={blok.gorselYukseklikPx ?? 160}
-          onChange={(e) => onBlokGuncelle({ ...blok, gorselYukseklikPx: Number(e.target.value) })}
+          value={blok.gorselYukseklikPx ?? ''}
+          placeholder={String(minH)}
+          onChange={(e) =>
+            onBlokGuncelle({
+              ...blok,
+              gorselYukseklikPx: e.target.value ? Number(e.target.value) : undefined,
+            })
+          }
         />
       </label>
       <label className="ap-blok-alan">
-        <span className="ap-muted text-xs">Genişlik</span>
+        <span className="ap-muted text-xs">Genişlik (px)</span>
+        <input
+          type="number"
+          min={80}
+          max={1200}
+          className={formInputSinifi}
+          value={blok.blokGenislikPx ?? ''}
+          placeholder="Otomatik"
+          onChange={(e) =>
+            onBlokGuncelle({
+              ...blok,
+              blokGenislikPx: e.target.value ? Number(e.target.value) : undefined,
+            })
+          }
+        />
+      </label>
+      <label className="ap-blok-alan">
+        <span className="ap-muted text-xs">Genişlik (oransal)</span>
         <select
           className={formInputSinifi}
           value={blok.gorselGenislik ?? 'tam'}
           onChange={(e) =>
-            onBlokGuncelle({ ...blok, gorselGenislik: e.target.value as BlokGorselGenislik })
+            onBlokGuncelle({
+              ...blok,
+              gorselGenislik: e.target.value as BlokGorselGenislik,
+              blokGenislikPx: undefined,
+            })
           }
         >
           <option value="tam">Tam</option>
@@ -138,11 +175,10 @@ function SeciliBlokEditor({
   blok: WidgetBlok;
   onBlokGuncelle: (blok: WidgetBlok) => void;
 }) {
-  const gorselBoyut = ['gorsel', 'kart', 'video'].includes(blok.tip);
-
   return (
     <div className="ap-blok-duzenle">
       <p className="ap-blok-palet-baslik mt-4">Seçili parça</p>
+      <GorselBoyutEditor blok={blok} onBlokGuncelle={onBlokGuncelle} />
 
       {(blok.tip === 'baslik' || blok.tip === 'metin' || blok.tip === 'gorsel') && (
         <label className="ap-blok-alan">
@@ -161,7 +197,6 @@ function SeciliBlokEditor({
             <span className="ap-muted text-xs">Görsel URL</span>
             <input className={formInputSinifi} value={blok.gorselUrl ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, gorselUrl: e.target.value })} />
           </label>
-          <GorselBoyutEditor blok={blok} onBlokGuncelle={onBlokGuncelle} />
         </>
       )}
 
@@ -175,7 +210,6 @@ function SeciliBlokEditor({
             <span className="ap-muted text-xs">Kapak görsel URL</span>
             <input className={formInputSinifi} value={blok.videoKapakUrl ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, videoKapakUrl: e.target.value })} />
           </label>
-          <GorselBoyutEditor blok={blok} onBlokGuncelle={onBlokGuncelle} />
         </>
       )}
 
@@ -197,7 +231,6 @@ function SeciliBlokEditor({
             <span className="ap-muted text-xs">Link</span>
             <input className={formInputSinifi} value={blok.kartLink ?? ''} onChange={(e) => onBlokGuncelle({ ...blok, kartLink: e.target.value })} />
           </label>
-          <GorselBoyutEditor blok={blok} onBlokGuncelle={onBlokGuncelle} />
         </>
       )}
 
@@ -376,10 +409,6 @@ function SeciliBlokEditor({
       {blok.tip === 'ayirici' && (
         <p className="ap-muted text-xs">Yatay ayırıcı çizgi — ek ayar gerekmez.</p>
       )}
-
-      {gorselBoyut && blok.tip !== 'gorsel' && blok.tip !== 'kart' && blok.tip !== 'video' && (
-        <GorselBoyutEditor blok={blok} onBlokGuncelle={onBlokGuncelle} />
-      )}
     </div>
   );
 }
@@ -387,43 +416,69 @@ function SeciliBlokEditor({
 export function WidgetBlokPaleti({
   seciliBlok,
   hucreSecili,
+  parcaSayisi,
+  duzen,
+  onParcaSayisi,
+  onDuzen,
+  onOlusturucuSifirla,
   onParcaEkle,
   onBlokGuncelle,
 }: WidgetBlokPaletiProps) {
   return (
     <aside className="ap-blok-palet">
-      <p className="ap-blok-palet-baslik">Parçalar</p>
-      <p className="ap-muted mb-3 text-xs">
-        {hucreSecili ? 'Parçaya tıklayarak hücreye ekleyin.' : 'Önce ortadaki bir hücreyi seçin.'}
-      </p>
+      <div className="ap-blok-palet-ust">
+        <div className="ap-blok-palet-baslik-satir">
+          <p className="ap-blok-palet-baslik">Parçalar</p>
+          <button
+            type="button"
+            className="ap-blok-palet-temizle"
+            disabled={parcaSayisi === 0}
+            onClick={onOlusturucuSifirla}
+          >
+            Paneli Temizle
+          </button>
+        </div>
+        <WidgetGridAltBar
+          kompakt
+          parcaSayisi={parcaSayisi}
+          duzen={duzen}
+          onParcaSayisi={onParcaSayisi}
+          onDuzen={onDuzen}
+        />
+        <p className="ap-muted text-xs">
+          {hucreSecili ? 'Parçaya tıklayarak hücreye ekleyin.' : 'Önce ortadaki bir hücreyi seçin.'}
+        </p>
+      </div>
 
-      {BLOK_PALET_KATEGORILERI.map((kat) => {
-        const ogeler = BLOK_PALET.filter((p) => p.kategori === kat.id);
-        if (ogeler.length === 0) return null;
-        return (
-          <div key={kat.id} className="ap-blok-palet-kategori">
-            <p className="ap-blok-palet-kategori-baslik">{kat.etiket}</p>
-            <div className="ap-blok-palet-liste">
-              {ogeler.map((p) => (
-                <button
-                  key={p.tip}
-                  type="button"
-                  className="ap-blok-palet-oge"
-                  disabled={!hucreSecili}
-                  onClick={() => onParcaEkle(p.tip)}
-                >
-                  <span className="ap-blok-palet-ikon" aria-hidden>
-                    {p.ikon}
-                  </span>
-                  <span>{p.etiket}</span>
-                </button>
-              ))}
+      <div className="ap-scroll ap-blok-palet-scroll">
+        {BLOK_PALET_KATEGORILERI.map((kat) => {
+          const ogeler = BLOK_PALET.filter((p) => p.kategori === kat.id);
+          if (ogeler.length === 0) return null;
+          return (
+            <div key={kat.id} className="ap-blok-palet-kategori">
+              <p className="ap-blok-palet-kategori-baslik">{kat.etiket}</p>
+              <div className="ap-blok-palet-liste">
+                {ogeler.map((p) => (
+                  <button
+                    key={p.tip}
+                    type="button"
+                    className="ap-blok-palet-oge"
+                    disabled={!hucreSecili}
+                    onClick={() => onParcaEkle(p.tip)}
+                  >
+                    <span className="ap-blok-palet-ikon" aria-hidden>
+                      {p.ikon}
+                    </span>
+                    <span>{p.etiket}</span>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
-        );
-      })}
+          );
+        })}
 
-      {seciliBlok && <SeciliBlokEditor blok={seciliBlok} onBlokGuncelle={onBlokGuncelle} />}
+        {seciliBlok && <SeciliBlokEditor blok={seciliBlok} onBlokGuncelle={onBlokGuncelle} />}
+      </div>
     </aside>
   );
 }

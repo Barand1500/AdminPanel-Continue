@@ -1,6 +1,6 @@
 import type { BlokHucre, BlokOlusturucuConfig, WidgetBlok } from '@/types/blokOlusturucu';
-import { blokGorselResizeDestekler } from '@/types/blokOlusturucu';
-import { BlokGorselResize } from './BlokGorselResize';
+import { blokOnizlemeMedyaStili } from '@/types/blokOlusturucu';
+import { BlokBoyutSurukle } from './BlokBoyutSurukle';
 
 interface WidgetGridTuvalProps {
   olusturucu: BlokOlusturucuConfig;
@@ -12,38 +12,35 @@ interface WidgetGridTuvalProps {
   onBlokGuncelle?: (blok: WidgetBlok) => void;
 }
 
-function BlokOnizleme({
-  blok,
-  secili,
-  onBoyutDegistir,
-}: {
-  blok: WidgetBlok;
-  secili: boolean;
-  onBoyutDegistir?: (yukseklik: number) => void;
-}) {
+function BlokOnizleme({ blok }: { blok: WidgetBlok }) {
+  const imgStil = blokOnizlemeMedyaStili(blok);
+
   switch (blok.tip) {
     case 'baslik':
       return <strong className="block text-sm">{blok.metin || 'Başlık'}</strong>;
     case 'metin':
       return <span className="block text-xs text-slate-500 line-clamp-2">{blok.metin || 'Metin'}</span>;
     case 'gorsel':
-      return (
-        <BlokGorselResize
-          blok={blok}
-          secili={secili}
-          src={blok.gorselUrl || undefined}
-          onBoyutDegistir={(h) => onBoyutDegistir?.(h)}
-        />
+      return blok.gorselUrl ? (
+        <img src={blok.gorselUrl} alt="" className="ap-blok-gorsel-img rounded object-cover" style={imgStil} />
+      ) : (
+        <div
+          className="flex items-center justify-center rounded bg-slate-100 text-xs text-slate-400"
+          style={{ height: imgStil.height, width: '100%' }}
+        >
+          Görsel
+        </div>
       );
     case 'video':
-      return (
-        <BlokGorselResize
-          blok={blok}
-          secili={secili}
-          src={blok.videoKapakUrl || undefined}
-          placeholder="Video kapak"
-          onBoyutDegistir={(h) => onBoyutDegistir?.(h)}
-        />
+      return blok.videoKapakUrl ? (
+        <img src={blok.videoKapakUrl} alt="" className="ap-blok-gorsel-img rounded object-cover" style={imgStil} />
+      ) : (
+        <div
+          className="flex items-center justify-center rounded bg-slate-800 text-xs text-white"
+          style={{ height: imgStil.height, width: '100%' }}
+        >
+          Video kapak
+        </div>
       );
     case 'tarih':
       return <span className="text-xs text-slate-500">{blok.tarih || 'Tarih'}</span>;
@@ -82,13 +79,16 @@ function BlokOnizleme({
     case 'kart':
       return (
         <div className="rounded border border-slate-200 p-1 text-xs">
-          <BlokGorselResize
-            blok={blok}
-            secili={secili}
-            src={blok.kartGorselUrl || undefined}
-            placeholder="Kart görseli"
-            onBoyutDegistir={(h) => onBoyutDegistir?.(h)}
-          />
+          {blok.kartGorselUrl ? (
+            <img src={blok.kartGorselUrl} alt="" className="w-full rounded object-cover" style={{ height: imgStil.height }} />
+          ) : (
+            <div
+              className="flex items-center justify-center rounded bg-slate-100 text-slate-400"
+              style={{ height: imgStil.height }}
+            >
+              Kart görseli
+            </div>
+          )}
           <strong className="mt-1 block">{blok.kartBaslik || 'Kart'}</strong>
           <span className="text-slate-500 line-clamp-1">{blok.kartMetin || ''}</span>
         </div>
@@ -163,11 +163,11 @@ export function WidgetGridTuval({
       : `ap-olusturucu-grid ap-olusturucu-grid-yatay ap-olusturucu-kolon-${olusturucu.parcaSayisi}`;
 
   return (
-    <div className="ap-olusturucu-tuval">
+    <div className="ap-olusturucu-tuval ap-scroll">
       {gridYok ? (
         <div className="ap-olusturucu-bos">
           <p className="ap-muted text-sm">Boş widget</p>
-          <p className="ap-muted mt-1 text-xs">Alttan parça sayısı ve yerleşim seçin.</p>
+          <p className="ap-muted mt-1 text-xs">Sağ panelden parça sayısı seçin.</p>
         </div>
       ) : (
         <div className={gridClass}>
@@ -233,15 +233,19 @@ function HucreKutu({
                   if (e.key === 'Enter') onBlokSec(blok.id);
                 }}
               >
-                <BlokOnizleme
+                <BlokBoyutSurukle
                   blok={blok}
                   secili={secili}
-                  onBoyutDegistir={
-                    secili && blokGorselResizeDestekler(blok.tip) && onBlokGuncelle
-                      ? (h) => onBlokGuncelle({ ...blok, gorselYukseklikPx: h })
-                      : undefined
-                  }
-                />
+                  onBoyutDegistir={(g, y) => {
+                    if (!onBlokGuncelle) return;
+                    const patch: Partial<WidgetBlok> = {};
+                    if (g != null) patch.blokGenislikPx = g;
+                    if (y != null) patch.gorselYukseklikPx = y;
+                    onBlokGuncelle({ ...blok, ...patch });
+                  }}
+                >
+                  <BlokOnizleme blok={blok} />
+                </BlokBoyutSurukle>
                 <button
                   type="button"
                   className="ap-olusturucu-blok-sil"

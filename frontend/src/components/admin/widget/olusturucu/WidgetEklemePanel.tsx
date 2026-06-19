@@ -3,14 +3,14 @@ import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
 import type { BlokDuzen, BlokTipi } from '@/types/blokOlusturucu';
 import { configGuncelle, configOku } from '@/types/widget';
 import { olusturucuOku } from '@/types/blokOlusturucu';
-import { yerlesimEtiketi } from '@/utils/widgetYerlesim';
 import type { WidgetBlok } from '@/types/blokOlusturucu';
+import { yerlesimEtiketi } from '@/utils/widgetYerlesim';
 import {
+  bosOlusturucu,
   hucreleriOlustur,
   varsayilanBlok,
 } from './blokOlusturucuYardimci';
 import { WidgetGridTuval } from './WidgetGridTuval';
-import { WidgetGridAltBar } from './WidgetGridAltBar';
 import { WidgetBlokPaleti } from './WidgetBlokPaleti';
 
 interface WidgetEklemePanelProps {
@@ -56,6 +56,12 @@ export function WidgetEklemePanel({
 
   function duzenDegistir(duzen: BlokDuzen) {
     olusturucuGuncelle({ ...olusturucu, duzen });
+  }
+
+  function olusturucuSifirla() {
+    olusturucuGuncelle(bosOlusturucu());
+    setAktifHucreId(null);
+    setSeciliBlokId(null);
   }
 
   function parcaEkle(tip: BlokTipi) {
@@ -118,16 +124,15 @@ export function WidgetEklemePanel({
             onBlokSil={blokSil}
             onBlokGuncelle={blokGuncelle}
           />
-          <WidgetGridAltBar
-            parcaSayisi={olusturucu.parcaSayisi}
-            duzen={olusturucu.duzen}
-            onParcaSayisi={parcaSayisiDegistir}
-            onDuzen={duzenDegistir}
-          />
         </div>
         <WidgetBlokPaleti
           seciliBlok={seciliBlok}
           hucreSecili={aktifHucreId != null}
+          parcaSayisi={olusturucu.parcaSayisi}
+          duzen={olusturucu.duzen}
+          onParcaSayisi={parcaSayisiDegistir}
+          onDuzen={duzenDegistir}
+          onOlusturucuSifirla={olusturucuSifirla}
           onParcaEkle={parcaEkle}
           onBlokGuncelle={blokGuncelle}
         />

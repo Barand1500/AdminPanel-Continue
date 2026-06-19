@@ -1,6 +1,11 @@
 import type { CSSProperties } from 'react';
 import type { BlokHucre, BlokOlusturucuConfig, BlokTipi, WidgetBlok } from '@/types/blokOlusturucu';
-import { VARSAYILAN_GORSEL_YUKSEKLIK, bosOlusturucu, olusturucuOku } from '@/types/blokOlusturucu';
+import {
+  VARSAYILAN_GORSEL_YUKSEKLIK,
+  blokOnizlemeMedyaStili,
+  bosOlusturucu,
+  olusturucuOku,
+} from '@/types/blokOlusturucu';
 import { uid } from '@/types/widget';
 
 export { bosOlusturucu, olusturucuOku };
@@ -126,11 +131,5 @@ export function varsayilanBlok(tip: BlokTipi): WidgetBlok {
 }
 
 export function gorselBlokStili(blok: WidgetBlok): CSSProperties {
-  const genislikMap = { tam: '100%', yari: '50%', uc_ceyrek: '75%' } as const;
-  return {
-    height: blok.gorselYukseklikPx ?? VARSAYILAN_GORSEL_YUKSEKLIK,
-    width: genislikMap[blok.gorselGenislik ?? 'tam'],
-    maxWidth: '100%',
-    objectFit: 'cover',
-  };
+  return blokOnizlemeMedyaStili(blok) as CSSProperties;
 }
