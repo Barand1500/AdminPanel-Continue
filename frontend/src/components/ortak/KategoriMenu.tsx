@@ -8,6 +8,8 @@ interface KategoriMenuProps {
   baslikMetni?: string;
   acilisModu?: KategoriAcilisModu | string;
   kategoriler?: Kategori[];
+  mega?: boolean;
+  kolonSayisi?: 3 | 4 | 5;
 }
 
 function AltKategoriListesi({
@@ -49,6 +51,8 @@ export function KategoriMenu({
   baslikMetni = 'Tüm Kategoriler',
   acilisModu: acilisModuProp = 'dropdown',
   kategoriler: kategoriListesi = [],
+  mega = false,
+  kolonSayisi = 4,
 }: KategoriMenuProps) {
   const acilisModu = kategoriAcilisModuNormalize(acilisModuProp);
   const [acik, setAcik] = useState(false);
@@ -178,11 +182,15 @@ export function KategoriMenu({
   }
 
   return (
-    <div ref={ref} className="kategori-menu-root relative hidden shrink-0 sm:block">
+    <div ref={ref} className={`kategori-menu-root relative hidden shrink-0 sm:block ${mega ? 'kategori-menu--mega' : ''}`}>
       {tetikleyici}
 
       {acik && (
-        <div className="kategori-menu-panel absolute left-0 top-full z-50 mt-2 w-[min(720px,calc(100vw-2rem))] overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10">
+        <div
+          className={`kategori-menu-panel absolute left-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10 ${
+            mega ? 'w-[min(960px,calc(100vw-2rem))]' : 'w-[min(720px,calc(100vw-2rem))]'
+          }`}
+        >
           <div className="grid sm:grid-cols-[200px_1fr]">
             <div className="border-r border-slate-200 bg-slate-50 p-2">
               {kategoriListesi.map((kat) => (
@@ -208,7 +216,10 @@ export function KategoriMenu({
                   <p className="mb-3 text-xs font-bold uppercase tracking-wider text-primary">
                     {secili.baslik}
                   </p>
-                  <div className="grid gap-4 sm:grid-cols-2">
+                  <div
+                    className="grid gap-4"
+                    style={{ gridTemplateColumns: `repeat(${mega ? kolonSayisi : 2}, minmax(0, 1fr))` }}
+                  >
                     {secili.altKategoriler?.map((alt) => (
                       <div key={alt.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                         {alt.yol ? (

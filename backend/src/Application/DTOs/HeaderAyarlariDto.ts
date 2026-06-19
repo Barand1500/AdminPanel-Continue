@@ -29,6 +29,36 @@ export const ustMenuOgesiSchema = z.object({
 });
 
 export const headerAyarlariSchema = z.object({
+  headerTipi: z
+    .enum([
+      'klasik',
+      'sade',
+      'kompakt',
+      'merkez-logo',
+      'arama-odakli',
+      'modern',
+      'kurumsal',
+      'mega-menu',
+      'seffaf-hero',
+      'split',
+    ])
+    .optional(),
+  tipEk: z
+    .object({
+      aramaGoster: z.boolean().optional(),
+      aramaModu: z.enum(['tam', 'ikon']).optional(),
+      kompaktYukseklik: z.union([z.literal(40), z.literal(48), z.literal(56)]).optional(),
+      ctaMetni: z.string().optional(),
+      ctaLink: z.string().optional(),
+      ikinciLogoUrl: z.string().nullable().optional(),
+      ikinciMarkaMetni: z.string().nullable().optional(),
+      destekMetni: z.string().optional(),
+      megaMenuKolon: z.union([z.literal(3), z.literal(4), z.literal(5)]).optional(),
+      seffafBaslangic: z.boolean().optional(),
+      scrollSonrasiStil: z.enum(['beyaz', 'koyu', 'cam']).optional(),
+      menuBolmeNoktasi: z.number().min(20).max(80).optional(),
+    })
+    .optional(),
   slogan: z.string().max(300).nullable().optional(),
   logoBoyutu: z.enum(['kucuk', 'orta', 'buyuk']).optional(),
   ustBant: z

@@ -1,6 +1,9 @@
 import type { LogoBoyutu } from './logo';
 import { logoBoyutuNormalize } from './logo';
 import { dilDestegiBirlestir } from '@/data/siteDilleri';
+import { headerTipiNormalize, tipEkBirlestir, type HeaderTipi } from '@/data/headerTipleri';
+
+export type { HeaderTipi };
 
 export type KurTipi = 'doviz_alis' | 'doviz_satis' | 'efektif_alis' | 'efektif_satis';
 
@@ -70,7 +73,27 @@ export interface DilDestegiAyarlari {
   ceviriler?: Record<string, Record<string, string>>;
 }
 
+export interface HeaderTipEkAyarlari {
+  /** Arama kutusu görünsün mü */
+  aramaGoster?: boolean;
+  /** tam: geniş kutu, ikon: yalnızca ikon butonu */
+  aramaModu?: 'tam' | 'ikon';
+  kompaktYukseklik?: 40 | 48 | 56;
+  ctaMetni?: string;
+  ctaLink?: string;
+  ikinciLogoUrl?: string | null;
+  ikinciMarkaMetni?: string | null;
+  destekMetni?: string;
+  megaMenuKolon?: 3 | 4 | 5;
+  seffafBaslangic?: boolean;
+  scrollSonrasiStil?: 'beyaz' | 'koyu' | 'cam';
+  /** Merkez logo: menüyü sol/sağ bölmek için yüzde (0-100) */
+  menuBolmeNoktasi?: number;
+}
+
 export interface HeaderAyarlari {
+  headerTipi?: HeaderTipi;
+  tipEk?: HeaderTipEkAyarlari;
   slogan?: string | null;
   /** Header marka alanında görünen metin (tarayıcı sekmesi site adından bağımsız) */
   markaMetni?: string | null;
@@ -144,7 +167,10 @@ export function varsayilanHeaderAyarlari(
   mevcut?: Partial<HeaderAyarlari> | null,
   legacy?: { logoUrl?: string | null; slogan?: string | null }
 ): HeaderAyarlari {
+  const tip = headerTipiNormalize(mevcut?.headerTipi);
   return {
+    headerTipi: tip,
+    tipEk: tipEkBirlestir(tip, mevcut?.tipEk),
     slogan:
       mevcut?.slogan ??
       legacy?.slogan ??
@@ -217,8 +243,11 @@ export function headerAyarlariBirlestir(
     logoUrl: ayarlar?.logoUrl ?? json?.logoUrl,
     slogan: ayarlar?.slogan ?? json?.slogan,
   });
+  const tip = headerTipiNormalize(json?.headerTipi ?? birlestirilmis.headerTipi);
   return {
     ...birlestirilmis,
+    headerTipi: tip,
+    tipEk: tipEkBirlestir(tip, json?.tipEk ?? birlestirilmis.tipEk),
     markaMetni: json?.markaMetni ?? birlestirilmis.markaMetni ?? null,
     logoUrl: json?.logoUrl ?? ayarlar?.logoUrl ?? null,
     logoBoyutu: logoBoyutuNormalize(json?.logoBoyutu ?? birlestirilmis.logoBoyutu),
