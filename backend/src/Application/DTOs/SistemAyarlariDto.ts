@@ -23,6 +23,13 @@ export const sagTikPanelAyarlariSchema = z.object({
   modulIdler: z.array(z.string().max(64)).max(40).optional(),
 });
 
+export const scriptAyarlariSchema = z.object({
+  googleAnalytics: z.string().max(50000).optional(),
+  headerScript: z.string().max(50000).optional(),
+  bodyAcilisScript: z.string().max(50000).optional(),
+  footerScript: z.string().max(50000).optional(),
+});
+
 export const sistemAyarlariGuncelleSchema = z.object({
   siteAktif: z.boolean().optional(),
   domain: z.union([z.string().max(200), z.literal(''), z.null()]).optional(),
@@ -41,6 +48,7 @@ export const sistemAyarlariGuncelleSchema = z.object({
   guvenlikBasliklari: z.boolean().optional(),
   robotsEngelle: z.boolean().optional(),
   sagTikPaneli: sagTikPanelAyarlariSchema.optional(),
+  scriptAyarlari: scriptAyarlariSchema.optional(),
 });
 
 export type SistemAyarlariGuncelleDto = z.infer<typeof sistemAyarlariGuncelleSchema>;
@@ -52,6 +60,13 @@ export interface Sayfa404Ayarlari {
   menuTipi?: 'ust' | 'footer' | 'her-ikisi' | 'yok';
   oneriSayfaId?: string | null;
   anaSayfaButonu?: boolean;
+}
+
+export interface ScriptAyarlari {
+  googleAnalytics?: string;
+  headerScript?: string;
+  bodyAcilisScript?: string;
+  footerScript?: string;
 }
 
 export interface SistemAyarlariJson {
@@ -74,4 +89,5 @@ export interface SistemAyarlariJson {
     ogeler?: { id: string; aktif: boolean }[];
     modulIdler?: string[];
   };
+  scriptAyarlari?: ScriptAyarlari;
 }

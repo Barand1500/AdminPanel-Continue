@@ -1,4 +1,4 @@
-import type { Sayfa404Ayarlari, SistemAyarlariJson } from '../../Application/DTOs/SistemAyarlariDto.js';
+import type { Sayfa404Ayarlari, ScriptAyarlari, SistemAyarlariJson } from '../../Application/DTOs/SistemAyarlariDto.js';
 
 const varsayilan404: Sayfa404Ayarlari = {
   baslik: 'Sayfa Bulunamadı',
@@ -24,6 +24,12 @@ export const varsayilanSistemAyarlari: SistemAyarlariJson = {
   otomatikYedeklemeGun: 7,
   guvenlikBasliklari: true,
   robotsEngelle: false,
+  scriptAyarlari: {
+    googleAnalytics: '',
+    headerScript: '',
+    bodyAcilisScript: '',
+    footerScript: '',
+  },
 };
 
 function panelCevirilerCoz(json: unknown): Record<string, Record<string, string>> {
@@ -38,6 +44,26 @@ function panelCevirilerCoz(json: unknown): Record<string, Record<string, string>
     if (Object.keys(kayit).length > 0) sonuc[dil] = kayit;
   }
   return sonuc;
+}
+
+function scriptAyarlariCoz(kaynak: unknown): ScriptAyarlari {
+  const varsayilan = varsayilanSistemAyarlari.scriptAyarlari!;
+  if (!kaynak || typeof kaynak !== 'object') return { ...varsayilan };
+  const s = kaynak as Record<string, unknown>;
+  return {
+    googleAnalytics: typeof s.googleAnalytics === 'string' ? s.googleAnalytics : '',
+    headerScript: typeof s.headerScript === 'string' ? s.headerScript : '',
+    bodyAcilisScript: typeof s.bodyAcilisScript === 'string' ? s.bodyAcilisScript : '',
+    footerScript: typeof s.footerScript === 'string' ? s.footerScript : '',
+  };
+}
+
+function scriptAyarlariEkAyarlarCoz(ekAyarlarJson: unknown): ScriptAyarlari {
+  if (!ekAyarlarJson || typeof ekAyarlarJson !== 'object') {
+    return { ...varsayilanSistemAyarlari.scriptAyarlari! };
+  }
+  const script = (ekAyarlarJson as Record<string, unknown>).scriptAyarlari;
+  return scriptAyarlariCoz(script);
 }
 
 function sayfa404Coz(json: unknown): Sayfa404Ayarlari {
@@ -107,6 +133,7 @@ export function sistemAyarlariJsonCozKayit(kayit: Record<string, unknown>): Sist
     robotsEngelle:
       typeof kayit.robotsEngelle === 'boolean' ? kayit.robotsEngelle : varsayilanSistemAyarlari.robotsEngelle,
     sagTikPaneli: sagTikPaneliCoz(kayit.sagTikPaneli),
+    scriptAyarlari: scriptAyarlariCoz(kayit.scriptAyarlari),
   };
 }
 
@@ -150,5 +177,6 @@ export function sistemAyariSatirdanJson(satir: Record<string, unknown> | null | 
         ? (satir.ekAyarlarJson as Record<string, unknown>).sagTikPaneli
         : undefined
     ),
+    scriptAyarlari: scriptAyarlariEkAyarlarCoz(satir.ekAyarlarJson),
   };
 }

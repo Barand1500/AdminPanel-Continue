@@ -1,6 +1,17 @@
 import type { SiteAyarlari } from '@/types/site';
 import type { SistemAyarlariJson } from '@/types/sistemAyarlari';
-import { bosSistemForm } from '@/types/sistemAyarlari';
+import { varsayilanScriptAyarlari, bosSistemForm } from '@/types/sistemAyarlari';
+
+function scriptAyarlariCoz(kaynak: unknown) {
+  if (!kaynak || typeof kaynak !== 'object') return { ...varsayilanScriptAyarlari };
+  const s = kaynak as Record<string, unknown>;
+  return {
+    googleAnalytics: typeof s.googleAnalytics === 'string' ? s.googleAnalytics : '',
+    headerScript: typeof s.headerScript === 'string' ? s.headerScript : '',
+    bodyAcilisScript: typeof s.bodyAcilisScript === 'string' ? s.bodyAcilisScript : '',
+    footerScript: typeof s.footerScript === 'string' ? s.footerScript : '',
+  };
+}
 
 export function sistemAyarlariCoz(ayarlar: SiteAyarlari | null | undefined): SistemAyarlariJson {
   const json = (ayarlar as { sistemAyarlariJson?: unknown } | null | undefined)?.sistemAyarlariJson;
@@ -11,6 +22,7 @@ export function sistemAyarlariCoz(ayarlar: SiteAyarlari | null | undefined): Sis
       bakimMesaji: bosSistemForm.bakimMesaji,
       bakimGorselUrl: '',
       bakimTahminiSure: '',
+      scriptAyarlari: { ...varsayilanScriptAyarlari },
     };
   }
   const kayit = json as Record<string, unknown>;
@@ -24,6 +36,7 @@ export function sistemAyarlariCoz(ayarlar: SiteAyarlari | null | undefined): Sis
       kayit.sayfa404 && typeof kayit.sayfa404 === 'object'
         ? (kayit.sayfa404 as SistemAyarlariJson['sayfa404'])
         : undefined,
+    scriptAyarlari: scriptAyarlariCoz(kayit.scriptAyarlari),
   };
 }
 

@@ -103,10 +103,16 @@ export class SistemAyarlariService {
       guvenlikBasliklari: dto.guvenlikBasliklari ?? mevcut.guvenlikBasliklari,
       robotsEngelle: dto.robotsEngelle ?? mevcut.robotsEngelle,
       sagTikPaneli: dto.sagTikPaneli ?? mevcut.sagTikPaneli,
+      scriptAyarlari: dto.scriptAyarlari
+        ? { ...mevcut.scriptAyarlari, ...dto.scriptAyarlari }
+        : mevcut.scriptAyarlari,
     };
 
     if (dto.sagTikPaneli !== undefined) {
       mevcutEk.sagTikPaneli = dto.sagTikPaneli;
+    }
+    if (guncel.scriptAyarlari !== undefined) {
+      mevcutEk.scriptAyarlari = guncel.scriptAyarlari;
     }
 
     if (dto.siteAktif !== undefined || dto.domain !== undefined) {

@@ -19,6 +19,7 @@ import { varsayilanSayfa404 } from '@/types/sistemAyarlari';
 import { bakimModuAktifMi, siteKapaliMi, sistemAyarlariCoz } from '@/utils/sistemAyarlariYardimci';
 import { navKategorileriMenuyeCevir } from '@/utils/navKategoriAgaci';
 import { SeoYonlendirmeKontrol } from '@/components/ortak/SeoYonlendirmeKontrol';
+import { SiteScriptEnjektor } from '@/components/ortak/SiteScriptEnjektor';
 
 function SiteLayoutIcerik() {
   const { veri, yukleniyor } = useSiteVerisi();
@@ -61,6 +62,7 @@ function SiteLayoutIcerik() {
 
   return (
     <SiteDilProvider ayarlar={site.ayarlar} sayfalar={veri.sayfalar} navKategoriler={veri.navKategoriler}>
+      <SiteScriptEnjektor scriptAyarlari={sistem.scriptAyarlari} />
       <SeoYonlendirmeKontrol yonlendirmeler={veri.seoYonlendirmeler} />
       <div className="site-public flex min-h-screen flex-col">
         {headerGoster && (

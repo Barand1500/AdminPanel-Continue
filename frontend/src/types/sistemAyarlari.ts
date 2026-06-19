@@ -4,6 +4,20 @@ import { sagTikPanelNormalize } from '@/utils/sagTikPanelYardimci';
 
 export type Sayfa404MenuTipi = 'ust' | 'footer' | 'her-ikisi' | 'yok';
 
+export interface ScriptAyarlari {
+  googleAnalytics: string;
+  headerScript: string;
+  bodyAcilisScript: string;
+  footerScript: string;
+}
+
+export const varsayilanScriptAyarlari: ScriptAyarlari = {
+  googleAnalytics: '',
+  headerScript: '',
+  bodyAcilisScript: '',
+  footerScript: '',
+};
+
 export interface SistemAyarlariJson {
   bakimModu?: boolean;
   bakimMesaji?: string;
@@ -18,6 +32,7 @@ export interface SistemAyarlariJson {
   otomatikYedeklemeGun?: number;
   guvenlikBasliklari?: boolean;
   robotsEngelle?: boolean;
+  scriptAyarlari?: ScriptAyarlari;
 }
 
 export interface Sayfa404Ayarlari {
@@ -47,9 +62,10 @@ export interface SistemAyarlariForm {
   guvenlikBasliklari: boolean;
   robotsEngelle: boolean;
   sagTikPaneli: SagTikPanelAyarlari;
+  scriptAyarlari: ScriptAyarlari;
 }
 
-export type SistemSekmeId = 'genel' | 'bakim' | 'sayfa404' | 'dil' | 'guvenlik' | 'sagTik';
+export type SistemSekmeId = 'genel' | 'bakim' | 'sayfa404' | 'dil' | 'guvenlik' | 'script' | 'sagTik';
 
 export const SISTEM_SEKMELER: { id: SistemSekmeId; ad: string; ikon: string }[] = [
   { id: 'genel', ad: 'Genel', ikon: '⚡' },
@@ -57,6 +73,7 @@ export const SISTEM_SEKMELER: { id: SistemSekmeId; ad: string; ikon: string }[] 
   { id: 'sayfa404', ad: '404 Sayfası', ikon: '🚫' },
   { id: 'dil', ad: 'Panel Dili', ikon: '🌐' },
   { id: 'guvenlik', ad: 'Güvenlik', ikon: '🛡️' },
+  { id: 'script', ad: 'Script Ayarları', ikon: '</>' },
   { id: 'sagTik', ad: 'Sağ Tık Paneli', ikon: '🖱️' },
 ];
 
@@ -102,6 +119,7 @@ export const bosSistemForm: SistemAyarlariForm = {
   guvenlikBasliklari: true,
   robotsEngelle: false,
   sagTikPaneli: { ...VARSAYILAN_SAG_TIK_PANEL, ogeler: [...VARSAYILAN_SAG_TIK_PANEL.ogeler] },
+  scriptAyarlari: { ...varsayilanScriptAyarlari },
 };
 
 export function sistemdenForm(
@@ -126,5 +144,6 @@ export function sistemdenForm(
     guvenlikBasliklari: sistem.guvenlikBasliklari ?? true,
     robotsEngelle: sistem.robotsEngelle ?? false,
     sagTikPaneli: sagTikPanelNormalize(sistem.sagTikPaneli),
+    scriptAyarlari: { ...varsayilanScriptAyarlari, ...sistem.scriptAyarlari },
   };
 }
