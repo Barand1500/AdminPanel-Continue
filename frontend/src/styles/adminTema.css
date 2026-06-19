@@ -6462,7 +6462,6 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 /* Widget Ekleme / Blok Oluşturucu */
 .ap-editor-icerik-ekleme {
-  overflow: hidden;
   display: flex;
   flex-direction: column;
   min-height: 420px;
@@ -6471,8 +6470,6 @@ html:has(.admin-panel[data-tema='acik']) body {
 .ap-widget-ekleme {
   display: flex;
   flex-direction: column;
-  flex: 1;
-  min-height: 0;
   gap: 0.75rem;
 }
 
@@ -6499,27 +6496,22 @@ html:has(.admin-panel[data-tema='acik']) body {
   display: grid;
   grid-template-columns: 1fr 220px;
   gap: 0.75rem;
-  flex: 1;
-  min-height: 0;
-  align-items: stretch;
+  align-items: start;
 }
 
 .ap-olusturucu-orta {
   display: flex;
   flex-direction: column;
-  min-height: 0;
   min-width: 0;
+  gap: 0.75rem;
 }
 
 .ap-olusturucu-tuval {
-  flex: 1;
-  min-height: 180px;
-  max-height: min(55vh, 480px);
+  min-height: 200px;
   border: 1px dashed var(--ap-border, rgba(148, 163, 184, 0.25));
   border-radius: 0.75rem;
   padding: 1rem;
   background: var(--ap-surface, rgba(15, 23, 42, 0.2));
-  overflow-y: auto;
 }
 
 .ap-olusturucu-bos {

@@ -163,11 +163,11 @@ export function WidgetGridTuval({
       : `ap-olusturucu-grid ap-olusturucu-grid-yatay ap-olusturucu-kolon-${olusturucu.parcaSayisi}`;
 
   return (
-    <div className="ap-olusturucu-tuval ap-scroll">
+    <div className="ap-olusturucu-tuval">
       {gridYok ? (
         <div className="ap-olusturucu-bos">
           <p className="ap-muted text-sm">Boş widget</p>
-          <p className="ap-muted mt-1 text-xs">Sağ panelden parça sayısı seçin.</p>
+          <p className="ap-muted mt-1 text-xs">Alttan parça sayısı ve yerleşim seçin.</p>
         </div>
       ) : (
         <div className={gridClass}>

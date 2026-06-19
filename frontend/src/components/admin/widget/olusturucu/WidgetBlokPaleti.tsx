@@ -2,7 +2,6 @@ import {
   BLOK_PALET,
   BLOK_PALET_KATEGORILERI,
   blokMinYukseklik,
-  type BlokDuzen,
   type BlokGorselGenislik,
   type BlokIkonOgesi,
   type BlokTipi,
@@ -10,15 +9,11 @@ import {
 } from '@/types/blokOlusturucu';
 import { uid } from '@/types/widget';
 import { formInputSinifi } from '@/components/form/FormAlani';
-import { WidgetGridAltBar } from './WidgetGridAltBar';
 
 interface WidgetBlokPaletiProps {
   seciliBlok: WidgetBlok | null;
   hucreSecili: boolean;
   parcaSayisi: 0 | 1 | 2 | 3 | 4;
-  duzen: BlokDuzen;
-  onParcaSayisi: (sayi: 1 | 2 | 3 | 4) => void;
-  onDuzen: (duzen: BlokDuzen) => void;
   onOlusturucuSifirla: () => void;
   onParcaEkle: (tip: BlokTipi) => void;
   onBlokGuncelle: (blok: WidgetBlok) => void;
@@ -417,9 +412,6 @@ export function WidgetBlokPaleti({
   seciliBlok,
   hucreSecili,
   parcaSayisi,
-  duzen,
-  onParcaSayisi,
-  onDuzen,
   onOlusturucuSifirla,
   onParcaEkle,
   onBlokGuncelle,
@@ -438,13 +430,6 @@ export function WidgetBlokPaleti({
             Paneli Temizle
           </button>
         </div>
-        <WidgetGridAltBar
-          kompakt
-          parcaSayisi={parcaSayisi}
-          duzen={duzen}
-          onParcaSayisi={onParcaSayisi}
-          onDuzen={onDuzen}
-        />
         <p className="ap-muted text-xs">
           {hucreSecili ? 'Parçaya tıklayarak hücreye ekleyin.' : 'Önce ortadaki bir hücreyi seçin.'}
         </p>

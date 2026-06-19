@@ -11,6 +11,7 @@ import {
   varsayilanBlok,
 } from './blokOlusturucuYardimci';
 import { WidgetGridTuval } from './WidgetGridTuval';
+import { WidgetGridAltBar } from './WidgetGridAltBar';
 import { WidgetBlokPaleti } from './WidgetBlokPaleti';
 
 interface WidgetEklemePanelProps {
@@ -124,14 +125,17 @@ export function WidgetEklemePanel({
             onBlokSil={blokSil}
             onBlokGuncelle={blokGuncelle}
           />
+          <WidgetGridAltBar
+            parcaSayisi={olusturucu.parcaSayisi}
+            duzen={olusturucu.duzen}
+            onParcaSayisi={parcaSayisiDegistir}
+            onDuzen={duzenDegistir}
+          />
         </div>
         <WidgetBlokPaleti
           seciliBlok={seciliBlok}
           hucreSecili={aktifHucreId != null}
           parcaSayisi={olusturucu.parcaSayisi}
-          duzen={olusturucu.duzen}
-          onParcaSayisi={parcaSayisiDegistir}
-          onDuzen={duzenDegistir}
           onOlusturucuSifirla={olusturucuSifirla}
           onParcaEkle={parcaEkle}
           onBlokGuncelle={blokGuncelle}
