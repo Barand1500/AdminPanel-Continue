@@ -736,7 +736,7 @@ import {
   KategoriHaberOverlayIcerik,
   KoseYazarlariIcerik,
   KriptoListesiIcerik,
-  NamazVakitleriIcerik,
+  SirketGirisCikisIcerik,
   SekmeliHaberIcerik,
   VideoGalerisiIcerik,
 } from './HaberWidgetIcerikPanelleri';
@@ -779,6 +779,6 @@ export const ICERIK_PANEL_MAP: Record<string, ComponentType<WidgetPanelProps>> =
   HAVA_DURUMU: HavaDurumuIcerik,
   KRIPTO_LISTESI: KriptoListesiIcerik,
   GUNCEL_KONULAR: GuncelKonularIcerik,
-  NAMAZ_VAKITLERI: NamazVakitleriIcerik,
+  SIRKET_GIRIS_CIKIS: SirketGirisCikisIcerik,
   HABER_MAGAZIN: HaberMagazinIcerik,
 };

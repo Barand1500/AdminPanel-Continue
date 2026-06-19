@@ -58,13 +58,13 @@ export interface WidgetKriptoPara {
   ikonUrl?: string;
 }
 
-export interface WidgetNamazVakti {
-  imsak: string;
-  gunes: string;
-  ogle: string;
-  ikindi: string;
-  aksam: string;
-  yatsi: string;
+export interface WidgetAcilisKapanisSaati {
+  haftaIciAcilis: string;
+  haftaIciKapanis: string;
+  cumartesiAcilis: string;
+  cumartesiKapanis: string;
+  pazarAcilis: string;
+  pazarKapanis: string;
 }
 
 export interface WidgetHavaGun {
@@ -86,7 +86,7 @@ export const HABER_PORTAL_WIDGET_TIPLERI = [
   'HAVA_DURUMU',
   'KRIPTO_LISTESI',
   'GUNCEL_KONULAR',
-  'NAMAZ_VAKITLERI',
+  'SIRKET_GIRIS_CIKIS',
   'HABER_MAGAZIN',
 ] as const;
 

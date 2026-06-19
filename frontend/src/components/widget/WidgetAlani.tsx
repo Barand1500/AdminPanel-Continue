@@ -33,7 +33,7 @@ import {
   KategoriHaberOverlayWidget,
   KoseYazarlariWidget,
   KriptoListesiWidget,
-  NamazVakitleriWidget,
+  SirketGirisCikisWidget,
   SekmeliHaberWidget,
   VideoGalerisiWidget,
 } from './haber/HaberPortalWidgetleri';
@@ -118,8 +118,8 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
         return <KriptoListesiWidget widget={widget} />;
       case 'GUNCEL_KONULAR':
         return <GuncelKonularWidget widget={widget} />;
-      case 'NAMAZ_VAKITLERI':
-        return <NamazVakitleriWidget widget={widget} />;
+      case 'SIRKET_GIRIS_CIKIS':
+        return <SirketGirisCikisWidget widget={widget} />;
       case 'HABER_MAGAZIN':
         return <HaberMagazinWidget widget={widget} />;
       case 'HARITA': {

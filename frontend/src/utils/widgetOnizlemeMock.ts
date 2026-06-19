@@ -378,12 +378,19 @@ function mockConfig(tip: string): WidgetConfig {
           link: '#',
         })),
       };
-    case 'NAMAZ_VAKITLERI':
+    case 'SIRKET_GIRIS_CIKIS':
       return {
-        namazKonum: 'Beşiktaş, İstanbul',
-        namazSaat: '09:50:28',
-        namazKalan: '03:19:32',
-        namazVakitleri: { imsak: '04:30', gunes: '06:15', ogle: '13:10', ikindi: '16:45', aksam: '19:30', yatsi: '21:00' },
+        sirketKonum: 'Merkez Ofis — İstanbul',
+        sirketAnlikSaat: '09:50:28',
+        kapanisaKalan: '08:09:32',
+        acilisKapanisSaatleri: {
+          haftaIciAcilis: '09:00',
+          haftaIciKapanis: '18:00',
+          cumartesiAcilis: '09:00',
+          cumartesiKapanis: '13:00',
+          pazarAcilis: 'Kapalı',
+          pazarKapanis: 'Kapalı',
+        },
       };
     default:
       return {};
@@ -446,10 +453,10 @@ function configBirlestir(mevcut: WidgetConfig, mock: WidgetConfig): WidgetConfig
   if (!sonuc.havaSehir && mock.havaSehir) sonuc.havaSehir = mock.havaSehir;
   if (!sonuc.havaIlce && mock.havaIlce) sonuc.havaIlce = mock.havaIlce;
   if (!sonuc.havaAnlik && mock.havaAnlik) sonuc.havaAnlik = mock.havaAnlik;
-  if (!sonuc.namazKonum && mock.namazKonum) sonuc.namazKonum = mock.namazKonum;
-  if (!sonuc.namazSaat && mock.namazSaat) sonuc.namazSaat = mock.namazSaat;
-  if (!sonuc.namazKalan && mock.namazKalan) sonuc.namazKalan = mock.namazKalan;
-  if (!sonuc.namazVakitleri && mock.namazVakitleri) sonuc.namazVakitleri = mock.namazVakitleri;
+  sonuc.acilisKapanisSaatleri = sonuc.acilisKapanisSaatleri ?? mock.acilisKapanisSaatleri;
+  if (!sonuc.sirketKonum && mock.sirketKonum) sonuc.sirketKonum = mock.sirketKonum;
+  if (!sonuc.sirketAnlikSaat && mock.sirketAnlikSaat) sonuc.sirketAnlikSaat = mock.sirketAnlikSaat;
+  if (!sonuc.kapanisaKalan && mock.kapanisaKalan) sonuc.kapanisaKalan = mock.kapanisaKalan;
 
   return sonuc;
 }
@@ -520,7 +527,7 @@ function mockBaslik(tip: string): string {
     HAVA_DURUMU: 'Hava Durumu',
     KRIPTO_LISTESI: 'KRİPTO PARALAR',
     GUNCEL_KONULAR: 'GÜNCEL KONULAR',
-    NAMAZ_VAKITLERI: 'Namaz Vakitleri',
+    SIRKET_GIRIS_CIKIS: 'Şirket Açılış / Kapanış',
     HABER_MAGAZIN: 'EKONOMİ',
   };
   return basliklar[tip] ?? 'Örnek Başlık';

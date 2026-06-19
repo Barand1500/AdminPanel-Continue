@@ -10,7 +10,7 @@ import type {
   WidgetIletisimKarti,
   WidgetKoseYazari,
   WidgetKriptoPara,
-  WidgetNamazVakti,
+  WidgetAcilisKapanisSaati,
   WidgetVideoKarti,
   WidgetHavaGun,
 } from '@/types/haberWidget';
@@ -367,10 +367,10 @@ export interface WidgetConfig {
   videoKartlari?: WidgetVideoKarti[];
   haberSekmeler?: WidgetHaberSekmesi[];
   kriptoParalar?: WidgetKriptoPara[];
-  namazVakitleri?: WidgetNamazVakti;
-  namazKonum?: string;
-  namazSaat?: string;
-  namazKalan?: string;
+  acilisKapanisSaatleri?: WidgetAcilisKapanisSaati;
+  sirketKonum?: string;
+  sirketAnlikSaat?: string;
+  kapanisaKalan?: string;
   havaSehir?: string;
   havaIlce?: string;
   havaAnlik?: { sicaklik: string; durum: string; hissedilen: string; nem: string; ruzgar: string };
@@ -506,8 +506,23 @@ export function varsayilanConfig(tip: string): WidgetConfig {
       return { yerlesim, gorunum: { ...gorunum, vurguRengi: '#dc2626' }, ek, kriptoParalar: [], tumunuGorMetin: 'Tümünü Göster →', tumunuGorLink: '#' };
     case 'GUNCEL_KONULAR':
       return { yerlesim, gorunum: { ...gorunum, vurguRengi: '#dc2626' }, ek, haberKartlari: [] };
-    case 'NAMAZ_VAKITLERI':
-      return { yerlesim, gorunum: { ...gorunum, vurguRengi: '#16a34a' }, ek, namazKonum: 'Beşiktaş, İstanbul', namazVakitleri: { imsak: '04:30', gunes: '06:15', ogle: '13:10', ikindi: '16:45', aksam: '19:30', yatsi: '21:00' } };
+    case 'SIRKET_GIRIS_CIKIS':
+      return {
+        yerlesim,
+        gorunum: { ...gorunum, vurguRengi: '#2563eb' },
+        ek,
+        sirketKonum: 'Merkez Ofis — İstanbul',
+        sirketAnlikSaat: '09:50:28',
+        kapanisaKalan: '08:09:32',
+        acilisKapanisSaatleri: {
+          haftaIciAcilis: '09:00',
+          haftaIciKapanis: '18:00',
+          cumartesiAcilis: '09:00',
+          cumartesiKapanis: '13:00',
+          pazarAcilis: 'Kapalı',
+          pazarKapanis: 'Kapalı',
+        },
+      };
     case 'HABER_MAGAZIN':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3 }, ek, haberKartlari: [], tumunuGorMetin: '+ Tümünü Görüntüle', tumunuGorLink: '#' };
     default:

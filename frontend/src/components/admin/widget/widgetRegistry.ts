@@ -62,7 +62,7 @@ export const WIDGET_TIPLERI = [
   { id: 'HAVA_DURUMU', etiket: 'Hava Durumu', ikon: '⛅', aciklama: 'Anlık hava ve tahmin', grup: 'Haber', kategori: 'haber' as const },
   { id: 'KRIPTO_LISTESI', etiket: 'Kripto Paralar', ikon: '📈', aciklama: 'Kripto fiyat listesi', grup: 'Haber', kategori: 'haber' as const },
   { id: 'GUNCEL_KONULAR', etiket: 'Güncel Konular', ikon: '☰', aciklama: 'Numaralı haber listesi', grup: 'Haber', kategori: 'haber' as const },
-  { id: 'NAMAZ_VAKITLERI', etiket: 'Namaz Vakitleri', ikon: '🕌', aciklama: 'Namaz vakitleri kartı', grup: 'Haber', kategori: 'haber' as const },
+  { id: 'SIRKET_GIRIS_CIKIS', etiket: 'Şirket Açılış / Kapanış', ikon: '🏢', aciklama: 'Haftalık açılış ve kapanış saatleri', grup: 'Haber', kategori: 'haber' as const },
   { id: 'HABER_MAGAZIN', etiket: 'Haber Magazin', ikon: '📊', aciklama: 'Karışık haber magazin grid', grup: 'Haber', kategori: 'haber' as const },
 ] as const;
 

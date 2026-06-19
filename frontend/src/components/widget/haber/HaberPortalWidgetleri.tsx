@@ -308,37 +308,56 @@ export function GuncelKonularWidget({ widget }: { widget: Widget }) {
   );
 }
 
-export function NamazVakitleriWidget({ widget }: { widget: Widget }) {
+export function SirketGirisCikisWidget({ widget }: { widget: Widget }) {
   const cfg = cfgOku(widget);
   const g = gOku(cfg);
-  const v = cfg.namazVakitleri;
-  const renk = g.vurguRengi ?? '#16a34a';
+  const v = cfg.acilisKapanisSaatleri;
+  const renk = g.vurguRengi ?? '#2563eb';
 
   if (!v) return null;
-  const satirlar = [
-    ['İmsak', v.imsak],
-    ['Güneş', v.gunes],
-    ['Öğle', v.ogle],
-    ['İkindi', v.ikindi],
-    ['Akşam', v.aksam],
-    ['Yatsı', v.yatsi],
+
+  const gunler = [
+    { ad: 'Hafta İçi', acilis: v.haftaIciAcilis, kapanis: v.haftaIciKapanis },
+    { ad: 'Cumartesi', acilis: v.cumartesiAcilis, kapanis: v.cumartesiKapanis },
+    { ad: 'Pazar', acilis: v.pazarAcilis, kapanis: v.pazarKapanis },
   ];
 
   return (
     <WidgetKabuk widget={widget}>
       <div className="overflow-hidden rounded-2xl text-white" style={{ backgroundColor: renk }}>
         <div className="flex items-center justify-between border-b border-white/20 px-4 py-3">
-          <span className="font-bold">🕌 Namaz Vakitleri</span>
+          <span className="font-bold">🏢 Şirket Açılış / Kapanış</span>
         </div>
         <div className="p-4">
-          <p className="text-xl font-bold">{cfg.namazKonum ?? 'İstanbul'}</p>
-          {cfg.namazSaat && <p className="mt-1 text-sm text-white/80">Saat: {cfg.namazSaat}</p>}
-          {cfg.namazKalan && <p className="text-sm text-white/80">Öğleye kalan: {cfg.namazKalan}</p>}
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            {satirlar.map(([ad, saat]) => (
-              <div key={ad} className="rounded-lg bg-white p-2 text-center">
-                <p className="text-[10px] font-bold uppercase text-slate-500">{ad}</p>
-                <p className="text-sm font-bold text-slate-900">{saat}</p>
+          <p className="text-xl font-bold">{cfg.sirketKonum ?? 'Merkez Ofis'}</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {cfg.sirketAnlikSaat && (
+              <div>
+                <p className="text-xs text-white/70">Anlık saat</p>
+                <p className="text-lg font-bold">{cfg.sirketAnlikSaat}</p>
+              </div>
+            )}
+            {cfg.kapanisaKalan && (
+              <div>
+                <p className="text-xs text-white/70">Kapanışa kalan</p>
+                <p className="text-lg font-bold">{cfg.kapanisaKalan}</p>
+              </div>
+            )}
+          </div>
+          <div className="mt-4 space-y-2">
+            {gunler.map((gun) => (
+              <div key={gun.ad} className="rounded-lg bg-white/10 p-2">
+                <p className="mb-2 text-center text-[11px] font-bold uppercase tracking-wide text-white/80">{gun.ad}</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="rounded-lg bg-white p-2 text-center">
+                    <p className="text-[10px] font-bold uppercase text-slate-500">Açılış</p>
+                    <p className="text-sm font-bold text-slate-900">{gun.acilis}</p>
+                  </div>
+                  <div className="rounded-lg bg-white p-2 text-center">
+                    <p className="text-[10px] font-bold uppercase text-slate-500">Kapanış</p>
+                    <p className="text-sm font-bold text-slate-900">{gun.kapanis}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>

@@ -44,7 +44,7 @@ export function HaberGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
     'BASLIK_METIN_GORSEL',
   ].includes(tip);
   const kartStiliGoster = ['KATEGORI_HABER_LISTESI', 'KATEGORI_HABER_OVERLAY', 'HABER_MAGAZIN'].includes(tip);
-  const baslikAyarGoster = !['HAVA_DURUMU', 'NAMAZ_VAKITLERI'].includes(tip);
+  const baslikAyarGoster = !['HAVA_DURUMU', 'SIRKET_GIRIS_CIKIS'].includes(tip);
   const haritaDuzen = tip === 'ILETISIM_BLOK';
 
   return (
@@ -148,12 +148,12 @@ export function HaberGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
         </AdminFormBolumu>
       )}
 
-      {tip === 'NAMAZ_VAKITLERI' && (
-        <AdminFormBolumu baslik="Namaz widget renkleri">
+      {tip === 'SIRKET_GIRIS_CIKIS' && (
+        <AdminFormBolumu baslik="Açılış / kapanış kartı renkleri">
           <RenkSecici
             etiket="Ana renk"
             deger={g.vurguRengi ?? ''}
-            varsayilan="#16a34a"
+            varsayilan="#2563eb"
             onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, vurguRengi: v } })))}
           />
         </AdminFormBolumu>

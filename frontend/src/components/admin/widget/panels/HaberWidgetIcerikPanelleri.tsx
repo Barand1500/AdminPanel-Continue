@@ -14,6 +14,7 @@ import type {
   WidgetKriptoPara,
   WidgetVideoKarti,
   WidgetHaberSekmesi,
+  WidgetAcilisKapanisSaati,
 } from '@/types/haberWidget';
 import { ListeSiralayici } from './WidgetPanelOrtak';
 import type { WidgetPanelProps } from './types';
@@ -305,21 +306,56 @@ export function GuncelKonularIcerik(props: WidgetPanelProps) {
   );
 }
 
-export function NamazVakitleriIcerik({ form, onChange }: WidgetPanelProps) {
+const ACILIS_KAPANIS_VARSAYILAN: WidgetAcilisKapanisSaati = {
+  haftaIciAcilis: '',
+  haftaIciKapanis: '',
+  cumartesiAcilis: '',
+  cumartesiKapanis: '',
+  pazarAcilis: '',
+  pazarKapanis: '',
+};
+
+const ACILIS_KAPANIS_GUNLER: { baslik: string; acilis: keyof WidgetAcilisKapanisSaati; kapanis: keyof WidgetAcilisKapanisSaati }[] = [
+  { baslik: 'Hafta İçi', acilis: 'haftaIciAcilis', kapanis: 'haftaIciKapanis' },
+  { baslik: 'Cumartesi', acilis: 'cumartesiAcilis', kapanis: 'cumartesiKapanis' },
+  { baslik: 'Pazar', acilis: 'pazarAcilis', kapanis: 'pazarKapanis' },
+];
+
+export function SirketGirisCikisIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
-  const v = cfg.namazVakitleri ?? { imsak: '', gunes: '', ogle: '', ikindi: '', aksam: '', yatsi: '' };
+  const v = { ...ACILIS_KAPANIS_VARSAYILAN, ...cfg.acilisKapanisSaatleri };
+
+  const saatGuncelle = (alan: keyof WidgetAcilisKapanisSaati, deger: string) => {
+    onChange(configGuncelle(form, (c) => ({
+      ...c,
+      acilisKapanisSaatleri: { ...ACILIS_KAPANIS_VARSAYILAN, ...c.acilisKapanisSaatleri, [alan]: deger },
+    })));
+  };
+
   return (
-    <AdminFormBolumu baslik="Namaz Vakitleri">
-      <FormAlani etiket="Konum"><input className={formInputSinifi} value={cfg.namazKonum ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, namazKonum: e.target.value })))} /></FormAlani>
-      <div className="grid gap-2 sm:grid-cols-3">
-        {(['imsak', 'gunes', 'ogle', 'ikindi', 'aksam', 'yatsi'] as const).map((alan) => (
-          <FormAlani key={alan} etiket={alan}>
-            <input className={formInputSinifi} value={v[alan]} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, namazVakitleri: { ...v, [alan]: e.target.value } })))} />
-          </FormAlani>
-        ))}
-      </div>
-      <FormAlani etiket="Anlık saat"><input className={formInputSinifi} value={cfg.namazSaat ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, namazSaat: e.target.value })))} /></FormAlani>
-      <FormAlani etiket="Öğleye kalan"><input className={formInputSinifi} value={cfg.namazKalan ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, namazKalan: e.target.value })))} /></FormAlani>
+    <AdminFormBolumu baslik="Şirket Açılış / Kapanış">
+      <FormAlani etiket="Konum / birim">
+        <input className={formInputSinifi} value={cfg.sirketKonum ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, sirketKonum: e.target.value })))} placeholder="Merkez Ofis — İstanbul" />
+      </FormAlani>
+      {ACILIS_KAPANIS_GUNLER.map((gun) => (
+        <div key={gun.baslik} className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface-2)] p-3">
+          <p className="mb-2 text-sm font-semibold text-[var(--ap-heading)]">{gun.baslik}</p>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <FormAlani etiket="Açılış">
+              <input className={formInputSinifi} value={v[gun.acilis]} placeholder="09:00" onChange={(e) => saatGuncelle(gun.acilis, e.target.value)} />
+            </FormAlani>
+            <FormAlani etiket="Kapanış">
+              <input className={formInputSinifi} value={v[gun.kapanis]} placeholder="18:00" onChange={(e) => saatGuncelle(gun.kapanis, e.target.value)} />
+            </FormAlani>
+          </div>
+        </div>
+      ))}
+      <FormAlani etiket="Anlık saat">
+        <input className={formInputSinifi} value={cfg.sirketAnlikSaat ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, sirketAnlikSaat: e.target.value })))} placeholder="09:50:28" />
+      </FormAlani>
+      <FormAlani etiket="Kapanışa kalan">
+        <input className={formInputSinifi} value={cfg.kapanisaKalan ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, kapanisaKalan: e.target.value })))} placeholder="08:09:32" />
+      </FormAlani>
     </AdminFormBolumu>
   );
 }
