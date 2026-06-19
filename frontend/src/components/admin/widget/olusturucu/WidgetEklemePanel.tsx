@@ -69,9 +69,8 @@ export function WidgetEklemePanel({
   }
 
   function blokGuncelle(guncelBlok: WidgetBlok) {
-    if (!aktifHucreId) return;
     const hucreler = olusturucu.hucreler.map((h) =>
-      h.id === aktifHucreId
+      h.bloklar.some((b) => b.id === guncelBlok.id)
         ? { ...h, bloklar: h.bloklar.map((b) => (b.id === guncelBlok.id ? guncelBlok : b)) }
         : h
     );
@@ -87,10 +86,8 @@ export function WidgetEklemePanel({
   }
 
   const seciliBlok =
-    aktifHucreId != null
-      ? olusturucu.hucreler
-          .find((h) => h.id === aktifHucreId)
-          ?.bloklar.find((b) => b.id === seciliBlokId) ?? null
+    seciliBlokId != null
+      ? olusturucu.hucreler.flatMap((h) => h.bloklar).find((b) => b.id === seciliBlokId) ?? null
       : null;
 
   return (
@@ -119,6 +116,7 @@ export function WidgetEklemePanel({
             }}
             onBlokSec={(_hucreId, blokId) => setSeciliBlokId(blokId)}
             onBlokSil={blokSil}
+            onBlokGuncelle={blokGuncelle}
           />
           <WidgetGridAltBar
             parcaSayisi={olusturucu.parcaSayisi}

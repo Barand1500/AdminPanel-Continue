@@ -1,5 +1,7 @@
 export type BlokDuzen = 'yan_yana' | 'alt_alta';
 
+export type BlokGorselGenislik = 'tam' | 'yari' | 'uc_ceyrek';
+
 export type BlokTipi =
   | 'baslik'
   | 'metin'
@@ -11,7 +13,18 @@ export type BlokTipi =
   | 'ikon_grup'
   | 'combobox'
   | 'toggle'
-  | 'kart';
+  | 'kart'
+  | 'video'
+  | 'sayac'
+  | 'fiyat'
+  | 'yorum_tek'
+  | 'link_satir'
+  | 'badge'
+  | 'ayirici'
+  | 'liste'
+  | 'cta_serit';
+
+export type BlokPaletKategori = 'metin' | 'medya' | 'kart' | 'etkilesim' | 'istatistik' | 'duzen';
 
 export interface BlokIkonOgesi {
   id: string;
@@ -29,20 +42,35 @@ export interface WidgetBlok {
   butonLink?: string;
   yildiz?: number;
   boslukPx?: number;
-  /** Çoklu ikon satırı */
+  gorselYukseklikPx?: number;
+  gorselGenislik?: BlokGorselGenislik;
   ikonlar?: BlokIkonOgesi[];
-  /** Combobox */
   comboboxEtiket?: string;
   secenekler?: string[];
   seciliSecenek?: string;
-  /** Toggle */
   toggleEtiket?: string;
   toggleAcik?: boolean;
-  /** Kart */
   kartBaslik?: string;
   kartMetin?: string;
   kartGorselUrl?: string;
   kartLink?: string;
+  videoUrl?: string;
+  videoKapakUrl?: string;
+  sayacDeger?: number;
+  sayacSonEk?: string;
+  sayacEtiket?: string;
+  fiyatMetin?: string;
+  paketAd?: string;
+  ozellikler?: string[];
+  yorumMetin?: string;
+  yorumAd?: string;
+  yorumFirma?: string;
+  linkIkon?: string;
+  linkMetin?: string;
+  linkUrl?: string;
+  badgeMetin?: string;
+  listeSatirlari?: string[];
+  ctaMetin?: string;
 }
 
 export interface BlokHucre {
@@ -56,19 +84,46 @@ export interface BlokOlusturucuConfig {
   hucreler: BlokHucre[];
 }
 
-export const BLOK_PALET: { tip: BlokTipi; etiket: string; ikon: string }[] = [
-  { tip: 'baslik', etiket: 'Başlık', ikon: 'H' },
-  { tip: 'metin', etiket: 'Metin', ikon: '¶' },
-  { tip: 'gorsel', etiket: 'Görsel', ikon: '🖼' },
-  { tip: 'kart', etiket: 'Kart', ikon: '🃏' },
-  { tip: 'ikon_grup', etiket: 'İkon Grubu', ikon: '⊞' },
-  { tip: 'combobox', etiket: 'Combobox', ikon: '▾' },
-  { tip: 'toggle', etiket: 'Toggle', ikon: '◉' },
-  { tip: 'tarih', etiket: 'Tarih', ikon: '📅' },
-  { tip: 'buton', etiket: 'Buton', ikon: '🔗' },
-  { tip: 'yildiz', etiket: 'Yıldız', ikon: '★' },
-  { tip: 'bosluk', etiket: 'Boşluk', ikon: '↕' },
+export interface BlokPaletOgesi {
+  tip: BlokTipi;
+  etiket: string;
+  ikon: string;
+  kategori: BlokPaletKategori;
+}
+
+export const BLOK_PALET_KATEGORILERI: { id: BlokPaletKategori; etiket: string }[] = [
+  { id: 'metin', etiket: 'Metin' },
+  { id: 'medya', etiket: 'Medya' },
+  { id: 'kart', etiket: 'Kart' },
+  { id: 'etkilesim', etiket: 'Etkileşim' },
+  { id: 'istatistik', etiket: 'İstatistik' },
+  { id: 'duzen', etiket: 'Düzen' },
 ];
+
+export const BLOK_PALET: BlokPaletOgesi[] = [
+  { tip: 'baslik', etiket: 'Başlık', ikon: 'H', kategori: 'metin' },
+  { tip: 'metin', etiket: 'Metin', ikon: '¶', kategori: 'metin' },
+  { tip: 'tarih', etiket: 'Tarih', ikon: '📅', kategori: 'metin' },
+  { tip: 'badge', etiket: 'Rozet', ikon: '🏷', kategori: 'metin' },
+  { tip: 'liste', etiket: 'Liste', ikon: '☰', kategori: 'metin' },
+  { tip: 'gorsel', etiket: 'Görsel', ikon: '🖼', kategori: 'medya' },
+  { tip: 'video', etiket: 'Video', ikon: '▶', kategori: 'medya' },
+  { tip: 'kart', etiket: 'Kart', ikon: '🃏', kategori: 'kart' },
+  { tip: 'yorum_tek', etiket: 'Yorum', ikon: '💬', kategori: 'kart' },
+  { tip: 'buton', etiket: 'Buton', ikon: '🔗', kategori: 'etkilesim' },
+  { tip: 'combobox', etiket: 'Combobox', ikon: '▾', kategori: 'etkilesim' },
+  { tip: 'toggle', etiket: 'Toggle', ikon: '◉', kategori: 'etkilesim' },
+  { tip: 'link_satir', etiket: 'Link Satırı', ikon: '↗', kategori: 'etkilesim' },
+  { tip: 'cta_serit', etiket: 'CTA Şerit', ikon: '📢', kategori: 'etkilesim' },
+  { tip: 'sayac', etiket: 'Sayaç', ikon: '#', kategori: 'istatistik' },
+  { tip: 'fiyat', etiket: 'Fiyat', ikon: '₺', kategori: 'istatistik' },
+  { tip: 'yildiz', etiket: 'Yıldız', ikon: '★', kategori: 'istatistik' },
+  { tip: 'ikon_grup', etiket: 'İkon Grubu', ikon: '⊞', kategori: 'duzen' },
+  { tip: 'bosluk', etiket: 'Boşluk', ikon: '↕', kategori: 'duzen' },
+  { tip: 'ayirici', etiket: 'Ayırıcı', ikon: '—', kategori: 'duzen' },
+];
+
+export const VARSAYILAN_GORSEL_YUKSEKLIK = 160;
 
 export function bosOlusturucu(): BlokOlusturucuConfig {
   return { parcaSayisi: 0, duzen: 'yan_yana', hucreler: [] };
@@ -76,4 +131,22 @@ export function bosOlusturucu(): BlokOlusturucuConfig {
 
 export function olusturucuOku(cfg: { olusturucu?: BlokOlusturucuConfig | null }): BlokOlusturucuConfig {
   return cfg.olusturucu ?? bosOlusturucu();
+}
+
+export function blokGorselBoyutStili(blok: Pick<WidgetBlok, 'gorselYukseklikPx' | 'gorselGenislik'>) {
+  const genislikMap: Record<BlokGorselGenislik, string> = {
+    tam: '100%',
+    yari: '50%',
+    uc_ceyrek: '75%',
+  };
+  return {
+    height: blok.gorselYukseklikPx ?? VARSAYILAN_GORSEL_YUKSEKLIK,
+    width: genislikMap[blok.gorselGenislik ?? 'tam'],
+    maxWidth: '100%',
+    objectFit: 'cover' as const,
+  };
+}
+
+export function blokGorselResizeDestekler(tip: BlokTipi) {
+  return tip === 'gorsel' || tip === 'kart' || tip === 'video';
 }

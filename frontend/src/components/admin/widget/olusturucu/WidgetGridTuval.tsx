@@ -1,4 +1,6 @@
 import type { BlokHucre, BlokOlusturucuConfig, WidgetBlok } from '@/types/blokOlusturucu';
+import { blokGorselResizeDestekler } from '@/types/blokOlusturucu';
+import { BlokGorselResize } from './BlokGorselResize';
 
 interface WidgetGridTuvalProps {
   olusturucu: BlokOlusturucuConfig;
@@ -7,19 +9,41 @@ interface WidgetGridTuvalProps {
   onHucreSec: (hucreId: string) => void;
   onBlokSec: (hucreId: string, blokId: string) => void;
   onBlokSil: (hucreId: string, blokId: string) => void;
+  onBlokGuncelle?: (blok: WidgetBlok) => void;
 }
 
-function BlokOnizleme({ blok }: { blok: WidgetBlok }) {
+function BlokOnizleme({
+  blok,
+  secili,
+  onBoyutDegistir,
+}: {
+  blok: WidgetBlok;
+  secili: boolean;
+  onBoyutDegistir?: (yukseklik: number) => void;
+}) {
   switch (blok.tip) {
     case 'baslik':
       return <strong className="block text-sm">{blok.metin || 'Başlık'}</strong>;
     case 'metin':
       return <span className="block text-xs text-slate-500 line-clamp-2">{blok.metin || 'Metin'}</span>;
     case 'gorsel':
-      return blok.gorselUrl ? (
-        <img src={blok.gorselUrl} alt="" className="h-16 w-full rounded object-cover" />
-      ) : (
-        <div className="flex h-16 items-center justify-center rounded bg-slate-100 text-xs text-slate-400">Görsel</div>
+      return (
+        <BlokGorselResize
+          blok={blok}
+          secili={secili}
+          src={blok.gorselUrl || undefined}
+          onBoyutDegistir={(h) => onBoyutDegistir?.(h)}
+        />
+      );
+    case 'video':
+      return (
+        <BlokGorselResize
+          blok={blok}
+          secili={secili}
+          src={blok.videoKapakUrl || undefined}
+          placeholder="Video kapak"
+          onBoyutDegistir={(h) => onBoyutDegistir?.(h)}
+        />
       );
     case 'tarih':
       return <span className="text-xs text-slate-500">{blok.tarih || 'Tarih'}</span>;
@@ -57,10 +81,65 @@ function BlokOnizleme({ blok }: { blok: WidgetBlok }) {
       );
     case 'kart':
       return (
-        <div className="rounded border border-slate-200 p-1.5 text-xs">
-          <strong className="block">{blok.kartBaslik || 'Kart'}</strong>
+        <div className="rounded border border-slate-200 p-1 text-xs">
+          <BlokGorselResize
+            blok={blok}
+            secili={secili}
+            src={blok.kartGorselUrl || undefined}
+            placeholder="Kart görseli"
+            onBoyutDegistir={(h) => onBoyutDegistir?.(h)}
+          />
+          <strong className="mt-1 block">{blok.kartBaslik || 'Kart'}</strong>
           <span className="text-slate-500 line-clamp-1">{blok.kartMetin || ''}</span>
         </div>
+      );
+    case 'sayac':
+      return (
+        <span className="text-xs">
+          <strong>{blok.sayacDeger ?? 0}{blok.sayacSonEk}</strong> {blok.sayacEtiket}
+        </span>
+      );
+    case 'fiyat':
+      return (
+        <span className="text-xs">
+          {blok.paketAd} — <strong>{blok.fiyatMetin}</strong>
+        </span>
+      );
+    case 'yorum_tek':
+      return (
+        <span className="block text-xs text-slate-500 line-clamp-2">
+          ★ {blok.yorumMetin?.slice(0, 60) || 'Yorum'}
+        </span>
+      );
+    case 'link_satir':
+      return (
+        <span className="text-xs">
+          {blok.linkIkon} {blok.linkMetin}
+        </span>
+      );
+    case 'badge':
+      return (
+        <span className="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-xs text-blue-700">
+          {blok.badgeMetin || 'Rozet'}
+        </span>
+      );
+    case 'ayirici':
+      return <hr className="my-1 border-slate-200" />;
+    case 'liste':
+      return (
+        <ul className="list-inside list-disc text-xs text-slate-500">
+          {(blok.listeSatirlari ?? []).slice(0, 3).map((s) => (
+            <li key={s} className="truncate">
+              {s}
+            </li>
+          ))}
+        </ul>
+      );
+    case 'cta_serit':
+      return (
+        <span className="text-xs text-slate-500">
+          {blok.ctaMetin?.slice(0, 40)} → {blok.butonMetni}
+        </span>
       );
     default:
       return null;
@@ -74,6 +153,7 @@ export function WidgetGridTuval({
   onHucreSec,
   onBlokSec,
   onBlokSil,
+  onBlokGuncelle,
 }: WidgetGridTuvalProps) {
   const gridYok = !olusturucu.parcaSayisi;
 
@@ -101,6 +181,7 @@ export function WidgetGridTuval({
               onHucreSec={() => onHucreSec(hucre.id)}
               onBlokSec={(blokId) => onBlokSec(hucre.id, blokId)}
               onBlokSil={(blokId) => onBlokSil(hucre.id, blokId)}
+              onBlokGuncelle={onBlokGuncelle}
             />
           ))}
         </div>
@@ -117,6 +198,7 @@ function HucreKutu({
   onHucreSec,
   onBlokSec,
   onBlokSil,
+  onBlokGuncelle,
 }: {
   hucre: BlokHucre;
   index: number;
@@ -125,6 +207,7 @@ function HucreKutu({
   onHucreSec: () => void;
   onBlokSec: (blokId: string) => void;
   onBlokSil: (blokId: string) => void;
+  onBlokGuncelle?: (blok: WidgetBlok) => void;
 }) {
   return (
     <button
@@ -137,31 +220,42 @@ function HucreKutu({
         <span className="ap-muted text-xs">Parça eklemek için seçin</span>
       ) : (
         <div className="ap-olusturucu-blok-liste" onClick={(e) => e.stopPropagation()}>
-          {hucre.bloklar.map((blok) => (
-            <div
-              key={blok.id}
-              className={`ap-olusturucu-blok${seciliBlokId === blok.id ? ' secili' : ''}`}
-              onClick={() => onBlokSec(blok.id)}
-              role="button"
-              tabIndex={0}
-              onKeyDown={(e) => {
-                if (e.key === 'Enter') onBlokSec(blok.id);
-              }}
-            >
-              <BlokOnizleme blok={blok} />
-              <button
-                type="button"
-                className="ap-olusturucu-blok-sil"
-                aria-label="Parçayı sil"
-                onClick={(e) => {
-                  e.stopPropagation();
-                  onBlokSil(blok.id);
+          {hucre.bloklar.map((blok) => {
+            const secili = seciliBlokId === blok.id;
+            return (
+              <div
+                key={blok.id}
+                className={`ap-olusturucu-blok${secili ? ' secili' : ''}`}
+                onClick={() => onBlokSec(blok.id)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') onBlokSec(blok.id);
                 }}
               >
-                ×
-              </button>
-            </div>
-          ))}
+                <BlokOnizleme
+                  blok={blok}
+                  secili={secili}
+                  onBoyutDegistir={
+                    secili && blokGorselResizeDestekler(blok.tip) && onBlokGuncelle
+                      ? (h) => onBlokGuncelle({ ...blok, gorselYukseklikPx: h })
+                      : undefined
+                  }
+                />
+                <button
+                  type="button"
+                  className="ap-olusturucu-blok-sil"
+                  aria-label="Parçayı sil"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onBlokSil(blok.id);
+                  }}
+                >
+                  ×
+                </button>
+              </div>
+            );
+          })}
         </div>
       )}
     </button>

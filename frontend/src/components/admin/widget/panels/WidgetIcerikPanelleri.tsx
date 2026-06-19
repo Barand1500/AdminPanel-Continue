@@ -741,6 +741,39 @@ import {
   VideoGalerisiIcerik,
 } from './HaberWidgetIcerikPanelleri';
 
+export function BlokOlusturucuIcerik({ form, onChange }: WidgetPanelProps) {
+  return (
+    <>
+      <AdminFormBolumu
+        baslik="Bölüm başlığı"
+        aciklama="Widgetın üstünde görünen başlık ve açıklama. Grid parçalarını Widget Ekleme sekmesinden düzenleyin."
+      >
+        <FormAlani etiket="Başlık">
+          <input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} />
+        </FormAlani>
+        <FormAlani etiket="Alt başlık (üst etiket)">
+          <input className={formInputSinifi} value={form.altBaslik} onChange={(e) => onChange({ ...form, altBaslik: e.target.value })} />
+        </FormAlani>
+        <FormAlani etiket="Açıklama">
+          <textarea
+            className={`${formInputSinifi} min-h-[100px]`}
+            value={form.aciklama}
+            onChange={(e) => onChange({ ...form, aciklama: e.target.value })}
+          />
+        </FormAlani>
+      </AdminFormBolumu>
+      <AdminFormBolumu baslik="CTA (opsiyonel)" aciklama="Bölüm altında gösterilmez; grid içinde buton parçası kullanın. Genel CTA alanları ileride eklenebilir.">
+        <FormAlani etiket="Buton metni">
+          <input className={formInputSinifi} value={form.butonMetni} onChange={(e) => onChange({ ...form, butonMetni: e.target.value })} />
+        </FormAlani>
+        <FormAlani etiket="Buton link">
+          <input className={formInputSinifi} value={form.butonLink} onChange={(e) => onChange({ ...form, butonLink: e.target.value })} />
+        </FormAlani>
+      </AdminFormBolumu>
+    </>
+  );
+}
+
 export const ICERIK_PANEL_MAP: Record<string, ComponentType<WidgetPanelProps>> = {
   BASLIK_METIN: BaslikMetinIcerik,
   BASLIK_METIN_GORSEL: BaslikMetinGorselIcerik,
@@ -770,6 +803,7 @@ export const ICERIK_PANEL_MAP: Record<string, ComponentType<WidgetPanelProps>> =
   VIDEO_BANNER: VideoBannerIcerik,
   ONCESI_SONRASI: OncesiSonrasiIcerik,
   BULTEN_KAYIT: BultenKayitIcerik,
+  BLOK_OLUSTURUCU: BlokOlusturucuIcerik,
   KOSE_YAZARLARI: KoseYazarlariIcerik,
   ILETISIM_BLOK: IletisimBlokIcerik,
   KATEGORI_HABER_LISTESI: KategoriHaberListesiIcerik,
