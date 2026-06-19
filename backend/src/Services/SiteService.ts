@@ -7,6 +7,7 @@ import { WidgetRepository } from '../Infrastructure/repositories/WidgetRepositor
 import { BlogRepository } from '../Infrastructure/repositories/BlogRepository.js';
 import { NavKategoriRepository } from '../Infrastructure/repositories/NavKategoriRepository.js';
 import { FormRepository } from '../Infrastructure/repositories/FormRepository.js';
+import { SeoYonlendirmeRepository } from '../Infrastructure/repositories/SeoYonlendirmeRepository.js';
 import {
   sistemAyariSatirdanJson,
   sistemAyarlariJsonCozKayit,
@@ -20,7 +21,13 @@ const widgetRepo = new WidgetRepository();
 const blogRepo = new BlogRepository();
 const navKategoriRepo = new NavKategoriRepository();
 const formRepo = new FormRepository();
+const yonlendirmeRepo = new SeoYonlendirmeRepository();
 const sistemAyariRepo = new SistemAyariRepository();
+
+function sayfaPublicUrl(slug: string): string {
+  if (slug === 'anasayfa' || slug === 'home') return '/';
+  return `/${slug}`;
+}
 
 function publicSistemAyarlari(
   siteAyarlari: { sistemAyarlariJson?: unknown } | null | undefined,
@@ -46,12 +53,13 @@ export class SiteService {
 
     await sayfaService.hiyerarsiOnar(site.id);
 
-    const [sayfalar, widgetlar, bloglar, navKategoriler, formlar, sistemSatiri] = await Promise.all([
+    const [sayfalar, widgetlar, bloglar, navKategoriler, formlar, seoYonlendirmeler, sistemSatiri] = await Promise.all([
       sayfaRepo.findBySiteId(site.id),
       widgetRepo.findBySiteId(site.id),
       blogRepo.findPublicBySiteId(site.id),
       navKategoriRepo.findPublicBySiteId(site.id),
       formRepo.findPublicBySiteId(site.id),
+      yonlendirmeRepo.findPublicBySiteId(site.id),
       sistemAyariRepo.findBySiteId(site.id),
     ]);
 
@@ -89,6 +97,18 @@ export class SiteService {
         ayarlarJson: f.ayarlarJson,
         aktif: f.aktif,
       })),
+      seoYonlendirmeler: seoYonlendirmeler
+        .map((y) => {
+          if (y.hedefTip !== 'sayfa') return null;
+          const hedef = sayfalar.find((s) => s.id === y.hedefId);
+          if (!hedef) return null;
+          return {
+            kaynakUrl: y.kaynakUrl,
+            hedefUrl: sayfaPublicUrl(hedef.slug),
+            kod: y.kod,
+          };
+        })
+        .filter((y): y is { kaynakUrl: string; hedefUrl: string; kod: number } => y != null),
     };
   }
 

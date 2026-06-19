@@ -42,4 +42,16 @@ export class SeoController {
       return res.status(status).json({ mesaj });
     }
   }
+
+  async topluKaydet(req: Request, res: Response) {
+    try {
+      const siteId = cozulenSiteId(req);
+      if (!siteId) return res.status(400).json({ mesaj: 'Site secimi gerekli' });
+      const seo = await service.topluKaydet(siteId, req.body);
+      return res.json(seo);
+    } catch (err) {
+      const mesaj = err instanceof Error ? err.message : 'SEO kaydi basarisiz';
+      return res.status(400).json({ mesaj });
+    }
+  }
 }

@@ -26,6 +26,7 @@ export async function siteVerisiGetir(signal?: AbortSignal): Promise<SitePublicD
         id: String(f.id),
         alanlarJson: Array.isArray(f.alanlarJson) ? f.alanlarJson : [],
       })),
+      seoYonlendirmeler: veri.seoYonlendirmeler ?? [],
     };
   } catch {
     return bosSiteVerisi;

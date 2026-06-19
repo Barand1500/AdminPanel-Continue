@@ -2,6 +2,20 @@ import { adminHeaders, adminJsonFetch } from './adminFetch';
 
 export type SeoKayitTipi = 'kategori' | 'marka' | 'firsat' | 'urun' | 'sayfa';
 
+export interface SeoYonlendirme {
+  id: string;
+  hedefTip: SeoKayitTipi;
+  hedefId: string;
+  kaynakUrl: string;
+  seoTitle: string | null;
+  seoDesc: string | null;
+  kod: number;
+  /** Yerel state — henüz kaydedilmemiş */
+  yeni?: boolean;
+  /** Yerel state — silinecek */
+  silindi?: boolean;
+}
+
 export interface SeoKayit {
   id: string;
   etiket: string;
@@ -55,6 +69,15 @@ export interface SeoOzet {
     slug: string;
     seoTitle: string | null;
     seoDesc: string | null;
+  }[];
+  yonlendirmeler: {
+    id: number;
+    hedefTip: SeoKayitTipi;
+    hedefId: number;
+    kaynakUrl: string;
+    seoTitle: string | null;
+    seoDesc: string | null;
+    kod: number;
   }[];
 }
 
@@ -127,6 +150,50 @@ export async function seoFirsatGuncelle(id: string, seoTitle: string, seoDesc: s
     headers: adminHeaders(),
     body: JSON.stringify(metaBody(seoTitle, seoDesc)),
   });
+}
+
+export async function seoTopluKaydet(payload: {
+  kayitlar: { tip: SeoKayitTipi; id: string; seoTitle: string | null; seoDesc: string | null }[];
+  yonlendirmeler: {
+    id?: string;
+    hedefTip: SeoKayitTipi;
+    hedefId: string;
+    kaynakUrl: string;
+    seoTitle: string | null;
+    seoDesc: string | null;
+    kod?: number;
+    sil?: boolean;
+  }[];
+}): Promise<SeoOzet> {
+  return adminJsonFetch<SeoOzet>('/seo/toplu', {
+    method: 'PUT',
+    headers: adminHeaders(),
+    body: JSON.stringify(payload),
+  });
+}
+
+export function seoUrlNormalize(url: string): string {
+  const temiz = url.trim();
+  if (!temiz) return '/';
+  return temiz.startsWith('/') ? temiz : `/${temiz}`;
+}
+
+export function yonlendirmeleriNormalize(
+  liste: SeoOzet['yonlendirmeler'] | undefined
+): SeoYonlendirme[] {
+  return (liste ?? []).map((y) => ({
+    id: String(y.id),
+    hedefTip: y.hedefTip,
+    hedefId: String(y.hedefId),
+    kaynakUrl: y.kaynakUrl,
+    seoTitle: y.seoTitle,
+    seoDesc: y.seoDesc,
+    kod: y.kod,
+  }));
+}
+
+export function yeniYonlendirmeId(): string {
+  return `yeni-${crypto.randomUUID()}`;
 }
 
 export async function seoKayitGuncelle(

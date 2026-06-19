@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import type { SeoGenelForm, SeoKayit } from '@/features/admin/seoApi';
+import type { SeoGenelForm, SeoKayit, SeoYonlendirme } from '@/features/admin/seoApi';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
 import { AdminPanelKarti } from '@/components/admin/ortak/AdminBilesenleri';
@@ -128,29 +128,46 @@ export function SeoGenelPanel({
           />
         </div>
       </AdminPanelKarti>
-      <SeoSerpOnizleme
-        baslik={form.seoBaslik}
-        aciklama={form.seoAciklama}
-        url="siteniz.com"
-      />
+      <SeoSerpOnizleme baslik={form.seoBaslik} aciklama={form.seoAciklama} url="siteniz.com" />
     </div>
   );
 }
 
 interface SeoMetaTabloProps {
   kayitlar: SeoKayit[];
+  yonlendirmeler: SeoYonlendirme[];
   kirliIdler: Set<string>;
-  kaydediliyorId: string | null;
+  kirliYonlendirmeIdler: Set<string>;
+  kaydediliyor: boolean;
   onDegistir: (id: string, alan: 'seoTitle' | 'seoDesc', deger: string) => void;
-  onKaydet: (id: string) => void;
+  onYonlendirmeDegistir: (id: string, alan: 'seoTitle' | 'seoDesc', deger: string) => void;
+  onYonlendirmeSil: (id: string) => void;
+  onLinkEkleTikla: (hedef: SeoKayit) => void;
+  onTopluKaydet: () => void;
+  kaydetAktif: boolean;
+}
+
+function hedefYonlendirmeleri(
+  yonlendirmeler: SeoYonlendirme[],
+  hedef: SeoKayit
+): SeoYonlendirme[] {
+  return yonlendirmeler.filter(
+    (y) => !y.silindi && y.hedefId === hedef.id && y.hedefTip === hedef.tip
+  );
 }
 
 export function SeoMetaTablo({
   kayitlar,
+  yonlendirmeler,
   kirliIdler,
-  kaydediliyorId,
+  kirliYonlendirmeIdler,
+  kaydediliyor,
   onDegistir,
-  onKaydet,
+  onYonlendirmeDegistir,
+  onYonlendirmeSil,
+  onLinkEkleTikla,
+  onTopluKaydet,
+  kaydetAktif,
 }: SeoMetaTabloProps) {
   const [arama, setArama] = useState('');
   const [sayfaBoyutu, setSayfaBoyutu] = useState(10);
@@ -159,18 +176,26 @@ export function SeoMetaTablo({
   const filtreli = useMemo(() => {
     const q = arama.trim().toLowerCase();
     if (!q) return kayitlar;
-    return kayitlar.filter(
-      (k) =>
+    return kayitlar.filter((k) => {
+      const alt = hedefYonlendirmeleri(yonlendirmeler, k);
+      return (
         k.etiket.toLowerCase().includes(q) ||
         k.url.toLowerCase().includes(q) ||
         (k.seoTitle ?? '').toLowerCase().includes(q) ||
-        (k.seoDesc ?? '').toLowerCase().includes(q)
-    );
-  }, [kayitlar, arama]);
+        (k.seoDesc ?? '').toLowerCase().includes(q) ||
+        alt.some(
+          (y) =>
+            y.kaynakUrl.toLowerCase().includes(q) ||
+            (y.seoTitle ?? '').toLowerCase().includes(q)
+        )
+      );
+    });
+  }, [kayitlar, yonlendirmeler, arama]);
 
   const toplamSayfa = Math.max(1, Math.ceil(filtreli.length / sayfaBoyutu));
   const gosterilen = filtreli.slice(sayfa * sayfaBoyutu, (sayfa + 1) * sayfaBoyutu);
 
+  const aktifYonlendirmeSayisi = yonlendirmeler.filter((y) => !y.silindi).length;
   const eksikSayisi = kayitlar.filter((k) => !k.seoTitle?.trim() || !k.seoDesc?.trim()).length;
   const tamSayisi = kayitlar.length - eksikSayisi;
 
@@ -188,6 +213,10 @@ export function SeoMetaTablo({
         <div className="ap-seo-ozet-kart ap-seo-ozet-amber">
           <span className="ap-seo-ozet-deger">{eksikSayisi}</span>
           <span className="ap-seo-ozet-etiket">Eksik</span>
+        </div>
+        <div className="ap-seo-ozet-kart">
+          <span className="ap-seo-ozet-deger">{aktifYonlendirmeSayisi}</span>
+          <span className="ap-seo-ozet-etiket">301 Yönlendirme</span>
         </div>
       </div>
 
@@ -207,6 +236,7 @@ export function SeoMetaTablo({
               </option>
             ))}
           </select>
+          <span>veri göster</span>
         </label>
         <div className="ap-arama ap-seo-arama">
           <div className="ap-arama-input-wrap">
@@ -239,12 +269,13 @@ export function SeoMetaTablo({
                 </tr>
               </thead>
               <tbody>
-                {gosterilen.map((k) => {
+                {gosterilen.flatMap((k) => {
                   const kirli = kirliIdler.has(k.id);
-                  const kaydediliyor = kaydediliyorId === k.id;
                   const titleEksik = !k.seoTitle?.trim();
                   const descEksik = !k.seoDesc?.trim();
-                  return (
+                  const altlar = hedefYonlendirmeleri(yonlendirmeler, k);
+
+                  const anaSatir = (
                     <tr key={k.id} className={kirli ? 'ap-seo-satir-kirli' : ''}>
                       <td>
                         <a
@@ -293,16 +324,71 @@ export function SeoMetaTablo({
                       <td>
                         <button
                           type="button"
-                          onClick={() => onKaydet(k.id)}
-                          disabled={!kirli || kaydediliyor}
-                          className="ap-seo-kaydet-btn"
-                          title={kirli ? 'Kaydet' : 'Değişiklik yok'}
+                          onClick={() => onLinkEkleTikla(k)}
+                          className="ap-seo-kaydet-btn ap-seo-link-ekle-btn"
+                          title="301 yönlendirme ekle"
                         >
-                          {kaydediliyor ? '…' : '+'}
+                          +
                         </button>
                       </td>
                     </tr>
                   );
+
+                  const altSatirlar = altlar.map((y) => {
+                    const yKirli = kirliYonlendirmeIdler.has(y.id);
+                    return (
+                      <tr key={y.id} className={`ap-seo-satir-301 ${yKirli ? 'ap-seo-satir-kirli' : ''}`}>
+                        <td>
+                          <div className="ap-seo-301-url">
+                            <span className="ap-seo-301-rozet">301</span>
+                            <span className="ap-seo-301-ok" aria-hidden>
+                              ↳
+                            </span>
+                            <span className="ap-seo-301-kaynak">{y.kaynakUrl}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <input
+                            className="ap-seo-hucre-input"
+                            value={y.seoTitle ?? ''}
+                            onChange={(e) => onYonlendirmeDegistir(y.id, 'seoTitle', e.target.value)}
+                            placeholder="Title"
+                          />
+                          <KarakterSayaci
+                            uzunluk={(y.seoTitle ?? '').length}
+                            limit={TITLE_LIMIT}
+                            etiket="T"
+                          />
+                        </td>
+                        <td>
+                          <textarea
+                            className="ap-seo-hucre-textarea"
+                            rows={2}
+                            value={y.seoDesc ?? ''}
+                            onChange={(e) => onYonlendirmeDegistir(y.id, 'seoDesc', e.target.value)}
+                            placeholder="Description"
+                          />
+                          <KarakterSayaci
+                            uzunluk={(y.seoDesc ?? '').length}
+                            limit={DESC_LIMIT}
+                            etiket="D"
+                          />
+                        </td>
+                        <td>
+                          <button
+                            type="button"
+                            onClick={() => onYonlendirmeSil(y.id)}
+                            className="ap-seo-sil-btn"
+                            title="301 yönlendirmeyi sil"
+                          >
+                            🗑
+                          </button>
+                        </td>
+                      </tr>
+                    );
+                  });
+
+                  return [anaSatir, ...altSatirlar];
                 })}
               </tbody>
             </table>
@@ -333,6 +419,21 @@ export function SeoMetaTablo({
           )}
         </>
       )}
+
+      <div className="ap-seo-alt-kaydet">
+        <p className="ap-muted text-xs">
+          Title, description ve 301 yönlendirmeleri düzenleyin; tüm değişiklikleri alttan veya üst aksiyon
+          çubuğundan kaydedin.
+        </p>
+        <button
+          type="button"
+          className="ap-btn ap-btn-birincil"
+          disabled={!kaydetAktif || kaydediliyor}
+          onClick={onTopluKaydet}
+        >
+          {kaydediliyor ? 'Kaydediliyor...' : 'Kaydet'}
+        </button>
+      </div>
     </div>
   );
 }

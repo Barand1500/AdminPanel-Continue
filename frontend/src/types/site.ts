@@ -71,6 +71,7 @@ export interface SitePublicData {
   bloglar: import('./blog').BlogYazisiOzet[];
   navKategoriler: import('./navKategori').NavKategoriKayit[];
   formlar?: import('@/utils/formYardimci').PublicFormKayit[];
+  seoYonlendirmeler?: { kaynakUrl: string; hedefUrl: string; kod: number }[];
 }
 
 export interface MenuOgesi {

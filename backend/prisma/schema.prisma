@@ -32,6 +32,7 @@ model Site {
   adminLoglari       AdminLog[]
   yedekKayitlari     YedekKaydi[]
   navKategoriler     NavKategori[]
+  seoYonlendirmeler  SeoYonlendirme[]
 
   @@map("siteler")
 }
@@ -305,6 +306,24 @@ model FormGonderim {
 
   @@index([formId, okundu])
   @@map("form_gonderimler")
+}
+
+model SeoYonlendirme {
+  id        Int      @id @default(autoincrement())
+  siteId    Int
+  site      Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  hedefTip  String   @db.VarChar(32)
+  hedefId   Int
+  kaynakUrl String   @db.VarChar(500)
+  seoTitle  String?  @db.VarChar(200)
+  seoDesc   String?  @db.Text
+  kod       Int      @default(301)
+  olusturma DateTime @default(now())
+  guncelleme DateTime @updatedAt
+
+  @@unique([siteId, kaynakUrl])
+  @@index([siteId, hedefTip, hedefId])
+  @@map("seo_yonlendirmeler")
 }
 
 // ─── Sistem ──────────────────────────────────────────────────────────────────

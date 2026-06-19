@@ -16,6 +16,7 @@ import { medyaOlusturSchema, medyaTopluSilSchema } from '../../Application/DTOs/
 import {
   seoGenelGuncelleSchema,
   seoSayfaGuncelleSchema,
+  seoTopluKaydetSchema,
 } from '../../Application/DTOs/SeoDto.js';
 import { siteAyarlariGuncelleSchema } from '../../Application/DTOs/SiteAyarlariDto.js';
 import { sistemAyarlariGuncelleSchema } from '../../Application/DTOs/SistemAyarlariDto.js';
@@ -152,6 +153,7 @@ router.delete('/medya', authMiddleware, yS, validateBySchema(medyaTopluSilSchema
 
 router.get('/seo', authMiddleware, yG, (req, res) => seoController.ozet(req, res));
 router.put('/seo/genel', authMiddleware, yD, validateBySchema(seoGenelGuncelleSchema), (req, res) => seoController.genelGuncelle(req, res));
+router.put('/seo/toplu', authMiddleware, yD, validateBySchema(seoTopluKaydetSchema), (req, res) => seoController.topluKaydet(req, res));
 router.put('/seo/sayfa/:id', authMiddleware, yD, validateBySchema(seoSayfaGuncelleSchema), (req, res) => seoController.sayfaGuncelle(req, res));
 
 router.get('/blog', authMiddleware, yG, (req, res) => blogController.listele(req, res));

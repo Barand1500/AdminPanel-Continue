@@ -4673,6 +4673,86 @@ html:has(.admin-panel[data-tema='acik']) body {
   cursor: not-allowed;
 }
 
+.ap-seo-link-ekle-btn {
+  opacity: 1;
+  cursor: pointer;
+}
+
+.ap-seo-link-ekle-btn:hover {
+  transform: scale(1.05);
+  background: #16a34a;
+}
+
+.ap-seo-satir-301 {
+  background: rgba(239, 68, 68, 0.04);
+}
+
+.ap-seo-satir-301 td {
+  border-top: 1px dashed rgba(239, 68, 68, 0.15);
+}
+
+.ap-seo-301-url {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding-left: 1.25rem;
+}
+
+.ap-seo-301-rozet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.25rem;
+  background: #ef4444;
+  color: #fff;
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.ap-seo-301-ok {
+  color: #ef4444;
+  font-size: 0.85rem;
+}
+
+.ap-seo-301-kaynak {
+  color: #ef4444;
+  font-size: 0.82rem;
+  font-weight: 600;
+  word-break: break-all;
+}
+
+.ap-seo-sil-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 999px;
+  background: rgba(239, 68, 68, 0.12);
+  color: #ef4444;
+  font-size: 1rem;
+  transition: background 0.15s, transform 0.15s;
+}
+
+.ap-seo-sil-btn:hover {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.05);
+}
+
+.ap-seo-alt-kaydet {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ap-border);
+}
+
 .ap-seo-sayfalama {
   display: flex;
   align-items: center;
