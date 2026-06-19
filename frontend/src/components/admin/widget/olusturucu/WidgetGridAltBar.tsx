@@ -5,13 +5,20 @@ interface WidgetGridAltBarProps {
   duzen: BlokDuzen;
   onParcaSayisi: (sayi: 1 | 2 | 3 | 4) => void;
   onDuzen: (duzen: BlokDuzen) => void;
+  kompakt?: boolean;
 }
 
 const PARCA_SECENEKLERI: (1 | 2 | 3 | 4)[] = [1, 2, 3, 4];
 
-export function WidgetGridAltBar({ parcaSayisi, duzen, onParcaSayisi, onDuzen }: WidgetGridAltBarProps) {
+export function WidgetGridAltBar({
+  parcaSayisi,
+  duzen,
+  onParcaSayisi,
+  onDuzen,
+  kompakt = false,
+}: WidgetGridAltBarProps) {
   return (
-    <div className="ap-olusturucu-alt-bar">
+    <div className={`ap-olusturucu-alt-bar${kompakt ? ' ap-olusturucu-alt-bar-kompakt' : ''}`}>
       <div className="ap-olusturucu-alt-grup">
         <span className="ap-olusturucu-alt-etiket">Kaç parça?</span>
         <div className="ap-olusturucu-segment">

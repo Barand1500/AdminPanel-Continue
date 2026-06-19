@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 export type BlokDuzen = 'yan_yana' | 'alt_alta';
 
 export type BlokGorselGenislik = 'tam' | 'yari' | 'uc_ceyrek';
@@ -44,6 +46,8 @@ export interface WidgetBlok {
   boslukPx?: number;
   gorselYukseklikPx?: number;
   gorselGenislik?: BlokGorselGenislik;
+  /** Sürükleme ile ayarlanan px genişlik; yoksa gorselGenislik yüzdesi kullanılır */
+  blokGenislikPx?: number;
   ikonlar?: BlokIkonOgesi[];
   comboboxEtiket?: string;
   secenekler?: string[];
@@ -133,20 +137,51 @@ export function olusturucuOku(cfg: { olusturucu?: BlokOlusturucuConfig | null })
   return cfg.olusturucu ?? bosOlusturucu();
 }
 
-export function blokGorselBoyutStili(blok: Pick<WidgetBlok, 'gorselYukseklikPx' | 'gorselGenislik'>) {
-  const genislikMap: Record<BlokGorselGenislik, string> = {
-    tam: '100%',
-    yari: '50%',
-    uc_ceyrek: '75%',
-  };
+const GENISLIK_YUZDE: Record<BlokGorselGenislik, string> = {
+  tam: '100%',
+  yari: '50%',
+  uc_ceyrek: '75%',
+};
+
+export function blokMinYukseklik(tip: BlokTipi): number {
+  return tip === 'gorsel' || tip === 'kart' || tip === 'video' ? 80 : 32;
+}
+
+export function blokOnizlemeWrapperStili(
+  blok: Pick<WidgetBlok, 'blokGenislikPx' | 'gorselGenislik' | 'gorselYukseklikPx'>
+): CSSProperties {
+  const width =
+    blok.blokGenislikPx != null ? `${blok.blokGenislikPx}px` : GENISLIK_YUZDE[blok.gorselGenislik ?? 'tam'];
+  const style: CSSProperties = { width, maxWidth: '100%' };
+  if (blok.gorselYukseklikPx != null) {
+    style.minHeight = blok.gorselYukseklikPx;
+    style.height = blok.gorselYukseklikPx;
+    style.overflow = 'hidden';
+  }
+  return style;
+}
+
+export function blokOnizlemeMedyaStili(
+  blok: Pick<WidgetBlok, 'gorselYukseklikPx' | 'gorselGenislik' | 'blokGenislikPx'>
+) {
   return {
     height: blok.gorselYukseklikPx ?? VARSAYILAN_GORSEL_YUKSEKLIK,
-    width: genislikMap[blok.gorselGenislik ?? 'tam'],
+    width: '100%',
     maxWidth: '100%',
     objectFit: 'cover' as const,
   };
 }
 
-export function blokGorselResizeDestekler(tip: BlokTipi) {
-  return tip === 'gorsel' || tip === 'kart' || tip === 'video';
+/** @deprecated blokOnizlemeMedyaStili kullanın */
+export function blokGorselBoyutStili(
+  blok: Pick<WidgetBlok, 'gorselYukseklikPx' | 'gorselGenislik' | 'blokGenislikPx'>
+) {
+  const width =
+    blok.blokGenislikPx != null ? `${blok.blokGenislikPx}px` : GENISLIK_YUZDE[blok.gorselGenislik ?? 'tam'];
+  return {
+    height: blok.gorselYukseklikPx ?? VARSAYILAN_GORSEL_YUKSEKLIK,
+    width,
+    maxWidth: '100%',
+    objectFit: 'cover' as const,
+  };
 }
