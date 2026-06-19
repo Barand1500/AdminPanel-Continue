@@ -9,6 +9,20 @@ export const sayfa404AyarlariSchema = z.object({
   anaSayfaButonu: z.boolean().optional(),
 });
 
+export const sagTikPanelAyarlariSchema = z.object({
+  aktif: z.boolean().optional(),
+  ogeler: z
+    .array(
+      z.object({
+        id: z.string().max(32),
+        aktif: z.boolean(),
+      })
+    )
+    .max(32)
+    .optional(),
+  modulIdler: z.array(z.string().max(64)).max(40).optional(),
+});
+
 export const sistemAyarlariGuncelleSchema = z.object({
   siteAktif: z.boolean().optional(),
   domain: z.union([z.string().max(200), z.literal(''), z.null()]).optional(),
@@ -26,6 +40,7 @@ export const sistemAyarlariGuncelleSchema = z.object({
   otomatikYedeklemeGun: z.number().int().min(1).max(30).optional(),
   guvenlikBasliklari: z.boolean().optional(),
   robotsEngelle: z.boolean().optional(),
+  sagTikPaneli: sagTikPanelAyarlariSchema.optional(),
 });
 
 export type SistemAyarlariGuncelleDto = z.infer<typeof sistemAyarlariGuncelleSchema>;
@@ -54,4 +69,9 @@ export interface SistemAyarlariJson {
   otomatikYedeklemeGun?: number;
   guvenlikBasliklari?: boolean;
   robotsEngelle?: boolean;
+  sagTikPaneli?: {
+    aktif?: boolean;
+    ogeler?: { id: string; aktif: boolean }[];
+    modulIdler?: string[];
+  };
 }

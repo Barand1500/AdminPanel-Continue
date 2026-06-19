@@ -1,3 +1,4 @@
+import { Prisma } from '@prisma/client';
 import type {
   SistemAyarlariGuncelleDto,
   SistemAyarlariJson,
@@ -79,6 +80,12 @@ export class SistemAyarlariService {
     const site = await siteRepo.findById(siteId);
     if (!site) throw new Error('Site bulunamadi');
 
+    const mevcutSatir = await ayarlarRepo.findBySiteId(siteId);
+    const mevcutEk =
+      mevcutSatir?.ekAyarlarJson && typeof mevcutSatir.ekAyarlarJson === 'object'
+        ? ({ ...(mevcutSatir.ekAyarlarJson as Record<string, unknown>) } as Record<string, unknown>)
+        : {};
+
     const mevcut = await this.getir(kullanici, explicitSiteId).then((x) => x.sistem);
     const guncel: SistemAyarlariJson = {
       bakimModu: dto.bakimModu ?? mevcut.bakimModu,
@@ -95,7 +102,12 @@ export class SistemAyarlariService {
       otomatikYedeklemeGun: dto.otomatikYedeklemeGun ?? mevcut.otomatikYedeklemeGun,
       guvenlikBasliklari: dto.guvenlikBasliklari ?? mevcut.guvenlikBasliklari,
       robotsEngelle: dto.robotsEngelle ?? mevcut.robotsEngelle,
+      sagTikPaneli: dto.sagTikPaneli ?? mevcut.sagTikPaneli,
     };
+
+    if (dto.sagTikPaneli !== undefined) {
+      mevcutEk.sagTikPaneli = dto.sagTikPaneli;
+    }
 
     if (dto.siteAktif !== undefined || dto.domain !== undefined) {
       await siteRepo.guncelle(siteId, {
@@ -124,8 +136,7 @@ export class SistemAyarlariService {
       otomatikYedeklemeGun: guncel.otomatikYedeklemeGun ?? 7,
       guvenlikBasliklari: guncel.guvenlikBasliklari ?? true,
       robotsEngelle: guncel.robotsEngelle ?? false,
-      // Dinamik genisleme alani: yeni sistem sekmeleri/opsiyonlari burada tutulabilir.
-      ekAyarlarJson: {},
+      ekAyarlarJson: mevcutEk as Prisma.InputJsonValue,
     });
 
     return this.getir(kullanici, explicitSiteId);

@@ -1,3 +1,7 @@
+import type { SagTikPanelAyarlari } from '@/types/sagTikPaneli';
+import { VARSAYILAN_SAG_TIK_PANEL } from '@/types/sagTikPaneli';
+import { sagTikPanelNormalize } from '@/utils/sagTikPanelYardimci';
+
 export type Sayfa404MenuTipi = 'ust' | 'footer' | 'her-ikisi' | 'yok';
 
 export interface SistemAyarlariJson {
@@ -42,9 +46,10 @@ export interface SistemAyarlariForm {
   otomatikYedeklemeGun: number;
   guvenlikBasliklari: boolean;
   robotsEngelle: boolean;
+  sagTikPaneli: SagTikPanelAyarlari;
 }
 
-export type SistemSekmeId = 'genel' | 'bakim' | 'sayfa404' | 'dil' | 'guvenlik';
+export type SistemSekmeId = 'genel' | 'bakim' | 'sayfa404' | 'dil' | 'guvenlik' | 'sagTik';
 
 export const SISTEM_SEKMELER: { id: SistemSekmeId; ad: string; ikon: string }[] = [
   { id: 'genel', ad: 'Genel', ikon: '⚡' },
@@ -52,6 +57,7 @@ export const SISTEM_SEKMELER: { id: SistemSekmeId; ad: string; ikon: string }[] 
   { id: 'sayfa404', ad: '404 Sayfası', ikon: '🚫' },
   { id: 'dil', ad: 'Panel Dili', ikon: '🌐' },
   { id: 'guvenlik', ad: 'Güvenlik', ikon: '🛡️' },
+  { id: 'sagTik', ad: 'Sağ Tık Paneli', ikon: '🖱️' },
 ];
 
 export const PANEL_DILLERI: { kod: string; ad: string }[] = [
@@ -95,6 +101,7 @@ export const bosSistemForm: SistemAyarlariForm = {
   otomatikYedeklemeGun: 7,
   guvenlikBasliklari: true,
   robotsEngelle: false,
+  sagTikPaneli: { ...VARSAYILAN_SAG_TIK_PANEL, ogeler: [...VARSAYILAN_SAG_TIK_PANEL.ogeler] },
 };
 
 export function sistemdenForm(
@@ -118,5 +125,6 @@ export function sistemdenForm(
     otomatikYedeklemeGun: sistem.otomatikYedeklemeGun ?? 7,
     guvenlikBasliklari: sistem.guvenlikBasliklari ?? true,
     robotsEngelle: sistem.robotsEngelle ?? false,
+    sagTikPaneli: sagTikPanelNormalize(sistem.sagTikPaneli),
   };
 }

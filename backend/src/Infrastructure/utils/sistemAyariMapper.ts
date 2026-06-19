@@ -55,6 +55,26 @@ function sayfa404Coz(json: unknown): Sayfa404Ayarlari {
   };
 }
 
+function sagTikPaneliCoz(json: unknown): SistemAyarlariJson['sagTikPaneli'] | undefined {
+  if (!json || typeof json !== 'object') return undefined;
+  const k = json as Record<string, unknown>;
+  const ogeler = Array.isArray(k.ogeler)
+    ? k.ogeler
+        .filter((o): o is { id: string; aktif: boolean } =>
+          Boolean(o && typeof o === 'object' && typeof (o as Record<string, unknown>).id === 'string')
+        )
+        .map((o) => ({ id: o.id, aktif: Boolean((o as { aktif?: boolean }).aktif) }))
+    : undefined;
+  const modulIdler = Array.isArray(k.modulIdler)
+    ? k.modulIdler.filter((x): x is string => typeof x === 'string')
+    : undefined;
+  return {
+    aktif: typeof k.aktif === 'boolean' ? k.aktif : undefined,
+    ogeler,
+    modulIdler,
+  };
+}
+
 export function sistemAyarlariJsonCozKayit(kayit: Record<string, unknown>): SistemAyarlariJson {
   return {
     bakimModu: typeof kayit.bakimModu === 'boolean' ? kayit.bakimModu : varsayilanSistemAyarlari.bakimModu,
@@ -86,6 +106,7 @@ export function sistemAyarlariJsonCozKayit(kayit: Record<string, unknown>): Sist
         : varsayilanSistemAyarlari.guvenlikBasliklari,
     robotsEngelle:
       typeof kayit.robotsEngelle === 'boolean' ? kayit.robotsEngelle : varsayilanSistemAyarlari.robotsEngelle,
+    sagTikPaneli: sagTikPaneliCoz(kayit.sagTikPaneli),
   };
 }
 
@@ -124,5 +145,10 @@ export function sistemAyariSatirdanJson(satir: Record<string, unknown> | null | 
     otomatikYedeklemeGun: typeof satir.otomatikYedeklemeGun === 'number' ? satir.otomatikYedeklemeGun : 7,
     guvenlikBasliklari: typeof satir.guvenlikBasliklari === 'boolean' ? satir.guvenlikBasliklari : true,
     robotsEngelle: typeof satir.robotsEngelle === 'boolean' ? satir.robotsEngelle : false,
+    sagTikPaneli: sagTikPaneliCoz(
+      satir.ekAyarlarJson && typeof satir.ekAyarlarJson === 'object'
+        ? (satir.ekAyarlarJson as Record<string, unknown>).sagTikPaneli
+        : undefined
+    ),
   };
 }

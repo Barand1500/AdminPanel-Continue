@@ -16,7 +16,9 @@ import { adminLogApi } from '@/features/admin/adminSistemApi';
 import { adminBildirimleriYenile } from '@/utils/adminBildirimOlaylari';
 import { GirisSayfasi } from '@/pages/admin/GirisSayfasi';
 import { ModulRehberSistemi } from '@/components/admin/ortak/ModulRehberSistemi';
-import { SistemKesifProvider } from '@/contexts/SistemKesifContext';
+import { SistemKesifProvider, useSistemKesifOptional } from '@/contexts/SistemKesifContext';
+import { SagTikPanelProvider } from '@/contexts/SagTikPanelContext';
+import { AdminSagTikMenu } from '@/components/admin/sagTik/AdminSagTikMenu';
 import { PanelDilKabuk } from '@/components/admin/PanelDilKabuk';
 import { sekmeAyarlariOku, splitSekmeleriHesapla } from '@/utils/sekmePanelAyarlari';
 import { kisayolAyarlariOku, klavyeOlayiEslesir } from '@/utils/kisayolAyarlari';
@@ -44,7 +46,7 @@ function AdminPanelGovde() {
     kaydedilmediIsaretle,
   } = useAdminSekmeler();
 
-  const { tema } = useAdminTema();
+  const { tema, temaDegistir } = useAdminTema();
   const { focusModulId, setFocusModulId, aksiyonCalistir } = useAdminAksiyon();
   const location = useLocation();
   const navigate = useNavigate();
@@ -325,9 +327,41 @@ function AdminPanelGovde() {
       />
 
       <ModulRehberSistemi modulId={focusModulId} zorlaAcik={rehberAcik} onAcikDegisti={setRehberAcik} gizliButon />
+
+      <AdminSagTikMenuKabuk
+        onModulAc={modulSecHandler}
+        onKaydet={() => void aksiyonCalistir('kaydet')}
+        onOnizle={() => void aksiyonCalistir('onizle')}
+        onTemaDegistir={temaDegistir}
+      />
     </div>
     </SistemKesifProvider>
   );
+}
+
+function AdminSagTikMenuKabuk({
+  onModulAc,
+  onKaydet,
+  onOnizle,
+  onTemaDegistir,
+}: {
+  onModulAc: (modulId: string) => void;
+  onKaydet: () => void;
+  onOnizle: () => void;
+  onTemaDegistir: () => void;
+}) {
+  const kesif = useSistemKesifOptional();
+  const aksiyonlar = useMemo(
+    () => ({
+      onModulAc,
+      onKaydet,
+      onOnizle,
+      onTemaDegistir,
+      onSistemKesif: () => kesif?.modalAc(),
+    }),
+    [onModulAc, onKaydet, onOnizle, onTemaDegistir, kesif]
+  );
+  return <AdminSagTikMenu aksiyonlar={aksiyonlar} />;
 }
 
 function AdminLayoutIcerik() {
@@ -348,7 +382,9 @@ function AdminLayoutIcerik() {
 
   return (
     <SiteAyarlariProvider>
-      <AdminPanelGovde />
+      <SagTikPanelProvider>
+        <AdminPanelGovde />
+      </SagTikPanelProvider>
     </SiteAyarlariProvider>
   );
 }

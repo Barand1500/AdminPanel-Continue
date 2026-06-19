@@ -203,6 +203,24 @@ export function SayfaYonetimiSayfasi() {
     setHata('');
   }
 
+  useEffect(() => {
+    function sayfaSecHandler(e: Event) {
+      const id = (e as CustomEvent<{ sayfaId?: string }>).detail?.sayfaId;
+      if (!id) return;
+      const s = sayfalar.find((x) => x.id === id);
+      if (s) sayfaSec(s);
+    }
+    function yeniSayfaHandler() {
+      yeniBaslat();
+    }
+    window.addEventListener('ap-admin-sayfa-sec', sayfaSecHandler);
+    window.addEventListener('ap-admin-yeni-sayfa', yeniSayfaHandler);
+    return () => {
+      window.removeEventListener('ap-admin-sayfa-sec', sayfaSecHandler);
+      window.removeEventListener('ap-admin-yeni-sayfa', yeniSayfaHandler);
+    };
+  }, [sayfalar, yeniBaslat]);
+
   return (
       <AdminModulKabuk baslik="Sayfa Yönetimi" aciklama="Site sayfalarını oluşturun ve düzenleyin.">
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}

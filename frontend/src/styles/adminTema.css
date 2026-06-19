@@ -7486,3 +7486,210 @@ html:has(.admin-panel[data-tema='acik']) body {
   50% { opacity: 1; transform: scale(1); }
 }
 
+/* ── Sağ tık menüsü ── */
+.ap-sag-tik-menu {
+  position: fixed;
+  z-index: 10050;
+  min-width: 220px;
+  max-width: min(280px, calc(100vw - 16px));
+  padding: 0.35rem 0;
+  border-radius: 10px;
+  background: var(--ap-surface, #1e293b);
+  border: 1px solid var(--ap-border, rgba(148, 163, 184, 0.25));
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  font-size: 0.8125rem;
+}
+
+.ap-sag-tik-oge {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  width: 100%;
+  padding: 0.45rem 0.75rem;
+  border: none;
+  background: transparent;
+  color: var(--ap-text, #e2e8f0);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.ap-sag-tik-oge:hover:not(:disabled),
+.ap-sag-tik-oge-aktif {
+  background: var(--ap-hover, rgba(148, 163, 184, 0.12));
+}
+
+.ap-sag-tik-oge:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.ap-sag-tik-oge > span:first-child {
+  flex-shrink: 0;
+  width: 1.25rem;
+  text-align: center;
+}
+
+.ap-sag-tik-ok {
+  margin-left: auto;
+  opacity: 0.55;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.ap-sag-tik-ayirici {
+  height: 1px;
+  margin: 0.3rem 0.5rem;
+  background: var(--ap-border, rgba(148, 163, 184, 0.2));
+}
+
+.ap-sag-tik-flyout-wrap {
+  position: relative;
+}
+
+.ap-sag-tik-flyout {
+  position: absolute;
+  top: 0;
+  left: calc(100% + 4px);
+  min-width: 200px;
+  max-height: 280px;
+  padding: 0.35rem 0;
+  border-radius: 10px;
+  background: var(--ap-surface, #1e293b);
+  border: 1px solid var(--ap-border, rgba(148, 163, 184, 0.25));
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.4);
+  overflow: hidden;
+}
+
+.ap-sag-tik-flyout-genis {
+  min-width: 260px;
+}
+
+.ap-sag-tik-ara {
+  display: block;
+  width: calc(100% - 1rem);
+  margin: 0.25rem 0.5rem 0.35rem;
+  padding: 0.35rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--ap-border, rgba(148, 163, 184, 0.3));
+  background: var(--ap-bg, #0f172a);
+  color: var(--ap-text, #e2e8f0);
+  font-size: 0.75rem;
+}
+
+.ap-sag-tik-flyout-scroll {
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.ap-sag-tik-sayfa-oge {
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.ap-sag-tik-sayfa-oge strong {
+  display: block;
+  font-weight: 600;
+  font-size: 0.8125rem;
+}
+
+.ap-sag-tik-sayfa-oge small {
+  display: block;
+  opacity: 0.6;
+  font-size: 0.6875rem;
+}
+
+.ap-sag-tik-bos {
+  padding: 0.5rem 0.75rem;
+  margin: 0;
+  font-size: 0.75rem;
+  opacity: 0.6;
+}
+
+/* Sağ tık yönetim sekmesi */
+.ap-sag-tik-yonetim .ap-sag-tik-oge-liste {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.ap-sag-tik-oge-satir {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.55rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid var(--ap-border, rgba(148, 163, 184, 0.2));
+  background: var(--ap-surface-alt, rgba(15, 23, 42, 0.5));
+}
+
+.ap-sag-tik-oge-satir.ap-sag-tik-oge-ayirici {
+  opacity: 0.85;
+}
+
+.ap-sag-tik-oge-etiket {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.55rem;
+  flex: 1;
+  cursor: pointer;
+}
+
+.ap-sag-tik-oge-etiket small {
+  display: block;
+  opacity: 0.65;
+  font-size: 0.6875rem;
+  margin-top: 0.1rem;
+}
+
+.ap-sag-tik-oge-ikon {
+  font-size: 1rem;
+  line-height: 1.3;
+}
+
+.ap-sag-tik-oge-sira {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.ap-sag-tik-oge-sira button {
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 6px;
+  border: 1px solid var(--ap-border, rgba(148, 163, 184, 0.25));
+  background: var(--ap-bg, #0f172a);
+  color: var(--ap-text, #e2e8f0);
+  cursor: pointer;
+  font-size: 0.75rem;
+}
+
+.ap-sag-tik-oge-sira button:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.ap-sag-tik-modul-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 0.4rem;
+}
+
+.ap-sag-tik-modul-sec {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.4rem 0.55rem;
+  border-radius: 6px;
+  border: 1px solid var(--ap-border, rgba(148, 163, 184, 0.2));
+  cursor: pointer;
+  font-size: 0.8125rem;
+}
+
+.ap-sag-tik-modul-sec:has(input:checked) {
+  border-color: #6366f1;
+  background: rgba(99, 102, 241, 0.08);
+}
