@@ -13,6 +13,7 @@ import type { EklentiKart, EklentiListeSekme } from '@/types/eklenti';
 import { EKLENTI_SEKMELER } from '@/types/eklenti';
 import { EklentiKarti } from './EklentiKarti';
 import { EklentiDetayModal } from './EklentiDetayModal';
+import { formInputSinifi } from '@/components/form/FormAlani';
 
 export function SistemEklentiSekme() {
   const { basariBildir, hataBildir } = useAdminSayfaBildirimi();
@@ -101,13 +102,17 @@ export function SistemEklentiSekme() {
   return (
     <div className="ap-eklenti-yonetimi">
       <div className="ap-eklenti-ust">
-        <div>
-          <h3 className="ap-heading text-lg font-semibold">Eklenti ekle</h3>
-          <p className="ap-muted mt-1 max-w-2xl text-sm leading-relaxed">
-            Eklentiler sitenize yeni özellikler katar. Katalogdan kurabilir veya zip dosyası yükleyebilirsiniz.
-          </p>
-        </div>
-        <div className="ap-eklenti-ust-aksiyon">
+        <div className="ap-eklenti-baslik-cubugu">
+          <button
+            type="button"
+            className="ap-eklenti-ust-btn ap-eklenti-ust-btn-aktif"
+            onClick={() => {
+              setSekme('one-cikan');
+              setArama('');
+            }}
+          >
+            Eklenti ekle
+          </button>
           <input
             ref={dosyaRef}
             type="file"
@@ -117,13 +122,16 @@ export function SistemEklentiSekme() {
           />
           <button
             type="button"
-            className="ap-btn ap-btn-secondary"
+            className="ap-eklenti-ust-btn ap-eklenti-ust-btn-yukle"
             disabled={zipYukleniyor}
             onClick={() => dosyaRef.current?.click()}
           >
             {zipYukleniyor ? 'Yükleniyor...' : 'Eklenti yükle'}
           </button>
         </div>
+        <p className="ap-muted max-w-2xl text-sm leading-relaxed">
+          Eklentiler sitenize yeni özellikler katar. Katalogdan kurabilir veya zip dosyası yükleyebilirsiniz.
+        </p>
       </div>
 
       <div className="ap-eklenti-filtre">
@@ -140,17 +148,24 @@ export function SistemEklentiSekme() {
           ))}
         </div>
         <div className="ap-eklenti-ara">
-          <label htmlFor="eklenti-ara" className="ap-muted text-xs">
+          <label htmlFor="eklenti-ara" className="ap-eklenti-ara-etiket">
             Eklenti ara
           </label>
-          <input
-            id="eklenti-ara"
-            type="search"
-            className="ap-input ap-input-sm"
-            placeholder="Anahtar kelime..."
-            value={arama}
-            onChange={(e) => setArama(e.target.value)}
-          />
+          <div className="ap-arama ap-eklenti-arama-kutu">
+            <div className="ap-arama-input-wrap">
+              <span className="ap-arama-ikon" aria-hidden>
+                🔍
+              </span>
+              <input
+                id="eklenti-ara"
+                type="search"
+                className={`${formInputSinifi} ap-arama-input ap-eklenti-arama-input`}
+                placeholder="Anahtar kelime..."
+                value={arama}
+                onChange={(e) => setArama(e.target.value)}
+              />
+            </div>
+          </div>
         </div>
       </div>
 

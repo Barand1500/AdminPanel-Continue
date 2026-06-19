@@ -7783,10 +7783,129 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 .ap-eklenti-ust {
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.ap-eklenti-baslik-cubugu {
+  display: flex;
   flex-wrap: wrap;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 1rem;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ap-eklenti-ust-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 0.25rem;
+  border: 1px solid #2271b1;
+  background: #f6f7f7;
+  color: #2271b1;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.ap-eklenti-ust-btn:hover:not(:disabled) {
+  background: #f0f0f1;
+  border-color: #0a4b78;
+  color: #0a4b78;
+}
+
+.ap-eklenti-ust-btn:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.ap-eklenti-ust-btn-aktif {
+  background: #2271b1;
+  border-color: #2271b1;
+  color: #fff;
+  font-weight: 600;
+}
+
+.ap-eklenti-ust-btn-aktif:hover:not(:disabled) {
+  background: #135e96;
+  border-color: #135e96;
+  color: #fff;
+}
+
+.ap-eklenti-ust-btn-yukle {
+  background: #f6f7f7;
+}
+
+.ap-eklenti-ara-etiket {
+  display: block;
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--ap-text);
+}
+
+.ap-eklenti-arama-kutu {
+  min-width: min(100%, 260px);
+  padding: 0;
+}
+
+.ap-eklenti-arama-input {
+  min-width: 220px;
+  min-height: 2.25rem;
+}
+
+.ap-eklenti-islem-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.875rem;
+  padding: 0.25rem 0.65rem;
+  border-radius: 0.25rem;
+  border: 1px solid transparent;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.ap-eklenti-islem-btn:disabled {
+  opacity: 0.55;
+  cursor: wait;
+}
+
+.ap-eklenti-islem-btn-birincil {
+  background: #2271b1;
+  border-color: #2271b1;
+  color: #fff;
+}
+
+.ap-eklenti-islem-btn-birincil:hover:not(:disabled) {
+  background: #135e96;
+  border-color: #135e96;
+}
+
+.ap-eklenti-islem-btn-ikincil {
+  background: var(--ap-surface);
+  border-color: var(--ap-border);
+  color: var(--ap-text);
+}
+
+.ap-eklenti-islem-btn-ikincil:hover:not(:disabled) {
+  background: var(--ap-hover);
+}
+
+.ap-eklenti-islem-btn-ghost {
+  background: transparent;
+  border-color: var(--ap-border);
+  color: var(--ap-muted);
+}
+
+.ap-eklenti-islem-btn-ghost:hover:not(:disabled) {
+  background: var(--ap-hover);
+  color: var(--ap-text);
 }
 
 .ap-eklenti-filtre {
@@ -7824,8 +7943,8 @@ html:has(.admin-panel[data-tema='acik']) body {
 .ap-eklenti-ara {
   display: flex;
   flex-direction: column;
-  gap: 0.25rem;
-  min-width: min(100%, 220px);
+  align-items: flex-end;
+  min-width: min(100%, 280px);
 }
 
 .ap-eklenti-grid {

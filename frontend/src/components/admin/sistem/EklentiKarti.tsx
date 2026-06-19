@@ -51,22 +51,22 @@ export function EklentiKarti({
         </div>
         <div className="ap-eklenti-kart-aksiyonlar">
           {!kurulu && (
-            <button type="button" className="ap-btn ap-btn-primary ap-btn-sm" disabled={islemde} onClick={onKur}>
+            <button type="button" className="ap-eklenti-islem-btn ap-eklenti-islem-btn-birincil" disabled={islemde} onClick={onKur}>
               Şimdi kur
             </button>
           )}
           {kurulu && !aktif && (
-            <button type="button" className="ap-btn ap-btn-primary ap-btn-sm" disabled={islemde} onClick={onAktif}>
+            <button type="button" className="ap-eklenti-islem-btn ap-eklenti-islem-btn-birincil" disabled={islemde} onClick={onAktif}>
               Etkinleştir
             </button>
           )}
           {kurulu && aktif && (
-            <button type="button" className="ap-btn ap-btn-secondary ap-btn-sm" disabled={islemde} onClick={onPasif}>
+            <button type="button" className="ap-eklenti-islem-btn ap-eklenti-islem-btn-ikincil" disabled={islemde} onClick={onPasif}>
               Pasifleştir
             </button>
           )}
           {kurulu && (
-            <button type="button" className="ap-btn ap-btn-ghost ap-btn-sm" disabled={islemde} onClick={onKaldir}>
+            <button type="button" className="ap-eklenti-islem-btn ap-eklenti-islem-btn-ghost" disabled={islemde} onClick={onKaldir}>
               Kaldır
             </button>
           )}
