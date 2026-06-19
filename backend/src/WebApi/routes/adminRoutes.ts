@@ -36,6 +36,8 @@ import { SistemAyarlariController } from '../controllers/SistemAyarlariControlle
 import { KullaniciController } from '../controllers/KullaniciController.js';
 import { RolController } from '../controllers/RolController.js';
 import { KurController } from '../controllers/KurController.js';
+import { HavaDurumuController } from '../controllers/HavaDurumuController.js';
+import { KriptoController } from '../controllers/KriptoController.js';
 import { KisayolController } from '../controllers/KisayolController.js';
 import { SekmeController } from '../controllers/SekmeController.js';
 import { NavKategoriController } from '../controllers/NavKategoriController.js';
@@ -66,6 +68,8 @@ const sistemAyarlariController = new SistemAyarlariController();
 const kullaniciController = new KullaniciController();
 const rolController = new RolController();
 const kurController = new KurController();
+const havaController = new HavaDurumuController();
+const kriptoController = new KriptoController();
 const kisayolController = new KisayolController();
 const sekmeController = new SekmeController();
 const navKategoriController = new NavKategoriController();
@@ -101,6 +105,8 @@ router.get('/site/ayarlar', authMiddleware, yG, (req, res) => siteAyarlariContro
 router.patch('/site/ayarlar', authMiddleware, yD, validateBySchema(siteAyarlariGuncelleSchema), (req, res) => siteAyarlariController.guncelle(req, res));
 
 router.get('/kur/tcmb-onizle', authMiddleware, yG, (req, res) => kurController.tcmbOnizle(req, res));
+router.get('/hava-onizle', authMiddleware, yG, (req, res) => havaController.getir(req, res));
+router.get('/kripto-onizle', authMiddleware, yG, (req, res) => kriptoController.listele(req, res));
 
 router.get('/kisayollar', authMiddleware, yG, (req, res) => kisayolController.listele(req, res));
 router.post('/kisayollar', authMiddleware, yE, validateBySchema(kisayolOlusturSchema), (req, res) =>

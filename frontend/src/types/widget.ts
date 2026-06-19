@@ -373,8 +373,12 @@ export interface WidgetConfig {
   kapanisaKalan?: string;
   havaSehir?: string;
   havaIlce?: string;
+  havaKaynak?: 'api' | 'manuel';
   havaAnlik?: { sicaklik: string; durum: string; hissedilen: string; nem: string; ruzgar: string };
   havaGunler?: WidgetHavaGun[];
+  kriptoKaynak?: 'api' | 'manuel';
+  kriptoLimit?: number;
+  kriptoSemboller?: string[];
 }
 
 export function uid() {
@@ -501,9 +505,18 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     case 'SEKMELI_HABER':
       return { yerlesim, gorunum, ek, haberSekmeler: [] };
     case 'HAVA_DURUMU':
-      return { yerlesim, gorunum, ek, havaSehir: 'İstanbul', havaGunler: [] };
+      return { yerlesim, gorunum, ek, havaSehir: 'İstanbul', havaIlce: 'Kadıköy', havaKaynak: 'api' };
     case 'KRIPTO_LISTESI':
-      return { yerlesim, gorunum: { ...gorunum, vurguRengi: '#dc2626' }, ek, kriptoParalar: [], tumunuGorMetin: 'Tümünü Göster →', tumunuGorLink: '#' };
+      return {
+        yerlesim,
+        gorunum: { ...gorunum, vurguRengi: '#dc2626' },
+        ek,
+        kriptoKaynak: 'api',
+        kriptoLimit: 10,
+        kriptoParalar: [],
+        tumunuGorMetin: 'Tümünü Göster →',
+        tumunuGorLink: '#',
+      };
     case 'GUNCEL_KONULAR':
       return { yerlesim, gorunum: { ...gorunum, vurguRengi: '#dc2626' }, ek, haberKartlari: [] };
     case 'SIRKET_GIRIS_CIKIS':

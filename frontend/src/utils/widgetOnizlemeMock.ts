@@ -1,6 +1,7 @@
 import type { Widget } from '@/types/site';
 import type { WidgetConfig } from '@/types/widget';
 import type { WidgetFormDegeri } from '@/types/admin';
+import type { WidgetAcilisKapanisSaati } from '@/types/haberWidget';
 import { uid } from '@/types/widget';
 
 function metin(mevcut: string | null | undefined, ornek: string): string {
@@ -350,23 +351,12 @@ function mockConfig(tip: string): WidgetConfig {
       return {
         havaSehir: 'İstanbul',
         havaIlce: 'Kadıköy',
-        havaAnlik: { sicaklik: '22°', durum: 'Parçalı Bulutlu', hissedilen: '23°', nem: '%60', ruzgar: '5.9 m/s' },
-        havaGunler: [
-          { id: id(), gun: 'Cuma', durum: 'Kapalı', ikon: '☁️', max: '24°', min: '20°' },
-          { id: id(), gun: 'Cumartesi', durum: 'Açık', ikon: '☀️', max: '26°', min: '21°' },
-          { id: id(), gun: 'Pazar', durum: 'Açık', ikon: '☀️', max: '27°', min: '22°' },
-          { id: id(), gun: 'Pazartesi', durum: 'Açık', ikon: '☀️', max: '25°', min: '20°' },
-        ],
+        havaKaynak: 'api',
       };
     case 'KRIPTO_LISTESI':
       return {
-        kriptoParalar: [
-          { id: id(), sembol: 'BTC', ad: 'Bitcoin', fiyat: '$62702', degisim: '-2.47%' },
-          { id: id(), sembol: 'ETH', ad: 'Ethereum', fiyat: '$1695.87', degisim: '0.01%' },
-          { id: id(), sembol: 'USDT', ad: 'Tether', fiyat: '$1.00', degisim: '0.00%' },
-          { id: id(), sembol: 'BNB', ad: 'BNB', fiyat: '$312.45', degisim: '-1.12%' },
-          { id: id(), sembol: 'SOL', ad: 'Solana', fiyat: '$98.32', degisim: '3.21%' },
-        ],
+        kriptoKaynak: 'api',
+        kriptoLimit: 10,
         tumunuGorMetin: 'Tümünü Göster →',
         tumunuGorLink: '#',
       };
@@ -397,7 +387,49 @@ function mockConfig(tip: string): WidgetConfig {
   }
 }
 
-function configBirlestir(mevcut: WidgetConfig, mock: WidgetConfig): WidgetConfig {
+function metinDolu(deger: string | undefined | null): boolean {
+  return Boolean(deger?.trim());
+}
+
+function nesneBirlestir<T extends Record<string, string | undefined>>(
+  mevcut: T | undefined,
+  mock: T | undefined
+): T | undefined {
+  if (!mock) return mevcut;
+  const sonuc = { ...mock, ...(mevcut ?? {}) } as T;
+  for (const k of Object.keys(mock) as (keyof T)[]) {
+    if (!metinDolu(sonuc[k] as string | undefined)) sonuc[k] = mock[k];
+  }
+  return sonuc;
+}
+
+function acilisKapanisBirlestir(
+  mevcut: WidgetAcilisKapanisSaati | undefined,
+  mock: WidgetAcilisKapanisSaati | undefined
+): WidgetAcilisKapanisSaati | undefined {
+  return nesneBirlestir(
+    mevcut as Record<string, string | undefined> | undefined,
+    mock as Record<string, string | undefined> | undefined
+  ) as WidgetAcilisKapanisSaati | undefined;
+}
+
+function diziZorla<T>(mevcut: T[] | undefined, ornek: T[]): T[] {
+  if (!ornek.length) return mevcut ?? [];
+  return mevcut && mevcut.length > 0 ? mevcut : ornek;
+}
+
+const HABER_PORTAL_TIPLERI = new Set([
+  'KOSE_YAZARLARI',
+  'ILETISIM_BLOK',
+  'KATEGORI_HABER_LISTESI',
+  'KATEGORI_HABER_OVERLAY',
+  'VIDEO_GALERISI',
+  'SEKMELI_HABER',
+  'GUNCEL_KONULAR',
+  'HABER_MAGAZIN',
+]);
+
+function configBirlestir(mevcut: WidgetConfig, mock: WidgetConfig, tip?: string): WidgetConfig {
   const sonuc: WidgetConfig = { ...mevcut };
 
   if (!sonuc.metin?.trim() && mock.metin) sonuc.metin = mock.metin;
@@ -452,11 +484,38 @@ function configBirlestir(mevcut: WidgetConfig, mock: WidgetConfig): WidgetConfig
 
   if (!sonuc.havaSehir && mock.havaSehir) sonuc.havaSehir = mock.havaSehir;
   if (!sonuc.havaIlce && mock.havaIlce) sonuc.havaIlce = mock.havaIlce;
-  if (!sonuc.havaAnlik && mock.havaAnlik) sonuc.havaAnlik = mock.havaAnlik;
-  sonuc.acilisKapanisSaatleri = sonuc.acilisKapanisSaatleri ?? mock.acilisKapanisSaatleri;
+  sonuc.havaAnlik = nesneBirlestir(sonuc.havaAnlik, mock.havaAnlik);
+  sonuc.acilisKapanisSaatleri = acilisKapanisBirlestir(sonuc.acilisKapanisSaatleri, mock.acilisKapanisSaatleri);
   if (!sonuc.sirketKonum && mock.sirketKonum) sonuc.sirketKonum = mock.sirketKonum;
   if (!sonuc.sirketAnlikSaat && mock.sirketAnlikSaat) sonuc.sirketAnlikSaat = mock.sirketAnlikSaat;
   if (!sonuc.kapanisaKalan && mock.kapanisaKalan) sonuc.kapanisaKalan = mock.kapanisaKalan;
+
+  if (tip === 'GUNCEL_KONULAR') {
+    sonuc.haberKartlari = diziZorla(sonuc.haberKartlari, mock.haberKartlari ?? []);
+  }
+  if (tip === 'SIRKET_GIRIS_CIKIS') {
+    sonuc.acilisKapanisSaatleri = acilisKapanisBirlestir(
+      sonuc.acilisKapanisSaatleri,
+      mock.acilisKapanisSaatleri
+    );
+  }
+  if (tip && HABER_PORTAL_TIPLERI.has(tip)) {
+    if (mock.haberKartlari?.length) {
+      sonuc.haberKartlari = diziZorla(sonuc.haberKartlari, mock.haberKartlari);
+    }
+    if (mock.koseYazarlari?.length) {
+      sonuc.koseYazarlari = diziZorla(sonuc.koseYazarlari, mock.koseYazarlari);
+    }
+    if (mock.videoKartlari?.length) {
+      sonuc.videoKartlari = diziZorla(sonuc.videoKartlari, mock.videoKartlari);
+    }
+    if (mock.haberSekmeler?.length) {
+      sonuc.haberSekmeler = diziZorla(sonuc.haberSekmeler, mock.haberSekmeler);
+    }
+    if (mock.iletisimKartlari?.length) {
+      sonuc.iletisimKartlari = diziZorla(sonuc.iletisimKartlari, mock.iletisimKartlari);
+    }
+  }
 
   return sonuc;
 }
@@ -465,7 +524,7 @@ function configBirlestir(mevcut: WidgetConfig, mock: WidgetConfig): WidgetConfig
 export function onizlemeMockVerisiUygula(widget: Widget): Widget {
   const cfg = (widget.configJson ?? {}) as WidgetConfig;
   const mock = mockConfig(widget.tip);
-  const birlesik = configBirlestir(cfg, mock);
+  const birlesik = configBirlestir(cfg, mock, widget.tip);
 
   return {
     ...widget,
@@ -563,6 +622,20 @@ function formdanWidget(form: WidgetFormDegeri): Widget {
 /** Formdaki boş alanları örnek içerikle doldurur; dolu alanlara dokunmaz */
 export function widgetFormMockUygula(form: WidgetFormDegeri): WidgetFormDegeri {
   const widget = onizlemeMockVerisiUygula(formdanWidget(form));
+  let configJson = { ...(widget.configJson ?? {}) } as WidgetConfig;
+
+  if (form.tip === 'SIRKET_GIRIS_CIKIS') {
+    const simdi = new Date();
+    const saat = simdi.toLocaleTimeString('tr-TR', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+    });
+    if (!configJson.sirketAnlikSaat?.trim()) {
+      configJson = { ...configJson, sirketAnlikSaat: saat };
+    }
+  }
+
   return {
     ...form,
     ad: widget.ad ?? form.ad,
@@ -572,6 +645,6 @@ export function widgetFormMockUygula(form: WidgetFormDegeri): WidgetFormDegeri {
     gorselUrl: widget.gorselUrl ?? '',
     butonMetni: widget.butonMetni ?? '',
     butonLink: widget.butonLink ?? '',
-    configJsonMetin: JSON.stringify(widget.configJson ?? {}, null, 2),
+    configJsonMetin: JSON.stringify(configJson, null, 2),
   };
 }

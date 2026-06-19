@@ -1,8 +1,10 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig } from '@/types/widget';
 import { WidgetKabuk } from '../widgetKabuk';
 import { configOkuFromWidget, gridStyle, haritaEmbedUrl, medyaUrl } from '../widgetHelpers';
+import { havaDurumuGetir, type HavaDurumuYanit } from '@/features/site/havaApi';
+import { kriptoListesiGetir, type KriptoPiyasaVeri } from '@/features/site/kriptoApi';
 import {
   HaberBolumBaslik,
   HaberKartGovde,
@@ -213,16 +215,52 @@ export function HavaDurumuWidget({ widget }: { widget: Widget }) {
   const cfg = cfgOku(widget);
   const sehir = cfg.havaSehir ?? 'İstanbul';
   const ilce = cfg.havaIlce ?? '';
-  const anlik = cfg.havaAnlik ?? { sicaklik: '22°', durum: 'Parçalı Bulutlu', hissedilen: '23°', nem: '%60', ruzgar: '5 m/s' };
-  const gunler = cfg.havaGunler ?? [];
+  const apiMod = cfg.havaKaynak !== 'manuel';
+  const [apiVeri, setApiVeri] = useState<HavaDurumuYanit | null>(null);
+  const [yukleniyor, setYukleniyor] = useState(false);
+  const [hata, setHata] = useState('');
+
+  useEffect(() => {
+    if (!apiMod || !sehir.trim()) return;
+    let iptal = false;
+    setYukleniyor(true);
+    setHata('');
+    void havaDurumuGetir(sehir, ilce)
+      .then((veri) => {
+        if (!iptal) setApiVeri(veri);
+      })
+      .catch((err) => {
+        if (!iptal) setHata(err instanceof Error ? err.message : 'Hava verisi alınamadı');
+      })
+      .finally(() => {
+        if (!iptal) setYukleniyor(false);
+      });
+    return () => {
+      iptal = true;
+    };
+  }, [apiMod, sehir, ilce]);
+
+  const anlik = apiVeri?.anlik ?? cfg.havaAnlik ?? {
+    sicaklik: '—',
+    durum: yukleniyor ? 'Yükleniyor...' : hata || 'Veri yok',
+    hissedilen: '—',
+    nem: '—',
+    ruzgar: '—',
+  };
+  const gunler = apiVeri?.gunler ?? cfg.havaGunler ?? [];
+  const gosterSehir = apiVeri?.sehir ?? sehir;
+  const gosterIlce = apiVeri?.ilce ?? ilce;
 
   return (
     <WidgetKabuk widget={widget}>
       <div className="rounded-2xl bg-gradient-to-br from-slate-800 to-slate-900 p-4 text-white">
         <div className="mb-4 flex gap-2">
-          <span className="rounded-lg bg-white/10 px-3 py-1 text-sm">{sehir}</span>
-          {ilce && <span className="rounded-lg bg-white/10 px-3 py-1 text-sm">{ilce}</span>}
+          <span className="rounded-lg bg-white/10 px-3 py-1 text-sm">{gosterSehir}</span>
+          {gosterIlce && <span className="rounded-lg bg-white/10 px-3 py-1 text-sm">{gosterIlce}</span>}
         </div>
+        {hata && !yukleniyor && (
+          <p className="mb-3 rounded-lg bg-red-500/20 px-3 py-2 text-sm">{hata}</p>
+        )}
         <div className="mb-6 flex items-center justify-between">
           <div>
             <p className="text-5xl font-bold">{anlik.sicaklik}</p>
@@ -253,12 +291,53 @@ export function HavaDurumuWidget({ widget }: { widget: Widget }) {
 export function KriptoListesiWidget({ widget }: { widget: Widget }) {
   const cfg = cfgOku(widget);
   const g = gOku(cfg);
-  const liste = cfg.kriptoParalar ?? [];
+  const apiMod = cfg.kriptoKaynak !== 'manuel';
+  const limit = cfg.kriptoLimit ?? 10;
+  const semboller = cfg.kriptoSemboller ?? [];
+  const [apiListe, setApiListe] = useState<KriptoPiyasaVeri[]>([]);
+  const [yukleniyor, setYukleniyor] = useState(false);
+
+  useEffect(() => {
+    if (!apiMod) return;
+    let iptal = false;
+
+    const yukle = () => {
+      setYukleniyor(true);
+      void kriptoListesiGetir(limit, semboller.length ? semboller : undefined)
+        .then((veri) => {
+          if (!iptal) setApiListe(veri);
+        })
+        .finally(() => {
+          if (!iptal) setYukleniyor(false);
+        });
+    };
+
+    yukle();
+    const timer = window.setInterval(yukle, 5 * 60 * 1000);
+    return () => {
+      iptal = true;
+      window.clearInterval(timer);
+    };
+  }, [apiMod, limit, semboller.join(',')]);
+
+  const liste = apiMod
+    ? apiListe.map((k) => ({
+        id: k.id,
+        sembol: k.sembol,
+        ad: k.ad,
+        fiyat: k.fiyat,
+        degisim: k.degisim,
+        ikonUrl: k.ikonUrl,
+      }))
+    : (cfg.kriptoParalar ?? []);
   const renk = haberVurguRengi(g);
 
   return (
     <WidgetKabuk widget={widget}>
       <HaberBolumBaslik baslik={widget.baslik} ikon={g.baslikIkon ?? '📈'} g={g} />
+      {yukleniyor && liste.length === 0 && (
+        <p className="py-4 text-center text-sm text-slate-500">Kripto verileri yükleniyor...</p>
+      )}
       <div className="overflow-hidden rounded-xl border border-slate-100 bg-white">
         {liste.map((k, i) => {
           const neg = k.degisim.trim().startsWith('-');

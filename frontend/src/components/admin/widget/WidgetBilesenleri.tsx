@@ -205,6 +205,7 @@ interface WidgetEditorPanelProps {
   onKaydetTetikleyici?: (fn: () => Promise<void>) => void;
   onKaydet: (deger: WidgetFormDegeri, widgetId?: string) => Promise<void>;
   onTipSecildi?: (tip: string) => void;
+  onOtomatikDoldurChange?: (acik: boolean) => void;
 }
 
 export function WidgetEditorPanel({
@@ -220,50 +221,66 @@ export function WidgetEditorPanel({
   onKaydetTetikleyici,
   onKaydet,
   onTipSecildi,
+  onOtomatikDoldurChange,
 }: WidgetEditorPanelProps) {
   const [sekme, setSekme] = useState<EditorSekme>('genel');
   const [otomatikDoldur, setOtomatikDoldur] = useState(false);
   const formYedekRef = useRef<WidgetFormDegeri | null>(null);
+  const yedekAnahtarRef = useRef<string | null>(null);
   const widgetAnahtar = seciliWidget?.id ?? 'yeni';
   const oncekiAnahtarRef = useRef(widgetAnahtar);
   const oncekiTipRef = useRef(form.tip);
+
+  useEffect(() => {
+    onOtomatikDoldurChange?.(otomatikDoldur);
+  }, [otomatikDoldur, onOtomatikDoldurChange]);
 
   useEffect(() => {
     if (oncekiAnahtarRef.current === widgetAnahtar) return;
     oncekiAnahtarRef.current = widgetAnahtar;
     oncekiTipRef.current = form.tip;
     formYedekRef.current = null;
+    yedekAnahtarRef.current = null;
     setOtomatikDoldur(yeniMod);
-  }, [widgetAnahtar, yeniMod, form.tip]);
+  }, [widgetAnahtar, yeniMod]);
 
   useEffect(() => {
     if (!otomatikDoldur) {
       oncekiTipRef.current = form.tip;
       return;
     }
-    if (!formYedekRef.current) {
+    const yedekGecersiz = yedekAnahtarRef.current !== widgetAnahtar;
+    const tipDegisti = oncekiTipRef.current !== form.tip;
+
+    if (!formYedekRef.current || yedekGecersiz) {
       formYedekRef.current = structuredClone(form);
+      yedekAnahtarRef.current = widgetAnahtar;
       oncekiTipRef.current = form.tip;
       onChange(widgetFormMockUygula(form));
       return;
     }
-    if (oncekiTipRef.current !== form.tip) {
+    if (tipDegisti) {
       oncekiTipRef.current = form.tip;
+      formYedekRef.current = structuredClone(form);
       onChange(widgetFormMockUygula(form));
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- yalnızca toggle/tip değişiminde
-  }, [otomatikDoldur, form.tip]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- yalnızca toggle/tip/widget değişiminde
+  }, [otomatikDoldur, form.tip, widgetAnahtar]);
 
   function otomatikDoldurDegistir(acik: boolean) {
     if (acik) {
+      formYedekRef.current = structuredClone(form);
+      yedekAnahtarRef.current = widgetAnahtar;
       setOtomatikDoldur(true);
+      onChange(widgetFormMockUygula(form));
       return;
     }
     setOtomatikDoldur(false);
-    if (formYedekRef.current) {
+    if (formYedekRef.current && yedekAnahtarRef.current === widgetAnahtar) {
       onChange(formYedekRef.current);
-      formYedekRef.current = null;
     }
+    formYedekRef.current = null;
+    yedekAnahtarRef.current = null;
   }
 
   async function submit() {

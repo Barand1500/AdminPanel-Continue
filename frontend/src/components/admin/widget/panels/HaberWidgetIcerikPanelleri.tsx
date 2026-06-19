@@ -1,7 +1,7 @@
-import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
+import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
 import { EmojiSecici } from '@/components/form/EmojiSecici';
-import { AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminAnahtarDugme, AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
   configGuncelle,
   configOku,
@@ -18,6 +18,11 @@ import type {
 } from '@/types/haberWidget';
 import { ListeSiralayici } from './WidgetPanelOrtak';
 import type { WidgetPanelProps } from './types';
+import { useEffect, useState } from 'react';
+import { TURKIYE_ILLERI } from '@/constants/turkiyeIlleri';
+import { havaOnizleGetir } from '@/features/admin/havaApi';
+import type { HavaDurumuYanit } from '@/features/site/havaApi';
+import { kriptoOnizleGetir } from '@/features/admin/kriptoApi';
 
 function TumunuGorAlanlari({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
@@ -256,43 +261,222 @@ export function SekmeliHaberIcerik({ form, onChange }: WidgetPanelProps) {
 
 export function HavaDurumuIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
-  const anlik = cfg.havaAnlik ?? { sicaklik: '22°', durum: 'Parçalı Bulutlu', hissedilen: '23°', nem: '%60', ruzgar: '5 m/s' };
+  const sehir = cfg.havaSehir ?? 'İstanbul';
+  const ilce = cfg.havaIlce ?? '';
+  const [onizleme, setOnizleme] = useState<HavaDurumuYanit | null>(null);
+  const [yukleniyor, setYukleniyor] = useState(false);
+  const [hata, setHata] = useState('');
+
+  useEffect(() => {
+    if (!sehir.trim()) return;
+    let iptal = false;
+    setYukleniyor(true);
+    setHata('');
+    void havaOnizleGetir(sehir, ilce)
+      .then((veri) => {
+        if (!iptal) setOnizleme(veri);
+      })
+      .catch((err) => {
+        if (!iptal) setHata(err instanceof Error ? err.message : 'Hava verisi alınamadı');
+      })
+      .finally(() => {
+        if (!iptal) setYukleniyor(false);
+      });
+    return () => {
+      iptal = true;
+    };
+  }, [sehir, ilce]);
+
+  const konumGuncelle = (yeniSehir: string, yeniIlce: string) => {
+    onChange(
+      configGuncelle(form, (c) => ({
+        ...c,
+        havaSehir: yeniSehir,
+        havaIlce: yeniIlce,
+        havaKaynak: 'api',
+        havaAnlik: undefined,
+        havaGunler: undefined,
+      }))
+    );
+  };
+
+  const anlik = onizleme?.anlik;
+
   return (
-    <AdminFormBolumu baslik="Hava Durumu">
+    <AdminFormBolumu baslik="Hava Durumu" aciklama="Konum seçin; sıcaklık ve tahmin Open-Meteo API üzerinden otomatik gelir.">
       <div className="grid gap-3 sm:grid-cols-2">
-        <FormAlani etiket="Şehir"><input className={formInputSinifi} value={cfg.havaSehir ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, havaSehir: e.target.value })))} /></FormAlani>
-        <FormAlani etiket="İlçe"><input className={formInputSinifi} value={cfg.havaIlce ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, havaIlce: e.target.value })))} /></FormAlani>
+        <FormAlani etiket="İl">
+          <select
+            className={formSelectSinifi}
+            value={sehir}
+            onChange={(e) => konumGuncelle(e.target.value, ilce)}
+          >
+            {TURKIYE_ILLERI.map((il) => (
+              <option key={il} value={il}>{il}</option>
+            ))}
+          </select>
+        </FormAlani>
+        <FormAlani etiket="İlçe">
+          <input
+            className={formInputSinifi}
+            value={ilce}
+            onChange={(e) => konumGuncelle(sehir, e.target.value)}
+            placeholder="Kadıköy"
+          />
+        </FormAlani>
       </div>
-      <div className="grid gap-2 sm:grid-cols-2">
-        {(['sicaklik', 'durum', 'hissedilen', 'nem', 'ruzgar'] as const).map((alan) => (
-          <FormAlani key={alan} etiket={alan}>
-            <input className={formInputSinifi} value={anlik[alan] ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, havaAnlik: { ...anlik, [alan]: e.target.value } })))} />
-          </FormAlani>
-        ))}
-      </div>
+      {yukleniyor && <p className="ap-muted text-sm">Hava verisi yükleniyor...</p>}
+      {hata && <p className="text-sm text-red-500">{hata}</p>}
+      {anlik && !yukleniyor && (
+        <div className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface-2)] p-4">
+          <p className="mb-2 text-sm font-semibold text-[var(--ap-heading)]">Canlı önizleme</p>
+          <p className="text-3xl font-bold">{anlik.sicaklik}</p>
+          <p className="text-sm text-[var(--ap-muted)]">{anlik.durum}</p>
+          <div className="mt-2 grid grid-cols-3 gap-2 text-xs">
+            <span>Hissedilen: {anlik.hissedilen}</span>
+            <span>Nem: {anlik.nem}</span>
+            <span>Rüzgar: {anlik.ruzgar}</span>
+          </div>
+          {onizleme?.gunler?.length ? (
+            <div className="mt-3 grid grid-cols-4 gap-2 text-xs">
+              {onizleme.gunler.slice(0, 4).map((gun: HavaDurumuYanit['gunler'][number]) => (
+                <div key={gun.id} className="rounded bg-[var(--ap-surface)] p-2 text-center">
+                  <p className="font-semibold">{gun.gun}</p>
+                  <p>{gun.ikon} {gun.max}/{gun.min}</p>
+                </div>
+              ))}
+            </div>
+          ) : null}
+        </div>
+      )}
     </AdminFormBolumu>
   );
 }
 
+const POPULER_KRIPTO = ['BTC', 'ETH', 'USDT', 'BNB', 'SOL', 'XRP', 'ADA', 'DOGE', 'TRX', 'AVAX'];
+
 export function KriptoListesiIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
+  const apiMod = cfg.kriptoKaynak !== 'manuel';
+  const limit = cfg.kriptoLimit ?? 10;
+  const seciliSemboller = cfg.kriptoSemboller ?? [];
   const liste = cfg.kriptoParalar ?? [];
+  const [onizleme, setOnizleme] = useState<Awaited<ReturnType<typeof kriptoOnizleGetir>>>([]);
+  const [yukleniyor, setYukleniyor] = useState(false);
+
+  useEffect(() => {
+    if (!apiMod) return;
+    let iptal = false;
+    setYukleniyor(true);
+    void kriptoOnizleGetir(limit, seciliSemboller.length ? seciliSemboller : undefined)
+      .then((veri) => {
+        if (!iptal) setOnizleme(veri);
+      })
+      .finally(() => {
+        if (!iptal) setYukleniyor(false);
+      });
+    return () => {
+      iptal = true;
+    };
+  }, [apiMod, limit, seciliSemboller.join(',')]);
+
+  const sembolToggle = (sembol: string) => {
+    const mevcut = new Set(seciliSemboller);
+    if (mevcut.has(sembol)) mevcut.delete(sembol);
+    else mevcut.add(sembol);
+    onChange(
+      configGuncelle(form, (c) => ({
+        ...c,
+        kriptoKaynak: 'api',
+        kriptoSemboller: Array.from(mevcut),
+        kriptoParalar: [],
+      }))
+    );
+  };
+
   return (
     <AdminFormBolumu baslik="Kripto Paralar">
-      <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} /></FormAlani>
+      <FormAlani etiket="Başlık">
+        <input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} />
+      </FormAlani>
       <TumunuGorAlanlari form={form} onChange={onChange} />
-      <ListeSiralayici<WidgetKriptoPara>
-        ogeler={liste}
-        onDegistir={(k) => onChange(configGuncelle(form, (c) => ({ ...c, kriptoParalar: k })))}
-        yeniEkle={() => ({ id: uid(), sembol: 'BTC', ad: 'Bitcoin', fiyat: '$0', degisim: '0%' })}
-        renderOge={(k, i) => (
-          <div className="grid gap-2 sm:grid-cols-4">
-            <input className={formInputSinifi} placeholder="Sembol" value={k.sembol} onChange={(e) => { const kopya = [...liste]; kopya[i] = { ...k, sembol: e.target.value }; onChange(configGuncelle(form, (c) => ({ ...c, kriptoParalar: kopya }))); }} />
-            <input className={formInputSinifi} placeholder="Fiyat" value={k.fiyat} onChange={(e) => { const kopya = [...liste]; kopya[i] = { ...k, fiyat: e.target.value }; onChange(configGuncelle(form, (c) => ({ ...c, kriptoParalar: kopya }))); }} />
-            <input className={formInputSinifi} placeholder="Değişim" value={k.degisim} onChange={(e) => { const kopya = [...liste]; kopya[i] = { ...k, degisim: e.target.value }; onChange(configGuncelle(form, (c) => ({ ...c, kriptoParalar: kopya }))); }} />
-          </div>
-        )}
+      <AdminAnahtarDugme
+        etiket="Otomatik API'den güncelle"
+        acik={apiMod}
+        onDegistir={(acik) =>
+          onChange(
+            configGuncelle(form, (c) => ({
+              ...c,
+              kriptoKaynak: acik ? 'api' : 'manuel',
+            }))
+          )
+        }
       />
+      {apiMod ? (
+        <>
+          <FormAlani etiket="Liste limiti">
+            <input
+              type="number"
+              min={1}
+              max={50}
+              className={formInputSinifi}
+              value={limit}
+              onChange={(e) =>
+                onChange(
+                  configGuncelle(form, (c) => ({
+                    ...c,
+                    kriptoLimit: Math.min(50, Math.max(1, Number(e.target.value) || 10)),
+                  }))
+                )
+              }
+            />
+          </FormAlani>
+          <FormAlani etiket="Sembol seçimi (boş = piyasa değerine göre top N)">
+            <div className="flex flex-wrap gap-2">
+              {POPULER_KRIPTO.map((s) => (
+                <button
+                  key={s}
+                  type="button"
+                  className={`rounded px-2 py-1 text-xs font-semibold ${
+                    seciliSemboller.includes(s)
+                      ? 'bg-[var(--ap-accent)] text-white'
+                      : 'bg-[var(--ap-surface-2)] text-[var(--ap-heading)]'
+                  }`}
+                  onClick={() => sembolToggle(s)}
+                >
+                  {s}
+                </button>
+              ))}
+            </div>
+          </FormAlani>
+          {yukleniyor && <p className="ap-muted text-sm">Kripto verisi yükleniyor...</p>}
+          {onizleme.length > 0 && (
+            <div className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface-2)] p-3 text-sm">
+              <p className="mb-2 font-semibold">Canlı önizleme</p>
+              {onizleme.map((k) => (
+                <div key={k.id} className="flex justify-between border-b border-[var(--ap-border)] py-1 last:border-0">
+                  <span>{k.sembol}</span>
+                  <span>{k.fiyat}</span>
+                  <span>{k.degisim}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </>
+      ) : (
+        <ListeSiralayici<WidgetKriptoPara>
+          ogeler={liste}
+          onDegistir={(k) => onChange(configGuncelle(form, (c) => ({ ...c, kriptoParalar: k })))}
+          yeniEkle={() => ({ id: uid(), sembol: 'BTC', ad: 'Bitcoin', fiyat: '$0', degisim: '0%' })}
+          renderOge={(k, i) => (
+            <div className="grid gap-2 sm:grid-cols-4">
+              <input className={formInputSinifi} placeholder="Sembol" value={k.sembol} onChange={(e) => { const kopya = [...liste]; kopya[i] = { ...k, sembol: e.target.value }; onChange(configGuncelle(form, (c) => ({ ...c, kriptoParalar: kopya }))); }} />
+              <input className={formInputSinifi} placeholder="Fiyat" value={k.fiyat} onChange={(e) => { const kopya = [...liste]; kopya[i] = { ...k, fiyat: e.target.value }; onChange(configGuncelle(form, (c) => ({ ...c, kriptoParalar: kopya }))); }} />
+              <input className={formInputSinifi} placeholder="Değişim" value={k.degisim} onChange={(e) => { const kopya = [...liste]; kopya[i] = { ...k, degisim: e.target.value }; onChange(configGuncelle(form, (c) => ({ ...c, kriptoParalar: kopya }))); }} />
+            </div>
+          )}
+        />
+      )}
     </AdminFormBolumu>
   );
 }

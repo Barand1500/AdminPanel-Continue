@@ -5,13 +5,14 @@ import type { WidgetFormDegeri } from '@/types/admin';
 interface WidgetOnizlemeModalProps {
   acik: boolean;
   form: WidgetFormDegeri;
+  otomatikDoldur?: boolean;
   onKapat: () => void;
 }
 
-export function WidgetOnizlemeModal({ acik, form, onKapat }: WidgetOnizlemeModalProps) {
+export function WidgetOnizlemeModal({ acik, form, otomatikDoldur = false, onKapat }: WidgetOnizlemeModalProps) {
   if (!acik) return null;
 
-  const widget = formToWidgetOnizleme(form);
+  const widget = formToWidgetOnizleme(form, 'onizleme', otomatikDoldur);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">

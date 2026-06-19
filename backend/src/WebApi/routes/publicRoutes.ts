@@ -2,6 +2,8 @@ import { Router } from 'express';
 import { SiteController } from '../controllers/SiteController.js';
 import { SiteAuthController, uyeAuthMiddleware } from '../controllers/SiteAuthController.js';
 import { PublicFormController } from '../controllers/PublicFormController.js';
+import { HavaDurumuController } from '../controllers/HavaDurumuController.js';
+import { KriptoController } from '../controllers/KriptoController.js';
 import { validateBySchema } from '../middleware/dogrulama.js';
 import { formRateLimit } from '../middleware/formRateLimit.js';
 import { formGonderSchema } from '../../Application/DTOs/FormDto.js';
@@ -16,8 +18,12 @@ const router = Router();
 const controller = new SiteController();
 const authController = new SiteAuthController();
 const publicFormController = new PublicFormController();
+const havaController = new HavaDurumuController();
+const kriptoController = new KriptoController();
 
 router.get('/health', (req, res) => controller.health(req, res));
+router.get('/hava', (req, res) => havaController.getir(req, res));
+router.get('/kripto', (req, res) => kriptoController.listele(req, res));
 router.get('/site', (req, res) => controller.getPublicSite(req, res));
 router.get('/sayfalar/detay', (req, res) => controller.getSayfa(req, res));
 router.get('/sayfalar/*splat', (req, res) => {

@@ -40,6 +40,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
   const [seciliId, setSeciliId] = useState<string | null>(null);
   const [onizlemeAcik, setOnizlemeAcik] = useState(false);
   const [onizlemeHazir, setOnizlemeHazir] = useState(false);
+  const [otomatikDoldur, setOtomatikDoldur] = useState(false);
   const kaydetFnRef = useRef<(() => Promise<void>) | null>(null);
 
   const yeniMod = seciliId === null;
@@ -214,12 +215,18 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
               onKaydet={kaydet}
               onKaydetTetikleyici={onKaydetTetikleyici}
               onTipSecildi={() => setOnizlemeHazir(true)}
+              onOtomatikDoldurChange={setOtomatikDoldur}
             />
           </div>
         </>
       )}
 
-      <WidgetOnizlemeModal acik={onizlemeAcik} form={form} onKapat={() => setOnizlemeAcik(false)} />
+      <WidgetOnizlemeModal
+        acik={onizlemeAcik}
+        form={form}
+        otomatikDoldur={otomatikDoldur}
+        onKapat={() => setOnizlemeAcik(false)}
+      />
     </AdminModulKabuk>
   );
 }
