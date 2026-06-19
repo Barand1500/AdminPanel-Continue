@@ -244,6 +244,8 @@ function AdminPanelGovde() {
         <div
           className="ap-modul-panel min-h-0 flex-1 overflow-y-auto p-6"
           data-ap-kesif="modul-icerik"
+          data-ap-kesif-modul={sekme.modulId}
+          data-ap-kesif-aktif={odakli ? 'true' : undefined}
           onMouseDown={() => setFocusModulId(sekme.modulId)}
           onFocusCapture={() => setFocusModulId(sekme.modulId)}
         >

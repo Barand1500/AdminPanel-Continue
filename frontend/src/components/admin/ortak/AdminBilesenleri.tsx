@@ -64,7 +64,7 @@ export function AdminPanelKarti({
 
 export function YukleniyorDurumu({ mesaj = 'Yükleniyor...' }: { mesaj?: string }) {
   return (
-    <div className="flex flex-col items-center justify-center gap-3 py-20">
+    <div className="flex flex-col items-center justify-center gap-3 py-20" data-ap-kesif="modul-yukleniyor">
       <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--ap-accent)] border-t-transparent" />
       <span className="ap-muted text-sm">{mesaj}</span>
     </div>

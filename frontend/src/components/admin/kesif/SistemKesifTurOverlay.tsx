@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { KesifOkYonu, SistemKesifAdim, SistemKesifTur } from '@/types/sistemKesif';
 
 interface Rect {
@@ -22,21 +22,58 @@ interface SistemKesifTurOverlayProps {
   onBitir: () => void;
 }
 
-const KART_GENISLIK = 360;
-const KART_YUKSEK = 200;
+const KART_GENISLIK = 400;
+const KART_TAHMIN_YUKSEK = 280;
 const PAD = 12;
 
 function bekle(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
-async function hedefBekle(hedef: string, deneme = 30): Promise<Element | null> {
-  for (let i = 0; i < deneme; i += 1) {
-    const el = document.querySelector(`[data-ap-kesif="${hedef}"]`);
-    if (el) return el;
-    await bekle(80);
+function gorunurMu(el: Element) {
+  const r = el.getBoundingClientRect();
+  return r.width > 8 && r.height > 8;
+}
+
+function hedefAra(ad: string, modulId?: string): Element | null {
+  const adaylar: string[] = [];
+
+  if (modulId) {
+    adaylar.push(`[data-ap-kesif-modul="${modulId}"][data-ap-kesif-aktif="true"] [data-ap-kesif="${ad}"]`);
+    adaylar.push(`[data-ap-kesif-modul="${modulId}"][data-ap-kesif-aktif="true"]`);
+  }
+  adaylar.push(`[data-ap-kesif-aktif="true"] [data-ap-kesif="${ad}"]`);
+  adaylar.push(`[data-ap-kesif="${ad}"]`);
+
+  for (const sel of adaylar) {
+    const el = document.querySelector(sel);
+    if (el && gorunurMu(el)) return el;
   }
   return null;
+}
+
+async function hedefBekle(adim: SistemKesifAdim): Promise<Element | null> {
+  const hedefler = [adim.hedef, ...(adim.hedefYedek ?? [])].filter(Boolean) as string[];
+  const deneme = adim.modulId ? 80 : 40;
+
+  for (let i = 0; i < deneme; i += 1) {
+    for (const ad of hedefler) {
+      const el = hedefAra(ad, adim.modulId);
+      if (el) return el;
+    }
+    await bekle(100);
+  }
+  return null;
+}
+
+async function modulPanelBekle(modulId: string) {
+  for (let i = 0; i < 80; i += 1) {
+    const panel = document.querySelector(
+      `[data-ap-kesif-modul="${modulId}"][data-ap-kesif-aktif="true"]`
+    );
+    if (panel && gorunurMu(panel)) return;
+    await bekle(100);
+  }
 }
 
 function hedefRect(el: Element, padding: number): Rect {
@@ -56,8 +93,8 @@ function kartKonumuHesapla(hedef: Rect | null, tercih: KesifOkYonu = 'alt'): Kar
 
   if (!hedef) {
     return {
-      top: vh / 2 - KART_YUKSEK / 2,
-      left: vw / 2 - KART_GENISLIK / 2,
+      top: Math.max(margin, vh / 2 - KART_TAHMIN_YUKSEK / 2),
+      left: Math.max(margin, vw / 2 - KART_GENISLIK / 2),
       okYonu: 'alt',
     };
   }
@@ -71,19 +108,19 @@ function kartKonumuHesapla(hedef: Rect | null, tercih: KesifOkYonu = 'alt'): Kar
     },
     {
       yon: 'ust',
-      top: hedef.top - KART_YUKSEK - margin,
+      top: hedef.top - KART_TAHMIN_YUKSEK - margin,
       left: hedef.left + hedef.width / 2 - KART_GENISLIK / 2,
       skor: tercih === 'ust' ? 0 : 1,
     },
     {
       yon: 'sag',
-      top: hedef.top + hedef.height / 2 - KART_YUKSEK / 2,
+      top: hedef.top + hedef.height / 2 - KART_TAHMIN_YUKSEK / 2,
       left: hedef.left + hedef.width + margin,
       skor: tercih === 'sag' ? 0 : 1,
     },
     {
       yon: 'sol',
-      top: hedef.top + hedef.height / 2 - KART_YUKSEK / 2,
+      top: hedef.top + hedef.height / 2 - KART_TAHMIN_YUKSEK / 2,
       left: hedef.left - KART_GENISLIK - margin,
       skor: tercih === 'sol' ? 0 : 1,
     },
@@ -92,21 +129,14 @@ function kartKonumuHesapla(hedef: Rect | null, tercih: KesifOkYonu = 'alt'): Kar
   adaylar.sort((a, b) => a.skor - b.skor);
 
   for (const aday of adaylar) {
-    const top = Math.max(margin, Math.min(aday.top, vh - KART_YUKSEK - margin));
+    const top = Math.max(margin, Math.min(aday.top, vh - KART_TAHMIN_YUKSEK - margin));
     const left = Math.max(margin, Math.min(aday.left, vw - KART_GENISLIK - margin));
-    const sigar =
-      top >= margin &&
-      left >= margin &&
-      top + KART_YUKSEK <= vh - margin &&
-      left + KART_GENISLIK <= vw - margin;
-    if (sigar || aday === adaylar[adaylar.length - 1]) {
-      return { top, left, okYonu: aday.yon };
-    }
+    return { top, left, okYonu: aday.yon };
   }
 
   return {
-    top: vh / 2 - KART_YUKSEK / 2,
-    left: vw / 2 - KART_GENISLIK / 2,
+    top: Math.max(margin, vh / 2 - KART_TAHMIN_YUKSEK / 2),
+    left: Math.max(margin, vw / 2 - KART_GENISLIK / 2),
     okYonu: tercih,
   };
 }
@@ -122,6 +152,7 @@ export function SistemKesifTurOverlay({
   const [hazir, setHazir] = useState(false);
   const [spotlight, setSpotlight] = useState<Rect | null>(null);
   const [kart, setKart] = useState<KartKonum | null>(null);
+  const kartRef = useRef<HTMLDivElement | null>(null);
 
   const adim = tur.adimlar[adimIdx];
   const sonAdim = adimIdx >= tur.adimlar.length - 1;
@@ -131,26 +162,33 @@ export function SistemKesifTurOverlay({
     setHazir(false);
 
     if (mevcutAdim.menuKapat) onMenuKapat();
-    if (mevcutAdim.modulId) onModulAc(mevcutAdim.modulId);
-    if (mevcutAdim.menuAc) onMenuAc();
 
-    if (mevcutAdim.modulId || mevcutAdim.menuAc) {
-      await bekle(mevcutAdim.menuAc ? 320 : 420);
+    if (mevcutAdim.modulId) {
+      onModulAc(mevcutAdim.modulId);
+      await bekle(120);
+      await modulPanelBekle(mevcutAdim.modulId);
+      await bekle(mevcutAdim.hedef ? 350 : 150);
+    }
+
+    if (mevcutAdim.menuAc) {
+      onMenuAc();
+      await bekle(400);
     }
 
     const padding = mevcutAdim.padding ?? PAD;
+    const hedefler = [mevcutAdim.hedef, ...(mevcutAdim.hedefYedek ?? [])].filter(Boolean);
 
-    if (!mevcutAdim.hedef) {
+    if (hedefler.length === 0) {
       setSpotlight(null);
       setKart(kartKonumuHesapla(null));
       setHazir(true);
       return;
     }
 
-    const el = await hedefBekle(mevcutAdim.hedef);
+    const el = await hedefBekle(mevcutAdim);
     if (el) {
       el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      await bekle(180);
+      await bekle(220);
       const rect = hedefRect(el, padding);
       setSpotlight(rect);
       setKart(kartKonumuHesapla(rect, mevcutAdim.okYonu));
@@ -167,8 +205,12 @@ export function SistemKesifTurOverlay({
 
   useEffect(() => {
     function yenidenOlc() {
-      if (!adim.hedef) return;
-      const el = document.querySelector(`[data-ap-kesif="${adim.hedef}"]`);
+      const hedefler = [adim.hedef, ...(adim.hedefYedek ?? [])].filter(Boolean) as string[];
+      let el: Element | null = null;
+      for (const ad of hedefler) {
+        el = hedefAra(ad, adim.modulId);
+        if (el) break;
+      }
       if (!el) return;
       const rect = hedefRect(el, adim.padding ?? PAD);
       setSpotlight(rect);
@@ -221,6 +263,7 @@ export function SistemKesifTurOverlay({
 
       {hazir && kart && (
         <div
+          ref={kartRef}
           className="ap-kesif-kart"
           style={{ top: kart.top, left: kart.left, width: KART_GENISLIK }}
           data-ok={kart.okYonu}
@@ -228,11 +271,19 @@ export function SistemKesifTurOverlay({
           <div className="ap-kesif-kart-ust">
             <span className="ap-kesif-kart-rozet">{tur.ikon}</span>
             <span className="ap-kesif-kart-sira">
-              {adimIdx + 1} / {tur.adimlar.length}
+              Adım {adimIdx + 1} / {tur.adimlar.length}
             </span>
           </div>
           <h3 className="ap-kesif-kart-baslik">{adim.baslik}</h3>
           <p className="ap-kesif-kart-metin">{adim.aciklama}</p>
+
+          {adim.ipuclari && adim.ipuclari.length > 0 && (
+            <ul className="ap-kesif-ipucu-liste">
+              {adim.ipuclari.map((ipucu) => (
+                <li key={ipucu}>{ipucu}</li>
+              ))}
+            </ul>
+          )}
 
           <div className="ap-kesif-kart-ilerleme">
             {tur.adimlar.map((_, i) => (
@@ -242,7 +293,7 @@ export function SistemKesifTurOverlay({
 
           <div className="ap-kesif-kart-alt">
             <button type="button" className="ap-kesif-atla" onClick={onBitir}>
-              Atla
+              Turu Kapat
             </button>
             <div className="ap-kesif-nav">
               {!ilkAdim && (
@@ -261,7 +312,7 @@ export function SistemKesifTurOverlay({
       {!hazir && (
         <div className="ap-kesif-yukleniyor">
           <span className="ap-kesif-yukleniyor-nokta" />
-          Hazırlanıyor…
+          {adim.modulId ? 'Modül açılıyor…' : 'Hazırlanıyor…'}
         </div>
       )}
     </div>

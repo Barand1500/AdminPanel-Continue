@@ -1,43 +1,71 @@
 import type { SistemKesifTur } from '@/types/sistemKesif';
 
+const MODUL_HEDEF = {
+  hedef: 'modul-kabuk' as const,
+  hedefYedek: ['modul-yukleniyor', 'modul-icerik'] as string[],
+};
+
 const panelAdimlari = [
   {
     id: 'hosgeldin',
-    baslik: 'Güzel Teknoloji Admin Paneline Hoş Geldiniz',
+    baslik: 'Hoş Geldiniz — Buradan Başlayalım',
     aciklama:
-      'Bu kısa turda panelin ana bölümlerini adım adım göstereceğiz. İleri ile devam edin; istediğiniz zaman atlayabilirsiniz.',
+      'Bu panel, web sitenizin tüm içeriğini, görünümünü ve ayarlarını yönettiğiniz merkezdir. Hiç deneyiminiz olmasa bile adım adım ilerleyerek her şeyi öğrenebilirsiniz.',
+    ipuclari: [
+      'İleri butonu ile bir sonraki adıma geçin',
+      'İstediğiniz zaman "Turu Kapat" diyebilirsiniz',
+      'ESC tuşu da turu sonlandırır',
+    ],
   },
   {
     id: 'baslat',
     hedef: 'baslat-menu',
     okYonu: 'sag' as const,
-    baslik: 'Başlat Menüsü',
+    baslik: 'Başlat Menüsü — Tüm Modüller Burada',
     aciklama:
-      'Sol üstteki ızgaraya tıklayarak tüm modüllere ulaşın. Sayfalar, widgetlar, SEO, kullanıcılar ve sistem ayarları buradan açılır.',
+      'Sol üstteki dört kareli simgeye tıklayınca tüm yönetim modülleri açılır. Sayfa eklemek, blog yazmak, SEO ayarlamak veya kullanıcı eklemek için önce buraya gelirsiniz.',
+    ipuclari: [
+      'Menüde arama kutusu ile modül adı yazarak hızlı bulun',
+      'Modüller kategorilere ayrılmıştır: Hızlı Erişim, Site Yönetimi, İçerik…',
+    ],
   },
   {
     id: 'sekmeler',
     hedef: 'sekme-cubugu',
     okYonu: 'alt' as const,
-    baslik: 'Sekme Çubuğu',
+    baslik: 'Sekmeler — Açık Sayfalarınız',
     aciklama:
-      'Açtığınız modüller sekme olarak üstte listelenir. Sürükleyerek sıralayabilir, gruplayabilir veya kapatıp tekrar açabilirsiniz.',
+      'Birden fazla modül açtığınızda üstte sekme olarak görünür. Tıpkı tarayıcı sekmeleri gibi çalışır: istediğiniz sekmeye tıklayarak geçiş yapın, X ile kapatabilirsiniz.',
+    ipuclari: [
+      'Sekmeleri sürükleyerek sıralayabilirsiniz',
+      'İki sekmeyi üst üste bırakarak gruplayabilirsiniz',
+      'Yeni açılan sekme listenin başına eklenir',
+    ],
   },
   {
     id: 'icerik',
     hedef: 'modul-icerik',
     okYonu: 'ust' as const,
-    baslik: 'Çalışma Alanı',
+    baslik: 'Çalışma Alanı — Asıl İş Burada Yapılır',
     aciklama:
-      'Seçili modülün içeriği bu alanda düzenlenir. Liste, form ve önizleme panelleri modüle göre değişir.',
+      'Seçtiğiniz modülün listesi, formları ve düzenleme ekranı bu geniş alanda görünür. Sol tarafta liste, sağ tarafta düzenleme paneli olan modüller çok yaygındır.',
+    ipuclari: [
+      'Değişiklik yaptıktan sonra mutlaka Kaydet\'e basın',
+      'Bazı modüllerde sekmeler (üst menü) farklı ayar grupları sunar',
+    ],
   },
   {
     id: 'aksiyon',
     hedef: 'aksiyon-cubugu',
     okYonu: 'ust' as const,
-    baslik: 'Alt Aksiyon Çubuğu',
+    baslik: 'Alt Çubuk — Kaydet, Ekle, Sil',
     aciklama:
-      'Kaydet, ekle, sil ve önizle gibi işlemler her modülde burada görünür. Değişikliklerinizi buradan kaydedin.',
+      'Ekranın en altındaki bu çubukta o anki modüle ait işlem butonları görünür. Kaydet butonu genelde mavi renktedir; değişikliklerinizi kaydetmeyi unutmayın.',
+    ipuclari: [
+      'Ctrl+S ile de kaydedebilirsiniz (Kısayol Ayarlarından değiştirilebilir)',
+      'Sağ taraftaki ? simgesi o sayfanın kısa yardım rehberini açar',
+      'Bildirim zili yeni işlemleri gösterir',
+    ],
   },
 ];
 
@@ -47,34 +75,44 @@ const dashboardAdimlari = [
     hedef: 'dash-kpi',
     modulId: 'dashboard',
     okYonu: 'alt' as const,
-    baslik: 'Özet Kartları',
+    baslik: 'Özet Kartları — Sitenizin Durumu',
     aciklama:
-      'Ziyaret, sayfa görüntüleme ve form gönderimi gibi temel metrikleri buradan takip edin. Analitik görünümde dönem seçerek filtreleyebilirsiniz.',
+      'Yayında kaç sayfa var, kaç form gönderildi, kaç medya yüklendi gibi bilgileri tek bakışta görürsünüz. Analitik modda ziyaret grafikleri de eklenir.',
+    ipuclari: [
+      'Analitik görünümde Bugün / Bu Hafta / Bu Ay seçebilirsiniz',
+      'Sade görünüm daha az grafik, daha çok özet sunar',
+    ],
   },
   {
     id: 'dash-hizli',
     hedef: 'dash-hizli-erisim',
     modulId: 'dashboard',
     okYonu: 'ust' as const,
-    baslik: 'Hızlı Erişim',
+    baslik: 'Hızlı Erişim — Sık Kullandıklarınız',
     aciklama:
-      'Sık kullandığınız modüllere tek tıkla gidin. Dişli simgesiyle kartları kendinize göre düzenleyin.',
+      'En çok girdiğiniz modüllere tek tıkla ulaşın. Dişli simgesine basarak hangi modüllerin görüneceğini kendiniz seçebilirsiniz.',
+    ipuclari: [
+      'Profil ayarlarından da hızlı erişim listesi düzenlenir',
+      'Kartlara tıklayınca ilgili modül yeni sekmede açılır',
+    ],
   },
   {
     id: 'dash-gorunum',
     hedef: 'dash-gorunum',
     modulId: 'dashboard',
     okYonu: 'alt' as const,
-    baslik: 'Dashboard Görünümü',
-    aciklama: 'Analitik veya sade görünüm arasında geçiş yapın. Tercihiniz tarayıcıda saklanır.',
+    baslik: 'Görünüm Seçimi',
+    aciklama:
+      'Dashboard\'u "Analitik" (grafikli, detaylı) veya "Sade" (sade özet) olarak görebilirsiniz. Tercihiniz otomatik hatırlanır.',
   },
   {
     id: 'site-onizle',
     hedef: 'site-onizle',
     modulId: 'dashboard',
     okYonu: 'alt' as const,
-    baslik: 'Canlı Site Önizlemesi',
-    aciklama: 'Yaptığınız değişiklikleri yayındaki sitede yeni sekmede görüntüleyin.',
+    baslik: 'Siteyi Önizle',
+    aciklama:
+      'Yaptığınız değişikliklerin ziyaretçilere nasıl göründüğünü kontrol etmek için canlı siteyi yeni sekmede açın. Her modülde de bu link bulunur.',
   },
 ];
 
@@ -82,7 +120,7 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
   {
     id: 'tam-tur',
     baslik: 'Tam Panel Turu',
-    aciklama: 'Panel arayüzü ve dashboard özelliklerini baştan sona keşfedin.',
+    aciklama: 'Panel arayüzü ve dashboard — sıfırdan başlayanlar için.',
     ikon: '🚀',
     adimlar: [
       ...panelAdimlari,
@@ -91,36 +129,39 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         id: 'bildirim',
         hedef: 'bildirim-tray',
         okYonu: 'ust' as const,
-        baslik: 'Bildirimler ve Görev Çubuğu',
+        baslik: 'Bildirimler ve Araçlar',
         aciklama:
-          'Sağ alttaki simgelerden log kayıtlarına, yedeklemeye ve bildirimlere hızlıca ulaşın.',
+          'Sağ alttaki simgeler: zil (bildirimler), belge (log kayıtları), indirme (yedekleme). Panelde ne olduğunu takip etmek için kullanılır.',
       },
       {
         id: 'bitis',
-        baslik: 'Tur Tamamlandı',
+        baslik: 'Tebrikler — Tur Bitti!',
         aciklama:
-          'Artık panele hakimsiniz. İstediğiniz konuyu tekrar seçerek o alana özel tur başlatabilirsiniz.',
+          'Temel panel yapısını öğrendiniz. Belirli bir konuyu derinlemesine görmek için "Sistemi Keşfet"ten o konuyu seçerek mini tur başlatabilirsiniz.',
+        ipuclari: ['Sayfalar, SEO, Widget gibi konular için ayrı turlar mevcut'],
       },
     ],
   },
   {
     id: 'panel-arayuzu',
     baslik: 'Panel Arayüzü',
-    aciklama: 'Menü, sekmeler, çalışma alanı ve aksiyon çubuğu.',
+    aciklama: 'Menü, sekmeler, çalışma alanı ve kaydetme çubuğu.',
     ikon: '🖥️',
     adimlar: panelAdimlari,
   },
   {
     id: 'dashboard',
     baslik: 'Dashboard',
-    aciklama: 'Özet kartlar, hızlı erişim ve görünüm seçenekleri.',
+    aciklama: 'Ana sayfa, özetler ve hızlı erişim.',
     ikon: '📊',
     adimlar: [
       {
         id: 'dash-giris',
         modulId: 'dashboard',
-        baslik: 'Dashboard',
-        aciklama: 'Ana sayfada sitenizin nabzını tutarsınız. Hadi önemli alanları tek tek görelim.',
+        baslik: 'Dashboard — Başlangıç Noktanız',
+        aciklama:
+          'Panele her girdiğinizde buradan başlarsınız. Sitenizin genel durumunu görür, sık kullandığınız modüllere hızlıca gidersiniz.',
+        ipuclari: ['Sol menüden Dashboard\'a her zaman dönebilirsiniz'],
       },
       ...dashboardAdimlari,
     ],
@@ -136,52 +177,72 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         hedef: 'baslat-menu',
         menuAc: true,
         okYonu: 'sag' as const,
-        baslik: 'İçerik Modülleri',
+        baslik: 'İçerik Modülleri Nerede?',
         aciklama:
-          'Başlat menüsünde İçerik Yönetimi bölümünde Sayfalar, Blog ve Formlar bulunur. Hızlı Erişimde Widget Yönetimi de vardır.',
+          'Başlat menüsünde "İçerik Yönetimi" bölümünde Blog ve Formlar var. "Hızlı Erişim" bölümünde Sayfalar ve Widget Yönetimi bulunur. Şimdi her birini tek tek ziyaret edeceğiz.',
+        ipuclari: ['Menü açıkken arama kutusuna "sayfa" yazarak filtreleyebilirsiniz'],
       },
       {
         id: 'sayfalar',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'sayfalar',
         menuKapat: true,
         okYonu: 'alt' as const,
         baslik: 'Sayfa Yönetimi',
         aciklama:
-          'Sol listeden sayfa seçin; sağda başlık, slug, içerik ve menü ayarlarını düzenleyin. Alt sayfalar hiyerarşik yapılandırılır.',
+          'Sitenizdeki tüm sayfaları buradan oluşturur ve düzenlersiniz. Sol listeden sayfa seçin; sağda başlık, URL (slug), içerik editörü ve menü ayarlarını bulursunuz.',
+        ipuclari: [
+          'Yeni sayfa: alttaki + veya üst çubuktaki Ekle',
+          'Alt sayfa: bir sayfanın altına hiyerarşik sayfa ekleyebilirsiniz',
+          'Yayında olmayan sayfalar ziyaretçiye görünmez',
+        ],
       },
       {
         id: 'widgetlar',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'widget-yonetimi',
         okYonu: 'alt' as const,
         baslik: 'Widget Yönetimi',
         aciklama:
-          'Anasayfa ve sayfa bileşenlerini buradan ekleyin. Slider, hizmet kartları, haber blokları ve daha fazlası widget tipleriyle gelir.',
+          'Anasayfa ve diğer sayfalardaki bileşenler (slider, hizmet kartları, haber blokları vb.) widget olarak eklenir. Sol listeden widget seçip sağdan tip ve içeriğini düzenlersiniz.',
+        ipuclari: [
+          'Her widget bir tipe sahiptir (Slider, Hero, SSS…)',
+          'Widget\'ı hangi sayfada göstereceğinizi seçebilirsiniz',
+          'Önizleme ile sonucu kontrol edin',
+        ],
       },
       {
         id: 'blog',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'blog',
         okYonu: 'alt' as const,
         baslik: 'Blog / Haberler',
-        aciklama: 'Yazı oluşturun, kategorilendirin ve yayına alın. SEO alanları her yazı için ayrı ayarlanır.',
+        aciklama:
+          'Haber ve blog yazılarını buradan ekleyin. Başlık, özet, kapak görseli ve zengin metin editörü ile içerik oluşturun. Yayına almadan önce taslak olarak saklayabilirsiniz.',
+        ipuclari: [
+          'Slug: yazının URL\'deki adresi (ör. /blog/yeni-yazi)',
+          'SEO başlık ve açıklama her yazı için ayrı ayarlanabilir',
+        ],
       },
       {
         id: 'formlar',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'formlar',
         okYonu: 'alt' as const,
         baslik: 'Form Yönetimi',
         aciklama:
-          'İletişim formları tasarlayın, alanları sürükleyerek düzenleyin ve gelen gönderimleri panelden takip edin.',
+          'İletişim, teklif alma veya başvuru formları tasarlayın. Alanları (metin, e-posta, telefon vb.) sürükleyerek ekleyin. Gelen mesajlar bu modülde listelenir.',
+        ipuclari: [
+          'Formu sitede nerede göstereceğinizi "Yerleşim" sekmesinden seçin',
+          'Bildirim e-postası ile yeni gönderimde haberdar olun',
+        ],
       },
     ],
   },
   {
     id: 'site-gorunumu',
     baslik: 'Site Görünümü',
-    aciklama: 'Header, hero, footer ve kategori ayarları.',
+    aciklama: 'Header, hero, footer ve kategoriler.',
     ikon: '🏠',
     adimlar: [
       {
@@ -189,112 +250,135 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         hedef: 'baslat-menu',
         menuAc: true,
         okYonu: 'sag' as const,
-        baslik: 'Site Yönetimi',
-        aciklama: 'Başlat menüsündeki Site Yönetimi kategorisinde görünüm modülleri gruplanır.',
+        baslik: 'Site Yönetimi Kategorisi',
+        aciklama:
+          'Başlat menüsünde "Site Yönetimi" altında sitenin görsel iskeletini oluşturan modüller vardır: üst menü (Header), ana banner (Hero), alt bilgi (Footer) ve kategoriler.',
       },
       {
         id: 'header',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'header',
         menuKapat: true,
         okYonu: 'alt' as const,
-        baslik: 'Header Yönetimi',
-        aciklama: 'Üst menü tipini seçin, logo ve navigasyonu yapılandırın. Canlı önizleme sekmeleriyle sonucu görün.',
+        baslik: 'Header — Üst Menü',
+        aciklama:
+          'Ziyaretçiler sitenize girdiğinde en üstte gördükleri alan. Logo, menü linkleri ve header tipi (kaç sütun, sabit/sticky vb.) buradan ayarlanır.',
+        ipuclari: [
+          'İlk sekme "Header Tipi" — farklı şablonlardan birini seçin',
+          'Önizleme sekmesinde canlı görünümü kontrol edin',
+        ],
       },
       {
         id: 'hero',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'hero',
         okYonu: 'alt' as const,
-        baslik: 'Hero Alanı',
-        aciklama: 'Ana banner görseli, başlık ve çağrı butonlarını buradan düzenleyin.',
+        baslik: 'Hero — Ana Banner',
+        aciklama:
+          'Anasayfanın büyük giriş alanı. Arka plan görseli, başlık, alt metin ve buton metnini buradan değiştirirsiniz.',
       },
       {
         id: 'footer',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'footer',
         okYonu: 'alt' as const,
-        baslik: 'Footer Yönetimi',
-        aciklama: 'Alt bilgi alanı tipini seçin; link sütunları, iletişim ve sosyal medya ayarlarını yapın.',
+        baslik: 'Footer — Alt Bilgi',
+        aciklama:
+          'Sitenin en altındaki alan. Footer tipi seçin, link sütunları ekleyin, iletişim ve telif bilgilerini girin.',
+        ipuclari: ['Footer Tipi sekmesinden farklı düzenler deneyin'],
       },
       {
         id: 'kategoriler',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'kategoriler',
         okYonu: 'alt' as const,
         baslik: 'Kategori Yönetimi',
-        aciklama: 'Menü ve haber kategorilerini hiyerarşik olarak oluşturun.',
+        aciklama:
+          'Menü ve haber kategorilerini ağaç yapısında oluşturun. Üst kategori altına alt kategoriler ekleyebilirsiniz.',
       },
     ],
   },
   {
     id: 'seo-yayin',
     baslik: 'SEO ve Yayın',
-    aciklama: 'Arama motoru ayarları ve site geneli SEO.',
+    aciklama: 'Google görünürlüğü ve genel site ayarları.',
     ikon: '🔍',
     adimlar: [
       {
         id: 'seo-giris',
         modulId: 'seo',
-        baslik: 'SEO Ayarları',
-        aciklama: 'Sitenizin Google ve diğer arama motorlarındaki görünürlüğünü buradan yönetirsiniz.',
+        baslik: 'SEO Nedir, Neden Önemli?',
+        aciklama:
+          'SEO (Arama Motoru Optimizasyonu), sitenizin Google\'da nasıl göründüğünü belirler. Title ve description doğru yazılırsa daha fazla ziyaretçi gelir.',
+        ipuclari: ['Şimdi SEO modülünü birlikte açacağız — birkaç saniye bekleyin'],
       },
       {
         id: 'seo-modul',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'seo',
         okYonu: 'alt' as const,
-        baslik: 'Meta ve 301 Yönlendirme',
+        baslik: 'SEO Ayarları Modülü',
         aciklama:
-          'Her URL için title ve description girin. Yeşil + ile 301 yönlendirme ekleyin; alt satırda kırmızı rozetle görünür.',
+          'Genel SEO sekmesinde site geneli ayarlar; Kategori ve Sabit Sayfa sekmelerinde her URL için title/description girilir. Yeşil + ile 301 yönlendirme eklenir (eski adres → yeni adres).',
+        ipuclari: [
+          '301 yönlendirme: taşınan sayfalar için eski linki yönlendirin',
+          'Değişiklikler alt Kaydet veya üst çubuktan kaydedilir',
+        ],
       },
       {
         id: 'site-ayarlari',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'site-ayarlari',
         okYonu: 'alt' as const,
         baslik: 'Site Ayarları',
-        aciklama: 'Logo, renkler, iletişim bilgileri ve genel site kimliği bu modülde toplanır.',
+        aciklama:
+          'Logo, site adı, ana renkler, telefon, e-posta, adres ve sosyal medya linkleri burada toplanır. Tüm sitede ortak kullanılır.',
       },
     ],
   },
   {
     id: 'kullanici-sistem',
     baslik: 'Kullanıcı ve Sistem',
-    aciklama: 'Yetkiler, ayarlar, sekmeler ve yedekleme.',
+    aciklama: 'Yetkiler, panel davranışı ve yedekleme.',
     ikon: '⚙️',
     adimlar: [
       {
         id: 'kullanicilar',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'kullanicilar',
         okYonu: 'alt' as const,
         baslik: 'Kullanıcı Yönetimi',
-        aciklama: 'Panel kullanıcılarını ekleyin, roller atayın ve erişimi kontrol edin.',
+        aciklama:
+          'Panele giriş yapabilecek kişileri ekleyin. Her kullanıcıya bir rol atarsınız; rol ne yapabileceğini belirler.',
+        ipuclari: ['Şifre güvenli olmalı; kullanıcıya e-posta ile bilgi verin'],
       },
       {
         id: 'roller',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'roller',
         okYonu: 'alt' as const,
         baslik: 'Roller ve Yetkiler',
-        aciklama: 'Her rol için hangi modüllere erişilebileceğini granüler olarak tanımlayın.',
+        aciklama:
+          'Örneğin "Editör" yalnızca içerik modüllerini, "Admin" her şeyi görebilir. Her rol için modül bazında izin işaretleyin.',
       },
       {
         id: 'sekme-yonetimi',
-        hedef: 'modul-kabuk',
+        ...MODUL_HEDEF,
         modulId: 'sekme-yonetimi',
         okYonu: 'alt' as const,
         baslik: 'Sekme Yönetimi',
-        aciklama: 'Üst sekme çubuğunun boyutunu, görünümünü ve davranışını özelleştirin.',
+        aciklama:
+          'Üst sekme çubuğunun boyutunu, yazı tipini ve davranışını (yan yana açma, sürükleyince ayırma vb.) buradan kişiselleştirin.',
       },
       {
         id: 'sistem-tray',
         hedef: 'gorev-tray',
         modulId: 'dashboard',
+        hedefYedek: ['aksiyon-cubugu'],
         okYonu: 'ust' as const,
         baslik: 'Log ve Yedekleme',
-        aciklama: 'Alt çubuktaki simgelerden işlem geçmişine ve veri yedeklemeye erişin.',
+        aciklama:
+          'Alt çubuktaki belge simgesi işlem geçmişini (log), indirme simgesi veri yedeklemeyi açar. Düzenli yedek almak veri kaybını önler.',
       },
     ],
   },

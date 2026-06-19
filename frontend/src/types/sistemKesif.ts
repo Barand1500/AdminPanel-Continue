@@ -4,8 +4,12 @@ export interface SistemKesifAdim {
   id: string;
   /** data-ap-kesif değeri; boş = ekran ortası */
   hedef?: string;
+  /** hedef bulunamazsa denenecek alternatifler */
+  hedefYedek?: string[];
   baslik: string;
   aciklama: string;
+  /** Yeni başlayanlar için kısa maddeler */
+  ipuclari?: string[];
   okYonu?: KesifOkYonu;
   modulId?: string;
   menuAc?: boolean;
