@@ -22,17 +22,28 @@ export function HeaderTipWireframe({ tip }: { tip: HeaderTipi }) {
       </div>
     ),
     sade: (
-      <div className="flex items-center gap-1 p-2">
-        <div className={`h-3 w-6 ${bar}`} />
-        <div className={`h-1 flex-1 ${line}`} />
-        <div className={`h-2 w-2 ${muted}`} />
+      <div className="space-y-1 p-2">
+        <div className="flex justify-center">
+          <div className={`h-2.5 w-8 ${bar}`} />
+        </div>
+        <div className={`mx-4 h-px ${muted}`} />
+        <div className="flex justify-center gap-1">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className={`h-0.5 w-3 ${line}`} />
+          ))}
+        </div>
       </div>
     ),
     kompakt: (
-      <div className="flex items-center gap-0.5 px-2 py-2.5">
-        <div className={`h-2 w-4 ${bar}`} />
-        <div className={`h-0.5 flex-1 ${line}`} />
-        <div className={`h-1.5 w-1.5 ${muted}`} />
+      <div className="rounded bg-[#111] p-2">
+        <div className="flex items-center gap-1">
+          <div className={`h-2 w-4 bg-white/80`} />
+          <div className={`h-1.5 w-5 rounded-full bg-white/25`} />
+          <div className={`h-1.5 w-5 rounded-full bg-white/25`} />
+          <div className={`h-1.5 w-5 rounded-full bg-white/25`} />
+          <div className="flex-1" />
+          <div className={`h-1.5 w-1.5 rounded-full bg-white/50`} />
+        </div>
       </div>
     ),
     'merkez-logo': (
@@ -78,11 +89,19 @@ export function HeaderTipWireframe({ tip }: { tip: HeaderTipi }) {
       </div>
     ),
     'seffaf-hero': (
-      <div className="relative p-2">
-        <div className="absolute inset-0 rounded bg-gradient-to-b from-slate-400/30 to-transparent" />
-        <div className="relative flex items-center gap-1">
-          <div className="h-2 w-5 bg-white/80" />
-          <div className="h-0.5 flex-1 bg-white/50" />
+      <div className="relative overflow-hidden rounded bg-[#1a1a1a] p-2">
+        <div className="mb-3 flex items-center gap-1">
+          <div className="h-1.5 w-4 rounded bg-white/70" />
+          <div className="flex-1" />
+          <div className="h-0.5 w-8 rounded bg-white/40" />
+        </div>
+        <div className="flex flex-col items-center gap-1 py-2">
+          <div className="h-1 w-10 rounded bg-white/30" />
+          <div className="h-2.5 w-14 rounded bg-white/80" />
+          <div className="mt-1 flex gap-1">
+            <div className="h-1.5 w-6 rounded bg-white/70" />
+            <div className="h-1.5 w-6 rounded border border-white/40" />
+          </div>
         </div>
       </div>
     ),

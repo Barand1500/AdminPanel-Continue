@@ -4,6 +4,8 @@ import type { HeaderAyarlari } from '@/types/header';
 import type { Kategori } from '@/data/kategoriler';
 import type { NavKategoriKayit } from '@/types/navKategori';
 import { headerAyarlariBirlestir } from '@/types/header';
+import { headerTipiNormalize } from '@/data/headerTipleri';
+import { headerTipDemoPaketi } from '@/data/headerTipDemoVerisi';
 import { SiteHeader } from '@/components/ortak/SiteHeader';
 import { SiteFooter } from '@/components/ortak/SiteFooter';
 import { SiteDilProvider } from '@/contexts/SiteDilContext';
@@ -17,6 +19,7 @@ interface SiteHeaderOnizlemeProps {
   ayarlar?: SiteAyarlari | null;
   headerAyarlari?: HeaderAyarlari | null;
   iletisim?: { telefon?: string | null; email?: string | null };
+  demoMod?: boolean;
 }
 
 export function SiteHeaderOnizleme({
@@ -24,12 +27,14 @@ export function SiteHeaderOnizleme({
   ayarlar,
   headerAyarlari: headerProp,
   iletisim,
+  demoMod = false,
 }: SiteHeaderOnizlemeProps) {
   const [sayfalar, setSayfalar] = useState<Awaited<ReturnType<typeof adminSayfalariGetir>>>([]);
   const [navKayitlar, setNavKayitlar] = useState<NavKategoriKayit[]>([]);
   const [kategoriler, setKategoriler] = useState<Kategori[] | undefined>();
 
   useEffect(() => {
+    if (demoMod) return;
     adminSayfalariGetir()
       .then(setSayfalar)
       .catch(() => setSayfalar([]));
@@ -42,32 +47,72 @@ export function SiteHeaderOnizleme({
         setNavKayitlar([]);
         setKategoriler(undefined);
       });
-  }, []);
+  }, [demoMod]);
+
+  const headerJson = headerProp ?? headerAyarlariBirlestir(ayarlar);
+  const tip = headerTipiNormalize(headerJson.headerTipi);
+  const demo = headerTipDemoPaketi(tip);
 
   const onizlemeAyarlar = useMemo((): SiteAyarlari => {
     const base = ayarlar ?? {};
-    const headerJson = headerProp ?? headerAyarlariBirlestir(ayarlar);
+
+    if (!demoMod) {
+      return {
+        ...base,
+        telefon: iletisim?.telefon ?? base.telefon,
+        email: iletisim?.email ?? base.email,
+        headerAyarlariJson: headerJson,
+      };
+    }
+
+    const mergedHeader = headerAyarlariBirlestir({
+      ...base,
+      headerAyarlariJson: headerJson,
+    });
+
     return {
       ...base,
-      telefon: iletisim?.telefon ?? base.telefon,
-      email: iletisim?.email ?? base.email,
-      headerAyarlariJson: headerJson,
+      anaRenk: demo.anaRenk,
+      ikincilRenk: demo.ikincilRenk,
+      telefon: demo.telefon || undefined,
+      email: demo.email || undefined,
+      headerAyarlariJson: {
+        ...mergedHeader,
+        markaMetni: demo.markaMetni,
+        slogan: demo.slogan || mergedHeader.slogan,
+        logoUrl: null,
+        arama: mergedHeader.arama
+          ? { ...mergedHeader.arama, placeholder: demo.aramaPlaceholder }
+          : mergedHeader.arama,
+        tipEk: {
+          ...mergedHeader.tipEk,
+          ...(tip === 'modern' && !mergedHeader.tipEk?.ctaMetni
+            ? { ctaMetni: 'İletişim', ctaLink: '/iletisim' }
+            : {}),
+        },
+      },
     };
-  }, [ayarlar, headerProp, iletisim]);
+  }, [ayarlar, headerJson, iletisim, demoMod, demo, tip]);
 
-  const menuOgeleri = useMemo(
-    () => headerMenuOlustur(sayfalar, onizlemeAyarlar.headerAyarlariJson, onizlemeAyarlar),
-    [sayfalar, onizlemeAyarlar]
-  );
+  const menuOgeleri = useMemo(() => {
+    if (demoMod) return demo.menu;
+    return headerMenuOlustur(sayfalar, onizlemeAyarlar.headerAyarlariJson, onizlemeAyarlar);
+  }, [demoMod, demo.menu, sayfalar, onizlemeAyarlar]);
+
+  const gosterilecekKategoriler = demoMod ? demo.kategoriler : kategoriler;
 
   return (
-    <SiteDilProvider ayarlar={onizlemeAyarlar} sayfalar={sayfalar} navKategoriler={navKayitlar}>
+    <SiteDilProvider
+      ayarlar={onizlemeAyarlar}
+      sayfalar={demoMod ? [] : sayfalar}
+      navKategoriler={demoMod ? [] : navKayitlar}
+    >
       <div className="ap-site-header-onizleme site-public min-w-0">
         <SiteHeader
-          siteAdi={siteAdi}
+          siteAdi={demoMod ? demo.markaMetni : siteAdi}
           ayarlar={onizlemeAyarlar}
           menuOgeleri={menuOgeleri}
-          kategoriler={kategoriler}
+          kategoriler={gosterilecekKategoriler}
         />
       </div>
     </SiteDilProvider>

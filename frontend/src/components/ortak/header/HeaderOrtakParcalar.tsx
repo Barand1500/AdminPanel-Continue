@@ -121,6 +121,20 @@ export function AramaAlani({ veri, className = '' }: { veri: HeaderVeri; classNa
   if (veri.tipEk.aramaGoster === false) return null;
 
   const arama = veri.header.arama!;
+
+  if (veri.tipEk.aramaModu === 'ikon') {
+    return (
+      <button
+        type="button"
+        className={`site-header-arama-ikon rounded-full p-2 transition hover:opacity-80 ${className}`}
+        style={{ color: 'inherit' }}
+        aria-label="Ara"
+      >
+        <HeaderIkon ikon={arama.ikon} grup="arama" className="h-5 w-5" />
+      </button>
+    );
+  }
+
   return (
     <div className={`relative ${className}`}>
       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary">
@@ -135,22 +149,28 @@ export function IkonGrubu({
   veri,
   onMenuToggle,
   menuAcik,
+  sadeceHamburger = false,
 }: {
   veri: HeaderVeri;
   onMenuToggle?: () => void;
   menuAcik?: boolean;
+  sadeceHamburger?: boolean;
 }) {
   return (
     <div className="flex items-center gap-1 sm:gap-2">
-      {veri.header.dilDestegi?.aktif && <HeaderDilSecici ayar={veri.header.dilDestegi} />}
-      <TemaToggle tema={veri.header.ikonlar?.tema} />
-      <Link
-        to="/hesabim"
-        className="rounded-full p-2 transition hover:bg-accent hover:text-primary"
-        style={{ color: 'var(--color-text-muted)' }}
-      >
-        <HeaderIkon ikon={veri.header.ikonlar!.hesap} grup="hesap" />
-      </Link>
+      {!sadeceHamburger && veri.header.dilDestegi?.aktif && (
+        <HeaderDilSecici ayar={veri.header.dilDestegi} />
+      )}
+      {!sadeceHamburger && <TemaToggle tema={veri.header.ikonlar?.tema} />}
+      {!sadeceHamburger && (
+        <Link
+          to="/hesabim"
+          className="rounded-full p-2 transition hover:bg-accent hover:text-primary"
+          style={{ color: 'var(--color-text-muted)' }}
+        >
+          <HeaderIkon ikon={veri.header.ikonlar!.hesap} grup="hesap" />
+        </Link>
+      )}
       {onMenuToggle && (
         <button
           type="button"
@@ -176,9 +196,11 @@ export function IkonGrubu({
 export function DesktopMenu({
   menu,
   className = '',
+  linkClassName = 'site-menu-nav-link text-sm font-medium transition hover:text-primary',
 }: {
   menu: MenuOgesi[];
   className?: string;
+  linkClassName?: string;
 }) {
   return (
     <nav className={`site-header-nav hidden items-center gap-5 lg:flex ${className}`}>
@@ -186,11 +208,42 @@ export function DesktopMenu({
         <MenuOgeGoster
           key={`${oge.yol}-${i}`}
           oge={oge}
-          linkClassName="site-menu-nav-link text-sm font-medium transition hover:text-primary"
+          linkClassName={linkClassName}
           style={{ color: 'var(--color-text-muted)' }}
         />
       ))}
     </nav>
+  );
+}
+
+export function KompaktPillMenu({ menu }: { menu: MenuOgesi[] }) {
+  return (
+    <nav className="site-header-pill-nav hidden flex-1 items-center gap-1 overflow-x-auto lg:flex">
+      {menu.map((oge, i) => (
+        <Link
+          key={`${oge.yol}-${i}`}
+          to={oge.yol}
+          className="site-header-pill shrink-0 rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-wide transition hover:bg-white/15"
+        >
+          {oge.baslik}
+        </Link>
+      ))}
+    </nav>
+  );
+}
+
+export function SadeMinimalIkonlar({ veri }: { veri: HeaderVeri }) {
+  return (
+    <div className="site-header-sade-ikonlar flex items-center gap-1">
+      <AramaAlani veri={veri} />
+      <Link
+        to="/hesabim"
+        className="rounded-full p-2 opacity-80 transition hover:opacity-100"
+        aria-label="Hesabım"
+      >
+        <HeaderIkon ikon={veri.header.ikonlar!.hesap} grup="hesap" className="h-[18px] w-[18px]" />
+      </Link>
+    </div>
   );
 }
 

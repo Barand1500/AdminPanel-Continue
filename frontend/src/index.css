@@ -431,11 +431,35 @@ body:has(.site-public)::-webkit-scrollbar,
 .site-header-sade,
 .site-header-varyant-sade {
   box-shadow: none;
+  background: var(--color-surface-elevated);
+}
+
+.site-header-varyant-sade .site-header-nav {
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 70%, transparent);
 }
 
 .site-header-kompakt,
 .site-header-varyant-kompakt {
   box-shadow: none;
+  background: #111111;
+  color: #ffffff;
+  border-color: #222;
+}
+
+.site-header-varyant-kompakt .site-header-pill {
+  color: rgb(255 255 255 / 0.88);
+}
+
+.site-header-varyant-kompakt .site-header-arama-ikon {
+  color: #fff;
+}
+
+.site-header-varyant-kompakt .site-marka-alani span {
+  color: #fff !important;
+}
+
+.site-header-varyant-kompakt .site-marka-alani .text-primary {
+  color: rgb(255 255 255 / 0.55) !important;
 }
 
 .site-header-merkez-logo,
@@ -465,8 +489,97 @@ body:has(.site-public)::-webkit-scrollbar,
 
 .site-header-seffaf-hero,
 .site-header-varyant-seffaf-hero {
-  background: color-mix(in srgb, var(--color-surface-elevated) 82%, transparent);
-  backdrop-filter: blur(8px);
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.site-header-hero-shell {
+  position: relative;
+}
+
+.site-header-hero-stage {
+  position: relative;
+  min-height: 320px;
+  overflow: hidden;
+}
+
+.site-header-hero-bg {
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(0 0 0 / 0.15) 0%, rgb(0 0 0 / 0.55) 100%),
+    radial-gradient(ellipse 80% 60% at 50% 20%, rgb(60 60 60 / 0.9), rgb(15 15 15) 70%);
+}
+
+.site-header-hero-icerik {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  min-height: 320px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-top: 3.5rem;
+  padding-bottom: 2.5rem;
+  text-align: center;
+  color: #fff;
+}
+
+.site-header-hero-etiket {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.site-header-hero-baslik {
+  margin: 0;
+  font-size: clamp(2rem, 5vw, 3rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+}
+
+.site-header-hero-alt {
+  margin: 0.75rem 0 0;
+  font-size: 0.95rem;
+  opacity: 0.8;
+}
+
+.site-header-hero-butonlar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+}
+
+.site-header-hero-btn {
+  display: inline-flex;
+  min-width: 140px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.35rem;
+  padding: 0.65rem 1.25rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.site-header-hero-btn--birincil {
+  background: rgb(255 255 255 / 0.92);
+  color: #111;
+}
+
+.site-header-hero-btn--ikincil {
+  border: 1px solid rgb(255 255 255 / 0.55);
+  background: rgb(255 255 255 / 0.08);
+  color: #fff;
+}
+
+.site-header-varyant-seffaf-hero .site-header-hamburger {
+  color: #fff;
 }
 
 .site-header-split,

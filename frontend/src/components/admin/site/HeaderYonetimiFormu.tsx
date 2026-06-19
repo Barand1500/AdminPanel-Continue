@@ -155,14 +155,7 @@ export function HeaderYonetimiFormu() {
         </div>
 
         {gecerliSekme === 'header-tipi' && (
-          <HeaderTipIcerik
-            secili={aktifTip}
-            onSec={tipDegistir}
-            siteAd={siteAd}
-            ayarlar={ayarlar}
-            headerAyarlari={birlesikHeader}
-            iletisim={{ telefon: ayarlar.telefon, email: ayarlar.email }}
-          />
+          <HeaderTipIcerik secili={aktifTip} onSec={tipDegistir} />
         )}
 
         {gecerliSekme === 'ust-bant' && (
@@ -343,8 +336,9 @@ export function HeaderYonetimiFormu() {
         siteAd={siteAd}
         headerAyarlari={birlesikHeader}
         iletisim={{ telefon: ayarlar.telefon, email: ayarlar.email }}
+        demoMod
       />
     </div>
   );
 }
-
+

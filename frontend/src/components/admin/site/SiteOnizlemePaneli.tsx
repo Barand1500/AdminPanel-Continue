@@ -1,5 +1,8 @@
+import { useMemo } from 'react';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import type { HeaderAyarlari } from '@/types/header';
+import { headerTipiNormalize } from '@/data/headerTipleri';
+import { headerTipDemoPaketi } from '@/data/headerTipDemoVerisi';
 import { SiteFooterOnizleme, SiteHeaderOnizleme } from './SiteOnizlemeBilesenleri';
 import { AdminPanelKarti } from '@/components/admin/ortak/AdminBilesenleri';
 import { siteOnizlemeCssStili } from '@/utils/siteOnizlemeStili';
@@ -9,19 +12,43 @@ interface SiteOnizlemePaneliProps {
   siteAd?: string;
   headerAyarlari?: HeaderAyarlari | null;
   iletisim?: { telefon?: string | null; email?: string | null };
+  /** Header yönetiminde tip bazlı sahte örnek verilerle önizleme */
+  demoMod?: boolean;
 }
 
-export function SiteOnizlemePaneli({ tip, siteAd, headerAyarlari, iletisim }: SiteOnizlemePaneliProps) {
+export function SiteOnizlemePaneli({
+  tip,
+  siteAd,
+  headerAyarlari,
+  iletisim,
+  demoMod = false,
+}: SiteOnizlemePaneliProps) {
   const { ayarlar, site, siteAd: ctxSiteAd, headerAyarlari: ctxHeader } = useSiteAyarlariYonetimi();
   const ad = siteAd ?? ctxSiteAd ?? site?.ad ?? 'Güzel Teknoloji';
   const header = headerAyarlari ?? ctxHeader;
-  const onizlemeStili = siteOnizlemeCssStili(ayarlar);
+  const tipId = headerTipiNormalize(header?.headerTipi);
+  const demo = headerTipDemoPaketi(tipId);
+
+  const onizlemeStili = useMemo(() => {
+    if (!demoMod || tip !== 'header') return siteOnizlemeCssStili(ayarlar);
+    return siteOnizlemeCssStili({ ...ayarlar, anaRenk: demo.anaRenk, ikincilRenk: demo.ikincilRenk });
+  }, [demoMod, tip, ayarlar, demo.anaRenk, demo.ikincilRenk]);
 
   return (
     <AdminPanelKarti
       baslik="Canlı Önizleme"
-      altBaslik="Form değişiklikleri anında yansır — Kaydet ile public site güncellenir"
+      altBaslik={
+        demoMod && tip === 'header'
+          ? `Örnek verilerle gösterim — ${demo.ornekNotu}. Kaydedince sitenizin gerçek içeriği görünür.`
+          : 'Form değişiklikleri anında yansır — Kaydet ile public site güncellenir'
+      }
     >
+      {demoMod && tip === 'header' && (
+        <div className="mb-3 rounded-lg border border-amber-500/30 bg-amber-500/10 px-3 py-2 text-xs text-amber-200/90">
+          Bu önizleme sahte marka ve menü verileri kullanır ({demo.markaMetni}). Gerçek logo, menü ve iletişim bilgileriniz kayıttan sonra sitede görünür.
+        </div>
+      )}
+
       <div
         className={`site-public rounded-lg border border-[var(--ap-border)] ${
           tip === 'header' ? 'overflow-hidden' : 'ap-scroll max-h-[70vh] overflow-y-auto overflow-x-hidden'
@@ -34,6 +61,7 @@ export function SiteOnizlemePaneli({ tip, siteAd, headerAyarlari, iletisim }: Si
             ayarlar={ayarlar}
             headerAyarlari={header}
             iletisim={iletisim}
+            demoMod={demoMod}
           />
         )}
 
@@ -45,16 +73,8 @@ export function SiteOnizlemePaneli({ tip, siteAd, headerAyarlari, iletisim }: Si
             />
             <p className="text-sm text-slate-600">
               Ana renk: <strong>{ayarlar?.anaRenk}</strong> · İkincil:{' '}
-              <strong>{ayarlar?.ikincilRenk}</strong> · Font:{' '}
-              <strong>{ayarlar?.font ?? 'Inter'}</strong>
+              <strong>{ayarlar?.ikincilRenk}</strong>
             </p>
-            <button
-              type="button"
-              className="mt-4 rounded-lg px-4 py-2 text-sm font-semibold text-white"
-              style={{ backgroundColor: ayarlar?.anaRenk ?? '#7c3aed' }}
-            >
-              Örnek Buton
-            </button>
           </div>
         )}
 

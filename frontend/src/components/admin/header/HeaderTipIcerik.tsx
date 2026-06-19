@@ -1,29 +1,14 @@
 import { HEADER_TIP_TANIMLARI, type HeaderTipi } from '@/data/headerTipleri';
 import { HeaderTipWireframe } from './HeaderTipWireframe';
-import { SiteHeaderOnizleme } from '@/components/admin/site/SiteOnizlemeBilesenleri';
-import type { HeaderAyarlari } from '@/types/header';
-import type { SiteAyarlari } from '@/types/site';
 import { AdminPanelKarti } from '@/components/admin/ortak/AdminBilesenleri';
-import { siteOnizlemeCssStili } from '@/utils/siteOnizlemeStili';
 
 interface HeaderTipIcerikProps {
   secili: HeaderTipi;
   onSec: (tip: HeaderTipi) => void;
-  siteAd: string;
-  ayarlar?: SiteAyarlari | null;
-  headerAyarlari: HeaderAyarlari;
-  iletisim?: { telefon?: string | null; email?: string | null };
 }
 
-/** Header Tipi sekmesinin içeriği: kart grid + altında canlı önizleme */
-export function HeaderTipIcerik({
-  secili,
-  onSec,
-  siteAd,
-  ayarlar,
-  headerAyarlari,
-  iletisim,
-}: HeaderTipIcerikProps) {
+/** Header Tipi sekmesi — yalnızca tip kartları (önizleme altta Canlı Önizleme'de) */
+export function HeaderTipIcerik({ secili, onSec }: HeaderTipIcerikProps) {
   const seciliTanim = HEADER_TIP_TANIMLARI.find((t) => t.id === secili);
 
   return (
@@ -58,21 +43,6 @@ export function HeaderTipIcerik({
             </button>
           );
         })}
-      </div>
-
-      <div className="mt-5 border-t border-[var(--ap-border)] pt-5">
-        <p className="ap-heading mb-2 text-sm font-semibold">Önizleme</p>
-        <div
-          className="site-public overflow-hidden rounded-lg border border-[var(--ap-border)]"
-          style={siteOnizlemeCssStili(ayarlar)}
-        >
-          <SiteHeaderOnizleme
-            siteAdi={siteAd}
-            ayarlar={ayarlar}
-            headerAyarlari={headerAyarlari}
-            iletisim={iletisim}
-          />
-        </div>
       </div>
     </AdminPanelKarti>
   );

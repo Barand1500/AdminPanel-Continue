@@ -1,4 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react';
+import { Link } from 'react-router-dom';
 import type { SiteAyarlari } from '@/types/site';
 import type { HeaderVeri } from './useHeaderVeri';
 import {
@@ -12,7 +13,10 @@ import {
   MobilMenuPanel,
   HeaderGovde,
   CtaLink,
+  KompaktPillMenu,
+  SadeMinimalIkonlar,
 } from './HeaderOrtakParcalar';
+import { HeaderIkon } from '../HeaderIkon';
 import { KategoriMenu } from '../KategoriMenu';
 
 interface HeaderLayoutProps {
@@ -44,10 +48,27 @@ export function HeaderKlasik({ veri, ayarlar, menuAcik, setMenuAcik }: HeaderLay
 export function HeaderSade({ veri, menuAcik, setMenuAcik }: HeaderLayoutProps) {
   return (
     <HeaderGovde veri={veri} className="site-header-varyant-sade">
-      <div className="container-site flex h-14 items-center justify-between gap-4">
-        <MarkaAlani veri={veri} className="max-w-[220px]" />
-        <DesktopMenu menu={veri.cevrilmisMenu} className="gap-4" />
-        <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
+      <div className="container-site border-b border-[var(--color-border)]/60 py-2">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+          <div className="hidden lg:block" />
+          <MarkaAlani veri={veri} className="justify-self-center max-w-[160px]" />
+          <div className="flex justify-end">
+            <SadeMinimalIkonlar veri={veri} />
+            <IkonGrubu
+              veri={veri}
+              menuAcik={menuAcik}
+              onMenuToggle={() => setMenuAcik((v) => !v)}
+              sadeceHamburger
+            />
+          </div>
+        </div>
+      </div>
+      <div className="container-site hidden py-2 lg:block">
+        <DesktopMenu
+          menu={veri.cevrilmisMenu}
+          className="justify-center gap-7 text-xs tracking-wide"
+          linkClassName="site-menu-nav-link text-xs font-normal opacity-80 transition hover:opacity-100"
+        />
       </div>
       <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
     </HeaderGovde>
@@ -55,13 +76,31 @@ export function HeaderSade({ veri, menuAcik, setMenuAcik }: HeaderLayoutProps) {
 }
 
 export function HeaderKompakt({ veri, menuAcik, setMenuAcik }: HeaderLayoutProps) {
-  const yukseklik = veri.tipEk.kompaktYukseklik ?? 48;
+  const yukseklik = veri.tipEk.kompaktYukseklik ?? 40;
   return (
     <HeaderGovde veri={veri} className="site-header-varyant-kompakt">
-      <div className="container-site flex items-center justify-between gap-4" style={{ minHeight: `${yukseklik}px` }}>
-        <MarkaAlani veri={veri} className="max-w-[200px]" />
-        <DesktopMenu menu={veri.cevrilmisMenu} className="gap-3" />
-        <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
+      <div
+        className="container-site flex items-center gap-3 px-2"
+        style={{ minHeight: `${yukseklik}px` }}
+      >
+        <MarkaAlani veri={veri} className="max-w-[88px] shrink-0 scale-90 origin-left" />
+        <KompaktPillMenu menu={veri.cevrilmisMenu} />
+        <div className="ml-auto flex shrink-0 items-center gap-0.5">
+          <AramaAlani veri={veri} />
+          <Link
+            to="/hesabim"
+            className="rounded p-1.5 opacity-90 transition hover:opacity-100"
+            aria-label="Hesabım"
+          >
+            <HeaderIkon ikon={veri.header.ikonlar!.hesap} grup="hesap" className="h-4 w-4" />
+          </Link>
+          <IkonGrubu
+            veri={veri}
+            menuAcik={menuAcik}
+            onMenuToggle={() => setMenuAcik((v) => !v)}
+            sadeceHamburger
+          />
+        </div>
       </div>
       <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
     </HeaderGovde>
@@ -171,17 +210,43 @@ export function HeaderMegaMenu({ veri, ayarlar, menuAcik, setMenuAcik }: HeaderL
 
 export function HeaderSeffafHero({ veri, menuAcik, setMenuAcik }: HeaderLayoutProps) {
   return (
-    <HeaderGovde veri={veri} className="site-header-varyant-seffaf-hero">
-      <div className="container-site flex h-16 items-center justify-between gap-4">
-        <MarkaAlani veri={veri} className="max-w-[250px]" />
-        <DesktopMenu menu={veri.cevrilmisMenu} />
-        <div className="flex items-center gap-2">
-          <CtaLink veri={veri} />
-          <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
+    <div className="site-header-hero-shell">
+      <header
+        className={`site-header site-header-seffaf-hero site-header-varyant-seffaf-hero ${veri.tipSinifi} absolute inset-x-0 top-0 z-50 border-0 bg-transparent shadow-none`}
+      >
+        <div className="container-site flex h-14 items-center justify-between gap-4">
+          <MarkaAlani veri={veri} className="max-w-[140px] site-header-hero-marka" />
+          <DesktopMenu
+            menu={veri.cevrilmisMenu}
+            className="site-header-hero-nav gap-6"
+            linkClassName="site-menu-nav-link text-sm font-medium text-white/90 transition hover:text-white"
+          />
+          <div className="flex items-center gap-2">
+            <CtaLink veri={veri} className="site-header-hero-cta" />
+            <IkonGrubu
+              veri={veri}
+              menuAcik={menuAcik}
+              onMenuToggle={() => setMenuAcik((v) => !v)}
+              sadeceHamburger
+            />
+          </div>
+        </div>
+        <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
+      </header>
+
+      <div className="site-header-hero-stage">
+        <div className="site-header-hero-bg" aria-hidden />
+        <div className="container-site site-header-hero-icerik">
+          <p className="site-header-hero-etiket">Tamamen elektrikli</p>
+          <h2 className="site-header-hero-baslik">Model S</h2>
+          <p className="site-header-hero-alt">Geleceği bugünden sürün</p>
+          <div className="site-header-hero-butonlar">
+            <span className="site-header-hero-btn site-header-hero-btn--birincil">Özel Sipariş</span>
+            <span className="site-header-hero-btn site-header-hero-btn--ikincil">Mevcut Envanter</span>
+          </div>
         </div>
       </div>
-      <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
-    </HeaderGovde>
+    </div>
   );
 }
 
