@@ -336,7 +336,7 @@ export function HeaderYonetimiFormu() {
         siteAd={siteAd}
         headerAyarlari={birlesikHeader}
         iletisim={{ telefon: ayarlar.telefon, email: ayarlar.email }}
-        demoMod
+        demoMod={gecerliSekme === 'header-tipi'}
       />
     </div>
   );
