@@ -36,7 +36,7 @@ export function DashboardAnalitik({
         Örnek analitik veriler gösteriliyor. Gerçek ziyaret ve tıklama takibi sonraki aşamada eklenecek.
       </p>
 
-      <div className="ap-dash-kpi-grid">
+      <div className="ap-dash-kpi-grid" data-ap-kesif="dash-kpi">
         <KpiKart etiket="Ziyaretçi" deger={analitik.ziyaret.toLocaleString('tr-TR')} />
         <KpiKart etiket="Sayfa Görüntüleme" deger={analitik.sayfaGoruntulenme.toLocaleString('tr-TR')} />
         <KpiKart

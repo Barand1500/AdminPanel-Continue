@@ -16,6 +16,7 @@ import { adminLogApi } from '@/features/admin/adminSistemApi';
 import { adminBildirimleriYenile } from '@/utils/adminBildirimOlaylari';
 import { GirisSayfasi } from '@/pages/admin/GirisSayfasi';
 import { ModulRehberSistemi } from '@/components/admin/ortak/ModulRehberSistemi';
+import { SistemKesifProvider } from '@/contexts/SistemKesifContext';
 import { PanelDilKabuk } from '@/components/admin/PanelDilKabuk';
 import { sekmeAyarlariOku, splitSekmeleriHesapla } from '@/utils/sekmePanelAyarlari';
 import { kisayolAyarlariOku, klavyeOlayiEslesir } from '@/utils/kisayolAyarlari';
@@ -242,6 +243,7 @@ function AdminPanelGovde() {
         )}
         <div
           className="ap-modul-panel min-h-0 flex-1 overflow-y-auto p-6"
+          data-ap-kesif="modul-icerik"
           onMouseDown={() => setFocusModulId(sekme.modulId)}
           onFocusCapture={() => setFocusModulId(sekme.modulId)}
         >
@@ -252,6 +254,7 @@ function AdminPanelGovde() {
   }
 
   return (
+    <SistemKesifProvider onModulAc={modulSecHandler}>
     <div className="admin-panel flex h-screen min-h-0 w-full flex-col overflow-hidden" data-tema={tema}>
       <AdminHeader
         sekmeler={sekmeler}
@@ -318,6 +321,7 @@ function AdminPanelGovde() {
 
       <ModulRehberSistemi modulId={focusModulId} zorlaAcik={rehberAcik} onAcikDegisti={setRehberAcik} gizliButon />
     </div>
+    </SistemKesifProvider>
   );
 }
 

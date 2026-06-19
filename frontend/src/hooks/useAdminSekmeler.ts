@@ -7,12 +7,6 @@ const VARSAYILAN_SEKMELER: AdminSekme[] = [
   { id: 'dashboard', modulId: 'dashboard', baslik: 'Dashboard' },
 ];
 
-function sekmeOnaTasi(liste: AdminSekme[], sekmeId: string): AdminSekme[] {
-  const hedef = liste.find((s) => s.id === sekmeId);
-  if (!hedef) return liste;
-  return [hedef, ...liste.filter((s) => s.id !== sekmeId)];
-}
-
 function sonrakiAktifSekme(liste: AdminSekme[], kapatilanId: string): string {
   const idx = liste.findIndex((s) => s.id === kapatilanId);
   if (idx < 0) return liste[0]?.id ?? 'dashboard';
@@ -41,7 +35,7 @@ export function useAdminSekmeler() {
         if (mevcut) {
           return {
             aktifSekmeId: mevcut.id,
-            sekmeler: sekmeOnaTasi(onceki.sekmeler, mevcut.id),
+            sekmeler: onceki.sekmeler,
           };
         }
       }
@@ -85,7 +79,7 @@ export function useAdminSekmeler() {
   const sekmeSec = useCallback((sekmeId: string) => {
     setDurum((onceki) => ({
       aktifSekmeId: sekmeId,
-      sekmeler: sekmeOnaTasi(onceki.sekmeler, sekmeId),
+      sekmeler: onceki.sekmeler,
     }));
   }, []);
 

@@ -53,7 +53,7 @@ export function DashboardSade({
         </p>
       </section>
 
-      <section className="ap-dash-sade-ozet">
+      <section className="ap-dash-sade-ozet" data-ap-kesif="dash-kpi">
         <OzetOge
           etiket="Yayında Sayfa"
           deger={s.yayindaSayfa}

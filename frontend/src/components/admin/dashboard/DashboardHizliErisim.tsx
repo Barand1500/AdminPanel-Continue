@@ -14,7 +14,7 @@ export function DashboardHizliErisim({
   const [acik, setAcik] = useState(false);
 
   return (
-    <section className={sade ? 'ap-dash-sade-hizli' : 'ap-dash-hizli-bolum'}>
+    <section className={sade ? 'ap-dash-sade-hizli' : 'ap-dash-hizli-bolum'} data-ap-kesif="dash-hizli-erisim">
       <div className="mb-4 flex items-center justify-between gap-3">
         <h2 className={sade ? 'ap-dash-sade-bolum-baslik mb-0' : 'ap-dash-bolum-baslik mb-0'}>
           Hızlı Erişim

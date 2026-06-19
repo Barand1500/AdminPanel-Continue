@@ -19,7 +19,7 @@ export function AdminModulKabuk({
   ustAksiyon,
 }: AdminModulKabukProps) {
   return (
-    <div className="ap-modul-kabuk w-full min-w-0">
+    <div className="ap-modul-kabuk w-full min-w-0" data-ap-kesif="modul-kabuk">
       <div className="ap-modul-baslik">
         <div>
           <h1 className="ap-heading text-xl font-bold">{baslik}</h1>

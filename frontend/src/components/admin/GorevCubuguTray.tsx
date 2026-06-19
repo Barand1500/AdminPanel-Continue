@@ -7,7 +7,7 @@ interface GorevCubuguTrayProps {
 
 export function GorevCubuguTray({ logAcik, yedekAcik, onLogToggle, onYedekToggle }: GorevCubuguTrayProps) {
   return (
-    <div className="ap-tray-grup flex items-center gap-1">
+    <div className="ap-tray-grup flex items-center gap-1" data-ap-kesif="gorev-tray">
       <button
         type="button"
         onClick={onYedekToggle}

@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminTema } from '@/contexts/AdminTemaContext';
+import { useSistemKesifOptional } from '@/contexts/SistemKesifContext';
 import { AdminProfilModal } from '@/components/admin/ortak/AdminProfilModal';
 import { BaslatMenu } from './BaslatMenu';
 import { UstSekmeCubugu } from './UstSekmeCubugu';
@@ -30,8 +31,16 @@ export function AdminHeader({
 }: AdminHeaderProps) {
   const { kullanici } = useAuth();
   const { temaDegistir, koyuMu } = useAdminTema();
+  const kesif = useSistemKesifOptional();
   const [menuAcik, setMenuAcik] = useState(false);
   const [profilAcik, setProfilAcik] = useState(false);
+
+  useEffect(() => {
+    kesif?.baslatMenuKaydet(
+      () => setMenuAcik(true),
+      () => setMenuAcik(false)
+    );
+  }, [kesif]);
 
   const basHarf = kullanici?.ad?.charAt(0).toUpperCase() ?? '?';
 
@@ -43,6 +52,7 @@ export function AdminHeader({
           onClick={() => setMenuAcik((a) => !a)}
           className="flex w-14 items-center justify-center border-r border-[var(--ap-border)] hover:bg-[var(--ap-hover)]"
           title="Başlat menüsü"
+          data-ap-kesif="baslat-menu"
         >
           <svg viewBox="0 0 24 24" className="h-5 w-5" fill="currentColor">
             <rect x="3" y="3" width="8" height="8" rx="1" />
@@ -108,6 +118,7 @@ export function AdminSiteOnizleLink() {
       to="/"
       target="_blank"
       className="text-xs text-blue-400 hover:underline"
+      data-ap-kesif="site-onizle"
     >
       Siteyi Önizle →
     </Link>

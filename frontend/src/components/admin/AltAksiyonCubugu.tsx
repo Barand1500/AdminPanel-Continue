@@ -38,7 +38,7 @@ export function AltAksiyonCubugu({
   }
 
   return (
-    <footer className="ap-footer ap-gorev-cubugu flex h-12 shrink-0 items-center gap-2 border-t px-3">
+    <footer className="ap-footer ap-gorev-cubugu flex h-12 shrink-0 items-center gap-2 border-t px-3" data-ap-kesif="aksiyon-cubugu">
       <div className="flex min-w-0 flex-1 items-center gap-2 overflow-x-auto">
         {aksiyonlar.map((aksiyon) => {
           const geriBildirim =
@@ -91,6 +91,7 @@ export function AltAksiyonCubugu({
           title="Bildirimler"
           aria-label="Bildirimler"
           onClick={() => panelAc('bildirim')}
+          data-ap-kesif="bildirim-tray"
         >
           🔔
           {okunmamisSayi > 0 && (

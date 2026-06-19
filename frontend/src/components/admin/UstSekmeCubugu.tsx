@@ -295,7 +295,7 @@ export function UstSekmeCubugu({
   };
 
   return (
-    <div className="ap-sekme-scroll-wrap" style={tabCss}>
+    <div className="ap-sekme-scroll-wrap" style={tabCss} data-ap-kesif="sekme-cubugu">
       <div className="ap-sekme-scroll-track">
         {solOk && (
           <button type="button" className="ap-sekme-scroll-btn ap-sekme-scroll-sol" onClick={() => kaydir('sol')} aria-label="Sola">

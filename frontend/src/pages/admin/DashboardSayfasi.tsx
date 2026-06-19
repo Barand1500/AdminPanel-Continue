@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
+import { SistemKesifButonu } from '@/components/admin/kesif/SistemKesifButonu';
 import { AdminSiteOnizleLink } from '@/components/admin/AdminHeader';
 import { YukleniyorDurumu } from '@/components/admin/ortak/AdminBilesenleri';
 import { DashboardAnalitik } from '@/components/admin/dashboard/DashboardAnalitik';
@@ -69,6 +70,7 @@ export function DashboardSayfasi({ onModulAc }: DashboardSayfasiProps) {
           <h1 className="ap-heading mt-0.5 text-2xl font-bold tracking-tight">Dashboard</h1>
         </div>
         <div className="flex flex-wrap items-center gap-3">
+          <SistemKesifButonu />
           <DashboardGorunumSecici aktif={gorunum} onDegistir={gorunumDegistir} />
           <AdminSiteOnizleLink />
         </div>

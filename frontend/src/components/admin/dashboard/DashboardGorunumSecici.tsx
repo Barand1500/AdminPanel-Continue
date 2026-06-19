@@ -11,7 +11,7 @@ export function DashboardGorunumSecici({
   onDegistir: (gorunum: DashboardGorunum) => void;
 }) {
   return (
-    <div className="ap-dash-gorunum" role="tablist" aria-label="Dashboard görünümü">
+    <div className="ap-dash-gorunum" role="tablist" aria-label="Dashboard görünümü" data-ap-kesif="dash-gorunum">
       {DASHBOARD_GORUNUM_ETIKETLERI.map((g) => (
         <button
           key={g.id}
