@@ -1,8 +1,8 @@
 import type { SistemKesifTur } from '@/types/sistemKesif';
 
 const MODUL_HEDEF = {
-  hedef: 'modul-kabuk' as const,
-  hedefYedek: ['modul-yukleniyor', 'modul-icerik'] as string[],
+  hedef: 'modul-icerik' as const,
+  hedefYedek: ['modul-kabuk', 'modul-yukleniyor'] as string[],
 };
 
 const panelAdimlari = [

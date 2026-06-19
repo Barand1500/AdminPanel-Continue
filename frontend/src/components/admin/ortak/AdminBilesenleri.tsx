@@ -108,7 +108,7 @@ export function ModulBaslik({
 }) {
   if (onizleGoster) {
     return (
-      <div className="ap-modul-baslik">
+      <div className="ap-modul-baslik" data-ap-kesif="modul-kabuk">
         <div>
           <h1 className="ap-heading text-xl font-bold">{baslik}</h1>
           <p className="ap-muted mt-1 text-sm">{aciklama}</p>
@@ -119,7 +119,7 @@ export function ModulBaslik({
   }
 
   return (
-    <div>
+    <div data-ap-kesif="modul-kabuk">
       <h1 className="ap-heading text-xl font-bold">{baslik}</h1>
       <p className="ap-muted mt-1 text-sm">{aciklama}</p>
     </div>

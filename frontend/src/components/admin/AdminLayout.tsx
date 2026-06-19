@@ -120,7 +120,10 @@ function AdminPanelGovde() {
 
   function modulSecHandler(modulId: string) {
     const modul = modulBul(modulId);
-    if (modul) modulAcHandler(modul);
+    if (modul) {
+      setFocusModulId(modulId);
+      modulAcHandler(modul);
+    }
   }
 
   function sekmeKapatHandler(sekmeId: string) {
@@ -227,11 +230,11 @@ function AdminPanelGovde() {
     pencereKapat(sekmeId);
   }
 
-  function icerikPanel(sekme: AdminSekme, odakli: boolean, split = false) {
+  function icerikPanel(sekme: AdminSekme, sekmeAktif: boolean, split = false) {
     return (
       <div
         key={sekme.id}
-        className={`ap-sekme-split-pane flex min-h-0 min-w-0 flex-1 flex-col ${odakli ? 'ap-modul-panel-odak' : ''}`}
+        className={`ap-sekme-split-pane flex min-h-0 min-w-0 flex-1 flex-col ${sekmeAktif ? 'ap-modul-panel-odak' : ''}`}
       >
         {split && (
           <div
@@ -245,7 +248,7 @@ function AdminPanelGovde() {
           className="ap-modul-panel min-h-0 flex-1 overflow-y-auto p-6"
           data-ap-kesif="modul-icerik"
           data-ap-kesif-modul={sekme.modulId}
-          data-ap-kesif-aktif={odakli ? 'true' : undefined}
+          data-ap-kesif-aktif={sekmeAktif ? 'true' : undefined}
           onMouseDown={() => setFocusModulId(sekme.modulId)}
           onFocusCapture={() => setFocusModulId(sekme.modulId)}
         >
@@ -278,7 +281,7 @@ function AdminPanelGovde() {
       <main className="ap-scroll flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden bg-[var(--ap-bg)]">
         {splitSekmeler ? (
           <div className="ap-sekme-split-alan flex min-h-0 flex-1">
-            {splitSekmeler.map((sekme) => icerikPanel(sekme, focusModulId === sekme.modulId, true))}
+            {splitSekmeler.map((sekme) => icerikPanel(sekme, aktifSekmeId === sekme.id, true))}
           </div>
         ) : (
           aktifModul &&

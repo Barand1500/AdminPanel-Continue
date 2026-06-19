@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { KesifOkYonu, SistemKesifAdim, SistemKesifTur } from '@/types/sistemKesif';
 
 interface Rect {
@@ -36,16 +36,18 @@ function gorunurMu(el: Element) {
 }
 
 function hedefAra(ad: string, modulId?: string): Element | null {
-  const adaylar: string[] = [];
+  const seciciler: string[] = [];
 
   if (modulId) {
-    adaylar.push(`[data-ap-kesif-modul="${modulId}"][data-ap-kesif-aktif="true"] [data-ap-kesif="${ad}"]`);
-    adaylar.push(`[data-ap-kesif-modul="${modulId}"][data-ap-kesif-aktif="true"]`);
+    seciciler.push(`[data-ap-kesif-modul="${modulId}"][data-ap-kesif-aktif="true"] [data-ap-kesif="${ad}"]`);
+    seciciler.push(`[data-ap-kesif-modul="${modulId}"][data-ap-kesif-aktif="true"]`);
+    seciciler.push(`[data-ap-kesif-modul="${modulId}"] [data-ap-kesif="${ad}"]`);
+    seciciler.push(`[data-ap-kesif-modul="${modulId}"]`);
   }
-  adaylar.push(`[data-ap-kesif-aktif="true"] [data-ap-kesif="${ad}"]`);
-  adaylar.push(`[data-ap-kesif="${ad}"]`);
+  seciciler.push(`[data-ap-kesif-aktif="true"] [data-ap-kesif="${ad}"]`);
+  seciciler.push(`[data-ap-kesif="${ad}"]`);
 
-  for (const sel of adaylar) {
+  for (const sel of seciciler) {
     const el = document.querySelector(sel);
     if (el && gorunurMu(el)) return el;
   }
@@ -54,25 +56,25 @@ function hedefAra(ad: string, modulId?: string): Element | null {
 
 async function hedefBekle(adim: SistemKesifAdim): Promise<Element | null> {
   const hedefler = [adim.hedef, ...(adim.hedefYedek ?? [])].filter(Boolean) as string[];
-  const deneme = adim.modulId ? 80 : 40;
+  const deneme = adim.modulId ? 40 : 25;
 
   for (let i = 0; i < deneme; i += 1) {
     for (const ad of hedefler) {
       const el = hedefAra(ad, adim.modulId);
       if (el) return el;
     }
-    await bekle(100);
+    await bekle(80);
   }
   return null;
 }
 
 async function modulPanelBekle(modulId: string) {
-  for (let i = 0; i < 80; i += 1) {
-    const panel = document.querySelector(
-      `[data-ap-kesif-modul="${modulId}"][data-ap-kesif-aktif="true"]`
-    );
+  for (let i = 0; i < 40; i += 1) {
+    const panel =
+      document.querySelector(`[data-ap-kesif-modul="${modulId}"][data-ap-kesif-aktif="true"]`) ??
+      document.querySelector(`[data-ap-kesif-modul="${modulId}"]`);
     if (panel && gorunurMu(panel)) return;
-    await bekle(100);
+    await bekle(80);
   }
 }
 
@@ -152,56 +154,77 @@ export function SistemKesifTurOverlay({
   const [hazir, setHazir] = useState(false);
   const [spotlight, setSpotlight] = useState<Rect | null>(null);
   const [kart, setKart] = useState<KartKonum | null>(null);
-  const kartRef = useRef<HTMLDivElement | null>(null);
+
+  const onModulAcRef = useRef(onModulAc);
+  const onMenuAcRef = useRef(onMenuAc);
+  const onMenuKapatRef = useRef(onMenuKapat);
+  onModulAcRef.current = onModulAc;
+  onMenuAcRef.current = onMenuAc;
+  onMenuKapatRef.current = onMenuKapat;
 
   const adim = tur.adimlar[adimIdx];
   const sonAdim = adimIdx >= tur.adimlar.length - 1;
   const ilkAdim = adimIdx === 0;
 
-  const konumGuncelle = useCallback(async (mevcutAdim: SistemKesifAdim) => {
-    setHazir(false);
-
-    if (mevcutAdim.menuKapat) onMenuKapat();
-
-    if (mevcutAdim.modulId) {
-      onModulAc(mevcutAdim.modulId);
-      await bekle(120);
-      await modulPanelBekle(mevcutAdim.modulId);
-      await bekle(mevcutAdim.hedef ? 350 : 150);
-    }
-
-    if (mevcutAdim.menuAc) {
-      onMenuAc();
-      await bekle(400);
-    }
-
-    const padding = mevcutAdim.padding ?? PAD;
-    const hedefler = [mevcutAdim.hedef, ...(mevcutAdim.hedefYedek ?? [])].filter(Boolean);
-
-    if (hedefler.length === 0) {
-      setSpotlight(null);
-      setKart(kartKonumuHesapla(null));
-      setHazir(true);
-      return;
-    }
-
-    const el = await hedefBekle(mevcutAdim);
-    if (el) {
-      el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
-      await bekle(220);
-      const rect = hedefRect(el, padding);
-      setSpotlight(rect);
-      setKart(kartKonumuHesapla(rect, mevcutAdim.okYonu));
-    } else {
-      setSpotlight(null);
-      setKart(kartKonumuHesapla(null));
-    }
-    setHazir(true);
-  }, [onModulAc, onMenuAc, onMenuKapat]);
-
   useLayoutEffect(() => {
-    void konumGuncelle(adim);
-  }, [adim, konumGuncelle]);
+    let iptal = false;
+
+    async function adimiHazirla() {
+      setHazir(false);
+      const mevcutAdim = tur.adimlar[adimIdx];
+
+      if (mevcutAdim.menuKapat) onMenuKapatRef.current();
+
+      if (mevcutAdim.modulId) {
+        onModulAcRef.current(mevcutAdim.modulId);
+        await bekle(80);
+        if (iptal) return;
+        await modulPanelBekle(mevcutAdim.modulId);
+        if (iptal) return;
+        await bekle(mevcutAdim.hedef ? 200 : 100);
+      }
+
+      if (iptal) return;
+
+      if (mevcutAdim.menuAc) {
+        onMenuAcRef.current();
+        await bekle(350);
+      }
+
+      if (iptal) return;
+
+      const padding = mevcutAdim.padding ?? PAD;
+      const hedefler = [mevcutAdim.hedef, ...(mevcutAdim.hedefYedek ?? [])].filter(Boolean);
+
+      if (hedefler.length === 0) {
+        setSpotlight(null);
+        setKart(kartKonumuHesapla(null));
+        setHazir(true);
+        return;
+      }
+
+      const el = await hedefBekle(mevcutAdim);
+      if (iptal) return;
+
+      if (el) {
+        el.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+        await bekle(150);
+        if (iptal) return;
+        const rect = hedefRect(el, padding);
+        setSpotlight(rect);
+        setKart(kartKonumuHesapla(rect, mevcutAdim.okYonu));
+      } else {
+        setSpotlight(null);
+        setKart(kartKonumuHesapla(null));
+      }
+      setHazir(true);
+    }
+
+    void adimiHazirla();
+    return () => {
+      iptal = true;
+    };
+  }, [adimIdx, tur.id]);
 
   useEffect(() => {
     function yenidenOlc() {
@@ -263,7 +286,6 @@ export function SistemKesifTurOverlay({
 
       {hazir && kart && (
         <div
-          ref={kartRef}
           className="ap-kesif-kart"
           style={{ top: kart.top, left: kart.left, width: KART_GENISLIK }}
           data-ok={kart.okYonu}
