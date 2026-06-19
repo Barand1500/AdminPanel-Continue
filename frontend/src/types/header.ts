@@ -74,9 +74,7 @@ export interface DilDestegiAyarlari {
 }
 
 export interface HeaderTipEkAyarlari {
-  /** Arama kutusu görünsün mü */
   aramaGoster?: boolean;
-  /** tam: geniş kutu, ikon: yalnızca ikon butonu */
   aramaModu?: 'tam' | 'ikon';
   kompaktYukseklik?: 40 | 48 | 56;
   ctaMetni?: string;
@@ -87,7 +85,6 @@ export interface HeaderTipEkAyarlari {
   megaMenuKolon?: 3 | 4 | 5;
   seffafBaslangic?: boolean;
   scrollSonrasiStil?: 'beyaz' | 'koyu' | 'cam';
-  /** Merkez logo: menüyü sol/sağ bölmek için yüzde (0-100) */
   menuBolmeNoktasi?: number;
 }
 

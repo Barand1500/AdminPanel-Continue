@@ -6,7 +6,7 @@ import type { SiteAyarlari } from '@/types/site';
 import { AdminPanelKarti } from '@/components/admin/ortak/AdminBilesenleri';
 import { siteOnizlemeCssStili } from '@/utils/siteOnizlemeStili';
 
-interface HeaderTipSeciciProps {
+interface HeaderTipIcerikProps {
   secili: HeaderTipi;
   onSec: (tip: HeaderTipi) => void;
   siteAd: string;
@@ -15,18 +15,21 @@ interface HeaderTipSeciciProps {
   iletisim?: { telefon?: string | null; email?: string | null };
 }
 
-export function HeaderTipSecici({
+/** Header Tipi sekmesinin içeriği: kart grid + altında canlı önizleme */
+export function HeaderTipIcerik({
   secili,
   onSec,
   siteAd,
   ayarlar,
   headerAyarlari,
   iletisim,
-}: HeaderTipSeciciProps) {
+}: HeaderTipIcerikProps) {
+  const seciliTanim = HEADER_TIP_TANIMLARI.find((t) => t.id === secili);
+
   return (
     <AdminPanelKarti
-      baslik="Header Tipi"
-      altBaslik="Sitenizin üst bant düzenini seçin — her tip farklı yerleşim ve davranış sunar"
+      baslik="Header Tipi Seçin"
+      altBaslik={seciliTanim ? `${seciliTanim.ad} — ${seciliTanim.aciklama}` : 'Sitenizin üst bant düzenini belirleyin'}
     >
       <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-5">
         {HEADER_TIP_TANIMLARI.map((tip) => {
@@ -36,7 +39,7 @@ export function HeaderTipSecici({
               key={tip.id}
               type="button"
               onClick={() => onSec(tip.id)}
-              className={`group rounded-xl border p-3 text-left transition ${
+              className={`rounded-xl border p-3 text-left transition ${
                 aktif
                   ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)]/10 ring-2 ring-[var(--ap-accent)]/40'
                   : 'border-[var(--ap-border)] hover:border-[var(--ap-accent)]/50 hover:bg-[var(--ap-hover)]'
@@ -58,7 +61,7 @@ export function HeaderTipSecici({
       </div>
 
       <div className="mt-5 border-t border-[var(--ap-border)] pt-5">
-        <p className="ap-heading mb-2 text-sm font-semibold">Seçili tip önizlemesi</p>
+        <p className="ap-heading mb-2 text-sm font-semibold">Önizleme</p>
         <div
           className="site-public overflow-hidden rounded-lg border border-[var(--ap-border)]"
           style={siteOnizlemeCssStili(ayarlar)}

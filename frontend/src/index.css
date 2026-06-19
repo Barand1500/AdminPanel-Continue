@@ -421,76 +421,57 @@ body:has(.site-public)::-webkit-scrollbar,
   border-color: var(--color-border);
 }
 
-.site-header--kompakt {
-  min-height: var(--header-yukseklik, 40px);
+.site-header-klasik,
+.site-header-arama-odakli,
+.site-header-kurumsal,
+.site-header-mega-menu {
+  backdrop-filter: saturate(1.05);
 }
 
-.site-header--kompakt .container-site {
-  min-height: var(--header-yukseklik, 40px);
+.site-header-sade,
+.site-header-varyant-sade {
+  box-shadow: none;
 }
 
-.site-header--modern {
+.site-header-kompakt,
+.site-header-varyant-kompakt {
+  box-shadow: none;
+}
+
+.site-header-merkez-logo,
+.site-header-varyant-merkez-logo .site-header-nav {
+  justify-content: center;
+}
+
+.site-header-modern,
+.site-header-varyant-modern {
+  border-color: color-mix(in srgb, var(--color-primary) 16%, var(--color-border));
+}
+
+.site-header-modern .site-menu-nav-link,
+.site-header-varyant-modern .site-menu-nav-link {
+  font-weight: 600;
+}
+
+.site-header-kurumsal,
+.site-header-varyant-kurumsal {
+  border-bottom-width: 2px;
+}
+
+.site-header-mega-menu .site-header-alt,
+.site-header-varyant-mega-menu .site-header-alt {
+  box-shadow: inset 0 1px 0 0 var(--color-border);
+}
+
+.site-header-seffaf-hero,
+.site-header-varyant-seffaf-hero {
+  background: color-mix(in srgb, var(--color-surface-elevated) 82%, transparent);
   backdrop-filter: blur(8px);
 }
 
-.site-header--kurumsal .site-header-nav {
-  letter-spacing: 0.06em;
-}
-
-.site-header--mega .site-header-nav--mega {
-  gap: 1.75rem;
-}
-
-.site-header--seffaf.is-seffaf {
-  background: transparent;
-  border-color: transparent;
-  box-shadow: none;
-  color: #fff;
-}
-
-.site-header--seffaf.is-seffaf .site-menu-nav-link,
-.site-header--seffaf.is-seffaf .site-header-hamburger,
-.site-header--seffaf.is-seffaf .site-header-arama-ikon {
-  color: rgb(255 255 255 / 0.92);
-}
-
-.site-header--seffaf.is-kati[data-scroll-stil='beyaz'] {
-  background-color: var(--color-surface-elevated);
-}
-
-.site-header--seffaf.is-kati[data-scroll-stil='koyu'] {
-  background-color: #0f172a;
-  color: #f8fafc;
-  border-color: #1e293b;
-}
-
-.site-header--seffaf.is-kati[data-scroll-stil='cam'] {
-  background: rgb(255 255 255 / 0.82);
-  backdrop-filter: blur(12px);
-}
-
-.site-header--split .site-header-alt {
-  display: none;
-}
-
-.site-header--merkez .site-header-nav {
-  flex-wrap: wrap;
-}
-
-.site-header-cta {
-  white-space: nowrap;
-}
-
-.site-header-ikinci-marka img {
-  max-height: 2rem;
-}
-
-.site-header--arama-ust .input-search {
-  width: 100%;
-}
-
-.site-header-ust-bant--kurumsal {
-  font-weight: 500;
+.site-header-split,
+.site-header-varyant-split {
+  border-bottom-style: dashed;
 }
 
 .header-dil-secici {

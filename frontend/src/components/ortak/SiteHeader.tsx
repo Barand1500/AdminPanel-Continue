@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
 import type { Kategori } from '@/data/kategoriler';
 import { useHeaderVeri } from './header/useHeaderVeri';
@@ -11,15 +12,15 @@ interface SiteHeaderProps {
 }
 
 export function SiteHeader({ siteAdi: _siteAdi, ayarlar, menuOgeleri, kategoriler }: SiteHeaderProps) {
-  const veri = useHeaderVeri(ayarlar, menuOgeleri, kategoriler);
+  const [menuAcik, setMenuAcik] = useState(false);
+  const veri = useHeaderVeri({ ayarlar, menuOgeleri, kategoriler });
 
   return (
     <HeaderLayoutSec
-      tip={veri.tip}
       veri={veri}
       ayarlar={ayarlar}
-      menuOgeleri={menuOgeleri}
-      kategoriler={kategoriler}
+      menuAcik={menuAcik}
+      setMenuAcik={setMenuAcik}
     />
   );
 }

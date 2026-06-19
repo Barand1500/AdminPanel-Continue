@@ -43,7 +43,6 @@ function ToggleSatir({
 
 export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEkAyarlariFormuProps) {
   const tanim = headerTipTanimiBul(tip);
-
   const guncelle = (parcalar: Partial<HeaderTipEkAyarlari>) => {
     onGuncelle({ tipEk: { ...tipEk, ...parcalar } });
   };
@@ -57,16 +56,12 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
   }
 
   return (
-    <AdminPanelKarti
-      baslik="Ek Ayarlar"
-      altBaslik={`${tanim.ad} tipine özel alanlar — yalnızca bu düzen için geçerlidir`}
-    >
+    <AdminPanelKarti baslik="Ek Ayarlar" altBaslik={`${tanim.ad} tipine özel alanlar`}>
       <div className="space-y-4">
         {(tip === 'sade' || tip === 'kompakt' || tip === 'arama-odakli' || tip === 'split') && (
           <>
             <ToggleSatir
               etiket="Arama kutusu göster"
-              aciklama="Kapalıysa yalnızca arama ikonu görünür"
               acik={tipEk.aramaGoster !== false}
               onDegistir={(aramaGoster) => guncelle({ aramaGoster })}
             />
@@ -92,21 +87,20 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
                 guncelle({ kompaktYukseklik: Number(e.target.value) as 40 | 48 | 56 })
               }
             >
-              <option value={40}>40 — Çok kompakt</option>
-              <option value={48}>48 — Standart kompakt</option>
-              <option value={56}>56 — Biraz daha yüksek</option>
+              <option value={40}>40</option>
+              <option value={48}>48</option>
+              <option value={56}>56</option>
             </select>
           </FormAlani>
         )}
 
         {tip === 'modern' && (
           <>
-            <FormAlani etiket="CTA buton metni" aciklama="Sağ taraftaki vurgulu buton">
+            <FormAlani etiket="CTA buton metni">
               <input
                 className={formInputSinifi}
                 value={tipEk.ctaMetni ?? ''}
                 onChange={(e) => guncelle({ ctaMetni: e.target.value })}
-                placeholder="İletişim"
               />
             </FormAlani>
             <FormAlani etiket="CTA link">
@@ -124,7 +118,7 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
           <>
             <GorselAlan
               etiket="İkinci logo"
-              aciklama="Merkez veya split düzeninde ikincil marka görseli"
+              aciklama="Split veya merkez logo düzeninde ikincil marka"
               deger={tipEk.ikinciLogoUrl ?? ''}
               onChange={(v) => guncelle({ ikinciLogoUrl: v || null })}
               onizlemeSinifi="h-10 max-w-[120px] rounded object-contain border border-[var(--ap-border)] p-1"
@@ -134,14 +128,13 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
                 className={formInputSinifi}
                 value={tipEk.ikinciMarkaMetni ?? ''}
                 onChange={(e) => guncelle({ ikinciMarkaMetni: e.target.value || null })}
-                placeholder="Alt marka / slogan"
               />
             </FormAlani>
           </>
         )}
 
         {tip === 'merkez-logo' && (
-          <FormAlani etiket="Menü bölme noktası (%)" aciklama="Sol menüde gösterilecek link oranı">
+          <FormAlani etiket="Menü bölme noktası (%)">
             <input
               type="number"
               min={20}
@@ -154,12 +147,11 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
         )}
 
         {tip === 'kurumsal' && (
-          <FormAlani etiket="Destek / bilgi metni" aciklama="Navigasyon altında görünen kurumsal metin">
+          <FormAlani etiket="Destek metni">
             <input
               className={formInputSinifi}
               value={tipEk.destekMetni ?? ''}
               onChange={(e) => guncelle({ destekMetni: e.target.value })}
-              placeholder="7/24 teknik destek — 0850 ..."
             />
           </FormAlani>
         )}
@@ -173,9 +165,9 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
                 guncelle({ megaMenuKolon: Number(e.target.value) as 3 | 4 | 5 })
               }
             >
-              <option value={3}>3 kolon</option>
-              <option value={4}>4 kolon</option>
-              <option value={5}>5 kolon</option>
+              <option value={3}>3</option>
+              <option value={4}>4</option>
+              <option value={5}>5</option>
             </select>
           </FormAlani>
         )}
@@ -184,7 +176,6 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
           <>
             <ToggleSatir
               etiket="Sayfa üstünde şeffaf başla"
-              aciklama="Scroll yapınca katı arka plana geçer"
               acik={tipEk.seffafBaslangic !== false}
               onDegistir={(seffafBaslangic) => guncelle({ seffafBaslangic })}
             />
@@ -196,9 +187,9 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
                   guncelle({ scrollSonrasiStil: e.target.value as 'beyaz' | 'koyu' | 'cam' })
                 }
               >
-                <option value="beyaz">Beyaz arka plan</option>
-                <option value="koyu">Koyu arka plan</option>
-                <option value="cam">Cam efekti (blur)</option>
+                <option value="beyaz">Beyaz</option>
+                <option value="koyu">Koyu</option>
+                <option value="cam">Cam (blur)</option>
               </select>
             </FormAlani>
           </>

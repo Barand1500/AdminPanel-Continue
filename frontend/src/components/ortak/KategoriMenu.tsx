@@ -93,6 +93,16 @@ export function KategoriMenu({
   if (kategoriListesi.length === 0) return null;
 
   const kapat = () => setAcik(false);
+  const megaKolonSinifi = mega
+    ? kolonSayisi === 5
+      ? 'lg:grid-cols-5'
+      : kolonSayisi === 3
+        ? 'lg:grid-cols-3'
+        : 'lg:grid-cols-4'
+    : 'sm:grid-cols-2';
+  const panelGenisligi = mega
+    ? 'w-[min(980px,calc(100vw-2rem))]'
+    : 'w-[min(720px,calc(100vw-2rem))]';
 
   const tetikleyici = (
     <button
@@ -182,15 +192,11 @@ export function KategoriMenu({
   }
 
   return (
-    <div ref={ref} className={`kategori-menu-root relative hidden shrink-0 sm:block ${mega ? 'kategori-menu--mega' : ''}`}>
+    <div ref={ref} className="kategori-menu-root relative hidden shrink-0 sm:block">
       {tetikleyici}
 
       {acik && (
-        <div
-          className={`kategori-menu-panel absolute left-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10 ${
-            mega ? 'w-[min(960px,calc(100vw-2rem))]' : 'w-[min(720px,calc(100vw-2rem))]'
-          }`}
-        >
+        <div className={`kategori-menu-panel absolute left-0 top-full z-50 mt-2 ${panelGenisligi} overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-2xl shadow-slate-900/10`}>
           <div className="grid sm:grid-cols-[200px_1fr]">
             <div className="border-r border-slate-200 bg-slate-50 p-2">
               {kategoriListesi.map((kat) => (
@@ -216,10 +222,7 @@ export function KategoriMenu({
                   <p className="mb-3 text-xs font-bold uppercase tracking-wider text-primary">
                     {secili.baslik}
                   </p>
-                  <div
-                    className="grid gap-4"
-                    style={{ gridTemplateColumns: `repeat(${mega ? kolonSayisi : 2}, minmax(0, 1fr))` }}
-                  >
+                  <div className={`grid gap-4 ${megaKolonSinifi}`}>
                     {secili.altKategoriler?.map((alt) => (
                       <div key={alt.id} className="rounded-xl border border-slate-200 bg-slate-50 p-3">
                         {alt.yol ? (
