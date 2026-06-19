@@ -1,7 +1,23 @@
 import type { CSSProperties } from 'react';
 import type { WidgetFormDegeri } from '@/types/admin';
 import type { Widget } from '@/types/site';
-import { onizlemeMockVerisiUygula } from '@/utils/widgetOnizlemeMock';
+import type {
+  GorselKonumu,
+  KartStili,
+  SayfalamaStili,
+  WidgetHaberKarti,
+  WidgetHaberSekmesi,
+  WidgetIletisimKarti,
+  WidgetKoseYazari,
+  WidgetKriptoPara,
+  WidgetNamazVakti,
+  WidgetVideoKarti,
+  WidgetHavaGun,
+} from '@/types/haberWidget';
+import { HABER_PORTAL_WIDGET_TIPLERI } from '@/types/haberWidget';
+import { onizlemeMockVerisiUygula, widgetFormMockUygula } from '@/utils/widgetOnizlemeMock';
+export { widgetFormMockUygula };
+export { HABER_PORTAL_WIDGET_TIPLERI };
 
 export const DEPRECATED_WIDGET_TIPLERI = [
   'HEADER',
@@ -33,6 +49,7 @@ export const MODERN_WIDGET_TIPLERI = [
   'VIDEO_BANNER',
   'ONCESI_SONRASI',
   'BULTEN_KAYIT',
+  ...HABER_PORTAL_WIDGET_TIPLERI,
 ] as const;
 
 export const AKTIF_WIDGET_TIPLERI = [
@@ -86,6 +103,8 @@ export const WIDGET_GORUNUM_GORSEL_TIPLERI = new Set([
   'YORUM_KARUSEL',
 ]);
 
+export const WIDGET_GORUNUM_HABER_TIPLERI = new Set<string>([...HABER_PORTAL_WIDGET_TIPLERI, 'SLIDER', 'BLOG_KARUSEL', 'EKIP_KARUSEL']);
+
 export const WIDGET_GORUNUM_GRID_TIPLERI = new Set([
   'HIZMET_KARTLARI',
   'LINK_KARTLARI',
@@ -100,6 +119,7 @@ export const WIDGET_GORUNUM_GRID_TIPLERI = new Set([
   'YORUM_KARUSEL',
   'FIYATLANDIRMA',
   'KARSILASTIRMA_TABLOSU',
+  ...HABER_PORTAL_WIDGET_TIPLERI,
 ]);
 
 export const WIDGET_GORUNUM_METIN_TIPLERI = new Set([
@@ -131,6 +151,16 @@ export interface WidgetGorunumAyarlari {
   tabloBaslikArkaPlan?: string;
   tabloKenarRengi?: string;
   vurguRengi?: string;
+  /** Slider / karusel / haber widget sayfalama */
+  sayfalamaStili?: SayfalamaStili;
+  /** Kartlarda görsel konumu */
+  gorselKonumu?: GorselKonumu;
+  /** Kart görünüm stili */
+  kartStili?: KartStili;
+  /** Bölüm başlığı alt çizgi */
+  baslikCizgi?: boolean;
+  /** Bölüm başlık ikonu (emoji) */
+  baslikIkon?: string;
 }
 
 export interface WidgetEkAyarlar {
@@ -331,6 +361,20 @@ export interface WidgetConfig {
   sonraGorsel?: string;
   bultenPlaceholder?: string;
   bultenKvkk?: string;
+  haberKartlari?: WidgetHaberKarti[];
+  koseYazarlari?: WidgetKoseYazari[];
+  iletisimKartlari?: WidgetIletisimKarti[];
+  videoKartlari?: WidgetVideoKarti[];
+  haberSekmeler?: WidgetHaberSekmesi[];
+  kriptoParalar?: WidgetKriptoPara[];
+  namazVakitleri?: WidgetNamazVakti;
+  namazKonum?: string;
+  namazSaat?: string;
+  namazKalan?: string;
+  havaSehir?: string;
+  havaIlce?: string;
+  havaAnlik?: { sicaklik: string; durum: string; hissedilen: string; nem: string; ruzgar: string };
+  havaGunler?: WidgetHavaGun[];
 }
 
 export function uid() {
@@ -377,7 +421,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     case 'BASLIK_METIN_GORSEL':
       return { yerlesim, gorunum: { ...gorunum, icerikDuzeni: 'sol' }, ek, metin: '', ikonKartlar: [] };
     case 'SLIDER':
-      return { yerlesim: { bolge: 'slider_alti' }, gorunum, ek, slides: [] };
+      return { yerlesim: { bolge: 'slider_alti' }, gorunum: { ...gorunum, sayfalamaStili: 'numara' }, ek, slides: [] };
     case 'HIZMET_KARTLARI':
       return { yerlesim, gorunum, ek, kartlar: [] };
     case 'GALERI':
@@ -444,6 +488,28 @@ export function varsayilanConfig(tip: string): WidgetConfig {
       return { yerlesim, gorunum, ek, onceGorsel: '', sonraGorsel: '' };
     case 'BULTEN_KAYIT':
       return { yerlesim: { bolge: 'footer_ustu' }, gorunum, ek, formSlug: 'bulten', bultenPlaceholder: 'E-posta adresiniz' };
+    case 'KOSE_YAZARLARI':
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4, gorselKonumu: 'sol', sayfalamaStili: 'ok' }, ek, koseYazarlari: [], tumunuGorMetin: 'Tüm Yazarlar', tumunuGorLink: '/yazarlar' };
+    case 'ILETISIM_BLOK':
+      return { yerlesim: { bolge: 'footer_ustu' }, gorunum: { ...gorunum, icerikDuzeni: 'sag' }, ek, iletisimKartlari: [], haritaZoom: 14 };
+    case 'KATEGORI_HABER_LISTESI':
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 2, gorselKonumu: 'sol', kartStili: 'yatay' }, ek, haberKartlari: [], tumunuGorMetin: '+ Tümünü Görüntüle', tumunuGorLink: '#' };
+    case 'KATEGORI_HABER_OVERLAY':
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3, kartStili: 'overlay' }, ek, haberKartlari: [], tumunuGorMetin: '+ Tümünü Görüntüle', tumunuGorLink: '#' };
+    case 'VIDEO_GALERISI':
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4, sayfalamaStili: 'ok' }, ek, videoKartlari: [], tumunuGorMetin: '+ Tümünü Görüntüle', tumunuGorLink: '#' };
+    case 'SEKMELI_HABER':
+      return { yerlesim, gorunum, ek, haberSekmeler: [] };
+    case 'HAVA_DURUMU':
+      return { yerlesim, gorunum, ek, havaSehir: 'İstanbul', havaGunler: [] };
+    case 'KRIPTO_LISTESI':
+      return { yerlesim, gorunum: { ...gorunum, vurguRengi: '#dc2626' }, ek, kriptoParalar: [], tumunuGorMetin: 'Tümünü Göster →', tumunuGorLink: '#' };
+    case 'GUNCEL_KONULAR':
+      return { yerlesim, gorunum: { ...gorunum, vurguRengi: '#dc2626' }, ek, haberKartlari: [] };
+    case 'NAMAZ_VAKITLERI':
+      return { yerlesim, gorunum: { ...gorunum, vurguRengi: '#16a34a' }, ek, namazKonum: 'Beşiktaş, İstanbul', namazVakitleri: { imsak: '04:30', gunes: '06:15', ogle: '13:10', ikindi: '16:45', aksam: '19:30', yatsi: '21:00' } };
+    case 'HABER_MAGAZIN':
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3 }, ek, haberKartlari: [], tumunuGorMetin: '+ Tümünü Görüntüle', tumunuGorLink: '#' };
     default:
       return { yerlesim, gorunum, ek };
   }

@@ -20,6 +20,7 @@ export const WIDGET_TIP_KATEGORILERI = [
   { id: 'iletisim', etiket: 'İletişim', aciklama: 'Harita ve iletişim CTA' },
   { id: 'diger', etiket: 'Diğer', aciklama: 'SSS, referans, popup, kategori' },
   { id: 'modern', etiket: 'Modern', aciklama: 'Zaman çizelgesi, video, geri sayım ve özel bloklar' },
+  { id: 'haber', etiket: 'Haber / Portal', aciklama: 'Köşe yazarları, haber grid, hava durumu, kripto ve daha fazlası' },
 ] as const;
 
 export type WidgetTipKategoriId = (typeof WIDGET_TIP_KATEGORILERI)[number]['id'];
@@ -52,6 +53,17 @@ export const WIDGET_TIPLERI = [
   { id: 'VIDEO_BANNER', etiket: 'Video Banner', ikon: '🎬', aciklama: 'YouTube veya video arka plan', grup: 'Modern', kategori: 'modern' as const },
   { id: 'ONCESI_SONRASI', etiket: 'Öncesi / Sonrası', ikon: '↔️', aciklama: 'Kaydırmalı görsel karşılaştırma', grup: 'Modern', kategori: 'modern' as const },
   { id: 'BULTEN_KAYIT', etiket: 'Bülten Kayıt', ikon: '✉️', aciklama: 'E-posta abonelik formu', grup: 'Modern', kategori: 'modern' as const },
+  { id: 'KOSE_YAZARLARI', etiket: 'Köşe Yazarları', ikon: '✒️', aciklama: 'Yazar kartları karuseli', grup: 'Haber', kategori: 'haber' as const },
+  { id: 'ILETISIM_BLOK', etiket: 'İletişim + Harita', ikon: '📍', aciklama: 'İletişim kartları ve harita', grup: 'Haber', kategori: 'haber' as const },
+  { id: 'KATEGORI_HABER_LISTESI', etiket: 'Kategori Haber Listesi', ikon: '🚗', aciklama: 'Yatay haber kart listesi', grup: 'Haber', kategori: 'haber' as const },
+  { id: 'KATEGORI_HABER_OVERLAY', etiket: 'Kategori Haber Grid', ikon: '📶', aciklama: 'Görsel üzeri başlıklı grid', grup: 'Haber', kategori: 'haber' as const },
+  { id: 'VIDEO_GALERISI', etiket: 'Video Galerisi', ikon: '▶️', aciklama: 'Video kapak kartları', grup: 'Haber', kategori: 'haber' as const },
+  { id: 'SEKMELI_HABER', etiket: 'Sekmeli Haber', ikon: '📰', aciklama: 'Sekmeli öne çıkan + liste', grup: 'Haber', kategori: 'haber' as const },
+  { id: 'HAVA_DURUMU', etiket: 'Hava Durumu', ikon: '⛅', aciklama: 'Anlık hava ve tahmin', grup: 'Haber', kategori: 'haber' as const },
+  { id: 'KRIPTO_LISTESI', etiket: 'Kripto Paralar', ikon: '📈', aciklama: 'Kripto fiyat listesi', grup: 'Haber', kategori: 'haber' as const },
+  { id: 'GUNCEL_KONULAR', etiket: 'Güncel Konular', ikon: '☰', aciklama: 'Numaralı haber listesi', grup: 'Haber', kategori: 'haber' as const },
+  { id: 'NAMAZ_VAKITLERI', etiket: 'Namaz Vakitleri', ikon: '🕌', aciklama: 'Namaz vakitleri kartı', grup: 'Haber', kategori: 'haber' as const },
+  { id: 'HABER_MAGAZIN', etiket: 'Haber Magazin', ikon: '📊', aciklama: 'Karışık haber magazin grid', grup: 'Haber', kategori: 'haber' as const },
 ] as const;
 
 export type WidgetTipMeta = (typeof WIDGET_TIPLERI)[number];

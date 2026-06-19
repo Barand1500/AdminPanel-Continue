@@ -5876,6 +5876,53 @@ html:has(.admin-panel[data-tema='acik']) body {
   overflow: hidden;
 }
 
+.emoji-secici-panel-portal {
+  position: fixed;
+  z-index: 10050;
+}
+
+.emoji-secici-sadece {
+  width: 100%;
+}
+
+.emoji-secici-tus-buyuk {
+  display: flex;
+  width: 100%;
+  min-height: 2.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-input-bg);
+  padding: 0.375rem 0.625rem;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+.emoji-secici-tus-buyuk:hover,
+.emoji-secici-tus-buyuk-acik {
+  border-color: var(--ap-accent);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ap-accent) 35%, transparent);
+}
+
+.emoji-secici-tus-emoji {
+  display: flex;
+  height: 2rem;
+  width: 2rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.375rem;
+  background: var(--ap-surface-2);
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.emoji-secici-tus-etiket {
+  font-size: 0.8125rem;
+  color: var(--ap-text-muted);
+}
+
 .emoji-secici-kategoriler {
   display: flex;
   flex-wrap: wrap;

@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
-import { varsayilanConfig } from '@/types/widget';
+import { varsayilanConfig, widgetFormMockUygula } from '@/types/widget';
 import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
 import {
   AdminAnahtarDugme,
@@ -222,6 +222,49 @@ export function WidgetEditorPanel({
   onTipSecildi,
 }: WidgetEditorPanelProps) {
   const [sekme, setSekme] = useState<EditorSekme>('genel');
+  const [otomatikDoldur, setOtomatikDoldur] = useState(false);
+  const formYedekRef = useRef<WidgetFormDegeri | null>(null);
+  const widgetAnahtar = seciliWidget?.id ?? 'yeni';
+  const oncekiAnahtarRef = useRef(widgetAnahtar);
+  const oncekiTipRef = useRef(form.tip);
+
+  useEffect(() => {
+    if (oncekiAnahtarRef.current === widgetAnahtar) return;
+    oncekiAnahtarRef.current = widgetAnahtar;
+    oncekiTipRef.current = form.tip;
+    formYedekRef.current = null;
+    setOtomatikDoldur(yeniMod);
+  }, [widgetAnahtar, yeniMod, form.tip]);
+
+  useEffect(() => {
+    if (!otomatikDoldur) {
+      oncekiTipRef.current = form.tip;
+      return;
+    }
+    if (!formYedekRef.current) {
+      formYedekRef.current = structuredClone(form);
+      oncekiTipRef.current = form.tip;
+      onChange(widgetFormMockUygula(form));
+      return;
+    }
+    if (oncekiTipRef.current !== form.tip) {
+      oncekiTipRef.current = form.tip;
+      onChange(widgetFormMockUygula(form));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- yalnızca toggle/tip değişiminde
+  }, [otomatikDoldur, form.tip]);
+
+  function otomatikDoldurDegistir(acik: boolean) {
+    if (acik) {
+      setOtomatikDoldur(true);
+      return;
+    }
+    setOtomatikDoldur(false);
+    if (formYedekRef.current) {
+      onChange(formYedekRef.current);
+      formYedekRef.current = null;
+    }
+  }
 
   async function submit() {
     await onKaydet(form, seciliWidget?.id);
@@ -352,11 +395,23 @@ export function WidgetEditorPanel({
         )}
 
         {sekme === 'icerik' && (
-          IcerikPanel ? (
-            <IcerikPanel form={form} onChange={onChange} />
-          ) : (
-            <AdminBosDurum ikon="📝" baslik="İçerik paneli yok" aciklama="Bu widget tipi için özel içerik editörü tanımlı değil." />
-          )
+          <>
+            <AdminFormBolumu
+              baslik="Otomatik doldur"
+              aciklama="Boş alanları örnek metin, görsel ve liste verileriyle doldurur. Kapattığınızda açmadan önceki haline döner. Kaydetmeden önce içeriği düzenleyebilirsiniz."
+            >
+              <AdminAnahtarDugme
+                etiket="Örnek içerikle doldur"
+                acik={otomatikDoldur}
+                onDegistir={otomatikDoldurDegistir}
+              />
+            </AdminFormBolumu>
+            {IcerikPanel ? (
+              <IcerikPanel form={form} onChange={onChange} />
+            ) : (
+              <AdminBosDurum ikon="📝" baslik="İçerik paneli yok" aciklama="Bu widget tipi için özel içerik editörü tanımlı değil." />
+            )}
+          </>
         )}
 
         {sekme === 'gorunum' && <OrtakGorunumPanel form={form} onChange={onChange} />}

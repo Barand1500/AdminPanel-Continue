@@ -1,5 +1,6 @@
 import type { Widget } from '@/types/site';
 import type { WidgetConfig } from '@/types/widget';
+import type { WidgetFormDegeri } from '@/types/admin';
 import { uid } from '@/types/widget';
 
 function metin(mevcut: string | null | undefined, ornek: string): string {
@@ -21,20 +22,56 @@ function mockConfig(tip: string): WidgetConfig {
         slides: [
           {
             id: id(),
-            gorselUrl: '',
-            baslik: 'Teknolojinin En Güzel Hali',
-            altBaslik: 'Güzel Teknoloji',
-            butonMetni: 'Keşfet',
-            butonLink: '/blog',
+            gorselUrl: ONIZLEME_GORSEL,
+            baslik: 'Düşük internet hızına ayıplı hizmet kararı',
+            altBaslik: 'SON GÜN BUGÜN',
+            butonMetni: 'Devamını Oku',
+            butonLink: '/haber/1',
             aktif: true,
           },
           {
             id: id(),
             gorselUrl: ONIZLEME_GORSEL,
-            baslik: 'Yenilikçi Çözümler',
-            altBaslik: 'Kurumsal',
-            butonMetni: 'İletişim',
-            butonLink: '/iletisim',
+            baslik: 'Teknoloji sektöründe yeni dönem',
+            altBaslik: 'GÜNDEM',
+            butonMetni: 'Devamını Oku',
+            butonLink: '/haber/2',
+            aktif: true,
+          },
+          {
+            id: id(),
+            gorselUrl: ONIZLEME_GORSEL,
+            baslik: 'Ekonomide son gelişmeler',
+            altBaslik: 'EKONOMİ',
+            butonMetni: 'Devamını Oku',
+            butonLink: '/haber/3',
+            aktif: true,
+          },
+          {
+            id: id(),
+            gorselUrl: ONIZLEME_GORSEL,
+            baslik: 'Spor dünyasından manşetler',
+            altBaslik: 'SPOR',
+            butonMetni: 'Devamını Oku',
+            butonLink: '/haber/4',
+            aktif: true,
+          },
+          {
+            id: id(),
+            gorselUrl: ONIZLEME_GORSEL,
+            baslik: 'Sağlık alanında önemli buluş',
+            altBaslik: 'SAĞLIK',
+            butonMetni: 'Devamını Oku',
+            butonLink: '/haber/5',
+            aktif: true,
+          },
+          {
+            id: id(),
+            gorselUrl: ONIZLEME_GORSEL,
+            baslik: 'Eğitimde dijital dönüşüm',
+            altBaslik: 'EĞİTİM',
+            butonMetni: 'Devamını Oku',
+            butonLink: '/haber/6',
             aktif: true,
           },
         ],
@@ -229,6 +266,125 @@ function mockConfig(tip: string): WidgetConfig {
       return { onceGorsel: ONIZLEME_GORSEL, sonraGorsel: ONIZLEME_GORSEL };
     case 'BULTEN_KAYIT':
       return { formSlug: 'bulten', bultenPlaceholder: 'E-posta adresiniz', bultenKvkk: 'Abone olarak gizlilik politikasını kabul etmiş olursunuz.' };
+    case 'KOSE_YAZARLARI':
+      return {
+        koseYazarlari: [
+          { id: id(), yazarAd: 'Ertan Yılmazlar', yazarGorsel: ONIZLEME_GORSEL, tarih: '10.05.2026', baslik: 'Ekonomide yeni dönem', ozet: 'Bu alana yazınızla ilgili kısa bir özet ekleyebilirsiniz.', link: '#' },
+          { id: id(), yazarAd: 'Ayşe Demir', yazarGorsel: ONIZLEME_GORSEL, tarih: '09.05.2026', baslik: 'Teknoloji ve toplum', ozet: 'Bu alana yazınızla ilgili kısa bir özet ekleyebilirsiniz.', link: '#' },
+          { id: id(), yazarAd: 'Mehmet Kaya', yazarGorsel: ONIZLEME_GORSEL, tarih: '08.05.2026', baslik: 'Siyaset gündemi', ozet: 'Bu alana yazınızla ilgili kısa bir özet ekleyebilirsiniz.', link: '#' },
+          { id: id(), yazarAd: 'Zeynep Arslan', yazarGorsel: ONIZLEME_GORSEL, tarih: '07.05.2026', baslik: 'Kültür sanat', ozet: 'Bu alana yazınızla ilgili kısa bir özet ekleyebilirsiniz.', link: '#' },
+        ],
+        tumunuGorMetin: 'TÜM YAZARLAR',
+        tumunuGorLink: '/yazarlar',
+      };
+    case 'ILETISIM_BLOK':
+      return {
+        iletisimKartlari: [
+          { id: id(), etiket: 'Merkez Şube', deger: 'Muratpaşa/Antalya', ikon: '📍' },
+          { id: id(), etiket: 'Sabit Telefon', deger: '0 123 456 78 90', ikon: '📞' },
+          { id: id(), etiket: 'Cep Telefonu', deger: '0 123 456 78 90', ikon: '📱' },
+          { id: id(), etiket: 'Whatsapp', deger: '05551112233', ikon: '💬' },
+          { id: id(), etiket: 'Email Adresimiz', deger: 'bilgi@siteadresi.com', ikon: '✉️' },
+          { id: id(), etiket: 'Çalışma Saatleri', deger: 'Pts-Cts: 09:00-20:00', ikon: '🕐' },
+        ],
+        haritaUrl: 'Antalya',
+      };
+    case 'KATEGORI_HABER_LISTESI':
+    case 'HABER_MAGAZIN':
+      return {
+        haberKartlari: Array.from({ length: 6 }, (_, i) => ({
+          id: id(),
+          baslik: `Örnek haber başlığı ${i + 1}`,
+          ozet: 'Bu alana eklemiş olduğunuz haberle ilgili kısa bir özet bilgisi.',
+          gorselUrl: ONIZLEME_GORSEL,
+          link: '#',
+          tarih: '10.05.2026',
+          yorumSayisi: i % 3,
+          badge: i === 4 ? 'DİJİTAL TÜRK LİRASI' : undefined,
+          kartStili: i === 1 ? 'overlay' as const : undefined,
+        })),
+        tumunuGorMetin: '+ TÜMÜNÜ GÖRÜNTÜLE',
+        tumunuGorLink: '#',
+      };
+    case 'KATEGORI_HABER_OVERLAY':
+      return {
+        haberKartlari: Array.from({ length: 6 }, (_, i) => ({
+          id: id(),
+          baslik: `Teknoloji haberi ${i + 1}`,
+          gorselUrl: ONIZLEME_GORSEL,
+          link: '#',
+        })),
+        tumunuGorMetin: '+ TÜMÜNÜ GÖRÜNTÜLE',
+        tumunuGorLink: '#',
+      };
+    case 'VIDEO_GALERISI':
+      return {
+        videoKartlari: Array.from({ length: 4 }, (_, i) => ({
+          id: id(),
+          baslik: `Video haber ${i + 1}`,
+          gorselUrl: ONIZLEME_GORSEL,
+          videoLink: '#',
+          link: '#',
+        })),
+        tumunuGorMetin: '+ TÜMÜNÜ GÖRÜNTÜLE',
+        tumunuGorLink: '#',
+      };
+    case 'SEKMELI_HABER':
+      return {
+        haberSekmeler: [
+          {
+            id: id(),
+            baslik: 'Dünya',
+            kartlar: [
+              { id: id(), baslik: 'ABD\'den 3 ülkeye 150 milyon dolarlık yeni askeri yardım', ozet: 'Bu alan öne çıkan haber özeti için kullanılır.', gorselUrl: ONIZLEME_GORSEL, link: '#', tarih: '13.05.2026', yorumSayisi: 0 },
+              { id: id(), baslik: 'İran\'da siyasi gelişmeler', gorselUrl: ONIZLEME_GORSEL, link: '#', tarih: '10.05.2026', yorumSayisi: 2 },
+              { id: id(), baslik: 'Meksika\'da gazeteciler protesto etti', gorselUrl: ONIZLEME_GORSEL, link: '#', tarih: '10.05.2026', yorumSayisi: 0 },
+              { id: id(), baslik: 'Brüksel\'de sokak isimleri değişiyor', gorselUrl: ONIZLEME_GORSEL, link: '#', tarih: '10.05.2026', yorumSayisi: 1 },
+            ],
+          },
+          { id: id(), baslik: 'Gündem', kartlar: [{ id: id(), baslik: 'Gündem haberi', gorselUrl: ONIZLEME_GORSEL, link: '#', tarih: '10.05.2026' }] },
+          { id: id(), baslik: 'Teknoloji', kartlar: [{ id: id(), baslik: 'Teknoloji haberi', gorselUrl: ONIZLEME_GORSEL, link: '#', tarih: '10.05.2026' }] },
+        ],
+      };
+    case 'HAVA_DURUMU':
+      return {
+        havaSehir: 'İstanbul',
+        havaIlce: 'Kadıköy',
+        havaAnlik: { sicaklik: '22°', durum: 'Parçalı Bulutlu', hissedilen: '23°', nem: '%60', ruzgar: '5.9 m/s' },
+        havaGunler: [
+          { id: id(), gun: 'Cuma', durum: 'Kapalı', ikon: '☁️', max: '24°', min: '20°' },
+          { id: id(), gun: 'Cumartesi', durum: 'Açık', ikon: '☀️', max: '26°', min: '21°' },
+          { id: id(), gun: 'Pazar', durum: 'Açık', ikon: '☀️', max: '27°', min: '22°' },
+          { id: id(), gun: 'Pazartesi', durum: 'Açık', ikon: '☀️', max: '25°', min: '20°' },
+        ],
+      };
+    case 'KRIPTO_LISTESI':
+      return {
+        kriptoParalar: [
+          { id: id(), sembol: 'BTC', ad: 'Bitcoin', fiyat: '$62702', degisim: '-2.47%' },
+          { id: id(), sembol: 'ETH', ad: 'Ethereum', fiyat: '$1695.87', degisim: '0.01%' },
+          { id: id(), sembol: 'USDT', ad: 'Tether', fiyat: '$1.00', degisim: '0.00%' },
+          { id: id(), sembol: 'BNB', ad: 'BNB', fiyat: '$312.45', degisim: '-1.12%' },
+          { id: id(), sembol: 'SOL', ad: 'Solana', fiyat: '$98.32', degisim: '3.21%' },
+        ],
+        tumunuGorMetin: 'Tümünü Göster →',
+        tumunuGorLink: '#',
+      };
+    case 'GUNCEL_KONULAR':
+      return {
+        haberKartlari: Array.from({ length: 10 }, (_, i) => ({
+          id: id(),
+          baslik: `Güncel konu başlığı ${i + 1} — örnek haber manşeti`,
+          link: '#',
+        })),
+      };
+    case 'NAMAZ_VAKITLERI':
+      return {
+        namazKonum: 'Beşiktaş, İstanbul',
+        namazSaat: '09:50:28',
+        namazKalan: '03:19:32',
+        namazVakitleri: { imsak: '04:30', gunes: '06:15', ogle: '13:10', ikindi: '16:45', aksam: '19:30', yatsi: '21:00' },
+      };
     default:
       return {};
   }
@@ -278,6 +434,22 @@ function configBirlestir(mevcut: WidgetConfig, mock: WidgetConfig): WidgetConfig
 
   if (!sonuc.tumunuGorMetin && mock.tumunuGorMetin) sonuc.tumunuGorMetin = mock.tumunuGorMetin;
   if (!sonuc.tumunuGorLink && mock.tumunuGorLink) sonuc.tumunuGorLink = mock.tumunuGorLink;
+
+  sonuc.haberKartlari = dizi(sonuc.haberKartlari, mock.haberKartlari ?? []);
+  sonuc.koseYazarlari = dizi(sonuc.koseYazarlari, mock.koseYazarlari ?? []);
+  sonuc.iletisimKartlari = dizi(sonuc.iletisimKartlari, mock.iletisimKartlari ?? []);
+  sonuc.videoKartlari = dizi(sonuc.videoKartlari, mock.videoKartlari ?? []);
+  sonuc.haberSekmeler = dizi(sonuc.haberSekmeler, mock.haberSekmeler ?? []);
+  sonuc.kriptoParalar = dizi(sonuc.kriptoParalar, mock.kriptoParalar ?? []);
+  sonuc.havaGunler = dizi(sonuc.havaGunler, mock.havaGunler ?? []);
+
+  if (!sonuc.havaSehir && mock.havaSehir) sonuc.havaSehir = mock.havaSehir;
+  if (!sonuc.havaIlce && mock.havaIlce) sonuc.havaIlce = mock.havaIlce;
+  if (!sonuc.havaAnlik && mock.havaAnlik) sonuc.havaAnlik = mock.havaAnlik;
+  if (!sonuc.namazKonum && mock.namazKonum) sonuc.namazKonum = mock.namazKonum;
+  if (!sonuc.namazSaat && mock.namazSaat) sonuc.namazSaat = mock.namazSaat;
+  if (!sonuc.namazKalan && mock.namazKalan) sonuc.namazKalan = mock.namazKalan;
+  if (!sonuc.namazVakitleri && mock.namazVakitleri) sonuc.namazVakitleri = mock.namazVakitleri;
 
   return sonuc;
 }
@@ -339,6 +511,60 @@ function mockBaslik(tip: string): string {
     VIDEO_BANNER: 'Tanıtım Videosu',
     ONCESI_SONRASI: 'Farkı Görün',
     BULTEN_KAYIT: 'Bültenimize Katılın',
+    KOSE_YAZARLARI: 'KÖŞE YAZARLARI',
+    ILETISIM_BLOK: 'Bizimle Çalışmaya Hazır mısınız?',
+    KATEGORI_HABER_LISTESI: 'OTOMOBİL',
+    KATEGORI_HABER_OVERLAY: 'TEKNOLOJİ',
+    VIDEO_GALERISI: 'Video Galeri',
+    SEKMELI_HABER: 'Haberler',
+    HAVA_DURUMU: 'Hava Durumu',
+    KRIPTO_LISTESI: 'KRİPTO PARALAR',
+    GUNCEL_KONULAR: 'GÜNCEL KONULAR',
+    NAMAZ_VAKITLERI: 'Namaz Vakitleri',
+    HABER_MAGAZIN: 'EKONOMİ',
   };
   return basliklar[tip] ?? 'Örnek Başlık';
+}
+
+function formdanWidget(form: WidgetFormDegeri): Widget {
+  let configJson: Record<string, unknown> | null = null;
+  try {
+    configJson = JSON.parse(form.configJsonMetin || '{}') as Record<string, unknown>;
+  } catch {
+    configJson = {};
+  }
+  return {
+    id: 'mock-fill',
+    ad: form.ad,
+    tip: form.tip,
+    sira: form.sira,
+    aktif: form.aktif,
+    baslik: form.baslik || null,
+    altBaslik: form.altBaslik || null,
+    aciklama: form.aciklama || null,
+    gorselUrl: form.gorselUrl || null,
+    butonMetni: form.butonMetni || null,
+    butonLink: form.butonLink || null,
+    arkaPlanRenk: form.arkaPlanRenk || null,
+    yaziRenk: form.yaziRenk || null,
+    mobilGoster: form.mobilGoster,
+    masaustuGoster: form.masaustuGoster,
+    configJson,
+  };
+}
+
+/** Formdaki boş alanları örnek içerikle doldurur; dolu alanlara dokunmaz */
+export function widgetFormMockUygula(form: WidgetFormDegeri): WidgetFormDegeri {
+  const widget = onizlemeMockVerisiUygula(formdanWidget(form));
+  return {
+    ...form,
+    ad: widget.ad ?? form.ad,
+    baslik: widget.baslik ?? '',
+    altBaslik: widget.altBaslik ?? '',
+    aciklama: widget.aciklama ?? '',
+    gorselUrl: widget.gorselUrl ?? '',
+    butonMetni: widget.butonMetni ?? '',
+    butonLink: widget.butonLink ?? '',
+    configJsonMetin: JSON.stringify(widget.configJson ?? {}, null, 2),
+  };
 }

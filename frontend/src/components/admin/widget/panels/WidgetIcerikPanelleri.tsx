@@ -373,25 +373,30 @@ export function LinkKartlariIcerik({ form, onChange }: WidgetPanelProps) {
         onDegistir={(l) => onChange(configGuncelle(form, (c) => ({ ...c, linkler: l })))}
         yeniEkle={() => ({ id: uid(), metin: '', ikon: '👤', link: '' })}
         renderOge={(l, i) => (
-          <div className="grid gap-2 sm:grid-cols-3">
-            <EmojiSecici
-              deger={l.ikon}
-              sadeceSecim
-              placeholder="İkon seç"
-              onChange={(emoji) => {
-                const kopya = [...linkler];
-                kopya[i] = { ...l, ikon: emoji };
+          <div className="link-kart-satir grid gap-2 sm:grid-cols-[minmax(7rem,9rem)_1fr_1fr] sm:items-end">
+            <FormAlani etiket="İkon">
+              <EmojiSecici
+                deger={l.ikon}
+                sadeceSecim
+                onChange={(emoji) => {
+                  const kopya = [...linkler];
+                  kopya[i] = { ...l, ikon: emoji };
+                  onChange(configGuncelle(form, (c) => ({ ...c, linkler: kopya })));
+                }}
+              />
+            </FormAlani>
+            <FormAlani etiket="Metin">
+              <input className={formInputSinifi} placeholder="Metin" value={l.metin} onChange={(e) => {
+                const kopya = [...linkler]; kopya[i] = { ...l, metin: e.target.value };
                 onChange(configGuncelle(form, (c) => ({ ...c, linkler: kopya })));
-              }}
-            />
-            <input className={formInputSinifi} placeholder="Metin" value={l.metin} onChange={(e) => {
-              const kopya = [...linkler]; kopya[i] = { ...l, metin: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, linkler: kopya })));
-            }} />
-            <input className={formInputSinifi} placeholder="Link" value={l.link} onChange={(e) => {
-              const kopya = [...linkler]; kopya[i] = { ...l, link: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, linkler: kopya })));
-            }} />
+              }} />
+            </FormAlani>
+            <FormAlani etiket="Link">
+              <input className={formInputSinifi} placeholder="Link" value={l.link} onChange={(e) => {
+                const kopya = [...linkler]; kopya[i] = { ...l, link: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, linkler: kopya })));
+              }} />
+            </FormAlani>
           </div>
         )}
       />
@@ -722,6 +727,20 @@ export function FiyatlandirmaIcerik({ form, onChange }: WidgetPanelProps) {
   );
 }
 
+import {
+  GuncelKonularIcerik,
+  HaberMagazinIcerik,
+  HavaDurumuIcerik,
+  IletisimBlokIcerik,
+  KategoriHaberListesiIcerik,
+  KategoriHaberOverlayIcerik,
+  KoseYazarlariIcerik,
+  KriptoListesiIcerik,
+  NamazVakitleriIcerik,
+  SekmeliHaberIcerik,
+  VideoGalerisiIcerik,
+} from './HaberWidgetIcerikPanelleri';
+
 export const ICERIK_PANEL_MAP: Record<string, ComponentType<WidgetPanelProps>> = {
   BASLIK_METIN: BaslikMetinIcerik,
   BASLIK_METIN_GORSEL: BaslikMetinGorselIcerik,
@@ -751,4 +770,15 @@ export const ICERIK_PANEL_MAP: Record<string, ComponentType<WidgetPanelProps>> =
   VIDEO_BANNER: VideoBannerIcerik,
   ONCESI_SONRASI: OncesiSonrasiIcerik,
   BULTEN_KAYIT: BultenKayitIcerik,
+  KOSE_YAZARLARI: KoseYazarlariIcerik,
+  ILETISIM_BLOK: IletisimBlokIcerik,
+  KATEGORI_HABER_LISTESI: KategoriHaberListesiIcerik,
+  KATEGORI_HABER_OVERLAY: KategoriHaberOverlayIcerik,
+  VIDEO_GALERISI: VideoGalerisiIcerik,
+  SEKMELI_HABER: SekmeliHaberIcerik,
+  HAVA_DURUMU: HavaDurumuIcerik,
+  KRIPTO_LISTESI: KriptoListesiIcerik,
+  GUNCEL_KONULAR: GuncelKonularIcerik,
+  NAMAZ_VAKITLERI: NamazVakitleriIcerik,
+  HABER_MAGAZIN: HaberMagazinIcerik,
 };

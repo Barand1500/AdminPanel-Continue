@@ -24,6 +24,19 @@ import { GeriSayimWidget } from './GeriSayimWidget';
 import { VideoBannerWidget } from './VideoBannerWidget';
 import { OncesiSonrasiWidget } from './OncesiSonrasiWidget';
 import { BultenKayitWidget } from './BultenKayitWidget';
+import {
+  GuncelKonularWidget,
+  HaberMagazinWidget,
+  HavaDurumuWidget,
+  IletisimBlokWidget,
+  KategoriHaberListesiWidget,
+  KategoriHaberOverlayWidget,
+  KoseYazarlariWidget,
+  KriptoListesiWidget,
+  NamazVakitleriWidget,
+  SekmeliHaberWidget,
+  VideoGalerisiWidget,
+} from './haber/HaberPortalWidgetleri';
 import { configOkuFromWidget, haritaEmbedUrl, widgetSectionClass, widgetSectionStyle } from './widgetHelpers';
 
 interface WidgetRenderProps {
@@ -87,6 +100,28 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
         return <OncesiSonrasiWidget widget={widget} />;
       case 'BULTEN_KAYIT':
         return <BultenKayitWidget widget={widget} />;
+      case 'KOSE_YAZARLARI':
+        return <KoseYazarlariWidget widget={widget} />;
+      case 'ILETISIM_BLOK':
+        return <IletisimBlokWidget widget={widget} />;
+      case 'KATEGORI_HABER_LISTESI':
+        return <KategoriHaberListesiWidget widget={widget} />;
+      case 'KATEGORI_HABER_OVERLAY':
+        return <KategoriHaberOverlayWidget widget={widget} />;
+      case 'VIDEO_GALERISI':
+        return <VideoGalerisiWidget widget={widget} />;
+      case 'SEKMELI_HABER':
+        return <SekmeliHaberWidget widget={widget} />;
+      case 'HAVA_DURUMU':
+        return <HavaDurumuWidget widget={widget} />;
+      case 'KRIPTO_LISTESI':
+        return <KriptoListesiWidget widget={widget} />;
+      case 'GUNCEL_KONULAR':
+        return <GuncelKonularWidget widget={widget} />;
+      case 'NAMAZ_VAKITLERI':
+        return <NamazVakitleriWidget widget={widget} />;
+      case 'HABER_MAGAZIN':
+        return <HaberMagazinWidget widget={widget} />;
       case 'HARITA': {
         const cfg = configOkuFromWidget(widget);
         const src = haritaEmbedUrl(cfg.haritaUrl, cfg.haritaLat, cfg.haritaLng, cfg.haritaZoom ?? 14);

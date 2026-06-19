@@ -11,6 +11,7 @@ import {
 } from '@/types/widget';
 import { SecimAlani } from '../panels/WidgetPanelOrtak';
 import type { WidgetGorunumPanelProps } from '../panels/types';
+import { HaberGorunumPanel } from './HaberGorunumPanel';
 
 export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
   const cfg = configOku(form);
@@ -159,6 +160,8 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
           )}
         </AdminFormBolumu>
       )}
+
+      <HaberGorunumPanel form={form} onChange={onChange} />
     </>
   );
 }
