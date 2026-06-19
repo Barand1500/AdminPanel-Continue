@@ -70,6 +70,7 @@ export interface SitePublicData {
   widgetlar: Widget[];
   bloglar: import('./blog').BlogYazisiOzet[];
   navKategoriler: import('./navKategori').NavKategoriKayit[];
+  formlar?: import('@/utils/formYardimci').PublicFormKayit[];
 }
 
 export interface MenuOgesi {

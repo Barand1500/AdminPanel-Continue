@@ -58,7 +58,12 @@ export function FormEditorKabuk({ form, seciliId, onChange }: FormEditorKabukPro
         {sekme === 'yerlesim' && <FormYerlesimSekme form={form} onChange={onChange} />}
         {sekme === 'kurallar' && <FormKurallarSekme form={form} onChange={onChange} />}
         {sekme === 'bildirim' && <FormBildirimSekme form={form} onChange={onChange} />}
-        {sekme === 'onizleme' && <FormOnizlemeSekme form={form} />}
+        {sekme === 'onizleme' && (
+          <FormOnizlemeSekme
+            form={form}
+            kayitliSlug={seciliId ? form.slug : null}
+          />
+        )}
       </div>
     </div>
   );

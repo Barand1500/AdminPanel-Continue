@@ -23,6 +23,22 @@ export class FormRepository {
     });
   }
 
+  async findPublicBySiteId(siteId: number) {
+    return prisma.formTanimi.findMany({
+      where: { siteId, aktif: true },
+      orderBy: [{ olusturma: 'asc' }],
+      select: {
+        id: true,
+        ad: true,
+        slug: true,
+        aciklama: true,
+        alanlarJson: true,
+        ayarlarJson: true,
+        aktif: true,
+      },
+    });
+  }
+
   async createForSite(siteId: number, data: Omit<Prisma.FormTanimiUncheckedCreateInput, 'siteId'>) {
     return prisma.formTanimi.create({ data: { ...data, siteId } });
   }

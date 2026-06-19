@@ -7,6 +7,8 @@ import { SiteFooter } from '@/components/ortak/SiteFooter';
 import { BakimEkrani } from '@/components/ortak/BakimEkrani';
 import { SiteKapaliEkrani } from '@/components/ortak/SiteKapaliEkrani';
 import { FloatingButonlar } from '@/components/eticaret/FloatingButonlar';
+import { SiteFormBolge } from '@/components/ortak/form/SiteFormBolge';
+import { SiteYuzucuFormlar } from '@/components/ortak/form/SiteYuzucuFormlar';
 import { SiteTemaProvider } from '@/contexts/SiteTemaContext';
 import { SiteAuthProvider } from '@/contexts/SiteAuthContext';
 import { useSiteVerisi } from '@/hooks/useSiteVerisi';
@@ -67,11 +69,16 @@ function SiteLayoutIcerik() {
             kategoriler={menuKategoriler}
           />
         )}
+        <SiteFormBolge formlar={veri.formlar ?? []} konum="hero-alti" />
         <main className="flex-1">
+          <SiteFormBolge formlar={veri.formlar ?? []} konum="icerik-basi" />
           <Outlet context={veri} />
+          <SiteFormBolge formlar={veri.formlar ?? []} konum="icerik-sonu" />
         </main>
+        <SiteFormBolge formlar={veri.formlar ?? []} konum="footer-ustu" />
         {footerGoster && <SiteFooter siteAdi={site.ad} ayarlar={site.ayarlar} />}
         <FloatingButonlar ayarlar={site.ayarlar} />
+        <SiteYuzucuFormlar formlar={veri.formlar ?? []} />
       </div>
     </SiteDilProvider>
   );

@@ -21,6 +21,11 @@ export async function siteVerisiGetir(signal?: AbortSignal): Promise<SitePublicD
         id: String(k.id),
         ustKategoriId: k.ustKategoriId != null ? String(k.ustKategoriId) : null,
       })),
+      formlar: (veri.formlar ?? []).map((f) => ({
+        ...f,
+        id: String(f.id),
+        alanlarJson: Array.isArray(f.alanlarJson) ? f.alanlarJson : [],
+      })),
     };
   } catch {
     return bosSiteVerisi;

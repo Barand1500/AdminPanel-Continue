@@ -76,8 +76,9 @@ export function FormYonetimiSayfasi() {
 
   const kaydet = useCallback(async () => {
     if (!form.ad.trim()) {
-      setHata('Form adı zorunludur');
-      return;
+      const mesaj = 'Form adı zorunludur';
+      setHata(mesaj);
+      throw new Error(mesaj);
     }
     setKaydediliyor(true);
     setHata('');

@@ -6,6 +6,7 @@ import { SistemAyariRepository } from '../Infrastructure/repositories/SistemAyar
 import { WidgetRepository } from '../Infrastructure/repositories/WidgetRepository.js';
 import { BlogRepository } from '../Infrastructure/repositories/BlogRepository.js';
 import { NavKategoriRepository } from '../Infrastructure/repositories/NavKategoriRepository.js';
+import { FormRepository } from '../Infrastructure/repositories/FormRepository.js';
 import {
   sistemAyariSatirdanJson,
   sistemAyarlariJsonCozKayit,
@@ -18,6 +19,7 @@ const sayfaService = new SayfaService();
 const widgetRepo = new WidgetRepository();
 const blogRepo = new BlogRepository();
 const navKategoriRepo = new NavKategoriRepository();
+const formRepo = new FormRepository();
 const sistemAyariRepo = new SistemAyariRepository();
 
 function publicSistemAyarlari(
@@ -44,11 +46,12 @@ export class SiteService {
 
     await sayfaService.hiyerarsiOnar(site.id);
 
-    const [sayfalar, widgetlar, bloglar, navKategoriler, sistemSatiri] = await Promise.all([
+    const [sayfalar, widgetlar, bloglar, navKategoriler, formlar, sistemSatiri] = await Promise.all([
       sayfaRepo.findBySiteId(site.id),
       widgetRepo.findBySiteId(site.id),
       blogRepo.findPublicBySiteId(site.id),
       navKategoriRepo.findPublicBySiteId(site.id),
+      formRepo.findPublicBySiteId(site.id),
       sistemAyariRepo.findBySiteId(site.id),
     ]);
 
@@ -76,6 +79,15 @@ export class SiteService {
       bloglar: bloglar.map((b) => ({
         ...b,
         olusturma: b.olusturma.toISOString(),
+      })),
+      formlar: formlar.map((f) => ({
+        id: String(f.id),
+        ad: f.ad,
+        slug: f.slug,
+        aciklama: f.aciklama,
+        alanlarJson: f.alanlarJson,
+        ayarlarJson: f.ayarlarJson,
+        aktif: f.aktif,
       })),
     };
   }
