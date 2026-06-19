@@ -15,6 +15,7 @@ import {
   SistemGuvenlikSekme,
 } from '@/components/admin/sistem/Sistem404VeGuvenlik';
 import { SistemScriptSekme } from '@/components/admin/sistem/SistemScriptSekme';
+import { SistemEklentiSekme } from '@/components/admin/sistem/SistemEklentiSekme';
 import {
   AdminModulKabuk,
   AdminPanelKarti,
@@ -180,6 +181,7 @@ export function SistemAyarlariSayfasi() {
               {sekme === 'dil' && <PanelDilSekme form={form} onChange={setForm} />}
               {sekme === 'guvenlik' && <SistemGuvenlikSekme form={form} onChange={setForm} />}
               {sekme === 'script' && <SistemScriptSekme form={form} onChange={setForm} />}
+              {sekme === 'eklentiler' && <SistemEklentiSekme />}
               {sekme === 'sagTik' && <SagTikPaneliYonetimSekme form={form} onChange={setForm} />}
             </AdminPanelKarti>
           </div>
@@ -196,6 +198,7 @@ const SEKME_BASLIK: Record<SistemSekmeId, string> = {
   dil: 'Panel Dili & Çeviriler',
   guvenlik: 'Güvenlik & Yedekleme',
   script: 'Script Ayarları',
+  eklentiler: 'Eklentiler',
   sagTik: 'Sağ Tık Paneli',
 };
 
@@ -206,5 +209,6 @@ const SEKME_ALT: Record<SistemSekmeId, string> = {
   dil: 'JSON çeviri editörü',
   guvenlik: 'Güvenlik başlıkları ve otomatik yedek',
   script: 'Google Analytics ve özel script kodları',
+  eklentiler: 'Site eklentilerini kur, etkinleştir veya kaldır',
   sagTik: 'Admin panel sağ tık menüsü öğeleri ve modül listesi',
 };

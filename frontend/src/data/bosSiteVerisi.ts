@@ -25,6 +25,7 @@ export const bosSiteVerisi: SitePublicData = {
   navKategoriler: [],
   formlar: [],
   seoYonlendirmeler: [],
+  aktifEklentiler: [],
 };
 
 export function sayfaYolunuBul(slug: string): string {

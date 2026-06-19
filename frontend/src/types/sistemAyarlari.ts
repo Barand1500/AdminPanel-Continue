@@ -65,7 +65,7 @@ export interface SistemAyarlariForm {
   scriptAyarlari: ScriptAyarlari;
 }
 
-export type SistemSekmeId = 'genel' | 'bakim' | 'sayfa404' | 'dil' | 'guvenlik' | 'script' | 'sagTik';
+export type SistemSekmeId = 'genel' | 'bakim' | 'sayfa404' | 'dil' | 'guvenlik' | 'script' | 'sagTik' | 'eklentiler';
 
 export const SISTEM_SEKMELER: { id: SistemSekmeId; ad: string; ikon: string }[] = [
   { id: 'genel', ad: 'Genel', ikon: '⚡' },
@@ -74,6 +74,7 @@ export const SISTEM_SEKMELER: { id: SistemSekmeId; ad: string; ikon: string }[] 
   { id: 'dil', ad: 'Panel Dili', ikon: '🌐' },
   { id: 'guvenlik', ad: 'Güvenlik', ikon: '🛡️' },
   { id: 'script', ad: 'Script Ayarları', ikon: '</>' },
+  { id: 'eklentiler', ad: 'Eklentiler', ikon: '🧩' },
   { id: 'sagTik', ad: 'Sağ Tık Paneli', ikon: '🖱️' },
 ];
 

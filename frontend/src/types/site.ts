@@ -72,6 +72,7 @@ export interface SitePublicData {
   navKategoriler: import('./navKategori').NavKategoriKayit[];
   formlar?: import('@/utils/formYardimci').PublicFormKayit[];
   seoYonlendirmeler?: { kaynakUrl: string; hedefUrl: string; kod: number }[];
+  aktifEklentiler?: import('./eklenti').AktifEklentiPublic[];
 }
 
 export interface MenuOgesi {

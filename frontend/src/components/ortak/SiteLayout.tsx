@@ -20,6 +20,8 @@ import { bakimModuAktifMi, siteKapaliMi, sistemAyarlariCoz } from '@/utils/siste
 import { navKategorileriMenuyeCevir } from '@/utils/navKategoriAgaci';
 import { SeoYonlendirmeKontrol } from '@/components/ortak/SeoYonlendirmeKontrol';
 import { SiteScriptEnjektor } from '@/components/ortak/SiteScriptEnjektor';
+import { EklentiYukleyici } from '@/components/ortak/eklentiler/EklentiYukleyici';
+import { useAktifEklentiler } from '@/hooks/useAktifEklentiler';
 
 function SiteLayoutIcerik() {
   const { veri, yukleniyor } = useSiteVerisi();
@@ -35,6 +37,7 @@ function SiteLayoutIcerik() {
     () => navKategorileriMenuyeCevir(veri.navKategoriler),
     [veri.navKategoriler]
   );
+  const aktifEklentiler = useAktifEklentiler(veri);
 
   useSiteTemaUygula(site.ayarlar, site.ad);
 
@@ -83,6 +86,7 @@ function SiteLayoutIcerik() {
         {footerGoster && <SiteFooter siteAdi={site.ad} ayarlar={site.ayarlar} />}
         <FloatingButonlar ayarlar={site.ayarlar} />
         <SiteYuzucuFormlar formlar={veri.formlar ?? []} />
+        <EklentiYukleyici aktifEklentiler={aktifEklentiler} />
       </div>
     </SiteDilProvider>
   );

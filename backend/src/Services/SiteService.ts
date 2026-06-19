@@ -8,6 +8,7 @@ import { BlogRepository } from '../Infrastructure/repositories/BlogRepository.js
 import { NavKategoriRepository } from '../Infrastructure/repositories/NavKategoriRepository.js';
 import { FormRepository } from '../Infrastructure/repositories/FormRepository.js';
 import { SeoYonlendirmeRepository } from '../Infrastructure/repositories/SeoYonlendirmeRepository.js';
+import { EklentiService } from './EklentiService.js';
 import {
   sistemAyariSatirdanJson,
   sistemAyarlariJsonCozKayit,
@@ -23,6 +24,7 @@ const navKategoriRepo = new NavKategoriRepository();
 const formRepo = new FormRepository();
 const yonlendirmeRepo = new SeoYonlendirmeRepository();
 const sistemAyariRepo = new SistemAyariRepository();
+const eklentiService = new EklentiService();
 
 function sayfaPublicUrl(slug: string): string {
   if (slug === 'anasayfa' || slug === 'home') return '/';
@@ -68,6 +70,8 @@ export class SiteService {
       sistemSatiri as Record<string, unknown> | null | undefined
     );
 
+    const aktifEklentiler = await eklentiService.aktifEklentilerPublic(site.id);
+
     return {
       site: {
         id: site.id,
@@ -109,6 +113,7 @@ export class SiteService {
           };
         })
         .filter((y): y is { kaynakUrl: string; hedefUrl: string; kod: number } => y != null),
+      aktifEklentiler,
     };
   }
 
