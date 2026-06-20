@@ -13,11 +13,19 @@ export type HeroButonKonum =
 
 export type HeroButonAksiyon = 'ayni-sekme' | 'yeni-sekme' | 'modal';
 
+/** Hero arka plan görselinin alana nasıl oturacağı */
+export type HeroGorselKirpma = 'kapla' | 'sigdir' | 'orijinal' | 'doldur';
+
+/** Kapla/orijinal modunda görselin hangi bölgesi öne çıksın */
+export type HeroGorselOdak = 'merkez' | 'ust' | 'alt' | 'sol' | 'sag';
+
 export interface HeroSlide {
   id: string;
   sira: number;
   aktif: boolean;
   gorselUrl: string;
+  gorselKirpma?: HeroGorselKirpma;
+  gorselOdak?: HeroGorselOdak;
   baslik: string;
   altBaslik: string;
   aciklama: string;
@@ -97,12 +105,68 @@ export const HERO_BUTON_KONUMLARI: { id: HeroButonKonum; etiket: string }[] = [
   { id: 'alt-sag', etiket: '↘' },
 ];
 
+export const HERO_GORSEL_KIRPMA: { id: HeroGorselKirpma; ad: string; aciklama: string }[] = [
+  { id: 'kapla', ad: 'Kapla', aciklama: 'Alanı doldurur; taşan kısımlar kırpılır (önerilen)' },
+  { id: 'sigdir', ad: 'Sığdır', aciklama: 'Görselin tamamı görünür; yanlarda boşluk kalabilir' },
+  { id: 'orijinal', ad: 'Orijinal boyut', aciklama: 'Gerçek piksel boyutu; büyükse taşar' },
+  { id: 'doldur', ad: 'Uzat', aciklama: 'Alana zorla sığdırır; oran bozulabilir' },
+];
+
+export const HERO_GORSEL_ODAK: { id: HeroGorselOdak; ad: string }[] = [
+  { id: 'merkez', ad: 'Merkez' },
+  { id: 'ust', ad: 'Üst' },
+  { id: 'alt', ad: 'Alt' },
+  { id: 'sol', ad: 'Sol' },
+  { id: 'sag', ad: 'Sağ' },
+];
+
+const GECERLI_GORSEL_KIRPMA: HeroGorselKirpma[] = ['kapla', 'sigdir', 'orijinal', 'doldur'];
+const GECERLI_GORSEL_ODAK: HeroGorselOdak[] = ['merkez', 'ust', 'alt', 'sol', 'sag'];
+
+export function heroGorselKirpmaNormalize(kirpma?: string | null): HeroGorselKirpma {
+  if (kirpma && GECERLI_GORSEL_KIRPMA.includes(kirpma as HeroGorselKirpma)) return kirpma as HeroGorselKirpma;
+  return 'kapla';
+}
+
+export function heroGorselOdakNormalize(odak?: string | null): HeroGorselOdak {
+  if (odak && GECERLI_GORSEL_ODAK.includes(odak as HeroGorselOdak)) return odak as HeroGorselOdak;
+  return 'merkez';
+}
+
+export function heroGorselObjectSinifi(
+  kirpma?: HeroGorselKirpma | null,
+  odak?: HeroGorselOdak | null,
+): string {
+  const fitMap: Record<HeroGorselKirpma, string> = {
+    kapla: 'object-cover',
+    sigdir: 'object-contain',
+    orijinal: 'object-none',
+    doldur: 'object-fill',
+  };
+  const odakMap: Record<HeroGorselOdak, string> = {
+    merkez: 'object-center',
+    ust: 'object-top',
+    alt: 'object-bottom',
+    sol: 'object-left',
+    sag: 'object-right',
+  };
+  const k = heroGorselKirpmaNormalize(kirpma);
+  const o = heroGorselOdakNormalize(odak);
+  return `${fitMap[k]} ${odakMap[o]}`;
+}
+
+export function heroGorselSinifi(kirpma?: HeroGorselKirpma | null, odak?: HeroGorselOdak | null): string {
+  return `absolute inset-0 h-full w-full ${heroGorselObjectSinifi(kirpma, odak)}`;
+}
+
 function slideNormalize(s: HeroSlide): HeroSlide {
   const stil = heroStilNormalize(s.stil);
   const tamEkran = stil === 'tam-ekran';
   return {
     ...s,
     stil,
+    gorselKirpma: heroGorselKirpmaNormalize(s.gorselKirpma),
+    gorselOdak: heroGorselOdakNormalize(s.gorselOdak),
     butonRenk: s.butonRenk || (tamEkran ? HERO_TAM_EKRAN_BUTON_RENK : HERO_VARSAYILAN_BUTON_RENK),
     butonYaziRenk: s.butonYaziRenk || (tamEkran ? HERO_TAM_EKRAN_BUTON_YAZI : HERO_VARSAYILAN_BUTON_YAZI),
     butonAksiyon: s.butonAksiyon ?? 'ayni-sekme',
@@ -136,6 +200,8 @@ export function bosHeroSlide(sira: number): HeroSlide {
     sira,
     aktif: true,
     gorselUrl: '',
+    gorselKirpma: 'kapla',
+    gorselOdak: 'merkez',
     baslik: '',
     altBaslik: '',
     aciklama: '',

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import type { HeroAyarlari, HeroButonAksiyon, HeroButonKonum, HeroSlide, HeroStil } from '@/types/hero';
-import { heroAyarlariBirlestir } from '@/types/hero';
+import { heroAyarlariBirlestir, heroGorselSinifi } from '@/types/hero';
 
 interface HeroSliderProps {
   heroJson?: HeroAyarlari | null;
@@ -373,7 +373,11 @@ export function HeroSlider({ heroJson }: HeroSliderProps) {
     <>
       <section className={`relative overflow-hidden bg-slate-900 ${tamEkran ? 'hero-tam-ekran-bolum' : ''}`}>
         <div className={`relative ${tamEkran ? 'min-h-[100svh]' : 'h-[300px] sm:h-[400px] lg:h-[440px]'}`}>
-          <img src={slide.gorselUrl} alt={slide.baslik || 'Slider'} className="absolute inset-0 h-full w-full object-cover" />
+          <img
+            src={slide.gorselUrl}
+            alt={slide.baslik || 'Slider'}
+            className={heroGorselSinifi(slide.gorselKirpma, slide.gorselOdak)}
+          />
           <SlideIcerik slide={slide} onModalAc={() => setModalAcik(true)} />
         </div>
 

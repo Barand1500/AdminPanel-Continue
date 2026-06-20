@@ -15,6 +15,8 @@ import {
 import {
   HERO_BUTON_AKSIYONLARI,
   HERO_BUTON_KONUMLARI,
+  HERO_GORSEL_KIRPMA,
+  HERO_GORSEL_ODAK,
   HERO_STILLER,
   HERO_TAM_EKRAN_BUTON_RENK,
   HERO_TAM_EKRAN_BUTON_YAZI,
@@ -23,6 +25,8 @@ import {
   HERO_VARSAYILAN_GECIS_SN,
   bosHeroSlide,
   heroAyarlariBirlestir,
+  heroGorselObjectSinifi,
+  heroGorselSinifi,
   type HeroAyarlari,
   type HeroButonAksiyon,
   type HeroKart,
@@ -95,7 +99,7 @@ function HeroOnizleme({ hero, seciliSlide }: { hero: HeroAyarlari; seciliSlide: 
               <img
                 src={gorselSrc}
                 alt=""
-                className="absolute inset-0 h-full w-full object-cover"
+                className={heroGorselSinifi(onizlenecek.gorselKirpma, onizlenecek.gorselOdak)}
                 onError={(e) => {
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}
@@ -234,8 +238,49 @@ function SlideDuzenlemeForm({
         etiket="Arka Plan Görseli"
         deger={slide.gorselUrl}
         onChange={(v) => slideGuncelle(slide.id, { gorselUrl: v })}
-        onizlemeSinifi="h-24 w-full max-w-md rounded-lg object-cover border border-[var(--ap-border)]"
+        onizlemeSinifi={`h-24 w-full max-w-md rounded-lg border border-[var(--ap-border)] ${heroGorselObjectSinifi(slide.gorselKirpma, slide.gorselOdak)}`}
       />
+
+      <FormAlani etiket="Görsel yerleşimi" aciklama="Görselin slider alanına nasıl oturacağını seçin">
+        <div className="grid gap-2 sm:grid-cols-2">
+          {HERO_GORSEL_KIRPMA.map((secenek) => (
+            <button
+              key={secenek.id}
+              type="button"
+              onClick={() => slideGuncelle(slide.id, { gorselKirpma: secenek.id })}
+              className={`rounded-lg border p-3 text-left text-sm transition ${
+                (slide.gorselKirpma ?? 'kapla') === secenek.id
+                  ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)]/10'
+                  : 'border-[var(--ap-border)] hover:border-[var(--ap-accent)]/40'
+              }`}
+            >
+              <span className="font-semibold">{secenek.ad}</span>
+              <span className="ap-muted mt-0.5 block text-xs">{secenek.aciklama}</span>
+            </button>
+          ))}
+        </div>
+      </FormAlani>
+
+      {(slide.gorselKirpma ?? 'kapla') !== 'doldur' && (
+        <FormAlani etiket="Görsel odağı" aciklama="Kırpma olursa hangi bölge öne çıksın">
+          <div className="flex flex-wrap gap-2">
+            {HERO_GORSEL_ODAK.map((secenek) => (
+              <button
+                key={secenek.id}
+                type="button"
+                onClick={() => slideGuncelle(slide.id, { gorselOdak: secenek.id })}
+                className={`rounded-lg border px-3 py-2 text-sm transition ${
+                  (slide.gorselOdak ?? 'merkez') === secenek.id
+                    ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)]/10 font-semibold'
+                    : 'border-[var(--ap-border)] hover:border-[var(--ap-accent)]/40'
+                }`}
+              >
+                {secenek.ad}
+              </button>
+            ))}
+          </div>
+        </FormAlani>
+      )}
 
       <div className="grid gap-4 sm:grid-cols-2">
         <FormAlani etiket={tamEkran ? 'Başlık satırları' : 'Başlık'} aciklama={tamEkran ? 'Her satır için Enter kullanın' : undefined}>
