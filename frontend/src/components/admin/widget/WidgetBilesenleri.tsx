@@ -64,7 +64,7 @@ export function widgettenForma(widget: AdminWidget): WidgetFormDegeri {
     mobilGoster: widget.mobilGoster,
     masaustuGoster: widget.masaustuGoster,
     configJsonMetin: JSON.stringify(cfg, null, 2),
-    sayfaId: widget.sayfaId ?? '',
+    sayfaId: widget.sayfaId != null && widget.sayfaId !== '' ? idString(widget.sayfaId) : '',
   };
 }
 

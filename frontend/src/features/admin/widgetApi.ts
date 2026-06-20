@@ -1,6 +1,7 @@
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
 import { tokenAl } from '@/features/auth/authApi';
 import { jsonYanitOku } from '@/utils/jsonFetch';
+import { idString } from '@/utils/idKarsilastir';
 import { AKTIF_WIDGET_TIPLERI, DEPRECATED_WIDGET_TIPLERI } from '@/types/widget';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 
@@ -29,6 +30,23 @@ const widgetTipleri = [...AKTIF_WIDGET_TIPLERI, ...DEPRECATED_WIDGET_TIPLERI];
 function temizleOpsiyonel(metin: string) {
   const trimmed = metin.trim();
   return trimmed.length > 0 ? trimmed : null;
+}
+
+/** API sayfaId'yi sayı döndürebilir; kayıt öncesi string'e çevir */
+function sayfaIdPayload(form: WidgetFormDegeri): string | null {
+  const ham = form.sayfaId;
+  if (ham == null || ham === '') return null;
+  const metin = idString(ham).trim();
+  return metin.length > 0 ? metin : null;
+}
+
+function adminWidgetNormalize(widget: AdminWidget): AdminWidget {
+  return {
+    ...widget,
+    id: idString(widget.id),
+    siteId: idString(widget.siteId),
+    sayfaId: widget.sayfaId != null && widget.sayfaId !== '' ? idString(widget.sayfaId) : null,
+  };
 }
 
 function payloadHazirla(form: WidgetFormDegeri, guncelleme = false) {
@@ -65,7 +83,7 @@ function payloadHazirla(form: WidgetFormDegeri, guncelleme = false) {
     mobilGoster: form.mobilGoster,
     masaustuGoster: form.masaustuGoster,
     configJson,
-    sayfaId: form.sayfaId.trim() ? form.sayfaId.trim() : null,
+    sayfaId: sayfaIdPayload(form),
   };
 }
 
@@ -87,7 +105,7 @@ export async function widgetlariGetir(tip?: string): Promise<AdminWidget[]> {
   });
   const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widgetlar?: AdminWidget[] }>(yanit);
   if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widgetlar alinamadi'));
-  return veri.widgetlar as AdminWidget[];
+  return (veri.widgetlar as AdminWidget[]).map(adminWidgetNormalize);
 }
 
 export async function widgetOlustur(form: WidgetFormDegeri): Promise<AdminWidget> {
@@ -98,7 +116,7 @@ export async function widgetOlustur(form: WidgetFormDegeri): Promise<AdminWidget
   });
   const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widget?: AdminWidget }>(yanit);
   if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widget olusturulamadi'));
-  return veri.widget as AdminWidget;
+  return adminWidgetNormalize(veri.widget as AdminWidget);
 }
 
 export async function widgetGuncelle(id: string, form: WidgetFormDegeri): Promise<AdminWidget> {
@@ -109,7 +127,7 @@ export async function widgetGuncelle(id: string, form: WidgetFormDegeri): Promis
   });
   const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widget?: AdminWidget }>(yanit);
   if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widget guncellenemedi'));
-  return veri.widget as AdminWidget;
+  return adminWidgetNormalize(veri.widget as AdminWidget);
 }
 
 export async function widgetSil(id: string): Promise<void> {
