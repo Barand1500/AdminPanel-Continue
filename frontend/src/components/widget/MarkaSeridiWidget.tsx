@@ -1,4 +1,5 @@
 import type { Widget } from '@/types/site';
+import { widgetTamEkranMi } from '@/types/widget';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
 
@@ -14,17 +15,27 @@ export function MarkaSeridiWidget({ widget }: { widget: Widget }) {
   if (markalar.length === 0) return null;
 
   const hiz = HIZ_SINIF[cfg.markaHizi ?? 'normal'] ?? HIZ_SINIF.normal;
+  const tamEkran = widgetTamEkranMi(cfg);
   const serit = [...markalar, ...markalar];
+
+  const baslikAlani =
+    widget.baslik || widget.altBaslik ? (
+      <div className={`mb-10 text-center${tamEkran ? ' container-site' : ''}`}>
+        {widget.altBaslik && <p className="text-sm font-semibold uppercase tracking-widest text-primary">{widget.altBaslik}</p>}
+        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-slate-900`}>{widget.baslik}</h2>}
+      </div>
+    ) : null;
 
   return (
     <WidgetKabuk widget={widget}>
-      {(widget.baslik || widget.altBaslik) && (
-        <div className="mb-10 text-center">
-          {widget.altBaslik && <p className="text-sm font-semibold uppercase tracking-widest text-primary">{widget.altBaslik}</p>}
-          {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-slate-900`}>{widget.baslik}</h2>}
-        </div>
-      )}
-      <div className="marka-seridi-kapsul relative overflow-hidden rounded-2xl border border-slate-100 bg-gradient-to-r from-slate-50 via-white to-slate-50 py-8">
+      {baslikAlani}
+      <div
+        className={`marka-seridi-kapsul relative overflow-hidden py-8 ${
+          tamEkran
+            ? 'marka-seridi-kapsul-tam border-y border-slate-100 bg-gradient-to-r from-slate-50 via-white to-slate-50'
+            : 'rounded-2xl border border-slate-100 bg-gradient-to-r from-slate-50 via-white to-slate-50'
+        }`}
+      >
         <div className="marka-seridi-soluk marka-seridi-soluk-sol" aria-hidden />
         <div className="marka-seridi-soluk marka-seridi-soluk-sag" aria-hidden />
         <div className={`marka-seridi-iz ${hiz}`}>

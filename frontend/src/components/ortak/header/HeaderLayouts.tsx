@@ -1,6 +1,7 @@
 import type { Dispatch, SetStateAction } from 'react';
 import { Link } from 'react-router-dom';
 import type { SiteAyarlari } from '@/types/site';
+import { headerMarkaKapSinifi, logoBoyutuNormalize } from '@/types/logo';
 import type { HeaderVeri } from './useHeaderVeri';
 import {
   UstBant,
@@ -112,9 +113,12 @@ export function HeaderMerkezLogo({ veri, ayarlar, menuAcik, setMenuAcik }: Heade
     <>
       <UstBant veri={veri} ayarlar={ayarlar} />
       <HeaderGovde veri={veri} className="site-header-varyant-merkez-logo">
-        <div className="container-site flex h-16 items-center justify-between gap-4">
+        <div className="container-site flex min-h-16 items-center justify-between gap-4 py-2">
           <DesktopMenu menu={veri.menuSol} className="flex-1 justify-end" />
-          <MarkaAlani veri={veri} className="mx-4 max-w-[220px] justify-center" />
+          <MarkaAlani
+            veri={veri}
+            className={`mx-4 justify-center ${headerMarkaKapSinifi(logoBoyutuNormalize(veri.header.logoBoyutu))}`}
+          />
           <DesktopMenu menu={veri.menuSag} className="flex-1" />
           <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
         </div>

@@ -83,6 +83,28 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
         </AdminFormBolumu>
       )}
 
+      <AdminFormBolumu baslik="Bölüm genişliği">
+        <SecimAlani
+          etiket="Yatay genişlik"
+          deger={g.bolumGenisligi ?? 'normal'}
+          secenekler={[
+            { id: 'normal', etiket: 'Normal genişlik' },
+            { id: 'tam_ekran', etiket: 'Tam ekran' },
+          ]}
+          onChange={(v) =>
+            onChange(
+              configGuncelle(form, (c) => ({
+                ...c,
+                gorunum: { ...c.gorunum, bolumGenisligi: v as 'normal' | 'tam_ekran' },
+              }))
+            )
+          }
+        />
+        <p className="ap-muted text-xs">
+          Tam ekran: bölüm yatayda kenardan kenara uzanır (marka şeridi gibi tam genişlik içerikler için).
+        </p>
+      </AdminFormBolumu>
+
       <AdminFormBolumu baslik="Görünürlük">
         <div className="ap-switch-grup">
           <AdminAnahtarDugme etiket="Mobilde göster" acik={form.mobilGoster} onDegistir={(v) => onChange({ ...form, mobilGoster: v })} />

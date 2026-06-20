@@ -76,6 +76,9 @@ export type GaleriDuzeni = 'yan_yana' | 'alt_alta' | 'grid';
 export type GorselBoyutu = 'kucuk' | 'orta' | 'buyuk' | 'tam';
 export type GorselKirpma = 'kapla' | 'sigdir' | 'orijinal';
 export type PaddingBoyutu = 'dar' | 'normal' | 'genis';
+
+/** normal: container-site; tam_ekran: yatayda kenardan kenara */
+export type WidgetBolumGenisligi = 'normal' | 'tam_ekran';
 export type BaslikBoyutu = 'sm' | 'md' | 'lg' | 'xl';
 export type GirisAnimasyonu = 'yok' | 'fade' | 'slide';
 
@@ -170,6 +173,8 @@ export interface WidgetGorunumAyarlari {
   yildizRengi?: string;
   kartFooterArkaPlan?: string;
   kartGolge?: boolean;
+  /** normal: yan boşluklu container; tam_ekran: viewport genişliği */
+  bolumGenisligi?: WidgetBolumGenisligi;
 }
 
 export interface WidgetEkAyarlar {
@@ -603,4 +608,8 @@ export function widgetGorunumStili(
     ['--widget-baslik-renk' as string]: g.baslikRengi || widget.yaziRenk || undefined,
     ['--widget-kolon' as string]: String(g.kolonSayisi ?? 3),
   };
+}
+
+export function widgetTamEkranMi(cfg: WidgetConfig): boolean {
+  return cfg.gorunum?.bolumGenisligi === 'tam_ekran';
 }

@@ -63,14 +63,14 @@ echo "[4/5] Frontend build & kopyalandi"
 cd "$SITE/backend"
 npm install --omit=dev
 npx prisma generate
-npx prisma migrate deploy || {
-  echo "UYARI: prisma migrate deploy basarisiz — manual SQL deneniyor..."
-  if [ -f prisma/migrations/manual_site_eklentiler.sql ]; then
-    npx prisma db execute --file prisma/migrations/manual_site_eklentiler.sql --schema prisma/schema.prisma || true
-  fi
-}
+if ! npx prisma migrate deploy; then
+  echo "UYARI: migrate deploy basarisiz — MySQL icin db push deneniyor..."
+  npx prisma migrate resolve --rolled-back "20260613075847_init" 2>/dev/null || true
+  npx prisma db push --accept-data-loss
+fi
+export PM2_NAME
 pm2 restart "$PM2_NAME" 2>/dev/null || pm2 start ecosystem.config.cjs
-echo "[5/5] PM2 restart tamam"
+echo "[5/5] PM2 restart tamam ($PM2_NAME)"
 
 echo ""
 echo "=== DEPLOY TAMAMLANDI ==="

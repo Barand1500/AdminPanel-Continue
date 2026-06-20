@@ -1,7 +1,7 @@
 import type { LogoBoyutu } from '@/types/logo';
 import { LOGO_BOYUT_ETIKET } from '@/types/logo';
 
-const BOYUTLAR: LogoBoyutu[] = ['kucuk', 'orta', 'buyuk'];
+const BOYUTLAR: LogoBoyutu[] = ['kucuk', 'orta', 'buyuk', 'cok_buyuk', 'mega_buyuk'];
 
 interface LogoBoyutSeciciProps {
   etiket?: string;
