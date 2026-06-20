@@ -1,4 +1,4 @@
-export type HeroStil = 'klasik' | 'metin-solda' | 'ortalanmis';
+export type HeroStil = 'klasik' | 'metin-solda' | 'ortalanmis' | 'tam-ekran';
 
 export type HeroButonKonum =
   | 'ust-sol'
@@ -29,6 +29,14 @@ export interface HeroSlide {
   butonRenk: string;
   butonYaziRenk: string;
   butonAksiyon?: HeroButonAksiyon;
+  /** Tam ekran stilinde turuncu vurgulu son satır */
+  baslikVurgu?: string;
+  ikinciButonAktif?: boolean;
+  ikinciButonMetni?: string;
+  ikinciButonLink?: string;
+  ikinciButonAksiyon?: HeroButonAksiyon;
+  /** Tam ekran stilinde sol altta saat/tarih */
+  saatGoster?: boolean;
 }
 
 export interface HeroKart {
@@ -60,12 +68,22 @@ export const HERO_BUTON_AKSIYONLARI: { id: HeroButonAksiyon; ad: string; aciklam
 export const HERO_VARSAYILAN_GECIS_SN = 6;
 export const HERO_VARSAYILAN_BUTON_RENK = '#ffffff';
 export const HERO_VARSAYILAN_BUTON_YAZI = '#7c3aed';
+export const HERO_TAM_EKRAN_BUTON_RENK = '#f97316';
+export const HERO_TAM_EKRAN_BUTON_YAZI = '#ffffff';
 
 export const HERO_STILLER: { id: HeroStil; ad: string; aciklama: string }[] = [
   { id: 'klasik', ad: 'Klasik', aciklama: 'Tam genişlik görsel, metin konuma göre' },
   { id: 'metin-solda', ad: 'Metin Solda', aciklama: 'Sol tarafta koyu panel üzerinde metin' },
   { id: 'ortalanmis', ad: 'Ortalanmış', aciklama: 'Metin ve buton ortada' },
+  { id: 'tam-ekran', ad: 'Tam Ekran', aciklama: 'Sol hizalı vitrin; aşağı kaydırınca kaybolur' },
 ];
+
+const GECERLI_HERO_STILLER: HeroStil[] = ['klasik', 'metin-solda', 'ortalanmis', 'tam-ekran'];
+
+export function heroStilNormalize(stil?: string | null): HeroStil {
+  if (stil && GECERLI_HERO_STILLER.includes(stil as HeroStil)) return stil as HeroStil;
+  return 'klasik';
+}
 
 export const HERO_BUTON_KONUMLARI: { id: HeroButonKonum; etiket: string }[] = [
   { id: 'ust-sol', etiket: '↖' },
@@ -80,11 +98,20 @@ export const HERO_BUTON_KONUMLARI: { id: HeroButonKonum; etiket: string }[] = [
 ];
 
 function slideNormalize(s: HeroSlide): HeroSlide {
+  const stil = heroStilNormalize(s.stil);
+  const tamEkran = stil === 'tam-ekran';
   return {
     ...s,
-    butonRenk: s.butonRenk || HERO_VARSAYILAN_BUTON_RENK,
-    butonYaziRenk: s.butonYaziRenk || HERO_VARSAYILAN_BUTON_YAZI,
+    stil,
+    butonRenk: s.butonRenk || (tamEkran ? HERO_TAM_EKRAN_BUTON_RENK : HERO_VARSAYILAN_BUTON_RENK),
+    butonYaziRenk: s.butonYaziRenk || (tamEkran ? HERO_TAM_EKRAN_BUTON_YAZI : HERO_VARSAYILAN_BUTON_YAZI),
     butonAksiyon: s.butonAksiyon ?? 'ayni-sekme',
+    baslikVurgu: s.baslikVurgu ?? '',
+    ikinciButonAktif: s.ikinciButonAktif ?? false,
+    ikinciButonMetni: s.ikinciButonMetni ?? '',
+    ikinciButonLink: s.ikinciButonLink ?? '',
+    ikinciButonAksiyon: s.ikinciButonAksiyon ?? 'ayni-sekme',
+    saatGoster: s.saatGoster ?? tamEkran,
   };
 }
 

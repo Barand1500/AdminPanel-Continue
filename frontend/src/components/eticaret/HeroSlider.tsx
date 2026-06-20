@@ -26,6 +26,8 @@ function HeroButon({
   yaziRenk,
   aksiyon = 'ayni-sekme',
   onModalAc,
+  sinif = 'inline-flex rounded-lg px-5 py-2.5 text-sm font-semibold shadow-md transition hover:opacity-90',
+  okGoster = false,
 }: {
   metin: string;
   link: string;
@@ -33,15 +35,22 @@ function HeroButon({
   yaziRenk: string;
   aksiyon?: HeroButonAksiyon;
   onModalAc?: () => void;
+  sinif?: string;
+  okGoster?: boolean;
 }) {
   const dis = link.startsWith('http');
   const stil = { backgroundColor: arkaPlan, color: yaziRenk };
-  const sinif = 'inline-flex rounded-lg px-5 py-2.5 text-sm font-semibold shadow-md transition hover:opacity-90';
+  const icerik = (
+    <>
+      <span>{metin}</span>
+      {okGoster ? <span aria-hidden className="ml-1.5">→</span> : null}
+    </>
+  );
 
   if (aksiyon === 'modal') {
     return (
       <button type="button" onClick={onModalAc} className={sinif} style={stil}>
-        {metin}
+        {icerik}
       </button>
     );
   }
@@ -49,19 +58,152 @@ function HeroButon({
   if (dis || aksiyon === 'yeni-sekme') {
     return (
       <a href={link} target="_blank" rel="noreferrer" className={sinif} style={stil}>
-        {metin}
+        {icerik}
       </a>
     );
   }
   return (
     <Link to={link} className={sinif} style={stil}>
+      {icerik}
+    </Link>
+  );
+}
+
+function HeroMetinLink({
+  metin,
+  link,
+  aksiyon = 'ayni-sekme',
+  onModalAc,
+}: {
+  metin: string;
+  link: string;
+  aksiyon?: HeroButonAksiyon;
+  onModalAc?: () => void;
+}) {
+  const sinif = 'hero-tam-ekran-ikincil-link';
+
+  if (aksiyon === 'modal') {
+    return (
+      <button type="button" onClick={onModalAc} className={sinif}>
+        {metin}
+      </button>
+    );
+  }
+
+  if (link.startsWith('http') || aksiyon === 'yeni-sekme') {
+    return (
+      <a href={link} target="_blank" rel="noreferrer" className={sinif}>
+        {metin}
+      </a>
+    );
+  }
+
+  return (
+    <Link to={link} className={sinif}>
       {metin}
     </Link>
   );
 }
 
+function HeroTamEkranBaslik({ baslik, vurgu }: { baslik: string; vurgu?: string }) {
+  const satirlar = baslik.split('\n').map((s) => s.trim()).filter(Boolean);
+  return (
+    <h1 className="hero-tam-ekran-baslik">
+      {satirlar.map((satir) => (
+        <span key={satir} className="block">
+          {satir}
+        </span>
+      ))}
+      {vurgu?.trim() ? <span className="hero-tam-ekran-baslik-vurgu block">{vurgu}</span> : null}
+    </h1>
+  );
+}
+
+function HeroSaatWidget() {
+  const [simdi, setSimdi] = useState(() => new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setSimdi(new Date()), 30_000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const saat = new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit' }).format(simdi);
+  const tarih = new Intl.DateTimeFormat('tr-TR', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+    weekday: 'long',
+  }).format(simdi);
+
+  return (
+    <div className="hero-tam-ekran-saat" aria-live="polite">
+      <p className="hero-tam-ekran-saat-saat">{saat}</p>
+      <p className="hero-tam-ekran-saat-tarih">{tarih}</p>
+    </div>
+  );
+}
+
+function TamEkranSlideIcerik({ slide, onModalAc }: { slide: HeroSlide; onModalAc?: () => void }) {
+  const aksiyon = slide.butonAksiyon ?? 'ayni-sekme';
+  const ikinciAksiyon = slide.ikinciButonAksiyon ?? 'ayni-sekme';
+
+  const birincilButon =
+    slide.butonAktif && slide.butonMetni && slide.butonLink ? (
+      <HeroButon
+        metin={slide.butonMetni}
+        link={slide.butonLink}
+        arkaPlan={slide.butonRenk}
+        yaziRenk={slide.butonYaziRenk}
+        aksiyon={aksiyon}
+        onModalAc={onModalAc}
+        okGoster
+        sinif="hero-tam-ekran-birincil-btn"
+      />
+    ) : null;
+
+  const ikinciButon =
+    slide.ikinciButonAktif && slide.ikinciButonMetni && slide.ikinciButonLink ? (
+      <HeroMetinLink
+        metin={slide.ikinciButonMetni}
+        link={slide.ikinciButonLink}
+        aksiyon={ikinciAksiyon}
+        onModalAc={onModalAc}
+      />
+    ) : null;
+
+  return (
+    <div className="hero-tam-ekran-katman">
+      <div className="hero-tam-ekran-overlay" aria-hidden />
+      <div className="hero-tam-ekran-icerik">
+        <div className="container-site">
+          <div className="hero-tam-ekran-metin-blok">
+            {slide.altBaslik?.trim() ? (
+              <p className="hero-tam-ekran-ust-etiket">{slide.altBaslik}</p>
+            ) : null}
+            {(slide.baslik || slide.baslikVurgu) && (
+              <HeroTamEkranBaslik baslik={slide.baslik} vurgu={slide.baslikVurgu} />
+            )}
+            {slide.aciklama?.trim() ? <p className="hero-tam-ekran-aciklama">{slide.aciklama}</p> : null}
+            {(birincilButon || ikinciButon) && (
+              <div className="hero-tam-ekran-cta">
+                {birincilButon}
+                {ikinciButon}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SlideIcerik({ slide, onModalAc }: { slide: HeroSlide; onModalAc?: () => void }) {
   const stil: HeroStil = slide.stil ?? 'klasik';
+
+  if (stil === 'tam-ekran') {
+    return <TamEkranSlideIcerik slide={slide} onModalAc={onModalAc} />;
+  }
+
   const konum = slide.butonKonum ?? 'alt-sol';
   const aksiyon = slide.butonAksiyon ?? 'ayni-sekme';
   const metinBlok = (
@@ -120,6 +262,73 @@ function SlideIcerik({ slide, onModalAc }: { slide: HeroSlide; onModalAc?: () =>
   );
 }
 
+function SliderNavigasyon({
+  tamEkran,
+  slide,
+  sliderlar,
+  aktif,
+  onOnceki,
+  onSonraki,
+  onSec,
+}: {
+  tamEkran: boolean;
+  slide: HeroSlide;
+  sliderlar: HeroSlide[];
+  aktif: number;
+  onOnceki: () => void;
+  onSonraki: () => void;
+  onSec: (index: number) => void;
+}) {
+  if (sliderlar.length <= 1) return null;
+
+  const okSinif = tamEkran ? 'hero-tam-ekran-ok' : 'absolute top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2.5 text-lg shadow hover:bg-white';
+  const solSinif = tamEkran ? `${okSinif} hero-tam-ekran-ok-sol` : `${okSinif} left-3`;
+  const sagSinif = tamEkran ? `${okSinif} hero-tam-ekran-ok-sag` : `${okSinif} right-3`;
+
+  const noktalar = (
+    <div className={tamEkran ? 'hero-tam-ekran-noktalar' : 'absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2'}>
+      {sliderlar.map((_, i) => (
+        <button
+          key={i}
+          type="button"
+          onClick={() => onSec(i)}
+          className={tamEkran ? `hero-tam-ekran-nokta ${i === aktif ? 'hero-tam-ekran-nokta-aktif' : ''}` : `h-2 rounded-full transition ${i === aktif ? 'w-6 bg-white' : 'w-2 bg-white/50'}`}
+          aria-label={`Slide ${i + 1}`}
+        />
+      ))}
+    </div>
+  );
+
+  if (tamEkran) {
+    return (
+      <>
+        <button type="button" onClick={onOnceki} className={solSinif} aria-label="Önceki">
+          ‹
+        </button>
+        <button type="button" onClick={onSonraki} className={sagSinif} aria-label="Sonraki">
+          ›
+        </button>
+        <div className="hero-tam-ekran-alt-sol">
+          {slide.saatGoster !== false ? <HeroSaatWidget /> : null}
+          {noktalar}
+        </div>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <button type="button" onClick={onOnceki} className={solSinif} aria-label="Önceki">
+        ‹
+      </button>
+      <button type="button" onClick={onSonraki} className={sagSinif} aria-label="Sonraki">
+        ›
+      </button>
+      {noktalar}
+    </>
+  );
+}
+
 export function HeroSlider({ heroJson }: HeroSliderProps) {
   const hero = heroAyarlariBirlestir(heroJson);
   const sliderlar = hero.sliderlar.filter((s) => s.aktif && s.gorselUrl);
@@ -152,82 +361,63 @@ export function HeroSlider({ heroJson }: HeroSliderProps) {
   }
 
   const slide = sliderlar[aktif];
-  const modalSlide = slide.butonAksiyon === 'modal' ? slide : null;
+  const tamEkran = slide.stil === 'tam-ekran';
+  const modalSlide =
+    slide.butonAksiyon === 'modal'
+      ? slide
+      : slide.ikinciButonAksiyon === 'modal' && slide.ikinciButonAktif
+        ? slide
+        : null;
 
   return (
     <>
-    <section className="relative overflow-hidden bg-slate-900">
-      <div className="relative h-[300px] sm:h-[400px] lg:h-[440px]">
-        <img src={slide.gorselUrl} alt={slide.baslik || 'Slider'} className="h-full w-full object-cover" />
-        <SlideIcerik slide={slide} onModalAc={() => setModalAcik(true)} />
-      </div>
-
-      {sliderlar.length > 1 && (
-        <>
-          <button
-            type="button"
-            onClick={() => setAktif((i) => (i - 1 + sliderlar.length) % sliderlar.length)}
-            className="absolute left-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2.5 text-lg shadow hover:bg-white"
-            aria-label="Önceki"
-          >
-            ‹
-          </button>
-          <button
-            type="button"
-            onClick={() => setAktif((i) => (i + 1) % sliderlar.length)}
-            className="absolute right-3 top-1/2 z-10 -translate-y-1/2 rounded-full bg-white/90 p-2.5 text-lg shadow hover:bg-white"
-            aria-label="Sonraki"
-          >
-            ›
-          </button>
-          <div className="absolute bottom-4 left-1/2 z-10 flex -translate-x-1/2 gap-2">
-            {sliderlar.map((_, i) => (
-              <button
-                key={i}
-                type="button"
-                onClick={() => setAktif(i)}
-                className={`h-2 rounded-full transition ${i === aktif ? 'w-6 bg-white' : 'w-2 bg-white/50'}`}
-                aria-label={`Slide ${i + 1}`}
-              />
-            ))}
-          </div>
-        </>
-      )}
-    </section>
-
-    {modalAcik && modalSlide && (
-      <div
-        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
-        role="dialog"
-        aria-modal
-        onClick={() => setModalAcik(false)}
-      >
-        <div
-          className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl"
-          onClick={(e) => e.stopPropagation()}
-        >
-          {modalSlide.baslik && <h3 className="text-xl font-bold text-slate-900">{modalSlide.baslik}</h3>}
-          {modalSlide.aciklama && <p className="mt-2 text-sm text-slate-600">{modalSlide.aciklama}</p>}
-          {modalSlide.butonLink && (
-            <a
-              href={modalSlide.butonLink}
-              target={modalSlide.butonLink.startsWith('http') ? '_blank' : undefined}
-              rel="noreferrer"
-              className="mt-4 inline-flex rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white"
-            >
-              {modalSlide.butonMetni || 'Devam et'}
-            </a>
-          )}
-          <button
-            type="button"
-            onClick={() => setModalAcik(false)}
-            className="mt-4 block text-sm text-slate-500 hover:text-slate-800"
-          >
-            Kapat
-          </button>
+      <section className={`relative overflow-hidden bg-slate-900 ${tamEkran ? 'hero-tam-ekran-bolum' : ''}`}>
+        <div className={`relative ${tamEkran ? 'min-h-[100svh]' : 'h-[300px] sm:h-[400px] lg:h-[440px]'}`}>
+          <img src={slide.gorselUrl} alt={slide.baslik || 'Slider'} className="absolute inset-0 h-full w-full object-cover" />
+          <SlideIcerik slide={slide} onModalAc={() => setModalAcik(true)} />
         </div>
-      </div>
-    )}
+
+        <SliderNavigasyon
+          tamEkran={tamEkran}
+          slide={slide}
+          sliderlar={sliderlar}
+          aktif={aktif}
+          onOnceki={() => setAktif((i) => (i - 1 + sliderlar.length) % sliderlar.length)}
+          onSonraki={() => setAktif((i) => (i + 1) % sliderlar.length)}
+          onSec={setAktif}
+        />
+      </section>
+
+      {modalAcik && modalSlide && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
+          role="dialog"
+          aria-modal
+          onClick={() => setModalAcik(false)}
+        >
+          <div className="w-full max-w-lg rounded-xl bg-white p-6 shadow-xl" onClick={(e) => e.stopPropagation()}>
+            {modalSlide.baslik && <h3 className="text-xl font-bold text-slate-900">{modalSlide.baslik}</h3>}
+            {modalSlide.aciklama && <p className="mt-2 text-sm text-slate-600">{modalSlide.aciklama}</p>}
+            {modalSlide.butonLink && (
+              <a
+                href={modalSlide.butonLink}
+                target={modalSlide.butonLink.startsWith('http') ? '_blank' : undefined}
+                rel="noreferrer"
+                className="mt-4 inline-flex rounded-lg bg-violet-600 px-4 py-2 text-sm font-semibold text-white"
+              >
+                {modalSlide.butonMetni || 'Devam et'}
+              </a>
+            )}
+            <button
+              type="button"
+              onClick={() => setModalAcik(false)}
+              className="mt-4 block text-sm text-slate-500 hover:text-slate-800"
+            >
+              Kapat
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 }

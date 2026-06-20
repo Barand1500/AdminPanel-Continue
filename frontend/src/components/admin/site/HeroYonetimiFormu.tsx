@@ -16,6 +16,8 @@ import {
   HERO_BUTON_AKSIYONLARI,
   HERO_BUTON_KONUMLARI,
   HERO_STILLER,
+  HERO_TAM_EKRAN_BUTON_RENK,
+  HERO_TAM_EKRAN_BUTON_YAZI,
   HERO_VARSAYILAN_BUTON_RENK,
   HERO_VARSAYILAN_BUTON_YAZI,
   HERO_VARSAYILAN_GECIS_SN,
@@ -82,12 +84,14 @@ function HeroOnizleme({ hero, seciliSlide }: { hero: HeroAyarlari; seciliSlide: 
           ? 'grid-cols-3 justify-items-center'
           : 'grid-cols-2 sm:grid-cols-4 justify-items-center';
 
+  const tamEkranOnizleme = onizlenecek?.stil === 'tam-ekran';
+
   return (
     <div className="xl:sticky xl:top-4">
       <AdminPanelKarti baslik="Önizleme" altBaslik="Seçili slider ve kartlar">
         <div className="overflow-hidden rounded-xl border border-[var(--ap-border)] bg-[var(--ap-input-bg)]">
           {onizlenecek && gorselSrc ? (
-            <div className="relative aspect-[16/9] w-full bg-slate-900">
+            <div className={`relative w-full bg-slate-900 ${tamEkranOnizleme ? 'aspect-[9/16] sm:aspect-[16/10]' : 'aspect-[16/9]'}`}>
               <img
                 src={gorselSrc}
                 alt=""
@@ -96,24 +100,58 @@ function HeroOnizleme({ hero, seciliSlide }: { hero: HeroAyarlari; seciliSlide: 
                   (e.target as HTMLImageElement).style.display = 'none';
                 }}
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
-              <div className="absolute inset-0 flex flex-col justify-end p-3">
-                {onizlenecek.altBaslik && (
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-violet-200">{onizlenecek.altBaslik}</p>
-                )}
-                {onizlenecek.baslik && (
-                  <p className="line-clamp-2 text-sm font-bold text-white">{onizlenecek.baslik}</p>
-                )}
-                {onizlenecek.butonAktif && onizlenecek.butonMetni && (
-                  <span
-                    className="mt-2 inline-flex w-fit rounded px-2.5 py-1 text-[10px] font-semibold shadow"
-                    style={{
-                      backgroundColor: gecerliHex(onizlenecek.butonRenk, HERO_VARSAYILAN_BUTON_RENK),
-                      color: gecerliHex(onizlenecek.butonYaziRenk, HERO_VARSAYILAN_BUTON_YAZI),
-                    }}
-                  >
-                    {onizlenecek.butonMetni}
-                  </span>
+              <div className={`absolute inset-0 ${tamEkranOnizleme ? 'bg-black/50' : 'bg-gradient-to-t from-black/60 via-black/20 to-transparent'}`} />
+              <div
+                className={`absolute inset-0 flex p-3 ${
+                  tamEkranOnizleme ? 'items-center justify-start' : 'flex-col justify-end'
+                }`}
+              >
+                {tamEkranOnizleme ? (
+                  <div className="max-w-[85%]">
+                    {onizlenecek.altBaslik && (
+                      <p className="text-[9px] font-semibold uppercase tracking-wide text-white/70">{onizlenecek.altBaslik}</p>
+                    )}
+                    {onizlenecek.baslik && (
+                      <p className="mt-1 whitespace-pre-line text-sm font-bold leading-tight text-white">{onizlenecek.baslik}</p>
+                    )}
+                    {onizlenecek.baslikVurgu && (
+                      <p className="text-sm font-bold text-orange-400">{onizlenecek.baslikVurgu}</p>
+                    )}
+                    {onizlenecek.aciklama && (
+                      <p className="mt-1 line-clamp-2 text-[10px] text-white/80">{onizlenecek.aciklama}</p>
+                    )}
+                    {onizlenecek.butonAktif && onizlenecek.butonMetni && (
+                      <span
+                        className="mt-2 inline-flex w-fit rounded-full px-2.5 py-1 text-[10px] font-semibold shadow"
+                        style={{
+                          backgroundColor: gecerliHex(onizlenecek.butonRenk, HERO_TAM_EKRAN_BUTON_RENK),
+                          color: gecerliHex(onizlenecek.butonYaziRenk, HERO_TAM_EKRAN_BUTON_YAZI),
+                        }}
+                      >
+                        {onizlenecek.butonMetni} →
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <>
+                    {onizlenecek.altBaslik && (
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-violet-200">{onizlenecek.altBaslik}</p>
+                    )}
+                    {onizlenecek.baslik && (
+                      <p className="line-clamp-2 text-sm font-bold text-white">{onizlenecek.baslik}</p>
+                    )}
+                    {onizlenecek.butonAktif && onizlenecek.butonMetni && (
+                      <span
+                        className="mt-2 inline-flex w-fit rounded px-2.5 py-1 text-[10px] font-semibold shadow"
+                        style={{
+                          backgroundColor: gecerliHex(onizlenecek.butonRenk, HERO_VARSAYILAN_BUTON_RENK),
+                          color: gecerliHex(onizlenecek.butonYaziRenk, HERO_VARSAYILAN_BUTON_YAZI),
+                        }}
+                      >
+                        {onizlenecek.butonMetni}
+                      </span>
+                    )}
+                  </>
                 )}
               </div>
               {!onizlenecek.aktif && (
@@ -188,6 +226,8 @@ function SlideDuzenlemeForm({
   slideGuncelle: (id: string, parca: Partial<HeroSlide>) => void;
   slideSil: (id: string) => void;
 }) {
+  const tamEkran = slide.stil === 'tam-ekran';
+
   return (
     <div className="space-y-4">
       <GorselAlan
@@ -198,23 +238,53 @@ function SlideDuzenlemeForm({
       />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <FormAlani etiket="Başlık">
-          <input
-            className={formInputSinifi}
-            value={slide.baslik}
-            onChange={(e) => slideGuncelle(slide.id, { baslik: e.target.value })}
-            placeholder="Ana başlık"
-          />
+        <FormAlani etiket={tamEkran ? 'Başlık satırları' : 'Başlık'} aciklama={tamEkran ? 'Her satır için Enter kullanın' : undefined}>
+          {tamEkran ? (
+            <textarea
+              className={formInputSinifi}
+              rows={3}
+              value={slide.baslik}
+              onChange={(e) => slideGuncelle(slide.id, { baslik: e.target.value })}
+              placeholder={'Tüm Süreçleri\nTek Ekrandan'}
+            />
+          ) : (
+            <input
+              className={formInputSinifi}
+              value={slide.baslik}
+              onChange={(e) => slideGuncelle(slide.id, { baslik: e.target.value })}
+              placeholder="Ana başlık"
+            />
+          )}
         </FormAlani>
-        <FormAlani etiket="Alt Başlık">
+        <FormAlani etiket={tamEkran ? 'Turuncu vurgu' : 'Alt Başlık'} aciklama={tamEkran ? 'Son satır turuncu renkte gösterilir' : undefined}>
+          {tamEkran ? (
+            <input
+              className={formInputSinifi}
+              value={slide.baslikVurgu ?? ''}
+              onChange={(e) => slideGuncelle(slide.id, { baslikVurgu: e.target.value })}
+              placeholder="Yönetin."
+            />
+          ) : (
+            <input
+              className={formInputSinifi}
+              value={slide.altBaslik}
+              onChange={(e) => slideGuncelle(slide.id, { altBaslik: e.target.value })}
+              placeholder="Üst etiket"
+            />
+          )}
+        </FormAlani>
+      </div>
+
+      {tamEkran && (
+        <FormAlani etiket="Üst etiket (opsiyonel)">
           <input
             className={formInputSinifi}
             value={slide.altBaslik}
             onChange={(e) => slideGuncelle(slide.id, { altBaslik: e.target.value })}
-            placeholder="Üst etiket"
+            placeholder="Kısa üst metin"
           />
         </FormAlani>
-      </div>
+      )}
 
       <FormAlani etiket="Açıklama">
         <textarea
@@ -226,12 +296,20 @@ function SlideDuzenlemeForm({
       </FormAlani>
 
       <FormAlani etiket="Slider Stili">
-        <div className="grid gap-2 sm:grid-cols-3">
+        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
           {HERO_STILLER.map((st) => (
             <button
               key={st.id}
               type="button"
-              onClick={() => slideGuncelle(slide.id, { stil: st.id })}
+              onClick={() => {
+                const parca: Partial<HeroSlide> = { stil: st.id };
+                if (st.id === 'tam-ekran' && slide.stil !== 'tam-ekran') {
+                  parca.butonRenk = HERO_TAM_EKRAN_BUTON_RENK;
+                  parca.butonYaziRenk = HERO_TAM_EKRAN_BUTON_YAZI;
+                  parca.saatGoster = true;
+                }
+                slideGuncelle(slide.id, parca);
+              }}
               className={`rounded-lg border p-3 text-left text-sm transition ${
                 slide.stil === st.id
                   ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)]/10'
@@ -245,13 +323,24 @@ function SlideDuzenlemeForm({
         </div>
       </FormAlani>
 
+      {tamEkran && (
+        <label className="flex items-center gap-2 text-sm">
+          <input
+            type="checkbox"
+            checked={slide.saatGoster !== false}
+            onChange={(e) => slideGuncelle(slide.id, { saatGoster: e.target.checked })}
+          />
+          Sol altta saat ve tarih göster
+        </label>
+      )}
+
       <label className="flex items-center gap-2 text-sm">
         <input
           type="checkbox"
           checked={slide.butonAktif}
           onChange={(e) => slideGuncelle(slide.id, { butonAktif: e.target.checked })}
         />
-        Buton göster
+        {tamEkran ? 'Birincil buton göster' : 'Buton göster'}
       </label>
 
       {slide.butonAktif && (
@@ -262,7 +351,7 @@ function SlideDuzenlemeForm({
                 className={formInputSinifi}
                 value={slide.butonMetni}
                 onChange={(e) => slideGuncelle(slide.id, { butonMetni: e.target.value })}
-                placeholder="Hemen İncele"
+                placeholder={tamEkran ? 'Özellikleri Keşfet' : 'Hemen İncele'}
               />
             </FormAlani>
             <FormAlani etiket="Buton Linki">
@@ -274,27 +363,39 @@ function SlideDuzenlemeForm({
               />
             </FormAlani>
           </div>
-          <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
-            <FormAlani etiket="Buton Konumu" aciklama="9 noktadan birini seçin">
-              <div className="inline-grid grid-cols-3 gap-1.5 rounded-lg border border-[var(--ap-border)] p-2">
-                {HERO_BUTON_KONUMLARI.map((k) => (
-                  <button
-                    key={k.id}
-                    type="button"
-                    title={k.id}
-                    onClick={() => slideGuncelle(slide.id, { butonKonum: k.id })}
-                    className={`flex h-9 w-9 items-center justify-center rounded text-sm ${
-                      slide.butonKonum === k.id
-                        ? 'bg-[var(--ap-accent)] text-white'
-                        : 'bg-[var(--ap-surface)] hover:bg-[var(--ap-hover)]'
-                    }`}
-                  >
-                    {k.etiket}
-                  </button>
-                ))}
-              </div>
-            </FormAlani>
+          {!tamEkran && (
+            <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
+              <FormAlani etiket="Buton Konumu" aciklama="9 noktadan birini seçin">
+                <div className="inline-grid grid-cols-3 gap-1.5 rounded-lg border border-[var(--ap-border)] p-2">
+                  {HERO_BUTON_KONUMLARI.map((k) => (
+                    <button
+                      key={k.id}
+                      type="button"
+                      title={k.id}
+                      onClick={() => slideGuncelle(slide.id, { butonKonum: k.id })}
+                      className={`flex h-9 w-9 items-center justify-center rounded text-sm ${
+                        slide.butonKonum === k.id
+                          ? 'bg-[var(--ap-accent)] text-white'
+                          : 'bg-[var(--ap-surface)] hover:bg-[var(--ap-hover)]'
+                      }`}
+                    >
+                      {k.etiket}
+                    </button>
+                  ))}
+                </div>
+              </FormAlani>
 
+              <FormAlani etiket="Butona tıklayınca" aciklama="Ziyaretçi butona tıkladığında ne olsun?">
+                <SecimKartlari
+                  secenekler={HERO_BUTON_AKSIYONLARI}
+                  secili={slide.butonAksiyon ?? 'ayni-sekme'}
+                  onSec={(id) => slideGuncelle(slide.id, { butonAksiyon: id as HeroButonAksiyon })}
+                />
+              </FormAlani>
+            </div>
+          )}
+
+          {tamEkran && (
             <FormAlani etiket="Butona tıklayınca" aciklama="Ziyaretçi butona tıkladığında ne olsun?">
               <SecimKartlari
                 secenekler={HERO_BUTON_AKSIYONLARI}
@@ -302,7 +403,7 @@ function SlideDuzenlemeForm({
                 onSec={(id) => slideGuncelle(slide.id, { butonAksiyon: id as HeroButonAksiyon })}
               />
             </FormAlani>
-          </div>
+          )}
 
           <div className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface)] p-3">
             <p className="mb-3 text-xs font-semibold text-[var(--ap-text)]">Buton Renkleri</p>
@@ -310,18 +411,61 @@ function SlideDuzenlemeForm({
               <KompaktRenkSatir
                 etiket="Arka plan"
                 deger={slide.butonRenk}
-                varsayilan={HERO_VARSAYILAN_BUTON_RENK}
+                varsayilan={tamEkran ? HERO_TAM_EKRAN_BUTON_RENK : HERO_VARSAYILAN_BUTON_RENK}
                 onChange={(v) => slideGuncelle(slide.id, { butonRenk: v })}
               />
               <KompaktRenkSatir
                 etiket="Yazı"
                 deger={slide.butonYaziRenk}
-                varsayilan={HERO_VARSAYILAN_BUTON_YAZI}
+                varsayilan={tamEkran ? HERO_TAM_EKRAN_BUTON_YAZI : HERO_VARSAYILAN_BUTON_YAZI}
                 onChange={(v) => slideGuncelle(slide.id, { butonYaziRenk: v })}
               />
             </div>
           </div>
         </div>
+      )}
+
+      {tamEkran && (
+        <>
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={slide.ikinciButonAktif ?? false}
+              onChange={(e) => slideGuncelle(slide.id, { ikinciButonAktif: e.target.checked })}
+            />
+            İkincil metin linki göster
+          </label>
+
+          {slide.ikinciButonAktif && (
+            <div className="space-y-4 rounded-lg border border-dashed border-[var(--ap-border)] p-4">
+              <div className="grid gap-4 sm:grid-cols-2">
+                <FormAlani etiket="Link metni">
+                  <input
+                    className={formInputSinifi}
+                    value={slide.ikinciButonMetni ?? ''}
+                    onChange={(e) => slideGuncelle(slide.id, { ikinciButonMetni: e.target.value })}
+                    placeholder="İletişime Geç"
+                  />
+                </FormAlani>
+                <FormAlani etiket="Link adresi">
+                  <input
+                    className={formInputSinifi}
+                    value={slide.ikinciButonLink ?? ''}
+                    onChange={(e) => slideGuncelle(slide.id, { ikinciButonLink: e.target.value })}
+                    placeholder="/iletisim"
+                  />
+                </FormAlani>
+              </div>
+              <FormAlani etiket="Linke tıklayınca">
+                <SecimKartlari
+                  secenekler={HERO_BUTON_AKSIYONLARI}
+                  secili={slide.ikinciButonAksiyon ?? 'ayni-sekme'}
+                  onSec={(id) => slideGuncelle(slide.id, { ikinciButonAksiyon: id as HeroButonAksiyon })}
+                />
+              </FormAlani>
+            </div>
+          )}
+        </>
       )}
 
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--ap-border)] pt-4">
