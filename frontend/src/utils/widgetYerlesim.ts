@@ -1,6 +1,7 @@
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetYerlesim, WidgetYerlesimBolge } from '@/types/widget';
 import { idString } from '@/utils/idKarsilastir';
+import { sayfaGomuluWidgetIdleri } from '@/utils/sayfaWidgetKodu';
 
 export const ANA_SAYFA_YERLESIM_BOLGELERI: {
   id: WidgetYerlesimBolge;
@@ -65,6 +66,13 @@ export function anaSayfaWidgetlari(widgetlar: Widget[]): Widget[] {
 
 export function sayfaWidgetlari(widgetlar: Widget[], sayfaId: string): Widget[] {
   return widgetlar.filter((w) => w.sayfaId && idString(w.sayfaId) === idString(sayfaId));
+}
+
+/** HTML içine gömülen widget'lar üst/alt bölgede tekrar gösterilmez */
+export function sayfaBolgeWidgetlariHaric(widgetlar: Widget[], html: string): Widget[] {
+  const gomulu = sayfaGomuluWidgetIdleri(html);
+  if (gomulu.size === 0) return widgetlar;
+  return widgetlar.filter((w) => !gomulu.has(idString(w.id)));
 }
 
 /** Bölge + göreli konum + sıra ile render sırası */

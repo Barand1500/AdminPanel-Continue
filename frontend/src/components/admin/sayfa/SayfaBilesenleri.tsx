@@ -19,6 +19,7 @@ const ALT_MENU_TETIK: { id: AltMenuTetikleyici; ad: string }[] = [
 ];
 
 import type { AdminSayfa, SayfaFormDegeri } from '@/features/admin/sayfaApi';
+import type { AdminWidget } from '@/types/admin';
 import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
 import { IcerikHtmlEditoru } from '@/components/form/IcerikHtmlEditoru';
 import { SayfaIkonSecici } from '@/components/admin/sayfa/SayfaIkonSecici';
@@ -330,6 +331,7 @@ interface SayfaEditorPanelProps {
   seciliId: string | null;
   slugManuel: boolean;
   sayfalar: AdminSayfa[];
+  sayfaWidgetlari?: AdminWidget[];
   onChange: (form: SayfaFormDegeri) => void;
   onSlugManuelChange: (v: boolean) => void;
   onAltSayfaEkle?: (ustSayfa: AdminSayfa) => void;
@@ -343,6 +345,7 @@ export function SayfaEditorPanel({
   seciliId,
   slugManuel,
   sayfalar,
+  sayfaWidgetlari = [],
   onChange,
   onSlugManuelChange,
   onAltSayfaEkle,
@@ -520,6 +523,7 @@ export function SayfaEditorPanel({
                   });
                 }}
                 placeholder="Sayfa içeriğinizi yazın..."
+                sayfaWidgetlari={seciliId ? sayfaWidgetlari : []}
               />
               {!sayfaIcerikVar(form.icerik) && altSayi > 0 && (
                 <p className="ap-muted mt-2 text-xs">

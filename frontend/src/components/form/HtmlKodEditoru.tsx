@@ -1,4 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import type { AdminWidget } from '@/types/admin';
+import { SayfaWidgetKodAraclari } from '@/components/admin/sayfa/SayfaWidgetKodAraclari';
 import { tamHtmlBelgesiOlustur } from '@/utils/sayfaIcerikIsle';
 
 const HTML_ETIKETLER = [
@@ -61,9 +63,10 @@ interface HtmlKodEditoruProps {
   deger: string;
   onChange: (html: string) => void;
   placeholder?: string;
+  sayfaWidgetlari?: AdminWidget[];
 }
 
-export function HtmlKodEditoru({ deger, onChange, placeholder }: HtmlKodEditoruProps) {
+export function HtmlKodEditoru({ deger, onChange, placeholder, sayfaWidgetlari = [] }: HtmlKodEditoruProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [oneriler, setOneriler] = useState<string[]>([]);
   const [oneriIndeks, setOneriIndeks] = useState(0);
@@ -137,8 +140,28 @@ export function HtmlKodEditoru({ deger, onChange, placeholder }: HtmlKodEditoruP
     oneriGuncelle(el.value, el.selectionStart);
   }, [deger, oneriGuncelle]);
 
+  const imlecKonumla = useCallback((baslangic: number, bitis?: number) => {
+    const el = textareaRef.current;
+    if (!el) return;
+    requestAnimationFrame(() => {
+      el.focus();
+      el.setSelectionRange(baslangic, bitis ?? baslangic);
+      const satir = deger.slice(0, baslangic).split('\n').length;
+      el.scrollTop = Math.max(0, (satir - 4) * 22);
+    });
+  }, [deger]);
+
   return (
-    <div className="ap-icerik-html-grid">
+    <div className="ap-icerik-html-alan">
+      {sayfaWidgetlari.length > 0 ? (
+        <SayfaWidgetKodAraclari
+          widgetlar={sayfaWidgetlari}
+          icerik={deger}
+          onIcerikDegistir={onChange}
+          onImlecKonumla={imlecKonumla}
+        />
+      ) : null}
+      <div className="ap-icerik-html-grid">
       <div className="ap-icerik-html-editor-wrap">
         <p className="ap-muted mb-2 text-xs">
           HTML yazın; <code>&lt;</code> sonrası etiket önerileri çıkar (Tab/Enter ile tamamlayın).
@@ -196,6 +219,7 @@ export function HtmlKodEditoru({ deger, onChange, placeholder }: HtmlKodEditoruP
             <p className="ap-muted p-4 text-sm">HTML önizlemesi burada görünür.</p>
           )}
         </div>
+      </div>
       </div>
     </div>
   );

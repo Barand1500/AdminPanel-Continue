@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useNavigation, useLoaderData, useOutletContext, Link } from 'react-router-dom';
 import type { PublicSayfa } from '@/features/site/sayfaApi';
-import { SayfaShadowIcerik } from '@/components/ortak/SayfaShadowIcerik';
+import { SayfaIcerikParcalari } from '@/components/ortak/SayfaIcerikParcalari';
 import { SayfaBaslikGosterimi } from '@/components/ortak/SayfaBaslikGosterimi';
 import { SayfaBulunamadi } from '@/pages/SayfaBulunamadi';
 import type { SitePublicData } from '@/types/site';
@@ -14,7 +14,7 @@ import {
   sayfaTamGenisDuzenMi,
 } from '@/utils/sayfaIcerikIsle';
 import { WidgetBolge } from '@/components/widget/WidgetBolge';
-import { sayfaWidgetlari } from '@/utils/widgetYerlesim';
+import { sayfaBolgeWidgetlariHaric, sayfaWidgetlari } from '@/utils/widgetYerlesim';
 
 export interface DinamikSayfaLoaderVerisi {
   bulunamadi: boolean;
@@ -68,9 +68,13 @@ export function DinamikSayfaSayfasi() {
   const { sayfalar, widgetlar } = useOutletContext<SitePublicData>();
   const navigation = useNavigation();
   const yukleniyor = navigation.state === 'loading';
-  const sayfaWidgetlar = useMemo(
+  const tumSayfaWidgetlar = useMemo(
     () => (sayfa ? sayfaWidgetlari(widgetlar, sayfa.id) : []),
     [widgetlar, sayfa]
+  );
+  const bolgeWidgetlar = useMemo(
+    () => (sayfa ? sayfaBolgeWidgetlariHaric(tumSayfaWidgetlar, sayfa.icerik) : []),
+    [tumSayfaWidgetlar, sayfa]
   );
 
   if (yukleniyor) {
@@ -105,7 +109,7 @@ export function DinamikSayfaSayfasi() {
   if (tamGenis) {
     return (
       <>
-        <WidgetBolge widgetlar={sayfaWidgetlar} bolge="sayfa_ustu" />
+        <WidgetBolge widgetlar={bolgeWidgetlar} bolge="sayfa_ustu" />
         {baslikGoster && (
           <section className="py-8 sm:py-10">
             <div className="container-site">
@@ -115,7 +119,11 @@ export function DinamikSayfaSayfasi() {
         )}
         {icerikVar && (
           <section className="sayfa-icerik-tam-bolum">
-            <SayfaShadowIcerik html={icerikHtml} className="sayfa-icerik-tam-host" />
+            <SayfaIcerikParcalari
+              html={sayfa.icerik}
+              widgetlar={tumSayfaWidgetlar}
+              shadowSinif="sayfa-icerik-tam-host"
+            />
           </section>
         )}
         {altSayfalar.length > 0 && (
@@ -125,14 +133,14 @@ export function DinamikSayfaSayfasi() {
             </div>
           </section>
         )}
-        <WidgetBolge widgetlar={sayfaWidgetlar} bolge="sayfa_alti" />
+        <WidgetBolge widgetlar={bolgeWidgetlar} bolge="sayfa_alti" />
       </>
     );
   }
 
   return (
     <>
-      <WidgetBolge widgetlar={sayfaWidgetlar} bolge="sayfa_ustu" />
+      <WidgetBolge widgetlar={bolgeWidgetlar} bolge="sayfa_ustu" />
       <section className="py-12 sm:py-16">
         <div className="container-site">
           {baslikGoster && (
@@ -141,7 +149,7 @@ export function DinamikSayfaSayfasi() {
 
           {icerikVar && (
             <div className={icerikKapsayiciSinif}>
-              <SayfaShadowIcerik html={icerikHtml} />
+              <SayfaIcerikParcalari html={sayfa.icerik} widgetlar={tumSayfaWidgetlar} />
             </div>
           )}
 
@@ -150,7 +158,7 @@ export function DinamikSayfaSayfasi() {
           )}
         </div>
       </section>
-      <WidgetBolge widgetlar={sayfaWidgetlar} bolge="sayfa_alti" />
+      <WidgetBolge widgetlar={bolgeWidgetlar} bolge="sayfa_alti" />
     </>
   );
 }

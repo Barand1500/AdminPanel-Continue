@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import type { AdminWidget } from '@/types/admin';
 import { ZenginMetinEditoru } from '@/components/form/ZenginMetinEditoru';
 import { HtmlKodEditoru } from '@/components/form/HtmlKodEditoru';
 
@@ -8,9 +9,10 @@ interface IcerikHtmlEditoruProps {
   deger: string;
   onChange: (html: string) => void;
   placeholder?: string;
+  sayfaWidgetlari?: AdminWidget[];
 }
 
-export function IcerikHtmlEditoru({ deger, onChange, placeholder }: IcerikHtmlEditoruProps) {
+export function IcerikHtmlEditoru({ deger, onChange, placeholder, sayfaWidgetlari }: IcerikHtmlEditoruProps) {
   const [mod, setMod] = useState<EditorModu>('gorsel');
 
   return (
@@ -35,7 +37,12 @@ export function IcerikHtmlEditoru({ deger, onChange, placeholder }: IcerikHtmlEd
       {mod === 'gorsel' ? (
         <ZenginMetinEditoru deger={deger} onChange={onChange} placeholder={placeholder} />
       ) : (
-        <HtmlKodEditoru deger={deger} onChange={onChange} placeholder={placeholder} />
+        <HtmlKodEditoru
+          deger={deger}
+          onChange={onChange}
+          placeholder={placeholder}
+          sayfaWidgetlari={sayfaWidgetlari}
+        />
       )}
     </div>
   );

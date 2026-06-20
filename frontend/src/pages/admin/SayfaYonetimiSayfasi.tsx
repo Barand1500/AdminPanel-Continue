@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   varsayilanSayfaForm,
   SayfaEditorPanel,
@@ -20,10 +20,14 @@ import {
   type AdminSayfa,
   type SayfaFormDegeri,
 } from '@/features/admin/sayfaApi';
+import { widgetlariGetir } from '@/features/admin/widgetApi';
+import type { AdminWidget } from '@/types/admin';
+import { idString } from '@/utils/idKarsilastir';
 import { sayfaSiraCakismasiBul, sonrakiSayfaSira } from '@/utils/sayfaSiraYardimci';
 
 export function SayfaYonetimiSayfasi() {
   const [sayfalar, setSayfalar] = useState<AdminSayfa[]>([]);
+  const [widgetlar, setWidgetlar] = useState<AdminWidget[]>([]);
   const [form, setForm] = useState<SayfaFormDegeri>(() => varsayilanSayfaForm([]));
   const [seciliId, setSeciliId] = useState<string | null>(null);
   const [slugManuel, setSlugManuel] = useState(false);
@@ -35,7 +39,12 @@ export function SayfaYonetimiSayfasi() {
   async function yukle() {
     setYukleniyor(true);
     try {
-      setSayfalar(await adminSayfalariGetir());
+      const [sayfaListesi, widgetListesi] = await Promise.all([
+        adminSayfalariGetir(),
+        widgetlariGetir(),
+      ]);
+      setSayfalar(sayfaListesi);
+      setWidgetlar(widgetListesi);
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Sayfalar alinamadi');
     } finally {
@@ -170,6 +179,11 @@ export function SayfaYonetimiSayfasi() {
     [seciliId, sayfalar]
   );
 
+  const seciliSayfaWidgetlari = useMemo(() => {
+    if (!seciliId) return [];
+    return widgetlar.filter((w) => w.sayfaId && idString(w.sayfaId) === seciliId);
+  }, [widgetlar, seciliId]);
+
   useModulAksiyonlari(
     {
       kaydet,
@@ -244,6 +258,7 @@ export function SayfaYonetimiSayfasi() {
               seciliId={seciliId}
               slugManuel={slugManuel}
               sayfalar={sayfalar}
+              sayfaWidgetlari={seciliSayfaWidgetlari}
               onChange={setForm}
               onSlugManuelChange={setSlugManuel}
               onAltSayfaEkle={altSayfaBaslat}

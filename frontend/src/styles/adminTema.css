@@ -5878,6 +5878,87 @@ html:has(.admin-panel[data-tema='acik']) body {
   color: #334155;
 }
 
+.ap-icerik-html-alan {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.ap-sayfa-widget-kod-panel {
+  border: 1px solid var(--ap-border);
+  border-radius: 0.75rem;
+  background: var(--ap-surface-2);
+  padding: 0.75rem;
+}
+
+.ap-sayfa-widget-kod-liste {
+  display: grid;
+  gap: 0.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+
+.ap-sayfa-widget-kod-kart {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border: 1px solid var(--ap-border);
+  border-radius: 0.5rem;
+  background: var(--ap-surface);
+  padding: 0.625rem;
+}
+
+.ap-sayfa-widget-kod-baslik {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+}
+
+.ap-sayfa-widget-kod-etiket {
+  margin-left: auto;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: var(--ap-surface-2);
+  padding: 0.125rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 600;
+  color: var(--ap-text-muted);
+}
+
+.ap-sayfa-widget-kod-etiket-yesil {
+  background: color-mix(in srgb, #22c55e 15%, transparent);
+  color: #15803d;
+}
+
+.ap-sayfa-widget-kod-tuslar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.ap-sayfa-widget-kod-tus {
+  flex: 1;
+  min-width: 7rem;
+  border: 1px solid var(--ap-border);
+  border-radius: 0.375rem;
+  background: var(--ap-surface);
+  padding: 0.35rem 0.5rem;
+  font-size: 0.6875rem;
+  font-weight: 600;
+  color: var(--ap-text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.ap-sayfa-widget-kod-tus:hover {
+  border-color: var(--ap-accent);
+  background: color-mix(in srgb, var(--ap-accent) 8%, transparent);
+}
+
+.ap-sayfa-widget-kod-tus-vurgu {
+  border-color: var(--ap-accent);
+  color: var(--ap-accent);
+}
+
 .ap-ayri-pencere {
   position: fixed;
   z-index: 45;

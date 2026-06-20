@@ -1910,6 +1910,11 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   max-width: none;
 }
 
+.sayfa-widget-yuvasi {
+  display: block;
+  width: 100%;
+}
+
 /* Görsel Grid Bloğu � sol panel filtre dropdown */
 .gorsel-grid-filtre-tus {
   display: flex;
