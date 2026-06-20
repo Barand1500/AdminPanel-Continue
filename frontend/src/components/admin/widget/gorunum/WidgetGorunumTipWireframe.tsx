@@ -71,6 +71,46 @@ export function WidgetGorunumTipWireframe({
         <div className="h-1 w-6 rounded bg-white/80" />
       </div>
     ),
+    'SLIDER:sinematik': (
+      <div className="rounded p-1" style={{ background: '#0f172a' }}>
+        <div className="h-4 rounded-sm" style={{ background: 'linear-gradient(to top, #1e293b, transparent)' }} />
+        <div className="mx-1 mt-0.5 h-1 w-4 rounded bg-white/60" />
+      </div>
+    ),
+    'SLIDER:kart-golge': (
+      <div className="p-2" style={{ background: renk.bg }}>
+        <div className="mx-auto h-5 w-3/4 rounded-md shadow-md ring-1 ring-slate-200" style={{ background: renk.accent }} />
+      </div>
+    ),
+    'SLIDER:bolunmus-metin': (
+      <div className="flex gap-0.5 p-1">
+        <div className="h-5 flex-1 rounded-l p-1" style={{ background: renk.surface }}>
+          <div className="h-0.5 w-3 rounded" style={{ background: renk.accent }} />
+        </div>
+        <div className="h-5 flex-1 rounded-r" style={{ background: renk.accent }} />
+      </div>
+    ),
+    'SLIDER:minimal-cizgi': (
+      <div className="p-1">
+        <div className="h-3 rounded-t" style={{ background: renk.surface }} />
+        <div className="flex gap-1 border-t border-slate-200 pt-0.5">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-0.5 w-2 rounded" style={{ background: i === 1 ? renk.accent : '#e2e8f0' }} />
+          ))}
+        </div>
+      </div>
+    ),
+    'SLIDER:gradient-hero': (
+      <div className="rounded p-2 text-center" style={{ background: `linear-gradient(135deg, ${renk.accent}, #ec4899)` }}>
+        <div className="mx-auto h-1 w-4 rounded bg-white/70" />
+        <div className="mx-auto mt-1 h-0.5 w-6 rounded bg-white/40" />
+      </div>
+    ),
+    'SLIDER:kenar-cerceve': (
+      <div className="rounded border-2 p-0.5" style={{ borderColor: renk.accent, background: renk.bg }}>
+        <div className="h-4 rounded-sm" style={{ background: renk.surface }} />
+      </div>
+    ),
   };
 
   const icerik =

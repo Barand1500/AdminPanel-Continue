@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { WidgetBlok } from '@/types/blokOlusturucu';
 import {
@@ -11,6 +11,7 @@ import {
   parcaGorunumuBirlesikMi,
 } from '@/types/blokOlusturucu';
 import type { WidgetConfig } from '@/types/widget';
+import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
 import type { Widget } from '@/types/site';
@@ -273,14 +274,122 @@ function BlokRender({ blok, cfg }: { blok: WidgetBlok; cfg: WidgetConfig }) {
   return <BlokKabuk blok={blok}>{icerik}</BlokKabuk>;
 }
 
+function hucreStiliAl(
+  gt: string,
+  birlesik: boolean,
+  g: WidgetConfig['gorunum'],
+  radius: number,
+  dikeyAyirici: boolean
+): CSSProperties {
+  const temel: CSSProperties = {
+    padding: '1rem',
+    borderRight: dikeyAyirici ? '1px solid rgba(148,163,184,0.35)' : undefined,
+  };
+
+  if (birlesik) return temel;
+
+  switch (gt) {
+    case 'cam-parca':
+      return {
+        ...temel,
+        borderRadius: radius,
+        backgroundColor: 'rgba(255,255,255,0.55)',
+        backdropFilter: 'blur(12px)',
+        border: '1px solid rgba(255,255,255,0.5)',
+        boxShadow: '0 8px 32px rgba(15,23,42,0.06)',
+      };
+    case 'sade-duzen':
+      return {
+        ...temel,
+        borderRadius: 8,
+        backgroundColor: '#fff',
+        border: '1px solid #e2e8f0',
+      };
+    case 'koyu-modul':
+      return {
+        ...temel,
+        borderRadius: radius,
+        backgroundColor: '#1e293b',
+        color: '#f1f5f9',
+        boxShadow: '0 4px 16px rgba(0,0,0,0.2)',
+      };
+    case 'mor-kart':
+      return {
+        ...temel,
+        borderRadius: radius,
+        backgroundColor: '#f5f3ff',
+        border: '1px solid #c4b5fd',
+        boxShadow: '0 2px 12px rgba(147,51,234,0.1)',
+      };
+    case 'turuncu-vurgu':
+      return {
+        ...temel,
+        borderRadius: radius,
+        backgroundColor: g?.kartFooterArkaPlan ?? '#fff7ed',
+        borderLeft: '4px solid #f97316',
+        boxShadow: g?.kartGolge !== false ? '0 1px 3px rgba(15,23,42,0.08)' : undefined,
+      };
+    default:
+      return {
+        ...temel,
+        borderRadius: radius,
+        backgroundColor: g?.kartFooterArkaPlan ?? '#f8fafc',
+        boxShadow: g?.kartGolge !== false ? '0 1px 3px rgba(15,23,42,0.08)' : undefined,
+      };
+  }
+}
+
+function kapsulStiliAl(gt: string, g: WidgetConfig['gorunum'], radius: number, birlesik: boolean) {
+  if (!birlesik) return undefined;
+  switch (gt) {
+    case 'cam-parca':
+      return {
+        borderRadius: radius,
+        background: 'linear-gradient(135deg, #eff6ff, #dbeafe)',
+        border: '1px solid rgba(147,197,253,0.5)',
+        overflow: 'hidden' as const,
+      };
+    case 'koyu-modul':
+      return {
+        borderRadius: radius,
+        backgroundColor: '#0f172a',
+        overflow: 'hidden' as const,
+      };
+    case 'mor-kart':
+      return {
+        borderRadius: radius,
+        backgroundColor: '#ede9fe',
+        border: '2px solid #a78bfa',
+        overflow: 'hidden' as const,
+      };
+    default:
+      return {
+        borderRadius: radius,
+        backgroundColor: g?.kartFooterArkaPlan ?? '#f8fafc',
+        boxShadow: g?.kartGolge !== false ? '0 1px 3px rgba(15,23,42,0.08)' : undefined,
+        overflow: 'hidden' as const,
+      };
+  }
+}
+
 export function BlokOlusturucuWidget({ widget }: { widget: Widget }) {
   const cfg = configOkuFromWidget(widget);
   const olusturucu = olusturucuOku(cfg);
   if (!olusturucu.parcaSayisi || olusturucu.hucreler.length === 0) return null;
 
   const g = cfg.gorunum ?? {};
+  const gt = widgetGorunumTipiAl(widget);
   const birlesik = parcaGorunumuBirlesikMi(olusturucu);
-  const gap = birlesik ? '0' : g.kartAraligi === 'dar' ? '1rem' : g.kartAraligi === 'genis' ? '2rem' : '1.5rem';
+  const gap =
+    gt === 'sade-duzen'
+      ? '0.75rem'
+      : birlesik
+        ? '0'
+        : g.kartAraligi === 'dar'
+          ? '1rem'
+          : g.kartAraligi === 'genis'
+            ? '2rem'
+            : '1.5rem';
   const radius = g.borderRadius ?? 12;
   const hizalama = g.hizalama ?? 'sol';
   const alignClass = hizalama === 'orta' ? 'text-center' : hizalama === 'sag' ? 'text-right' : 'text-left';
@@ -290,31 +399,13 @@ export function BlokOlusturucuWidget({ widget }: { widget: Widget }) {
       ? { display: 'grid' as const, gridTemplateColumns: '1fr', gap }
       : { display: 'grid' as const, gridTemplateColumns: `repeat(${olusturucu.parcaSayisi}, minmax(0, 1fr))`, gap };
 
-  const birlesikKapsulStili = birlesik
-    ? {
-        borderRadius: radius,
-        backgroundColor: g.kartFooterArkaPlan ?? '#f8fafc',
-        boxShadow: g.kartGolge !== false ? '0 1px 3px rgba(15,23,42,0.08)' : undefined,
-        overflow: 'hidden' as const,
-      }
-    : undefined;
+  const birlesikKapsulStili = kapsulStiliAl(gt, g, radius, birlesik);
 
   const hucreler = olusturucu.hucreler.map((hucre, index) => {
     const sonHucre = index === olusturucu.hucreler.length - 1;
     const dikeyAyirici = hucreDikeyAyiriciVar(hucre) && yanYana && !sonHucre;
     const icerikBloklar = hucreIcerikBloklari(hucre);
-    const hucreStili = birlesik
-      ? {
-          padding: '1rem',
-          borderRight: dikeyAyirici ? '1px solid rgba(148,163,184,0.35)' : undefined,
-        }
-      : {
-          borderRadius: radius,
-          backgroundColor: g.kartFooterArkaPlan ?? '#f8fafc',
-          boxShadow: g.kartGolge !== false ? '0 1px 3px rgba(15,23,42,0.08)' : undefined,
-          padding: '1rem',
-          borderRight: dikeyAyirici ? '1px solid rgba(148,163,184,0.35)' : undefined,
-        };
+    const hucreStili = hucreStiliAl(gt, birlesik, g, radius, dikeyAyirici);
 
     return (
       <div key={hucre.id} className="flex flex-col gap-3" style={hucreStili}>

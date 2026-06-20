@@ -3190,3 +3190,51 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   align-items: center;
   gap: 2rem;
 }
+
+/* â”€â”€â”€ Slider gÃ¶rÃ¼nÃ¼m varyantlarÄ± â”€â”€â”€ */
+.widget-slider--sinematik .slider-sinematik {
+  margin-left: calc(-1 * var(--container-pad, 1rem));
+  margin-right: calc(-1 * var(--container-pad, 1rem));
+  width: calc(100% + 2 * var(--container-pad, 1rem));
+  max-width: none;
+}
+
+.slider-minimal-nav button {
+  min-width: 1.75rem;
+}
+
+.slider-bolunmus-metin .grid {
+  min-height: 320px;
+}
+
+@media (min-width: 768px) {
+  .widget-slider--sinematik.widget-bolum-tam-ekran .slider-sinematik {
+    margin-left: 0;
+    margin-right: 0;
+    width: 100%;
+  }
+}
+
+/* ¦¦¦ Slider görünüm varyantlarý ¦¦¦ */
+.widget-slider--sinematik .slider-sinematik {
+  margin-left: calc(-1 * var(--container-pad, 1rem));
+  margin-right: calc(-1 * var(--container-pad, 1rem));
+  width: calc(100% + 2 * var(--container-pad, 1rem));
+  max-width: none;
+}
+
+.slider-minimal-nav button {
+  min-width: 1.75rem;
+}
+
+.slider-bolunmus-metin .grid {
+  min-height: 320px;
+}
+
+.galeri-masonry-mor {
+  column-gap: 1rem;
+}
+
+.galeri-genis-serit {
+  scrollbar-width: thin;
+}
