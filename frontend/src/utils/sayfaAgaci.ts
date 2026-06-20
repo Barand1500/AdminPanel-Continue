@@ -2,9 +2,11 @@ import type { AdminSayfa } from '@/features/admin/sayfaApi';
 import { sayfaYolunuBul } from '@/data/bosSiteVerisi';
 import type { MenuOgesi, SayfaAcilisModu } from '@/types/site';
 import { idString } from '@/utils/idKarsilastir';
+import { sayfaDuzenEtiketiKaldir } from '@/utils/sayfaIcerikIsle';
 
 export function sayfaIcerikVar(icerik?: string | null): boolean {
-  return Boolean(icerik?.replace(/<[^>]*>/g, '').trim());
+  const metin = sayfaDuzenEtiketiKaldir(icerik ?? '').replace(/<[^>]*>/g, '').trim();
+  return Boolean(metin);
 }
 
 export type AltMenuGorunum = 'dikey' | 'yatay';

@@ -181,7 +181,7 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
       {
         ikon: '📤',
         baslik: 'Dosya Yükleme',
-        aciklama: 'PNG, JPG, WEBP dosyalarını bilgisayardan yükleyin veya URL ile ekleyin. Max 5MB.',
+        aciklama: 'PNG, JPG, WEBP dosyalarını bilgisayardan yükleyin veya URL ile ekleyin. Max 15MB.',
         renk: 'mor',
       },
       {

@@ -15,6 +15,8 @@ set -e
 #   ./deploy.sh
 #
 # Nginx: /api ve /uploads istekleri Node'a (port 4000) gitmeli.
+# Medya yukleme (max 15MB) icin vhost icine ekleyin:
+#   client_max_body_size 15M;
 # Ornek:
 #   location /api { proxy_pass http://127.0.0.1:4000; ... }
 #   location /uploads { proxy_pass http://127.0.0.1:4000; ... }

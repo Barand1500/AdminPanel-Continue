@@ -6,7 +6,18 @@ interface SayfaShadowIcerikProps {
   className?: string;
 }
 
-/** Kullanıcı HTML/CSS'ini siteden izole ederek gösterir — header/footer bozulmaz */
+function shadowScriptleriCalistir(kok: ShadowRoot | DocumentFragment | HTMLElement) {
+  kok.querySelectorAll('script').forEach((eski) => {
+    const yeni = document.createElement('script');
+    for (const attr of eski.attributes) {
+      yeni.setAttribute(attr.name, attr.value);
+    }
+    yeni.textContent = eski.textContent;
+    eski.replaceWith(yeni);
+  });
+}
+
+/** Kullanıcı HTML/CSS/JS'ini siteden izole ederek gösterir — header/footer bozulmaz */
 export function SayfaShadowIcerik({ html, className }: SayfaShadowIcerikProps) {
   const hostRef = useRef<HTMLDivElement>(null);
 
@@ -17,12 +28,24 @@ export function SayfaShadowIcerik({ html, className }: SayfaShadowIcerikProps) {
     const shadow = host.shadowRoot ?? host.attachShadow({ mode: 'open' });
     shadow.innerHTML = `
       <style>
-        :host { display: block; width: 100%; }
-        .sayfa-icerik-govde { width: 100%; }
-        img { max-width: 100%; height: auto; }
+        :host {
+          display: block;
+          width: 100%;
+          max-width: none;
+        }
+        *, *::before, *::after { box-sizing: border-box; }
+        .sayfa-icerik-govde {
+          width: 100%;
+          max-width: none;
+        }
+        img, video, iframe {
+          max-width: 100%;
+          height: auto;
+        }
       </style>
       ${sayfaShadowIcerikHazirla(html)}
     `;
+    shadowScriptleriCalistir(shadow);
   }, [html]);
 
   if (!html.trim()) return null;

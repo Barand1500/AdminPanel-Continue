@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import multer from 'multer';
+import { MEDYA_MAX_DOSYA_BOYUTU } from '../../config/medya.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const uploadsDir = path.join(__dirname, '../../../uploads');
@@ -20,7 +21,7 @@ const storage = multer.diskStorage({
 
 export const medyaYukle = multer({
   storage,
-  limits: { fileSize: 5 * 1024 * 1024 },
+  limits: { fileSize: MEDYA_MAX_DOSYA_BOYUTU },
   fileFilter: (_req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);

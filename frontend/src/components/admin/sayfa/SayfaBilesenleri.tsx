@@ -42,6 +42,11 @@ import {
   ustSayfaBul,
   ustSayfaSecenekleri,
 } from '@/utils/sayfaAgaci';
+import {
+  SAYFA_ICERIK_DUZENLER,
+  sayfaDuzenEtiketiGuncelle,
+  sayfaDuzenModuOku,
+} from '@/utils/sayfaIcerikIsle';
 import { sayfaSiraCakismasiBul, sonrakiSayfaSira } from '@/utils/sayfaSiraYardimci';
 
 type EditorSekme = 'icerik' | 'seo' | 'ayarlar' | 'alt-sayfa';
@@ -478,9 +483,42 @@ export function SayfaEditorPanel({
             </AdminFormBolumu>
 
             <AdminFormBolumu baslik="İçerik" aciklama="Görsel editör veya HTML kodu ile sayfa içeriği oluşturun">
+              <FormAlani etiket="İçerik genişliği" aciklama="Özel HTML sayfalar için Tam genişlik (özel HTML) seçin">
+                <div className="grid gap-2 sm:grid-cols-2">
+                  {SAYFA_ICERIK_DUZENLER.map((secenek) => {
+                    const secili = sayfaDuzenModuOku(form.icerik) === secenek.id;
+                    return (
+                      <button
+                        key={secenek.id}
+                        type="button"
+                        onClick={() =>
+                          onChange({
+                            ...form,
+                            icerik: sayfaDuzenEtiketiGuncelle(form.icerik, secenek.id),
+                          })
+                        }
+                        className={`rounded-lg border p-3 text-left text-sm transition ${
+                          secili
+                            ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)]/10'
+                            : 'border-[var(--ap-border)] hover:border-[var(--ap-accent)]/40'
+                        }`}
+                      >
+                        <span className="font-semibold">{secenek.ad}</span>
+                        <span className="ap-muted mt-0.5 block text-xs">{secenek.aciklama}</span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </FormAlani>
               <IcerikHtmlEditoru
                 deger={form.icerik}
-                onChange={(icerik) => onChange({ ...form, icerik })}
+                onChange={(icerik) => {
+                  const duzen = sayfaDuzenModuOku(form.icerik);
+                  onChange({
+                    ...form,
+                    icerik: duzen === 'normal' ? icerik : sayfaDuzenEtiketiGuncelle(icerik, duzen),
+                  });
+                }}
                 placeholder="Sayfa içeriğinizi yazın..."
               />
               {!sayfaIcerikVar(form.icerik) && altSayi > 0 && (

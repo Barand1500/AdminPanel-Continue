@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useMemo, useState, type ReactNo
 import { sayfaDetayGetir, type PublicSayfa } from '@/features/site/sayfaApi';
 import { SayfaShadowIcerik } from '@/components/ortak/SayfaShadowIcerik';
 import { SayfaBaslikGosterimi } from '@/components/ortak/SayfaBaslikGosterimi';
+import { sayfaDuzenEtiketiKaldir } from '@/utils/sayfaIcerikIsle';
 
 interface SayfaModalContextDeger {
   acik: boolean;
@@ -62,7 +63,9 @@ export function SayfaModalProvider({ children }: { children: ReactNode }) {
               {yukleniyor ? (
                 <p className="text-sm text-slate-500">Yükleniyor...</p>
               ) : sayfa ? (
-                sayfa.icerik.trim() ? <SayfaShadowIcerik html={sayfa.icerik} /> : (
+                sayfa.icerik.trim() ? (
+                  <SayfaShadowIcerik html={sayfaDuzenEtiketiKaldir(sayfa.icerik)} />
+                ) : (
                   <p className="text-sm text-slate-500">Bu sayfada içerik yok.</p>
                 )
               ) : null}

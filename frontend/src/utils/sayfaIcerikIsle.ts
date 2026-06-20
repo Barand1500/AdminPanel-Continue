@@ -1,5 +1,46 @@
 const KOK_SINIF = 'sayfa-icerik-kok';
 
+/** İçerik HTML'inin başındaki gizli düzen etiketi: <!-- @sayfa-duzen:tam-basliksiz --> */
+export type SayfaIcerikDuzeni = 'normal' | 'tam' | 'dar' | 'tam-basliksiz';
+
+const DUZEN_ETIKET =
+  /^<!--\s*@sayfa-duzen:(normal|tam|dar|tam-basliksiz)\s*-->\s*/i;
+
+export const SAYFA_ICERIK_DUZENLER: {
+  id: SayfaIcerikDuzeni;
+  ad: string;
+  aciklama: string;
+}[] = [
+  { id: 'normal', ad: 'Normal', aciklama: 'Ortalanmış içerik (max ~896px)' },
+  { id: 'tam', ad: 'Tam genişlik', aciklama: 'Header/footer arası tam kaplar; sayfa başlığı üstte kalır' },
+  {
+    id: 'tam-basliksiz',
+    ad: 'Tam genişlik (özel HTML)',
+    aciklama: 'Başlık gizlenir; HTML/CSS/JS ile kendi düzeninizi kurarsınız',
+  },
+  { id: 'dar', ad: 'Dar sütun', aciklama: 'Blog yazısı gibi dar, ortalanmış metin' },
+];
+
+export function sayfaDuzenModuOku(html: string): SayfaIcerikDuzeni {
+  const eslesme = html.trim().match(DUZEN_ETIKET);
+  if (eslesme) return eslesme[1] as SayfaIcerikDuzeni;
+  return 'normal';
+}
+
+export function sayfaDuzenEtiketiKaldir(html: string): string {
+  return html.replace(DUZEN_ETIKET, '');
+}
+
+export function sayfaDuzenEtiketiGuncelle(html: string, duzen: SayfaIcerikDuzeni): string {
+  const temiz = sayfaDuzenEtiketiKaldir(html);
+  if (duzen === 'normal') return temiz;
+  return `<!-- @sayfa-duzen:${duzen} -->\n${temiz}`;
+}
+
+export function sayfaTamGenisDuzenMi(duzen: SayfaIcerikDuzeni): boolean {
+  return duzen === 'tam' || duzen === 'tam-basliksiz';
+}
+
 /** Tam HTML belgesinden gövde + head stillerini çıkarır */
 export function sayfaHtmlParcala(html: string): { govde: string; stiller: string[] } {
   let kaynak = html.trim();
@@ -109,7 +150,8 @@ export function tamHtmlBelgesiOlustur(icerik: string): string {
 
 /** Shadow DOM içine yazılacak içerik */
 export function sayfaShadowIcerikHazirla(html: string): string {
-  const { govde, stiller } = sayfaHtmlParcala(html);
+  const temiz = sayfaDuzenEtiketiKaldir(html);
+  const { govde, stiller } = sayfaHtmlParcala(temiz);
   const styleBlok = stiller.map((s) => `<style>${s}</style>`).join('\n');
   return `${styleBlok}<div class="sayfa-icerik-govde">${govde}</div>`;
 }

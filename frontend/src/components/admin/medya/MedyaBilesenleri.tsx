@@ -1,6 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import type { AdminMedya } from '@/features/admin/medyaApi';
 import { medyaTamUrl } from '@/features/admin/medyaApi';
+import { MEDYA_MAX_DOSYA_MB } from '@/constants/medya';
 
 interface MedyaGridProps {
   medyalar: AdminMedya[];
@@ -135,7 +136,7 @@ export function MedyaYukleyici({
           {surukleniyor ? 'Dosyaları buraya bırakın' : 'Toplu görsel yükle'}
         </p>
         <p className="ap-medya-toplu-aciklama">
-          Görselleri sürükleyip bırakın veya bilgisayarınızdan seçin. PNG, JPG, WEBP — dosya başına max 5MB.
+          Görselleri sürükleyip bırakın veya bilgisayarınızdan seçin. PNG, JPG, WEBP — dosya başına max {MEDYA_MAX_DOSYA_MB}MB.
         </p>
         <button
           type="button"

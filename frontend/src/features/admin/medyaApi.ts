@@ -1,5 +1,6 @@
 import { adminHeaders, adminJsonFetch } from './adminFetch';
 import { tokenAl } from '@/features/auth/authApi';
+import { MEDYA_MAX_DOSYA_BOYUTU, medyaBoyutMesaji } from '@/constants/medya';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '/api';
 
@@ -29,6 +30,10 @@ export async function adminMedyaOlustur(ad: string, url: string): Promise<AdminM
 export async function adminMedyaYukle(dosya: File, ad?: string): Promise<AdminMedya> {
   const token = tokenAl();
   if (!token) throw new Error('Oturum bulunamadi');
+
+  if (dosya.size > MEDYA_MAX_DOSYA_BOYUTU) {
+    throw new Error(medyaBoyutMesaji());
+  }
 
   const formData = new FormData();
   formData.append('dosya', dosya);

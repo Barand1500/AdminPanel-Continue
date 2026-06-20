@@ -1899,7 +1899,18 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   min-height: 1rem;
 }
 
-/* Görsel Grid Bloğu — sol panel filtre dropdown */
+.sayfa-icerik-tam-bolum {
+  width: 100%;
+}
+
+.sayfa-icerik-tam-host,
+.sayfa-icerik-tam-wrap {
+  display: block;
+  width: 100%;
+  max-width: none;
+}
+
+/* Görsel Grid Bloğu � sol panel filtre dropdown */
 .gorsel-grid-filtre-tus {
   display: flex;
   width: 100%;
