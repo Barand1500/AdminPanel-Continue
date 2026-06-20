@@ -1,5 +1,5 @@
 import type { Prisma } from '@prisma/client';
-import { EKLENTI_KATALOGU, katalogKaydiBul } from '../data/eklentiKatalogu.js';
+import { EKLENTI_KATALOGU, katalogKaydiBul, varsayilanEklentiAyarlar } from '../data/eklentiKatalogu.js';
 import { EklentiRepository } from '../Infrastructure/repositories/EklentiRepository.js';
 
 const repo = new EklentiRepository();
@@ -79,7 +79,7 @@ export class EklentiService {
         gelistirici: katalog.gelistirici,
         publicHook: katalog.publicHook,
       } as Prisma.InputJsonValue,
-      ayarlarJson: {},
+      ayarlarJson: varsayilanEklentiAyarlar(katalog.kod) as Prisma.InputJsonValue,
     });
   }
 

@@ -404,6 +404,10 @@ function SeciliBlokEditor({
       {blok.tip === 'ayirici' && (
         <p className="ap-muted text-xs">Yatay ayırıcı çizgi — ek ayar gerekmez.</p>
       )}
+
+      {blok.tip === 'ayirici_dikey' && (
+        <p className="ap-muted text-xs">Parçanın sağına dikey çizgi ekler (yan yana yerleşimde).</p>
+      )}
     </div>
   );
 }

@@ -6584,6 +6584,41 @@ html:has(.admin-panel[data-tema='acik']) body {
   box-shadow: 0 0 0 1px var(--ap-accent, #3b82f6);
 }
 
+.ap-olusturucu-birlesik-kapsul {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  border: 1px solid var(--ap-border, rgba(148, 163, 184, 0.2));
+  border-radius: 0.625rem;
+  background: var(--ap-surface-2, rgba(255, 255, 255, 0.03));
+  overflow: hidden;
+}
+
+.ap-olusturucu-birlesik-kapsul .ap-olusturucu-grid {
+  gap: 0;
+}
+
+.ap-olusturucu-birlesik-kapsul .ap-olusturucu-hucre {
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.ap-olusturucu-birlesik-kapsul .ap-olusturucu-hucre.bos {
+  border-style: none;
+  border-bottom: 1px dashed var(--ap-border, rgba(148, 163, 184, 0.2));
+}
+
+.ap-olusturucu-birlesik-kapsul .ap-olusturucu-hucre.aktif {
+  background: rgba(59, 130, 246, 0.08);
+  box-shadow: inset 0 0 0 1px var(--ap-accent, #3b82f6);
+}
+
+.ap-olusturucu-hucre-dikey-ayirici {
+  border-right: 1px solid var(--ap-border, rgba(148, 163, 184, 0.35)) !important;
+}
+
 .ap-olusturucu-hucre-no {
   font-size: 0.6875rem;
   font-weight: 600;

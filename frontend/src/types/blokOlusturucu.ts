@@ -2,6 +2,9 @@ import type { CSSProperties } from 'react';
 
 export type BlokDuzen = 'yan_yana' | 'alt_alta';
 
+/** Parçalar tek kutu mu, ayrı kutular mı */
+export type ParcaGorunum = 'birlesik' | 'ayri';
+
 export type BlokGorselGenislik = 'tam' | 'yari' | 'uc_ceyrek';
 
 export type BlokTipi =
@@ -23,6 +26,7 @@ export type BlokTipi =
   | 'link_satir'
   | 'badge'
   | 'ayirici'
+  | 'ayirici_dikey'
   | 'liste'
   | 'cta_serit';
 
@@ -85,6 +89,8 @@ export interface BlokHucre {
 export interface BlokOlusturucuConfig {
   parcaSayisi: 0 | 1 | 2 | 3 | 4;
   duzen: BlokDuzen;
+  /** birlesik: tek kutu; ayri: parça başına ayrı kart */
+  parcaGorunum?: ParcaGorunum;
   hucreler: BlokHucre[];
 }
 
@@ -125,16 +131,35 @@ export const BLOK_PALET: BlokPaletOgesi[] = [
   { tip: 'ikon_grup', etiket: 'İkon Grubu', ikon: '⊞', kategori: 'duzen' },
   { tip: 'bosluk', etiket: 'Boşluk', ikon: '↕', kategori: 'duzen' },
   { tip: 'ayirici', etiket: 'Ayırıcı', ikon: '—', kategori: 'duzen' },
+  { tip: 'ayirici_dikey', etiket: 'Dikey Ayırıcı', ikon: '|', kategori: 'duzen' },
 ];
 
 export const VARSAYILAN_GORSEL_YUKSEKLIK = 160;
 
 export function bosOlusturucu(): BlokOlusturucuConfig {
-  return { parcaSayisi: 0, duzen: 'yan_yana', hucreler: [] };
+  return { parcaSayisi: 0, duzen: 'yan_yana', parcaGorunum: 'birlesik', hucreler: [] };
 }
 
 export function olusturucuOku(cfg: { olusturucu?: BlokOlusturucuConfig | null }): BlokOlusturucuConfig {
-  return cfg.olusturucu ?? bosOlusturucu();
+  const ham = cfg.olusturucu ?? bosOlusturucu();
+  return {
+    parcaSayisi: ham.parcaSayisi ?? 0,
+    duzen: ham.duzen ?? 'yan_yana',
+    parcaGorunum: ham.parcaGorunum ?? 'ayri',
+    hucreler: ham.hucreler ?? [],
+  };
+}
+
+export function hucreDikeyAyiriciVar(hucre: BlokHucre): boolean {
+  return hucre.bloklar.some((b) => b.tip === 'ayirici_dikey');
+}
+
+export function hucreIcerikBloklari(hucre: BlokHucre): WidgetBlok[] {
+  return hucre.bloklar.filter((b) => b.tip !== 'ayirici_dikey');
+}
+
+export function parcaGorunumuBirlesikMi(olusturucu: BlokOlusturucuConfig): boolean {
+  return (olusturucu.parcaGorunum ?? 'ayri') === 'birlesik';
 }
 
 const GENISLIK_YUZDE: Record<BlokGorselGenislik, string> = {

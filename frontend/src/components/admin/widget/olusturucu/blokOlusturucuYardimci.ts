@@ -111,6 +111,8 @@ export function varsayilanBlok(tip: BlokTipi): WidgetBlok {
       return { id, tip, badgeMetin: 'Yeni' };
     case 'ayirici':
       return { id, tip };
+    case 'ayirici_dikey':
+      return { id, tip };
     case 'liste':
       return {
         id,

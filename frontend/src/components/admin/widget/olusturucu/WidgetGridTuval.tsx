@@ -1,5 +1,9 @@
 import type { BlokHucre, BlokOlusturucuConfig, WidgetBlok } from '@/types/blokOlusturucu';
-import { blokOnizlemeMedyaStili } from '@/types/blokOlusturucu';
+import {
+  blokOnizlemeMedyaStili,
+  hucreDikeyAyiriciVar,
+  parcaGorunumuBirlesikMi,
+} from '@/types/blokOlusturucu';
 import { BlokBoyutSurukle } from './BlokBoyutSurukle';
 
 interface WidgetGridTuvalProps {
@@ -125,6 +129,13 @@ function BlokOnizleme({ blok }: { blok: WidgetBlok }) {
       );
     case 'ayirici':
       return <hr className="my-1 border-slate-200" />;
+    case 'ayirici_dikey':
+      return (
+        <span className="inline-flex items-center gap-1 text-xs text-slate-400">
+          <span className="inline-block h-4 w-px shrink-0 bg-slate-300" aria-hidden />
+          Dikey ayırıcı
+        </span>
+      );
     case 'liste':
       return (
         <ul className="list-inside list-disc text-xs text-slate-500">
@@ -156,11 +167,33 @@ export function WidgetGridTuval({
   onBlokGuncelle,
 }: WidgetGridTuvalProps) {
   const gridYok = !olusturucu.parcaSayisi;
+  const birlesik = parcaGorunumuBirlesikMi(olusturucu);
 
   const gridClass =
     olusturucu.duzen === 'alt_alta'
       ? 'ap-olusturucu-grid ap-olusturucu-grid-dikey'
       : `ap-olusturucu-grid ap-olusturucu-grid-yatay ap-olusturucu-kolon-${olusturucu.parcaSayisi}`;
+
+  const gridIcerik = (
+    <div className={gridClass}>
+      {olusturucu.hucreler.map((hucre, index) => (
+        <HucreKutu
+          key={hucre.id}
+          hucre={hucre}
+          index={index}
+          sonHucre={index === olusturucu.hucreler.length - 1}
+          yanYana={olusturucu.duzen === 'yan_yana'}
+          birlesik={birlesik}
+          aktif={aktifHucreId === hucre.id}
+          seciliBlokId={seciliBlokId}
+          onHucreSec={() => onHucreSec(hucre.id)}
+          onBlokSec={(blokId) => onBlokSec(hucre.id, blokId)}
+          onBlokSil={(blokId) => onBlokSil(hucre.id, blokId)}
+          onBlokGuncelle={onBlokGuncelle}
+        />
+      ))}
+    </div>
+  );
 
   return (
     <div className="ap-olusturucu-tuval">
@@ -169,22 +202,10 @@ export function WidgetGridTuval({
           <p className="ap-muted text-sm">Boş widget</p>
           <p className="ap-muted mt-1 text-xs">Alttan parça sayısı ve yerleşim seçin.</p>
         </div>
+      ) : birlesik ? (
+        <div className="ap-olusturucu-birlesik-kapsul">{gridIcerik}</div>
       ) : (
-        <div className={gridClass}>
-          {olusturucu.hucreler.map((hucre, index) => (
-            <HucreKutu
-              key={hucre.id}
-              hucre={hucre}
-              index={index}
-              aktif={aktifHucreId === hucre.id}
-              seciliBlokId={seciliBlokId}
-              onHucreSec={() => onHucreSec(hucre.id)}
-              onBlokSec={(blokId) => onBlokSec(hucre.id, blokId)}
-              onBlokSil={(blokId) => onBlokSil(hucre.id, blokId)}
-              onBlokGuncelle={onBlokGuncelle}
-            />
-          ))}
-        </div>
+        gridIcerik
       )}
     </div>
   );
@@ -193,6 +214,9 @@ export function WidgetGridTuval({
 function HucreKutu({
   hucre,
   index,
+  sonHucre,
+  yanYana,
+  birlesik,
   aktif,
   seciliBlokId,
   onHucreSec,
@@ -202,6 +226,9 @@ function HucreKutu({
 }: {
   hucre: BlokHucre;
   index: number;
+  sonHucre: boolean;
+  yanYana: boolean;
+  birlesik: boolean;
   aktif: boolean;
   seciliBlokId: string | null;
   onHucreSec: () => void;
@@ -209,12 +236,19 @@ function HucreKutu({
   onBlokSil: (blokId: string) => void;
   onBlokGuncelle?: (blok: WidgetBlok) => void;
 }) {
+  const dikeyAyirici = hucreDikeyAyiriciVar(hucre) && yanYana && !sonHucre;
+  const hucreSinif = [
+    'ap-olusturucu-hucre',
+    aktif ? 'aktif' : '',
+    hucre.bloklar.length === 0 ? 'bos' : '',
+    birlesik ? 'ap-olusturucu-hucre-birlesik' : '',
+    dikeyAyirici ? 'ap-olusturucu-hucre-dikey-ayirici' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
+
   return (
-    <button
-      type="button"
-      className={`ap-olusturucu-hucre${aktif ? ' aktif' : ''}${hucre.bloklar.length === 0 ? ' bos' : ''}`}
-      onClick={onHucreSec}
-    >
+    <button type="button" className={hucreSinif} onClick={onHucreSec}>
       <span className="ap-olusturucu-hucre-no">Parça {index + 1}</span>
       {hucre.bloklar.length === 0 ? (
         <span className="ap-muted text-xs">Parça eklemek için seçin</span>

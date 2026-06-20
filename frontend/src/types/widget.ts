@@ -554,7 +554,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
         yerlesim,
         gorunum: { ...gorunum, kolonSayisi: 2, padding: 'normal', borderRadius: 12 },
         ek,
-        olusturucu: { parcaSayisi: 0, duzen: 'yan_yana', hucreler: [] },
+        olusturucu: { parcaSayisi: 0, duzen: 'yan_yana', parcaGorunum: 'birlesik', hucreler: [] },
       };
     default:
       return { yerlesim, gorunum, ek };

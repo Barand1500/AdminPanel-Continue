@@ -1,10 +1,12 @@
-import type { BlokDuzen } from '@/types/blokOlusturucu';
+import type { BlokDuzen, ParcaGorunum } from '@/types/blokOlusturucu';
 
 interface WidgetGridAltBarProps {
   parcaSayisi: 0 | 1 | 2 | 3 | 4;
   duzen: BlokDuzen;
+  parcaGorunum: ParcaGorunum;
   onParcaSayisi: (sayi: 1 | 2 | 3 | 4) => void;
   onDuzen: (duzen: BlokDuzen) => void;
+  onParcaGorunum: (gorunum: ParcaGorunum) => void;
   kompakt?: boolean;
 }
 
@@ -13,8 +15,10 @@ const PARCA_SECENEKLERI: (1 | 2 | 3 | 4)[] = [1, 2, 3, 4];
 export function WidgetGridAltBar({
   parcaSayisi,
   duzen,
+  parcaGorunum,
   onParcaSayisi,
   onDuzen,
+  onParcaGorunum,
   kompakt = false,
 }: WidgetGridAltBarProps) {
   return (
@@ -50,6 +54,25 @@ export function WidgetGridAltBar({
             onClick={() => onDuzen('alt_alta')}
           >
             Alt alta
+          </button>
+        </div>
+      </div>
+      <div className="ap-olusturucu-alt-grup">
+        <span className="ap-olusturucu-alt-etiket">Parça kutusu</span>
+        <div className="ap-olusturucu-segment">
+          <button
+            type="button"
+            className={`ap-olusturucu-segment-btn${parcaGorunum === 'birlesik' ? ' aktif' : ''}`}
+            onClick={() => onParcaGorunum('birlesik')}
+          >
+            Birleşik
+          </button>
+          <button
+            type="button"
+            className={`ap-olusturucu-segment-btn${parcaGorunum === 'ayri' ? ' aktif' : ''}`}
+            onClick={() => onParcaGorunum('ayri')}
+          >
+            Ayrı
           </button>
         </div>
       </div>

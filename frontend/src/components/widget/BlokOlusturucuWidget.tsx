@@ -5,7 +5,10 @@ import {
   blokGorselBoyutStili,
   blokOnizlemeMedyaStili,
   blokOnizlemeWrapperStili,
+  hucreDikeyAyiriciVar,
+  hucreIcerikBloklari,
   olusturucuOku,
+  parcaGorunumuBirlesikMi,
 } from '@/types/blokOlusturucu';
 import type { WidgetConfig } from '@/types/widget';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
@@ -245,6 +248,8 @@ function BlokRender({ blok, cfg }: { blok: WidgetBlok; cfg: WidgetConfig }) {
       );
     case 'ayirici':
       return <hr className="border-slate-200" />;
+    case 'ayirici_dikey':
+      return null;
     case 'liste':
       return (
         <ul className="list-inside list-disc space-y-1 text-sm" style={{ color: metinRenk }}>
@@ -274,14 +279,51 @@ export function BlokOlusturucuWidget({ widget }: { widget: Widget }) {
   if (!olusturucu.parcaSayisi || olusturucu.hucreler.length === 0) return null;
 
   const g = cfg.gorunum ?? {};
-  const gap = g.kartAraligi === 'dar' ? '1rem' : g.kartAraligi === 'genis' ? '2rem' : '1.5rem';
+  const birlesik = parcaGorunumuBirlesikMi(olusturucu);
+  const gap = birlesik ? '0' : g.kartAraligi === 'dar' ? '1rem' : g.kartAraligi === 'genis' ? '2rem' : '1.5rem';
   const radius = g.borderRadius ?? 12;
   const hizalama = g.hizalama ?? 'sol';
   const alignClass = hizalama === 'orta' ? 'text-center' : hizalama === 'sag' ? 'text-right' : 'text-left';
+  const yanYana = olusturucu.duzen === 'yan_yana';
   const gridStyle =
     olusturucu.duzen === 'alt_alta'
-      ? { display: 'grid', gridTemplateColumns: '1fr', gap }
-      : { display: 'grid', gridTemplateColumns: `repeat(${olusturucu.parcaSayisi}, minmax(0, 1fr))`, gap };
+      ? { display: 'grid' as const, gridTemplateColumns: '1fr', gap }
+      : { display: 'grid' as const, gridTemplateColumns: `repeat(${olusturucu.parcaSayisi}, minmax(0, 1fr))`, gap };
+
+  const birlesikKapsulStili = birlesik
+    ? {
+        borderRadius: radius,
+        backgroundColor: g.kartFooterArkaPlan ?? '#f8fafc',
+        boxShadow: g.kartGolge !== false ? '0 1px 3px rgba(15,23,42,0.08)' : undefined,
+        overflow: 'hidden' as const,
+      }
+    : undefined;
+
+  const hucreler = olusturucu.hucreler.map((hucre, index) => {
+    const sonHucre = index === olusturucu.hucreler.length - 1;
+    const dikeyAyirici = hucreDikeyAyiriciVar(hucre) && yanYana && !sonHucre;
+    const icerikBloklar = hucreIcerikBloklari(hucre);
+    const hucreStili = birlesik
+      ? {
+          padding: '1rem',
+          borderRight: dikeyAyirici ? '1px solid rgba(148,163,184,0.35)' : undefined,
+        }
+      : {
+          borderRadius: radius,
+          backgroundColor: g.kartFooterArkaPlan ?? '#f8fafc',
+          boxShadow: g.kartGolge !== false ? '0 1px 3px rgba(15,23,42,0.08)' : undefined,
+          padding: '1rem',
+          borderRight: dikeyAyirici ? '1px solid rgba(148,163,184,0.35)' : undefined,
+        };
+
+    return (
+      <div key={hucre.id} className="flex flex-col gap-3" style={hucreStili}>
+        {icerikBloklar.map((blok) => (
+          <BlokRender key={blok.id} blok={blok} cfg={cfg} />
+        ))}
+      </div>
+    );
+  });
 
   return (
     <WidgetKabuk widget={widget}>
@@ -300,23 +342,13 @@ export function BlokOlusturucuWidget({ widget }: { widget: Widget }) {
           )}
         </div>
       )}
-      <div style={gridStyle}>
-        {olusturucu.hucreler.map((hucre) => (
-          <div
-            key={hucre.id}
-            className="flex flex-col gap-3 p-4"
-            style={{
-              borderRadius: radius,
-              backgroundColor: g.kartFooterArkaPlan ?? '#f8fafc',
-              boxShadow: g.kartGolge !== false ? '0 1px 3px rgba(15,23,42,0.08)' : undefined,
-            }}
-          >
-            {hucre.bloklar.map((blok) => (
-              <BlokRender key={blok.id} blok={blok} cfg={cfg} />
-            ))}
-          </div>
-        ))}
-      </div>
+      {birlesik ? (
+        <div style={birlesikKapsulStili}>
+          <div style={gridStyle}>{hucreler}</div>
+        </div>
+      ) : (
+        <div style={gridStyle}>{hucreler}</div>
+      )}
     </WidgetKabuk>
   );
 }

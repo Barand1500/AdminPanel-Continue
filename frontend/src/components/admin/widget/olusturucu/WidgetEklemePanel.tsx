@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
-import type { BlokDuzen, BlokTipi } from '@/types/blokOlusturucu';
+import type { BlokDuzen, BlokTipi, ParcaGorunum } from '@/types/blokOlusturucu';
 import { configGuncelle, configOku } from '@/types/widget';
 import { olusturucuOku } from '@/types/blokOlusturucu';
 import type { WidgetBlok } from '@/types/blokOlusturucu';
@@ -57,6 +57,10 @@ export function WidgetEklemePanel({
 
   function duzenDegistir(duzen: BlokDuzen) {
     olusturucuGuncelle({ ...olusturucu, duzen });
+  }
+
+  function parcaGorunumDegistir(parcaGorunum: ParcaGorunum) {
+    olusturucuGuncelle({ ...olusturucu, parcaGorunum });
   }
 
   function olusturucuSifirla() {
@@ -128,8 +132,10 @@ export function WidgetEklemePanel({
           <WidgetGridAltBar
             parcaSayisi={olusturucu.parcaSayisi}
             duzen={olusturucu.duzen}
+            parcaGorunum={olusturucu.parcaGorunum ?? 'ayri'}
             onParcaSayisi={parcaSayisiDegistir}
             onDuzen={duzenDegistir}
+            onParcaGorunum={parcaGorunumDegistir}
           />
         </div>
         <WidgetBlokPaleti
