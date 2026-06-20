@@ -63,7 +63,12 @@ echo "[4/5] Frontend build & kopyalandi"
 cd "$SITE/backend"
 npm install --omit=dev
 npx prisma generate
-npx prisma migrate deploy
+npx prisma migrate deploy || {
+  echo "UYARI: prisma migrate deploy basarisiz — manual SQL deneniyor..."
+  if [ -f prisma/migrations/manual_site_eklentiler.sql ]; then
+    npx prisma db execute --file prisma/migrations/manual_site_eklentiler.sql --schema prisma/schema.prisma || true
+  fi
+}
 pm2 restart "$PM2_NAME" 2>/dev/null || pm2 start ecosystem.config.cjs
 echo "[5/5] PM2 restart tamam"
 

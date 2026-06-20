@@ -1,4 +1,4 @@
--- SiteEklenti tablosu
+-- SiteEklenti tablosu (eklenti sistemi)
 CREATE TABLE IF NOT EXISTS `site_eklentiler` (
   `id` INT NOT NULL AUTO_INCREMENT,
   `siteId` INT NOT NULL,

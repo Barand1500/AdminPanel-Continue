@@ -70,7 +70,15 @@ export class SiteService {
       sistemSatiri as Record<string, unknown> | null | undefined
     );
 
-    const aktifEklentiler = await eklentiService.aktifEklentilerPublic(site.id);
+    let aktifEklentiler: Awaited<ReturnType<EklentiService['aktifEklentilerPublic']>> = [];
+    try {
+      aktifEklentiler = await eklentiService.aktifEklentilerPublic(site.id);
+    } catch (err) {
+      console.error(
+        '[SiteService] aktifEklentiler alinamadi (site_eklentiler tablosu eksik olabilir):',
+        err instanceof Error ? err.message : err
+      );
+    }
 
     return {
       site: {
