@@ -5,6 +5,7 @@ import {
   type AktifWidgetTipi,
 } from '@/types/widget';
 import type { WidgetFormDegeri, AdminWidget } from '@/types/admin';
+import { formSayfaId } from '@/utils/widgetFormYardimci';
 import { sonrakiWidgetSira } from '@/utils/widgetSiraYardimci';
 import { ICERIK_PANEL_MAP } from './panels/WidgetIcerikPanelleri';
 
@@ -155,7 +156,7 @@ export function tipDegistir(
     aktif: form.aktif,
     mobilGoster: form.mobilGoster,
     masaustuGoster: form.masaustuGoster,
-    sayfaId: form.sayfaId,
+    sayfaId: formSayfaId(form.sayfaId),
   };
 }
 

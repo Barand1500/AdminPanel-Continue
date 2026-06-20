@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
-import { varsayilanConfig, widgetFormMockUygula } from '@/types/widget';
+import { widgetFormMockUygula } from '@/types/widget';
 import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
 import {
   AdminAnahtarDugme,
@@ -31,6 +31,7 @@ import { yerlesimEtiketi, yerlesimOku, widgetSayfaFiltrele, widgetSayfaFiltreOge
 import { siraCakismasiBul } from '@/utils/widgetSiraYardimci';
 import type { AdminSayfa } from '@/features/admin/sayfaApi';
 import { idString } from '@/utils/idKarsilastir';
+import { widgettenForma } from '@/utils/widgetFormYardimci';
 
 export {
   WIDGET_TIPLERI,
@@ -42,31 +43,8 @@ export {
   varsayilanWidgetForm,
   tipOlusturulabilirMi,
   widgetTipleriKategoriyeGore,
+  widgettenForma,
 };
-
-export function widgettenForma(widget: AdminWidget): WidgetFormDegeri {
-  const cfg = widget.configJson && Object.keys(widget.configJson).length > 0
-    ? widget.configJson
-    : varsayilanConfig(widget.tip);
-  return {
-    ad: widget.ad,
-    tip: widget.tip,
-    sira: widget.sira,
-    aktif: widget.aktif,
-    baslik: widget.baslik ?? '',
-    altBaslik: widget.altBaslik ?? '',
-    aciklama: widget.aciklama ?? '',
-    gorselUrl: widget.gorselUrl ?? '',
-    butonMetni: widget.butonMetni ?? '',
-    butonLink: widget.butonLink ?? '',
-    arkaPlanRenk: widget.arkaPlanRenk ?? '',
-    yaziRenk: widget.yaziRenk ?? '',
-    mobilGoster: widget.mobilGoster,
-    masaustuGoster: widget.masaustuGoster,
-    configJsonMetin: JSON.stringify(cfg, null, 2),
-    sayfaId: widget.sayfaId != null && widget.sayfaId !== '' ? idString(widget.sayfaId) : '',
-  };
-}
 
 interface WidgetListesiPanelProps {
   widgetlar: AdminWidget[];

@@ -1,10 +1,21 @@
 import { WIDGET_TIPLERI, type WidgetTip } from '../../Application/DTOs/WidgetDto.js';
 import type { Request, Response } from 'express';
+import type { Widget } from '@prisma/client';
 import { WidgetService } from '../../Services/WidgetService.js';
 import { cozulenSiteId } from '../utils/cozulenSiteId.js';
 import { paramId } from '../../Infrastructure/utils/paramId.js';
+import { idToApi } from '../../Infrastructure/utils/sayisalId.js';
 
 const widgetService = new WidgetService();
+
+function widgetToApi(widget: Widget) {
+  return {
+    ...widget,
+    id: idToApi(widget.id),
+    siteId: idToApi(widget.siteId),
+    sayfaId: widget.sayfaId != null ? idToApi(widget.sayfaId) : null,
+  };
+}
 
 export class WidgetController {
   async listele(req: Request, res: Response) {
@@ -20,7 +31,7 @@ export class WidgetController {
         : undefined;
 
       const widgetlar = await widgetService.listele(siteId, tip);
-      return res.json({ widgetlar });
+      return res.json({ widgetlar: widgetlar.map(widgetToApi) });
     } catch (err) {
       const mesaj = err instanceof Error ? err.message : 'Widgetlar alinamadi';
       return res.status(500).json({ mesaj });
@@ -35,7 +46,7 @@ export class WidgetController {
       }
 
       const widget = await widgetService.olustur(siteId, req.body);
-      return res.status(201).json({ widget });
+      return res.status(201).json({ widget: widgetToApi(widget) });
     } catch (err) {
       const mesaj = err instanceof Error ? err.message : 'Widget olusturulamadi';
       return res.status(400).json({ mesaj });
@@ -50,7 +61,7 @@ export class WidgetController {
       }
 
       const widget = await widgetService.guncelle(siteId, paramId(req.params.id), req.body);
-      return res.json({ widget });
+      return res.json({ widget: widgetToApi(widget) });
     } catch (err) {
       const mesaj = err instanceof Error ? err.message : 'Widget guncellenemedi';
       const status = mesaj === 'Widget bulunamadi' ? 404 : 400;

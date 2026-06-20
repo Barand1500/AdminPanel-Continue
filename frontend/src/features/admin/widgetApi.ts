@@ -1,7 +1,11 @@
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
 import { tokenAl } from '@/features/auth/authApi';
 import { jsonYanitOku } from '@/utils/jsonFetch';
-import { idString } from '@/utils/idKarsilastir';
+import {
+  adminWidgetNormalize,
+  formSayfaId,
+  widgetFormNormalize,
+} from '@/utils/widgetFormYardimci';
 import { AKTIF_WIDGET_TIPLERI, DEPRECATED_WIDGET_TIPLERI } from '@/types/widget';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 
@@ -32,24 +36,13 @@ function temizleOpsiyonel(metin: string) {
   return trimmed.length > 0 ? trimmed : null;
 }
 
-/** API sayfaId'yi sayı döndürebilir; kayıt öncesi string'e çevir */
 function sayfaIdPayload(form: WidgetFormDegeri): string | null {
-  const ham = form.sayfaId;
-  if (ham == null || ham === '') return null;
-  const metin = idString(ham).trim();
+  const metin = formSayfaId(form.sayfaId).trim();
   return metin.length > 0 ? metin : null;
 }
 
-function adminWidgetNormalize(widget: AdminWidget): AdminWidget {
-  return {
-    ...widget,
-    id: idString(widget.id),
-    siteId: idString(widget.siteId),
-    sayfaId: widget.sayfaId != null && widget.sayfaId !== '' ? idString(widget.sayfaId) : null,
-  };
-}
-
 function payloadHazirla(form: WidgetFormDegeri, guncelleme = false) {
+  form = widgetFormNormalize(form);
   if (!widgetTipleri.includes(form.tip as (typeof widgetTipleri)[number])) {
     throw new Error('Geçersiz widget tipi');
   }

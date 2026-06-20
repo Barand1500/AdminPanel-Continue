@@ -17,6 +17,7 @@ import { adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi'
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 import { sonrakiWidgetSira, siraCakismasiBul } from '@/utils/widgetSiraYardimci';
 import { siteVerisiGuncellendiYayinla } from '@/utils/siteVerisiOlaylari';
+import { widgetFormNormalize } from '@/utils/widgetFormYardimci';
 import { configOku } from '@/types/widget';
 import { olusturucuOku } from '@/types/blokOlusturucu';
 import { olusturucuDoluMu } from '@/components/admin/widget/olusturucu/blokOlusturucuYardimci';
@@ -169,6 +170,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
   );
 
   async function kaydet(deger: WidgetFormDegeri, widgetId?: string, opts?: { hizli?: boolean }) {
+    deger = widgetFormNormalize(deger);
     const ad = deger.ad.trim() || deger.baslik.trim() || tipEtiketi(deger.tip);
     if (!ad) {
       setHata('Widget adı veya içerik başlığı gerekli');
@@ -249,7 +251,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
               varsayilanTip={varsayilanTip}
               tumWidgetlar={widgetlar}
               sayfalar={sayfalar}
-              onChange={setForm}
+              onChange={(yeni) => setForm(widgetFormNormalize(yeni))}
               onKaydet={kaydet}
               onKaydetTetikleyici={onKaydetTetikleyici}
               onTipSecildi={() => setOnizlemeHazir(true)}

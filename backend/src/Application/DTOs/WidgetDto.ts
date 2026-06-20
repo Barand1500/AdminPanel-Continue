@@ -67,6 +67,15 @@ const bosMetin = z
     return t.length > 0 ? t : null;
   });
 
+const sayfaIdAlani = z
+  .union([z.string(), z.number(), z.null()])
+  .optional()
+  .transform((v) => {
+    if (v == null || v === '') return null;
+    const t = String(v).trim();
+    return t.length > 0 ? t : null;
+  });
+
 const baseWidgetSchema = z.object({
   ad: z
     .string()
@@ -74,7 +83,7 @@ const baseWidgetSchema = z.object({
     .min(1, 'Widget adi gerekli')
     .transform((v) => (v.length < 2 ? `${v} Widget` : v)),
   tip: z.enum(WIDGET_TIPLERI, { message: 'Gecersiz widget tipi' }),
-  sayfaId: z.string().optional().nullable(),
+  sayfaId: sayfaIdAlani,
   sira: z.coerce.number().int().min(0).default(0),
   aktif: z.coerce.boolean().default(true),
   baslik: bosMetin,

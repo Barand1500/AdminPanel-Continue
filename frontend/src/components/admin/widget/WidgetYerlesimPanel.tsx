@@ -7,6 +7,7 @@ import {
   bolgeNormalize,
 } from '@/utils/widgetYerlesim';
 import { idString } from '@/utils/idKarsilastir';
+import { formSayfaId } from '@/utils/widgetFormYardimci';
 import { AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { FormAlani, formSelectSinifi } from '@/components/form/FormAlani';
 import { SecimAlani } from './panels/WidgetPanelOrtak';
@@ -45,11 +46,12 @@ export function WidgetYerlesimPanel({
   }
 
   function sayfaDegistir(sayfaId: string) {
-    const yeniAnaSayfa = !sayfaId;
+    const temizSayfaId = formSayfaId(sayfaId);
+    const yeniAnaSayfa = !temizSayfaId;
     const yeniBolge = yeniAnaSayfa ? 'icerik_alani' : 'sayfa_ustu';
     onChange(
       configGuncelle(
-        { ...form, sayfaId },
+        { ...form, sayfaId: temizSayfaId },
         (c) => ({
           ...c,
           yerlesim: {
@@ -74,7 +76,7 @@ export function WidgetYerlesimPanel({
       <FormAlani etiket="Sayfa" aciklama="Ana sayfa veya oluşturduğunuz bir sayfa">
         <select
           className={formSelectSinifi}
-          value={idString(form.sayfaId)}
+          value={formSayfaId(form.sayfaId)}
           onChange={(e) => sayfaDegistir(e.target.value)}
         >
           <option value="">Ana Sayfa</option>
