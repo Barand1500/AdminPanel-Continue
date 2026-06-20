@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig } from '@/types/widget';
+import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk } from '../widgetKabuk';
 import { configOkuFromWidget, gridStyle, haritaEmbedUrl, medyaUrl } from '../widgetHelpers';
 import { havaDurumuGetir, type HavaDurumuYanit } from '@/features/site/havaApi';
@@ -75,16 +76,30 @@ export function IletisimBlokWidget({ widget }: { widget: Widget }) {
   const kartlar = cfg.iletisimKartlari ?? [];
   const harita = haritaEmbedUrl(cfg.haritaUrl, cfg.haritaLat, cfg.haritaLng, cfg.haritaZoom ?? 14);
   const mapSag = (g.icerikDuzeni ?? 'sag') === 'sag';
+  const gt = widgetGorunumTipiAl(widget);
 
-  return (
-    <WidgetKabuk widget={widget}>
+  const kartSinif =
+    gt === 'kart'
+      ? 'rounded-2xl border border-slate-200 bg-white p-4 shadow-sm'
+      : 'flex gap-3 rounded-xl bg-slate-50 p-4';
+
+  const icerik = (
+    <>
       {widget.altBaslik && <p className="mb-1 text-xs font-bold uppercase tracking-wider text-blue-600">{widget.altBaslik}</p>}
       {widget.baslik && <h2 className="mb-2 text-2xl font-bold text-slate-900">{widget.baslik}</h2>}
       {widget.aciklama && <p className="mb-6 text-slate-600">{widget.aciklama}</p>}
-      <div className={`grid gap-8 lg:grid-cols-2 ${mapSag ? '' : 'lg:[direction:rtl] lg:*:[direction:ltr]'}`}>
-        <div className="grid gap-3 sm:grid-cols-2">
+      <div
+        className={
+          gt === 'bol-split'
+            ? `grid gap-8 lg:grid-cols-2 ${mapSag ? '' : 'lg:[direction:rtl] lg:*:[direction:ltr]'}`
+            : gt === 'kart'
+              ? 'space-y-4'
+              : `grid gap-8 lg:grid-cols-2 ${mapSag ? '' : 'lg:[direction:rtl] lg:*:[direction:ltr]'}`
+        }
+      >
+        <div className={gt === 'kart' ? 'grid gap-3' : 'grid gap-3 sm:grid-cols-2'}>
           {kartlar.map((k) => (
-            <div key={k.id} className="flex gap-3 rounded-xl bg-slate-50 p-4">
+            <div key={k.id} className={kartSinif}>
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-lg">
                 {k.ikon || '📍'}
               </span>
@@ -95,12 +110,17 @@ export function IletisimBlokWidget({ widget }: { widget: Widget }) {
             </div>
           ))}
         </div>
-        {harita && (
+        {harita && gt !== 'kart' && (
           <iframe title="Harita" src={harita} className="min-h-[320px] w-full rounded-2xl shadow-lg" loading="lazy" />
         )}
       </div>
-    </WidgetKabuk>
+      {harita && gt === 'kart' && (
+        <iframe title="Harita" src={harita} className="mt-6 min-h-[280px] w-full rounded-2xl border border-slate-200 shadow-sm" loading="lazy" />
+      )}
+    </>
   );
+
+  return <WidgetKabuk widget={widget}>{icerik}</WidgetKabuk>;
 }
 
 export function KategoriHaberListesiWidget({ widget }: { widget: Widget }) {
@@ -177,16 +197,22 @@ export function SekmeliHaberWidget({ widget }: { widget: Widget }) {
   const sekme = sekmeler[aktif];
   const oneCikan = sekme?.kartlar[0];
   const liste = sekme?.kartlar.slice(1) ?? [];
+  const gt = widgetGorunumTipiAl(widget);
+  const pillMod = gt === 'pill-sekme';
 
   return (
     <WidgetKabuk widget={widget}>
-      <div className="mb-4 flex flex-wrap gap-2 border-b border-slate-200">
+      <div className={`mb-4 flex flex-wrap gap-2 ${pillMod ? '' : 'border-b border-slate-200'}`}>
         {sekmeler.map((s, i) => (
           <button
             key={s.id}
             type="button"
             onClick={() => setAktif(i)}
-            className={`border-b-2 px-4 py-2 text-sm font-semibold transition ${i === aktif ? 'border-primary text-primary' : 'border-transparent text-slate-500'}`}
+            className={
+              pillMod
+                ? `rounded-full px-4 py-2 text-sm font-semibold transition ${i === aktif ? 'bg-primary text-white' : 'bg-slate-100 text-slate-600'}`
+                : `border-b-2 px-4 py-2 text-sm font-semibold transition ${i === aktif ? 'border-primary text-primary' : 'border-transparent text-slate-500'}`
+            }
           >
             {s.baslik}
           </button>

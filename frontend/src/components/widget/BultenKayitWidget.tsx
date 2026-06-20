@@ -1,5 +1,6 @@
 import { FormEvent, useState } from 'react';
 import type { Widget } from '@/types/site';
+import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget } from './widgetHelpers';
 import { publicFormGonder } from '@/features/site/formApi';
@@ -10,6 +11,7 @@ export function BultenKayitWidget({ widget }: { widget: Widget }) {
   const [gonderiliyor, setGonderiliyor] = useState(false);
   const [basari, setBasari] = useState(false);
   const [hata, setHata] = useState('');
+  const gt = widgetGorunumTipiAl(widget);
 
   async function gonder(e: FormEvent) {
     e.preventDefault();
@@ -26,15 +28,22 @@ export function BultenKayitWidget({ widget }: { widget: Widget }) {
     }
   }
 
+  const kartSinif =
+    gt === 'banner'
+      ? 'bulten-kayit-banner w-full rounded-none border-y border-slate-200 bg-gradient-to-r from-primary/10 to-slate-50 px-6 py-10'
+      : gt === 'kart'
+        ? 'bulten-kayit-kart mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm'
+        : 'bulten-kayit-kart mx-auto max-w-2xl overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-8 shadow-sm sm:p-10';
+
   return (
     <WidgetKabuk widget={widget}>
-      <div className="bulten-kayit-kart mx-auto max-w-2xl overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-8 shadow-sm sm:p-10">
-        <div className="text-center">
+      <div className={kartSinif}>
+        <div className={gt === 'banner' ? 'mx-auto max-w-3xl text-center' : 'text-center'}>
           {widget.altBaslik && <p className="text-sm font-semibold uppercase tracking-wide text-primary">{widget.altBaslik}</p>}
           {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-slate-900`}>{widget.baslik}</h2>}
           {widget.aciklama && <p className="mt-3 text-slate-600">{widget.aciklama}</p>}
         </div>
-        <form onSubmit={gonder} className="mt-8 flex flex-col gap-3 sm:flex-row">
+        <form onSubmit={gonder} className={`mt-8 flex flex-col gap-3 ${gt === 'banner' ? 'mx-auto max-w-xl sm:flex-row' : 'sm:flex-row'}`}>
           <input
             type="email"
             required

@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig } from '@/types/widget';
 import { widgetTamEkranMi } from '@/types/widget';
+import { widgetGorunumSinifAl } from '@/utils/widgetGorunumYardimci';
 import { configOkuFromWidget, widgetSectionClass, widgetSectionStyle } from './widgetHelpers';
 
 export { configOkuFromWidget, widgetSectionClass, widgetSectionStyle, medyaUrl } from './widgetHelpers';
@@ -14,7 +15,7 @@ export function WidgetKabuk({ widget, children }: { widget: Widget; children: Re
   return (
     <section
       id={id || undefined}
-      className={`${widgetSectionClass(widget, sinif)}${tamEkran ? ' widget-bolum-tam-ekran' : ''}`}
+      className={`${widgetSectionClass(widget, sinif)} ${widgetGorunumSinifAl(widget)}${tamEkran ? ' widget-bolum-tam-ekran' : ''}`}
       style={widgetSectionStyle(widget)}
     >
       {tamEkran ? <div className="widget-icerik-tam-ekran w-full">{children}</div> : <div className="container-site">{children}</div>}

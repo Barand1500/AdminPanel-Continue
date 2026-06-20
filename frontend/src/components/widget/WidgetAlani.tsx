@@ -38,7 +38,8 @@ import {
   VideoGalerisiWidget,
 } from './haber/HaberPortalWidgetleri';
 import { BlokOlusturucuWidget } from './BlokOlusturucuWidget';
-import { configOkuFromWidget, haritaEmbedUrl, widgetSectionClass, widgetSectionStyle } from './widgetHelpers';
+import { HaritaWidget } from './HaritaWidget';
+import { KategoriWidget } from './KategoriWidget';
 
 interface WidgetRenderProps {
   widget: Widget;
@@ -125,36 +126,10 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
         return <HaberMagazinWidget widget={widget} />;
       case 'BLOK_OLUSTURUCU':
         return <BlokOlusturucuWidget widget={widget} />;
-      case 'HARITA': {
-        const cfg = configOkuFromWidget(widget);
-        const src = haritaEmbedUrl(cfg.haritaUrl, cfg.haritaLat, cfg.haritaLng, cfg.haritaZoom ?? 14);
-        if (!src) return null;
-        return (
-          <section className={widgetSectionClass(widget, 'py-8')} style={widgetSectionStyle(widget)}>
-            <div className="container-site">
-              <iframe title="Harita" src={src} className="h-80 w-full rounded-xl border-0" loading="lazy" allowFullScreen referrerPolicy="no-referrer-when-downgrade" />
-            </div>
-          </section>
-        );
-      }
-      case 'KATEGORI': {
-        const cfg = configOkuFromWidget(widget);
-        const kategoriler = cfg.kategoriler ?? [];
-        return (
-          <section className={widgetSectionClass(widget, 'py-12')} style={widgetSectionStyle(widget)}>
-            <div className="container-site">
-              {widget.baslik && <h2 className="section-title mb-6">{widget.baslik}</h2>}
-              <div className="flex flex-wrap gap-3">
-                {kategoriler.map((k) => (
-                  <a key={k.id} href={k.link || '#'} className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:border-primary">
-                    {k.ikon} {k.metin}
-                  </a>
-                ))}
-              </div>
-            </div>
-          </section>
-        );
-      }
+      case 'HARITA':
+        return <HaritaWidget widget={widget} />;
+      case 'KATEGORI':
+        return <KategoriWidget widget={widget} />;
       default:
         return null;
     }

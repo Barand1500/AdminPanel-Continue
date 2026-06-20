@@ -17,6 +17,7 @@ import type {
 } from '@/types/haberWidget';
 import { HABER_PORTAL_WIDGET_TIPLERI } from '@/types/haberWidget';
 import { onizlemeMockVerisiUygula, widgetFormMockUygula } from '@/utils/widgetOnizlemeMock';
+import { varsayilanWidgetGorunumTipi } from '@/data/widgetGorunumTipleri';
 export { widgetFormMockUygula };
 export { HABER_PORTAL_WIDGET_TIPLERI };
 
@@ -175,6 +176,10 @@ export interface WidgetGorunumAyarlari {
   kartGolge?: boolean;
   /** normal: yan boşluklu container; tam_ekran: viewport genişliği */
   bolumGenisligi?: WidgetBolumGenisligi;
+  /** Widget layout varyantı (headerTipi benzeri) */
+  gorunumTipi?: string;
+  /** Seçilen görünüm tipine özel ek ayarlar */
+  tipEk?: Record<string, unknown>;
 }
 
 export interface WidgetEkAyarlar {
@@ -314,6 +319,11 @@ export interface WidgetMarkaLogosu {
   ad: string;
   gorselUrl: string;
   link?: string;
+  /** istatistik-kapsul varyantı için */
+  deger?: string;
+  sonEk?: string;
+  trend?: string;
+  durumEtiketi?: string;
 }
 
 export interface WidgetKarsilastirmaPaket {
@@ -433,6 +443,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     gorselKirpma: 'kapla',
     borderRadius: 12,
     baslikBoyutu: 'lg',
+    gorunumTipi: varsayilanWidgetGorunumTipi(tip),
   };
   const ek: WidgetEkAyarlar = { girisAnimasyonu: 'yok' };
   const yerlesim: WidgetYerlesim = { bolge: 'icerik_alani' };

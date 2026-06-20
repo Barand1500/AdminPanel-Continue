@@ -1,5 +1,6 @@
 import type { CSSProperties } from 'react';
 import type { Widget } from '@/types/site';
+import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget } from './widgetHelpers';
 
@@ -19,6 +20,7 @@ export function KarsilastirmaTablosuWidget({ widget }: { widget: Widget }) {
   const paketler = cfg.karsilastirmaPaketler ?? [];
   const satirlar = cfg.karsilastirmaSatirlari ?? [];
   const g = cfg.gorunum ?? {};
+  const gt = widgetGorunumTipiAl(widget);
   if (paketler.length === 0) return null;
 
   const baslikRengi = g.baslikRengi || widget.yaziRenk || '#0f172a';
@@ -31,6 +33,46 @@ export function KarsilastirmaTablosuWidget({ widget }: { widget: Widget }) {
   const hucreStili: CSSProperties = { color: metinRengi };
   const ozellikStili: CSSProperties = { color: baslikRengi };
 
+  if (gt === 'kart') {
+    return (
+      <WidgetKabuk widget={widget}>
+        {widget.baslik && (
+          <h2 className={`${baslikSinifi(cfg)} mb-8 text-center font-bold`} style={{ color: baslikRengi }}>
+            {widget.baslik}
+          </h2>
+        )}
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+          {paketler.map((p) => (
+            <article
+              key={p.id}
+              className="rounded-2xl border p-6 shadow-sm"
+              style={{
+                borderColor: p.oneCikan ? vurguRengi : kenarRengi,
+                backgroundColor: p.oneCikan ? `${vurguRengi}08` : tabloArkaPlan,
+              }}
+            >
+              <h3 className="text-lg font-bold" style={{ color: baslikRengi }}>{p.ad}</h3>
+              {p.fiyat && <p className="mt-1 font-semibold" style={{ color: vurguRengi }}>{p.fiyat}</p>}
+              <ul className="mt-4 space-y-2">
+                {satirlar.map((s) => {
+                  const pi = paketler.findIndex((x) => x.id === p.id);
+                  return (
+                    <li key={s.id} className="flex justify-between gap-2 text-sm">
+                      <span style={ozellikStili}>{s.ozellik}</span>
+                      {hucreGoster(s.hucreler[pi] ?? '—', hucreStili)}
+                    </li>
+                  );
+                })}
+              </ul>
+            </article>
+          ))}
+        </div>
+      </WidgetKabuk>
+    );
+  }
+
+  const tabloSinif = gt === 'minimal' ? 'text-sm' : '';
+
   return (
     <WidgetKabuk widget={widget}>
       {widget.baslik && (
@@ -42,7 +84,7 @@ export function KarsilastirmaTablosuWidget({ widget }: { widget: Widget }) {
         </h2>
       )}
       <div
-        className="overflow-x-auto rounded-2xl shadow-sm"
+        className={`overflow-x-auto rounded-2xl shadow-sm ${tabloSinif}`}
         style={{ border: `1px solid ${kenarRengi}`, backgroundColor: tabloArkaPlan }}
       >
         <table className="w-full min-w-[560px] border-collapse text-left">

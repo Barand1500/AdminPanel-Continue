@@ -82,37 +82,75 @@ export function SurecAdimlariIcerik({ form, onChange }: WidgetPanelProps) {
 export function MarkaSeridiIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const markalar = cfg.markalar ?? [];
+  const gorunumTipi = cfg.gorunum?.gorunumTipi ?? 'logo-kayan';
+  const istatistikMod = gorunumTipi === 'istatistik-kapsul';
+
   return (
-    <AdminFormBolumu baslik="Marka / Partner Şeridi" aciklama="Logolar yatay kayan şeritte gösterilir">
+    <AdminFormBolumu
+      baslik="Marka / Partner Şeridi"
+      aciklama={
+        istatistikMod
+          ? 'KPI kapsül şeridi — her satır bir istatistik'
+          : gorunumTipi === 'egik-metin-seridi'
+            ? 'Metin maddeleri eğik kayan bandda gösterilir'
+            : 'Logolar yatay kayan şeritte gösterilir'
+      }
+    >
       <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} /></FormAlani>
-      <SecimAlani
-        etiket="Kaydırma hızı"
-        deger={cfg.markaHizi ?? 'normal'}
-        secenekler={[
-          { id: 'yavas', etiket: 'Yavaş' },
-          { id: 'normal', etiket: 'Normal' },
-          { id: 'hizli', etiket: 'Hızlı' },
-        ]}
-        onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, markaHizi: v as 'yavas' | 'normal' | 'hizli' })))}
-      />
+      {!istatistikMod && (
+        <SecimAlani
+          etiket="Kaydırma hızı"
+          deger={cfg.markaHizi ?? 'normal'}
+          secenekler={[
+            { id: 'yavas', etiket: 'Yavaş' },
+            { id: 'normal', etiket: 'Normal' },
+            { id: 'hizli', etiket: 'Hızlı' },
+          ]}
+          onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, markaHizi: v as 'yavas' | 'normal' | 'hizli' })))}
+        />
+      )}
       <ListeSiralayici<WidgetMarkaLogosu>
         ogeler={markalar}
         onDegistir={(m) => onChange(configGuncelle(form, (c) => ({ ...c, markalar: m })))}
         yeniEkle={() => ({ id: uid(), ad: '', gorselUrl: '', link: '' })}
         renderOge={(m, i) => (
           <div className="space-y-2">
-            <GorselAlan etiket="Logo" deger={m.gorselUrl} onChange={(v) => {
-              const k = [...markalar]; k[i] = { ...m, gorselUrl: v };
-              onChange(configGuncelle(form, (c) => ({ ...c, markalar: k })));
-            }} />
-            <input className={formInputSinifi} placeholder="Marka adı" value={m.ad} onChange={(e) => {
+            {!istatistikMod && (
+              <GorselAlan etiket="Logo" deger={m.gorselUrl} onChange={(v) => {
+                const k = [...markalar]; k[i] = { ...m, gorselUrl: v };
+                onChange(configGuncelle(form, (c) => ({ ...c, markalar: k })));
+              }} />
+            )}
+            <input className={formInputSinifi} placeholder={istatistikMod ? 'Etiket (ör. Sipariş)' : 'Marka adı / metin'} value={m.ad} onChange={(e) => {
               const k = [...markalar]; k[i] = { ...m, ad: e.target.value };
               onChange(configGuncelle(form, (c) => ({ ...c, markalar: k })));
             }} />
-            <input className={formInputSinifi} placeholder="Link (opsiyonel)" value={m.link ?? ''} onChange={(e) => {
-              const k = [...markalar]; k[i] = { ...m, link: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, markalar: k })));
-            }} />
+            {istatistikMod && (
+              <>
+                <input className={formInputSinifi} placeholder="Değer (ör. 247)" value={m.deger ?? ''} onChange={(e) => {
+                  const k = [...markalar]; k[i] = { ...m, deger: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, markalar: k })));
+                }} />
+                <input className={formInputSinifi} placeholder="Son ek (ör. K)" value={m.sonEk ?? ''} onChange={(e) => {
+                  const k = [...markalar]; k[i] = { ...m, sonEk: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, markalar: k })));
+                }} />
+                <input className={formInputSinifi} placeholder="Trend (ör. ↑ %32)" value={m.trend ?? ''} onChange={(e) => {
+                  const k = [...markalar]; k[i] = { ...m, trend: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, markalar: k })));
+                }} />
+                <input className={formInputSinifi} placeholder="Durum etiketi (ör. Aktif)" value={m.durumEtiketi ?? ''} onChange={(e) => {
+                  const k = [...markalar]; k[i] = { ...m, durumEtiketi: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, markalar: k })));
+                }} />
+              </>
+            )}
+            {!istatistikMod && (
+              <input className={formInputSinifi} placeholder="Link (opsiyonel)" value={m.link ?? ''} onChange={(e) => {
+                const k = [...markalar]; k[i] = { ...m, link: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, markalar: k })));
+              }} />
+            )}
           </div>
         )}
       />

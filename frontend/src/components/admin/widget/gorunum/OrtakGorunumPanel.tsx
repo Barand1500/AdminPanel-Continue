@@ -12,6 +12,7 @@ import {
 import { SecimAlani } from '../panels/WidgetPanelOrtak';
 import type { WidgetGorunumPanelProps } from '../panels/types';
 import { HaberGorunumPanel } from './HaberGorunumPanel';
+import { WidgetGorunumTipSecici } from './WidgetGorunumTipSecici';
 
 export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
   const cfg = configOku(form);
@@ -23,9 +24,72 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
   const metinGoster = WIDGET_GORUNUM_METIN_TIPLERI.has(tip);
   const karuselEk = tip === 'BLOG_KARUSEL';
   const karsilastirmaEk = tip === 'KARSILASTIRMA_TABLOSU';
+  const iletisimCtaEk = tip === 'ILETISIM_FORMU';
+  const gorunumTipi = g.gorunumTipi ?? 'merkez-basit';
+  const tipEk = g.tipEk ?? {};
 
   return (
     <>
+      <WidgetGorunumTipSecici form={form} onChange={onChange} />
+
+      {iletisimCtaEk && ['gradient-banner', 'bol-split'].includes(gorunumTipi) && (
+        <AdminFormBolumu baslik="CTA banner ayarları">
+          {gorunumTipi === 'gradient-banner' && (
+            <FormAlani etiket="Rozet metni">
+              <input
+                className="max-w-md rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] px-3 py-2 text-sm"
+                value={(tipEk.rozetMetni as string) ?? 'Hazır Mısınız?'}
+                onChange={(e) =>
+                  onChange(
+                    configGuncelle(form, (c) => ({
+                      ...c,
+                      gorunum: {
+                        ...c.gorunum,
+                        tipEk: { ...c.gorunum?.tipEk, rozetMetni: e.target.value },
+                      },
+                    }))
+                  )
+                }
+              />
+            </FormAlani>
+          )}
+          <FormAlani etiket="İkinci buton metni">
+            <input
+              className="max-w-md rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] px-3 py-2 text-sm"
+              value={(tipEk.ikinciButonMetni as string) ?? 'Tüm Özellikler'}
+              onChange={(e) =>
+                onChange(
+                  configGuncelle(form, (c) => ({
+                    ...c,
+                    gorunum: {
+                      ...c.gorunum,
+                      tipEk: { ...c.gorunum?.tipEk, ikinciButonMetni: e.target.value },
+                    },
+                  }))
+                )
+              }
+            />
+          </FormAlani>
+          <FormAlani etiket="İkinci buton linki">
+            <input
+              className="max-w-md rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] px-3 py-2 text-sm"
+              value={(tipEk.ikinciButonLink as string) ?? '#'}
+              onChange={(e) =>
+                onChange(
+                  configGuncelle(form, (c) => ({
+                    ...c,
+                    gorunum: {
+                      ...c.gorunum,
+                      tipEk: { ...c.gorunum?.tipEk, ikinciButonLink: e.target.value },
+                    },
+                  }))
+                )
+              }
+            />
+          </FormAlani>
+        </AdminFormBolumu>
+      )}
+
       <AdminFormBolumu baslik="Renkler ve boşluk">
         <RenkSecici etiket="Arka plan" deger={form.arkaPlanRenk} varsayilan="#ffffff" onChange={(v) => onChange({ ...form, arkaPlanRenk: v })} />
         <RenkSecici etiket="Genel yazı rengi" deger={form.yaziRenk} varsayilan="#111827" onChange={(v) => onChange({ ...form, yaziRenk: v })} />
