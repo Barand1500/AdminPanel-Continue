@@ -33,7 +33,7 @@ export function OncesiSonrasiWidget({ widget }: { widget: Widget }) {
 
   if (!once || !sonra) return null;
 
-  if (gt === 'yan-yana') {
+  if (gt === 'yan-yana-sabit') {
     return (
       <WidgetKabuk widget={widget}>
         {widget.baslik && (
@@ -53,7 +53,7 @@ export function OncesiSonrasiWidget({ widget }: { widget: Widget }) {
     );
   }
 
-  const rounded = gt === 'kart' ? 'rounded-xl border border-slate-200' : 'rounded-2xl shadow-lg';
+  const rounded = gt === 'cerceveli-kart' ? 'rounded-xl border border-slate-200' : 'rounded-2xl shadow-lg';
 
   return (
     <WidgetKabuk widget={widget}>

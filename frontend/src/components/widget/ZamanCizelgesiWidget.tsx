@@ -10,7 +10,7 @@ export function ZamanCizelgesiWidget({ widget }: { widget: Widget }) {
 
   const gt = widgetGorunumTipiAl(widget);
 
-  if (gt === 'kart') {
+  if (gt === 'kart-zaman') {
     return (
       <WidgetKabuk widget={widget}>
         <div className="mx-auto max-w-3xl text-center">
@@ -31,7 +31,7 @@ export function ZamanCizelgesiWidget({ widget }: { widget: Widget }) {
     );
   }
 
-  if (gt === 'yatay') {
+  if (gt === 'yatay-adim') {
     return (
       <WidgetKabuk widget={widget}>
         <div className="mx-auto max-w-3xl text-center">

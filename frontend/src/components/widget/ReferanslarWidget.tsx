@@ -13,7 +13,7 @@ export function ReferanslarWidget({ widget }: ReferanslarWidgetProps) {
   const kolon = cfg.gorunum?.kolonSayisi ?? 4;
   const gt = widgetGorunumTipiAl(widget);
 
-  if (gt === 'quote' && referanslar[0]) {
+  if (gt === 'buyuk-alinti' && referanslar[0]) {
     return (
       <WidgetKabuk widget={widget}>
         <blockquote className="mx-auto max-w-3xl text-center">
@@ -26,18 +26,18 @@ export function ReferanslarWidget({ widget }: ReferanslarWidgetProps) {
   }
 
   const listeSinif =
-    gt === 'carousel'
+    gt === 'kayan-serit'
       ? 'mt-10 flex gap-4 overflow-x-auto pb-4'
       : 'mt-10 grid gap-4';
 
   return (
     <WidgetKabuk widget={widget}>
       {widget.baslik && <h2 className={`${baslikSinifi(cfg)} text-center font-bold`}>{widget.baslik}</h2>}
-      <div className={listeSinif} style={gt === 'carousel' ? undefined : gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
+      <div className={listeSinif} style={gt === 'kayan-serit' ? undefined : gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
         {referanslar.map((referans) => (
           <div
             key={referans}
-            className={`flex h-24 items-center justify-center rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-600 ${gt === 'carousel' ? 'min-w-[160px] shrink-0' : ''}`}
+            className={`flex h-24 items-center justify-center rounded-xl border border-slate-200 bg-white text-sm font-semibold text-slate-600 ${gt === 'kayan-serit' ? 'min-w-[160px] shrink-0' : ''}`}
           >
             {referans}
           </div>

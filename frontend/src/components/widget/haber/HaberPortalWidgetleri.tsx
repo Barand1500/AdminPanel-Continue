@@ -79,9 +79,15 @@ export function IletisimBlokWidget({ widget }: { widget: Widget }) {
   const gt = widgetGorunumTipiAl(widget);
 
   const kartSinif =
-    gt === 'kart'
+    gt === 'kompakt-kart'
       ? 'rounded-2xl border border-slate-200 bg-white p-4 shadow-sm'
-      : 'flex gap-3 rounded-xl bg-slate-50 p-4';
+      : gt === 'koyu-iletisim'
+        ? 'flex gap-3 rounded-xl bg-slate-800 p-4 text-white'
+        : gt === 'mor-kart'
+          ? 'flex gap-3 rounded-xl border border-violet-200 bg-violet-50 p-4'
+          : gt === 'turuncu-baslik'
+            ? 'flex gap-3 rounded-xl border-l-4 border-orange-500 bg-orange-50 p-4'
+            : 'flex gap-3 rounded-xl bg-slate-50 p-4';
 
   const icerik = (
     <>
@@ -90,14 +96,14 @@ export function IletisimBlokWidget({ widget }: { widget: Widget }) {
       {widget.aciklama && <p className="mb-6 text-slate-600">{widget.aciklama}</p>}
       <div
         className={
-          gt === 'bol-split'
+          gt === 'bolunmus-panel'
             ? `grid gap-8 lg:grid-cols-2 ${mapSag ? '' : 'lg:[direction:rtl] lg:*:[direction:ltr]'}`
-            : gt === 'kart'
+            : gt === 'kompakt-kart'
               ? 'space-y-4'
               : `grid gap-8 lg:grid-cols-2 ${mapSag ? '' : 'lg:[direction:rtl] lg:*:[direction:ltr]'}`
         }
       >
-        <div className={gt === 'kart' ? 'grid gap-3' : 'grid gap-3 sm:grid-cols-2'}>
+        <div className={gt === 'kompakt-kart' ? 'grid gap-3' : 'grid gap-3 sm:grid-cols-2'}>
           {kartlar.map((k) => (
             <div key={k.id} className={kartSinif}>
               <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-blue-100 text-lg">
@@ -110,11 +116,11 @@ export function IletisimBlokWidget({ widget }: { widget: Widget }) {
             </div>
           ))}
         </div>
-        {harita && gt !== 'kart' && (
+        {harita && gt !== 'kompakt-kart' && (
           <iframe title="Harita" src={harita} className="min-h-[320px] w-full rounded-2xl shadow-lg" loading="lazy" />
         )}
       </div>
-      {harita && gt === 'kart' && (
+      {harita && gt === 'kompakt-kart' && (
         <iframe title="Harita" src={harita} className="mt-6 min-h-[280px] w-full rounded-2xl border border-slate-200 shadow-sm" loading="lazy" />
       )}
     </>

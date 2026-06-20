@@ -33,7 +33,7 @@ export function KarsilastirmaTablosuWidget({ widget }: { widget: Widget }) {
   const hucreStili: CSSProperties = { color: metinRengi };
   const ozellikStili: CSSProperties = { color: baslikRengi };
 
-  if (gt === 'kart') {
+  if (gt === 'mobil-kart') {
     return (
       <WidgetKabuk widget={widget}>
         {widget.baslik && (
@@ -71,7 +71,7 @@ export function KarsilastirmaTablosuWidget({ widget }: { widget: Widget }) {
     );
   }
 
-  const tabloSinif = gt === 'minimal' ? 'text-sm' : '';
+  const tabloSinif = gt === 'minimal-cizgi' ? 'text-sm' : '';
 
   return (
     <WidgetKabuk widget={widget}>

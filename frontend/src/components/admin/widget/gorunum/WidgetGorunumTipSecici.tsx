@@ -1,5 +1,6 @@
 import { AdminPanelKarti } from '@/components/admin/ortak/AdminBilesenleri';
 import {
+  WIDGET_GORUNUM_TEMA_RENKLERI,
   widgetGorunumTipTanimiBul,
   widgetGorunumTipleriBul,
 } from '@/data/widgetGorunumTipleri';
@@ -32,9 +33,10 @@ export function WidgetGorunumTipSecici({ form, onChange }: WidgetGorunumPanelPro
           : 'Bu widget için layout stilini seçin'
       }
     >
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4">
+      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-3">
         {tanimlar.map((t) => {
           const aktif = secili === t.id;
+          const temaRenk = WIDGET_GORUNUM_TEMA_RENKLERI[t.tema];
           return (
             <button
               key={t.id}
@@ -42,9 +44,14 @@ export function WidgetGorunumTipSecici({ form, onChange }: WidgetGorunumPanelPro
               onClick={() => tipSec(t.id)}
               className={`rounded-xl border p-3 text-left transition ${
                 aktif
-                  ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)]/10 ring-2 ring-[var(--ap-accent)]/40'
-                  : 'border-[var(--ap-border)] hover:border-[var(--ap-accent)]/50 hover:bg-[var(--ap-hover)]'
+                  ? 'ring-2 ring-offset-1 ring-offset-[var(--ap-surface)]'
+                  : 'border-[var(--ap-border)] hover:bg-[var(--ap-hover)]'
               }`}
+              style={{
+                borderColor: aktif ? temaRenk.accent : undefined,
+                background: aktif ? `${temaRenk.accent}12` : undefined,
+                boxShadow: aktif ? `inset 0 0 0 1px ${temaRenk.accent}40` : undefined,
+              }}
             >
               <div
                 className={`mb-2 overflow-hidden rounded-lg border bg-[var(--ap-surface-elevated)] ${
@@ -55,7 +62,13 @@ export function WidgetGorunumTipSecici({ form, onChange }: WidgetGorunumPanelPro
               </div>
               <p className="ap-heading text-sm font-semibold">{t.ad}</p>
               <p className="ap-muted mt-0.5 line-clamp-2 text-xs">{t.aciklama}</p>
-              {t.ilham && <p className="mt-1 text-[10px] text-[var(--ap-accent)]">{t.ilham}</p>}
+              <span
+                className="mt-1.5 inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                style={{ background: temaRenk.surface, color: temaRenk.accent, border: `1px solid ${temaRenk.accent}40` }}
+              >
+                {t.tema.charAt(0).toUpperCase() + t.tema.slice(1)} tema
+              </span>
+              {t.ilham && <p className="mt-1 text-[10px] opacity-70">{t.ilham}</p>}
             </button>
           );
         })}

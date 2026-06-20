@@ -13,6 +13,7 @@ import { SecimAlani } from '../panels/WidgetPanelOrtak';
 import type { WidgetGorunumPanelProps } from '../panels/types';
 import { HaberGorunumPanel } from './HaberGorunumPanel';
 import { WidgetGorunumTipSecici } from './WidgetGorunumTipSecici';
+import { YorumKartlariGorunumPanel } from './YorumKartlariGorunumPanel';
 
 export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
   const cfg = configOku(form);
@@ -248,6 +249,7 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
       )}
 
       <HaberGorunumPanel form={form} onChange={onChange} />
+      <YorumKartlariGorunumPanel form={form} onChange={onChange} />
     </>
   );
 }

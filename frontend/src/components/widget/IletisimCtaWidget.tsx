@@ -108,17 +108,80 @@ function BolSplit({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
   );
 }
 
+function KoyuCam({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
+  const { rozetMetni, ikinciButonMetni, ikinciButonLink } = tipEkOku(cfg);
+  return (
+    <div className="iletisim-cta-koyu-cam rounded-3xl border border-white/10 bg-slate-900/90 px-8 py-10 text-white backdrop-blur-md md:px-12">
+      <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">{rozetMetni}</span>
+      {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-4 font-bold`}>{widget.baslik}</h2>}
+      {widget.aciklama && <p className="mt-3 text-slate-300">{widget.aciklama}</p>}
+      <div className="mt-8 flex flex-wrap gap-3">
+        {widget.butonMetni && widget.butonLink && (
+          <Link to={widget.butonLink} className="rounded-full bg-sky-500 px-6 py-3 text-sm font-semibold text-white hover:bg-sky-400">
+            {widget.butonMetni}
+          </Link>
+        )}
+        <Link to={ikinciButonLink} className="rounded-full border border-white/30 px-6 py-3 text-sm font-semibold hover:bg-white/10">
+          {ikinciButonMetni}
+        </Link>
+      </div>
+    </div>
+  );
+}
+
+function MorSerit({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
+  const { ikinciButonMetni, ikinciButonLink } = tipEkOku(cfg);
+  return (
+    <div className="iletisim-cta-mor-serit -mx-4 rounded-none bg-gradient-to-r from-violet-600 to-purple-700 px-8 py-10 text-white sm:-mx-6 md:rounded-2xl">
+      <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+        <div>
+          {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold`}>{widget.baslik}</h2>}
+          {widget.aciklama && <p className="mt-2 text-purple-100">{widget.aciklama}</p>}
+        </div>
+        <div className="flex flex-wrap gap-3">
+          {widget.butonMetni && widget.butonLink && (
+            <Link to={widget.butonLink} className="rounded-full bg-white px-6 py-3 text-sm font-bold text-purple-700">
+              {widget.butonMetni}
+            </Link>
+          )}
+          <Link to={ikinciButonLink} className="rounded-full border border-white/40 px-6 py-3 text-sm font-semibold">
+            {ikinciButonMetni}
+          </Link>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function YesilCerceve({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
+  return (
+    <div className="rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 p-8 text-center md:p-10">
+      {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold text-emerald-950`}>{widget.baslik}</h2>}
+      {widget.aciklama && <p className="mx-auto mt-3 max-w-xl text-emerald-800">{widget.aciklama}</p>}
+      {widget.butonMetni && widget.butonLink && (
+        <Link
+          to={widget.butonLink}
+          className="mt-8 inline-flex rounded-full border-2 border-emerald-600 bg-white px-8 py-3 text-sm font-bold text-emerald-700 hover:bg-emerald-600 hover:text-white"
+        >
+          {widget.butonMetni}
+        </Link>
+      )}
+    </div>
+  );
+}
+
 export function IletisimCtaWidget({ widget }: IletisimCtaWidgetProps) {
   const cfg = configOkuFromWidget(widget);
-  const gorunumTipi = widgetGorunumTipiAl(widget);
+  const gt = widgetGorunumTipiAl(widget);
 
   return (
     <WidgetKabuk widget={widget}>
-      {gorunumTipi === 'gradient-banner' && <GradientBanner widget={widget} cfg={cfg} />}
-      {gorunumTipi === 'bol-split' && <BolSplit widget={widget} cfg={cfg} />}
-      {(gorunumTipi === 'merkez-basit' || !['gradient-banner', 'bol-split'].includes(gorunumTipi)) && (
-        <MerkezBasit widget={widget} cfg={cfg} />
-      )}
+      {gt === 'gradient-banner' && <GradientBanner widget={widget} cfg={cfg} />}
+      {gt === 'bol-split' && <BolSplit widget={widget} cfg={cfg} />}
+      {gt === 'koyu-cam' && <KoyuCam widget={widget} cfg={cfg} />}
+      {gt === 'mor-serit' && <MorSerit widget={widget} cfg={cfg} />}
+      {gt === 'yesil-cerceve' && <YesilCerceve widget={widget} cfg={cfg} />}
+      {gt === 'merkez-basit' && <MerkezBasit widget={widget} cfg={cfg} />}
     </WidgetKabuk>
   );
 }

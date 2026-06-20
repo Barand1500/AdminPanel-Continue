@@ -97,22 +97,88 @@ function DikeyZaman({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetConfi
   );
 }
 
+const RENKLI_KART_RENK = ['#9333ea', '#2563eb', '#059669', '#ea580c', '#e11d48', '#0d9488'];
+
+function RenkliKart({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetConfig; adimlar: WidgetSurecAdimi[] }) {
+  return (
+    <>
+      <div className="mx-auto max-w-2xl text-center"><Baslik widget={widget} cfg={cfg} /></div>
+      <div className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+        {adimlar.map((a, i) => {
+          const renk = RENKLI_KART_RENK[i % RENKLI_KART_RENK.length];
+          return (
+            <article
+              key={a.id}
+              className="rounded-2xl border-2 bg-white p-6 text-center shadow-sm"
+              style={{ borderColor: renk, boxShadow: `0 8px 24px ${renk}18` }}
+            >
+              <span className="text-2xl">{a.ikon || '📌'}</span>
+              <h3 className="mt-3 font-semibold" style={{ color: renk }}>{a.baslik}</h3>
+              {a.aciklama && <p className="mt-2 text-sm text-slate-600">{a.aciklama}</p>}
+            </article>
+          );
+        })}
+      </div>
+    </>
+  );
+}
+
+function OkBaglantili({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetConfig; adimlar: WidgetSurecAdimi[] }) {
+  return (
+    <>
+      <div className="mx-auto max-w-2xl text-center"><Baslik widget={widget} cfg={cfg} /></div>
+      <div className="surec-adim-ok mt-12 flex flex-col gap-6 md:flex-row md:items-start md:justify-between">
+        {adimlar.map((a, i) => (
+          <div key={a.id} className="surec-adim-ok-oge relative flex-1 text-center">
+            {i < adimlar.length - 1 && <span className="surec-adim-ok-cizgi hidden md:block" aria-hidden />}
+            <div className="surec-adim-ok-numara">{i + 1}</div>
+            <h3 className="mt-3 font-semibold text-slate-900">{a.baslik}</h3>
+            {a.aciklama && <p className="mt-2 text-sm text-slate-600">{a.aciklama}</p>}
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function BuyukSimge({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetConfig; adimlar: WidgetSurecAdimi[] }) {
+  const vurgu = cfg.gorunum?.vurguRengi || '#f97316';
+  return (
+    <>
+      <div className="mx-auto max-w-2xl text-center"><Baslik widget={widget} cfg={cfg} /></div>
+      <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        {adimlar.map((a) => (
+          <div key={a.id} className="text-center">
+            <div
+              className="mx-auto flex h-20 w-20 items-center justify-center rounded-full text-3xl text-white shadow-lg"
+              style={{ backgroundColor: vurgu }}
+            >
+              {a.ikon || '✓'}
+            </div>
+            <h3 className="mt-4 text-lg font-bold text-slate-900">{a.baslik}</h3>
+            {a.aciklama && <p className="mt-2 text-sm text-slate-600">{a.aciklama}</p>}
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
 export function SurecAdimlariWidget({ widget }: { widget: Widget }) {
   const cfg = configOkuFromWidget(widget);
   const adimlar = cfg.surecAdimlari ?? [];
   if (adimlar.length === 0) return null;
 
-  const gorunumTipi = widgetGorunumTipiAl(widget);
+  const gt = widgetGorunumTipiAl(widget);
 
   return (
     <WidgetKabuk widget={widget}>
-      {gorunumTipi === 'koyu-yatay-adim' && (
-        <KoyuYatayAdim widget={widget} cfg={cfg} adimlar={adimlar} />
-      )}
-      {gorunumTipi === 'dikey-zaman' && <DikeyZaman widget={widget} cfg={cfg} adimlar={adimlar} />}
-      {(gorunumTipi === 'kart-grid' || !['koyu-yatay-adim', 'dikey-zaman'].includes(gorunumTipi)) && (
-        <KartGrid widget={widget} cfg={cfg} adimlar={adimlar} />
-      )}
+      {gt === 'koyu-yatay-adim' && <KoyuYatayAdim widget={widget} cfg={cfg} adimlar={adimlar} />}
+      {gt === 'dikey-zaman' && <DikeyZaman widget={widget} cfg={cfg} adimlar={adimlar} />}
+      {gt === 'renkli-kart' && <RenkliKart widget={widget} cfg={cfg} adimlar={adimlar} />}
+      {gt === 'ok-baglantili' && <OkBaglantili widget={widget} cfg={cfg} adimlar={adimlar} />}
+      {gt === 'buyuk-simge' && <BuyukSimge widget={widget} cfg={cfg} adimlar={adimlar} />}
+      {gt === 'kart-grid' && <KartGrid widget={widget} cfg={cfg} adimlar={adimlar} />}
     </WidgetKabuk>
   );
 }

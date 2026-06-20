@@ -122,24 +122,74 @@ function IstatistikKapsul({ widget, cfg, markalar }: { widget: Widget; cfg: Widg
   );
 }
 
+function NeonGeceSeridi({ markalar }: { markalar: WidgetMarkaLogosu[] }) {
+  const hiz = HIZ_SINIF.normal;
+  const serit = [...markalar, ...markalar, ...markalar];
+  return (
+    <div className="marka-seridi-neon overflow-hidden py-5">
+      <div className={`marka-seridi-neon-iz ${hiz}`}>
+        {serit.map((m, i) => (
+          <span key={`${m.id}-${i}`} className="marka-seridi-neon-oge">
+            {m.ad}
+            <span className="marka-seridi-neon-nokta">●</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function DalgaMorSeridi({ markalar }: { markalar: WidgetMarkaLogosu[] }) {
+  const hiz = HIZ_SINIF.normal;
+  const serit = [...markalar, ...markalar];
+  return (
+    <div className="marka-seridi-dalga overflow-hidden py-6">
+      <div className={`marka-seridi-dalga-iz ${hiz}`}>
+        {serit.map((m, i) => (
+          <span key={`${m.id}-${i}`} className="marka-seridi-dalga-oge">
+            {m.ad}
+            <span aria-hidden>✦</span>
+          </span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CiftSerit({ markalar }: { markalar: WidgetMarkaLogosu[] }) {
+  const hiz = HIZ_SINIF.normal;
+  const serit = [...markalar, ...markalar];
+  return (
+    <div className="marka-seridi-cift space-y-3 py-4">
+      <div className={`marka-seridi-cift-iz marka-seridi-cift-ileri ${hiz}`}>
+        {serit.map((m, i) => (
+          <span key={`a-${m.id}-${i}`} className="marka-seridi-cift-oge">{m.ad}</span>
+        ))}
+      </div>
+      <div className={`marka-seridi-cift-iz marka-seridi-cift-geri ${hiz}`}>
+        {serit.map((m, i) => (
+          <span key={`b-${m.id}-${i}`} className="marka-seridi-cift-oge marka-seridi-cift-oge-alt">{m.ad}</span>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 export function MarkaSeridiWidget({ widget }: { widget: Widget }) {
   const cfg = configOkuFromWidget(widget);
   const markalar = cfg.markalar ?? [];
   if (markalar.length === 0) return null;
 
-  const gorunumTipi = widgetGorunumTipiAl(widget);
+  const gt = widgetGorunumTipiAl(widget);
 
   return (
     <WidgetKabuk widget={widget}>
-      {gorunumTipi === 'egik-metin-seridi' && (
-        <EgikMetinSeridi widget={widget} cfg={cfg} markalar={markalar} />
-      )}
-      {gorunumTipi === 'istatistik-kapsul' && (
-        <IstatistikKapsul widget={widget} cfg={cfg} markalar={markalar} />
-      )}
-      {(gorunumTipi === 'logo-kayan' || !['egik-metin-seridi', 'istatistik-kapsul'].includes(gorunumTipi)) && (
-        <LogoKayan widget={widget} cfg={cfg} markalar={markalar} />
-      )}
+      {gt === 'egik-metin-seridi' && <EgikMetinSeridi widget={widget} cfg={cfg} markalar={markalar} />}
+      {gt === 'istatistik-kapsul' && <IstatistikKapsul widget={widget} cfg={cfg} markalar={markalar} />}
+      {gt === 'neon-gece' && <NeonGeceSeridi markalar={markalar} />}
+      {gt === 'dalga-mor' && <DalgaMorSeridi markalar={markalar} />}
+      {gt === 'cift-serit' && <CiftSerit markalar={markalar} />}
+      {gt === 'logo-kayan' && <LogoKayan widget={widget} cfg={cfg} markalar={markalar} />}
     </WidgetKabuk>
   );
 }

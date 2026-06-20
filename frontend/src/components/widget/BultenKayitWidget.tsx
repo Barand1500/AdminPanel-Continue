@@ -29,21 +29,70 @@ export function BultenKayitWidget({ widget }: { widget: Widget }) {
   }
 
   const kartSinif =
-    gt === 'banner'
-      ? 'bulten-kayit-banner w-full rounded-none border-y border-slate-200 bg-gradient-to-r from-primary/10 to-slate-50 px-6 py-10'
-      : gt === 'kart'
-        ? 'bulten-kayit-kart mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-sm'
-        : 'bulten-kayit-kart mx-auto max-w-2xl overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-8 shadow-sm sm:p-10';
+    gt === 'tam-banner-mavi'
+      ? 'bulten-kayit-banner w-full rounded-none border-y border-blue-200 bg-gradient-to-r from-blue-600 to-blue-500 px-6 py-10 text-white'
+      : gt === 'kart-golge'
+        ? 'bulten-kayit-kart mx-auto max-w-md rounded-2xl border border-slate-200 bg-white p-6 shadow-lg'
+        : gt === 'koyu-cam'
+          ? 'bulten-kayit-kart mx-auto max-w-lg rounded-3xl border border-white/10 bg-slate-900/90 p-8 text-white backdrop-blur-md'
+          : gt === 'turuncu-serit'
+            ? 'bulten-kayit-banner w-full rounded-none border-y border-orange-200 bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-10 text-white'
+            : gt === 'yesil-minimal'
+              ? 'bulten-kayit-kart mx-auto max-w-lg rounded-2xl border-2 border-emerald-400 bg-emerald-50/80 p-8'
+              : 'bulten-kayit-kart mx-auto max-w-2xl overflow-hidden rounded-3xl border border-slate-200 bg-gradient-to-br from-white to-slate-50 p-8 shadow-sm sm:p-10';
 
   return (
     <WidgetKabuk widget={widget}>
       <div className={kartSinif}>
-        <div className={gt === 'banner' ? 'mx-auto max-w-3xl text-center' : 'text-center'}>
-          {widget.altBaslik && <p className="text-sm font-semibold uppercase tracking-wide text-primary">{widget.altBaslik}</p>}
-          {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-slate-900`}>{widget.baslik}</h2>}
-          {widget.aciklama && <p className="mt-3 text-slate-600">{widget.aciklama}</p>}
+        <div className={gt === 'tam-banner-mavi' || gt === 'turuncu-serit' ? 'mx-auto max-w-3xl text-center' : 'text-center'}>
+          {widget.altBaslik && (
+            <p
+              className={`text-sm font-semibold uppercase tracking-wide ${
+                gt === 'tam-banner-mavi' || gt === 'turuncu-serit' || gt === 'koyu-cam'
+                  ? 'text-white/80'
+                  : gt === 'yesil-minimal'
+                    ? 'text-emerald-700'
+                    : 'text-primary'
+              }`}
+            >
+              {widget.altBaslik}
+            </p>
+          )}
+          {widget.baslik && (
+            <h2
+              className={`${baslikSinifi(cfg)} mt-2 font-bold ${
+                gt === 'tam-banner-mavi' || gt === 'turuncu-serit' || gt === 'koyu-cam'
+                  ? 'text-white'
+                  : gt === 'yesil-minimal'
+                    ? 'text-emerald-950'
+                    : 'text-slate-900'
+              }`}
+            >
+              {widget.baslik}
+            </h2>
+          )}
+          {widget.aciklama && (
+            <p
+              className={`mt-3 ${
+                gt === 'tam-banner-mavi' || gt === 'turuncu-serit'
+                  ? 'text-white/90'
+                  : gt === 'koyu-cam'
+                    ? 'text-slate-300'
+                    : gt === 'yesil-minimal'
+                      ? 'text-emerald-800'
+                      : 'text-slate-600'
+              }`}
+            >
+              {widget.aciklama}
+            </p>
+          )}
         </div>
-        <form onSubmit={gonder} className={`mt-8 flex flex-col gap-3 ${gt === 'banner' ? 'mx-auto max-w-xl sm:flex-row' : 'sm:flex-row'}`}>
+        <form
+          onSubmit={gonder}
+          className={`mt-8 flex flex-col gap-3 ${
+            gt === 'tam-banner-mavi' || gt === 'turuncu-serit' ? 'mx-auto max-w-xl sm:flex-row' : 'sm:flex-row'
+          }`}
+        >
           <input
             type="email"
             required

@@ -713,6 +713,62 @@ export function YorumKaruselIcerik({ form, onChange }: WidgetPanelProps) {
   );
 }
 
+export function YorumKartlariIcerik({ form, onChange }: WidgetPanelProps) {
+  const cfg = configOku(form);
+  const yorumlar = cfg.yorumlar ?? [];
+  return (
+    <AdminFormBolumu baslik="Müşteri Yorumları (Grid)">
+      <FormAlani etiket="Üst etiket"><input className={formInputSinifi} value={form.altBaslik} onChange={(e) => onChange({ ...form, altBaslik: e.target.value })} placeholder="YORUMLAR" /></FormAlani>
+      <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} placeholder="Müşterilerimizin Görüşleri" /></FormAlani>
+      <ListeSiralayici<WidgetYorum>
+        ogeler={yorumlar}
+        onDegistir={(y) => onChange(configGuncelle(form, (c) => ({ ...c, yorumlar: y })))}
+        yeniEkle={() => ({ id: uid(), metin: '', ad: '', firma: '', yildiz: 5 })}
+        renderOge={(y, i) => (
+          <div className="space-y-2">
+            <FormAlani etiket="Yıldız (1–5)">
+              <input
+                type="number"
+                min={1}
+                max={5}
+                className={formInputSinifi}
+                value={y.yildiz ?? 5}
+                onChange={(e) => {
+                  const kopya = [...yorumlar];
+                  kopya[i] = { ...y, yildiz: Math.min(5, Math.max(1, Number(e.target.value) || 5)) };
+                  onChange(configGuncelle(form, (c) => ({ ...c, yorumlar: kopya })));
+                }}
+              />
+            </FormAlani>
+            <textarea className={formInputSinifi} placeholder="Yorum metni" rows={3} value={y.metin} onChange={(e) => {
+              const kopya = [...yorumlar]; kopya[i] = { ...y, metin: e.target.value };
+              onChange(configGuncelle(form, (c) => ({ ...c, yorumlar: kopya })));
+            }} />
+            <div className="grid gap-2 sm:grid-cols-2">
+              <input className={formInputSinifi} placeholder="Ad Soyad" value={y.ad} onChange={(e) => {
+                const kopya = [...yorumlar]; kopya[i] = { ...y, ad: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, yorumlar: kopya })));
+              }} />
+              <input className={formInputSinifi} placeholder="Firma / unvan" value={y.firma} onChange={(e) => {
+                const kopya = [...yorumlar]; kopya[i] = { ...y, firma: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, yorumlar: kopya })));
+              }} />
+            </div>
+            <GorselAlan
+              etiket="Profil fotoğrafı"
+              deger={y.gorselUrl ?? ''}
+              onChange={(url) => {
+                const kopya = [...yorumlar]; kopya[i] = { ...y, gorselUrl: url };
+                onChange(configGuncelle(form, (c) => ({ ...c, yorumlar: kopya })));
+              }}
+            />
+          </div>
+        )}
+      />
+    </AdminFormBolumu>
+  );
+}
+
 export function FiyatlandirmaIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const paketler = cfg.paketler ?? [];
@@ -833,6 +889,7 @@ export const ICERIK_PANEL_MAP: Record<string, ComponentType<WidgetPanelProps>> =
   EKIP_KARUSEL: EkipKaruselIcerik,
   SAYAC_BLOK: SayacBlokIcerik,
   YORUM_KARUSEL: YorumKaruselIcerik,
+  YORUM_KARTLARI: YorumKartlariIcerik,
   FIYATLANDIRMA: FiyatlandirmaIcerik,
   HARITA: HaritaIcerik,
   ILETISIM_FORMU: IletisimIcerik,

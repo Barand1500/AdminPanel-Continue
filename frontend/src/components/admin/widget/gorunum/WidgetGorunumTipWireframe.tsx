@@ -1,12 +1,14 @@
 import type { ReactNode } from 'react';
-import { widgetGorunumTipiNormalize } from '@/data/widgetGorunumTipleri';
+import {
+  WIDGET_GORUNUM_TEMA_RENKLERI,
+  widgetGorunumTipTanimiBul,
+  widgetGorunumTipiNormalize,
+} from '@/data/widgetGorunumTipleri';
 
-const bar = 'rounded-sm bg-[var(--ap-accent)]/70';
-const muted = 'rounded-sm bg-[var(--ap-border)]';
-const line = 'rounded-sm bg-[var(--ap-muted)]/40';
-const orange = 'rounded-sm bg-orange-500/80';
+const bar = 'rounded-sm';
+const line = 'rounded-sm';
 
-function strip(items: number, cls = line) {
+function strip(items: number, cls: string) {
   return (
     <div className="flex gap-0.5">
       {Array.from({ length: items }, (_, i) => (
@@ -16,7 +18,7 @@ function strip(items: number, cls = line) {
   );
 }
 
-/** Widget tipi + görünüm varyantı için mini wireframe */
+/** Widget tipi + görünüm varyantı için renkli mini wireframe */
 export function WidgetGorunumTipWireframe({
   widgetTip,
   gorunumTipi,
@@ -25,157 +27,87 @@ export function WidgetGorunumTipWireframe({
   gorunumTipi: string;
 }) {
   const tip = widgetGorunumTipiNormalize(widgetTip, gorunumTipi);
+  const tanim = widgetGorunumTipTanimiBul(widgetTip, tip);
+  const renk = WIDGET_GORUNUM_TEMA_RENKLERI[tanim.tema];
   const key = `${widgetTip}:${tip}`;
 
   const ozel: Record<string, ReactNode> = {
-    'MARKA_SERIDI:logo-kayan': (
-      <div className="space-y-1 p-2">
-        <div className="flex gap-1 overflow-hidden">
-          {[1, 2, 3, 4].map((i) => (
-            <div key={i} className={`h-3 w-6 shrink-0 ${muted}`} />
-          ))}
-        </div>
-      </div>
-    ),
-    'MARKA_SERIDI:egik-metin-seridi': (
-      <div className="overflow-hidden p-1">
-        <div className="-rotate-2 rounded bg-orange-500/90 px-2 py-1">
-          {strip(4, 'h-0.5 w-2 rounded-sm bg-white/70')}
-        </div>
-      </div>
-    ),
-    'MARKA_SERIDI:istatistik-kapsul': (
-      <div className="flex justify-center p-2">
-        <div className="flex gap-1 rounded-full border border-[var(--ap-border)] px-2 py-1 shadow-sm">
-          <div className={`h-2 w-5 ${bar}`} />
-          <div className={`h-2 w-5 ${line}`} />
-          <div className={`h-2 w-5 ${orange}`} />
-        </div>
-      </div>
-    ),
-    'SUREC_ADIMLARI:kart-grid': (
-      <div className="grid grid-cols-3 gap-0.5 p-2">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className={`h-6 rounded border ${muted}`} />
-        ))}
-      </div>
-    ),
-    'SUREC_ADIMLARI:koyu-yatay-adim': (
-      <div className="rounded bg-slate-800 p-2">
-        <div className="flex items-center gap-1">
+    'MARKA_SERIDI:neon-gece': (
+      <div className="rounded p-2" style={{ background: '#0f172a' }}>
+        <div className="flex gap-2">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="flex flex-1 flex-col items-center gap-0.5">
-              <div className="h-2 w-2 rounded-full bg-orange-500" />
-              <div className="h-0.5 w-full bg-white/20" />
-            </div>
+            <span key={i} className="text-[8px] font-bold" style={{ color: '#38bdf8' }}>
+              ABC
+            </span>
           ))}
         </div>
       </div>
     ),
-    'SUREC_ADIMLARI:dikey-zaman': (
-      <div className="space-y-1 p-2">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="flex items-center gap-1">
-            <div className={`h-1.5 w-1.5 rounded-full ${bar}`} />
-            <div className={`h-1 flex-1 ${line}`} />
-          </div>
+    'MARKA_SERIDI:dalga-mor': (
+      <div className="rounded p-2" style={{ background: `linear-gradient(90deg, ${renk.accent}, #ec4899)` }}>
+        {strip(3, `${bar} h-0.5 w-4 bg-white/80`)}
+      </div>
+    ),
+    'MARKA_SERIDI:cift-serit': (
+      <div className="space-y-1 p-1" style={{ background: renk.bg }}>
+        <div className="flex gap-1 rounded px-1 py-0.5" style={{ background: renk.accent, opacity: 0.9 }}>{strip(3, `${bar} h-0.5 w-2 bg-white/70`)}</div>
+        <div className="flex gap-1 rounded px-1 py-0.5 opacity-70" style={{ background: renk.surface }}>{strip(3, `${bar} h-0.5 w-2`)}</div>
+      </div>
+    ),
+    'SUREC_ADIMLARI:renkli-kart': (
+      <div className="grid grid-cols-3 gap-0.5 p-1">
+        {['#9333ea', '#2563eb', '#059669'].map((c) => (
+          <div key={c} className="h-5 rounded border-2" style={{ borderColor: c, background: `${c}18` }} />
         ))}
       </div>
     ),
-    'ILETISIM_FORMU:merkez-basit': (
-      <div className="space-y-1 p-2 text-center">
-        <div className={`mx-auto h-1 w-8 ${line}`} />
-        <div className={`mx-auto h-0.5 w-12 ${muted}`} />
-        <div className={`mx-auto h-2 w-6 rounded ${bar}`} />
+    'ILETISIM_FORMU:koyu-cam': (
+      <div className="rounded p-2" style={{ background: `${renk.bg}dd`, border: `1px solid ${renk.accent}50` }}>
+        <div className="h-1 w-8 rounded" style={{ background: renk.accent }} />
       </div>
     ),
-    'ILETISIM_FORMU:gradient-banner': (
-      <div className="rounded bg-gradient-to-r from-orange-500 to-orange-600 p-2">
-        <div className="flex items-center justify-between gap-1">
-          <div className="space-y-0.5">
-            <div className="h-1 w-6 rounded bg-white/80" />
-            <div className="h-0.5 w-8 rounded bg-white/40" />
-          </div>
-          <div className="h-2 w-5 rounded-full bg-white" />
-        </div>
-      </div>
-    ),
-    'ILETISIM_FORMU:bol-split': (
-      <div className="flex items-center gap-1 p-2">
-        <div className="flex-1 space-y-0.5">
-          <div className={`h-1 w-6 ${line}`} />
-          <div className={`h-0.5 w-8 ${muted}`} />
-        </div>
-        <div className={`h-2 w-4 rounded ${bar}`} />
+    'ILETISIM_FORMU:mor-serit': (
+      <div className="rounded p-2" style={{ background: renk.accent }}>
+        <div className="h-1 w-6 rounded bg-white/80" />
       </div>
     ),
   };
 
-  if (ozel[key]) return ozel[key];
-
-  if (tip.includes('grid') || tip.includes('klasik-grid')) {
-    return (
+  const icerik =
+    ozel[key] ??
+    (tip.includes('grid') || tip.includes('kart') ? (
       <div className="grid grid-cols-3 gap-0.5 p-2">
         {[1, 2, 3, 4, 5, 6].map((i) => (
-          <div key={i} className={`h-3 rounded ${muted}`} />
+          <div
+            key={i}
+            className="h-3 rounded opacity-80"
+            style={{ background: i === 1 ? renk.accent : renk.surface }}
+          />
         ))}
       </div>
-    );
-  }
-  if (tip.includes('cam')) {
-    return (
-      <div className="grid grid-cols-2 gap-0.5 p-2">
-        {[1, 2].map((i) => (
-          <div key={i} className="h-5 rounded border border-white/30 bg-white/10 backdrop-blur-sm" />
-        ))}
-      </div>
-    );
-  }
-  if (tip.includes('minimal') || tip.includes('liste')) {
-    return (
+    ) : tip.includes('liste') || tip.includes('minimal') || tip.includes('kompakt') ? (
       <div className="space-y-0.5 p-2">
         {[1, 2, 3].map((i) => (
-          <div key={i} className={`h-1.5 w-full ${line}`} />
+          <div key={i} className={`w-full ${line} h-1`} style={{ background: renk.accent, opacity: 0.25 + i * 0.15 }} />
         ))}
       </div>
-    );
-  }
-  if (tip.includes('banner')) {
-    return (
-      <div className={`mx-1 h-5 rounded ${bar}`} />
-    );
-  }
-  if (tip.includes('bol-split') || tip.includes('bolunmus')) {
-    return (
+    ) : tip.includes('banner') || tip.includes('serit') ? (
+      <div className="mx-1 h-5 rounded" style={{ background: `linear-gradient(90deg, ${renk.surface}, ${renk.accent}55)` }} />
+    ) : tip.includes('bol') || tip.includes('split') || tip.includes('bolunmus') ? (
       <div className="flex gap-0.5 p-2">
-        <div className={`h-5 flex-1 ${line}`} />
-        <div className={`h-5 flex-1 ${bar}`} />
+        <div className="h-5 flex-1 rounded" style={{ background: renk.surface }} />
+        <div className="h-5 flex-1 rounded" style={{ background: renk.accent }} />
       </div>
-    );
-  }
-  if (tip.includes('overlay')) {
-    return (
-      <div className="relative p-2">
-        <div className={`h-6 w-full rounded ${muted}`} />
-        <div className="absolute inset-x-3 bottom-3 h-1 rounded bg-white/80" />
+    ) : (
+      <div className="space-y-1 p-2">
+        <div className={`w-6 ${bar} h-2`} style={{ background: renk.accent }} />
+        <div className={`w-full ${line} h-1`} style={{ background: renk.text, opacity: 0.2 }} />
       </div>
-    );
-  }
-  if (tip.includes('kapsul') || tip.includes('pill')) {
-    return (
-      <div className="flex justify-center gap-0.5 p-2">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className={`h-2 w-4 rounded-full ${i === 2 ? bar : muted}`} />
-        ))}
-      </div>
-    );
-  }
+    ));
 
   return (
-    <div className="space-y-1 p-2">
-      <div className={`h-1 w-6 ${bar}`} />
-      <div className={`h-3 w-full ${line}`} />
-      <div className={`h-1 w-4 ${muted}`} />
+    <div className="rounded-md" style={{ background: renk.bg }}>
+      {icerik}
     </div>
   );
 }

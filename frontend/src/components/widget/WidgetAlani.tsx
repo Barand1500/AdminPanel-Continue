@@ -12,6 +12,7 @@ import { GorselEtiketKartlariWidget } from './GorselEtiketKartlariWidget';
 import { EkipKaruselWidget } from './EkipKaruselWidget';
 import { SayacBlokWidget } from './SayacBlokWidget';
 import { YorumKaruselWidget } from './YorumKaruselWidget';
+import { YorumKartlariWidget } from './YorumKartlariWidget';
 import { FiyatlandirmaWidget } from './FiyatlandirmaWidget';
 import { GaleriWidget } from './GaleriWidget';
 import { SssWidget } from './SssWidget';
@@ -72,6 +73,8 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
         return <SayacBlokWidget widget={widget} />;
       case 'YORUM_KARUSEL':
         return <YorumKaruselWidget widget={widget} />;
+      case 'YORUM_KARTLARI':
+        return <YorumKartlariWidget widget={widget} />;
       case 'FIYATLANDIRMA':
         return <FiyatlandirmaWidget widget={widget} />;
       case 'GALERI':

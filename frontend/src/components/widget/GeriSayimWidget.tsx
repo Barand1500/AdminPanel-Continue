@@ -39,37 +39,53 @@ export function GeriSayimWidget({ widget }: { widget: Widget }) {
     { etiket: 'Saniye', deger: kalan.saniye },
   ];
 
-  const wrapSinif =
-    gt === 'banner'
-      ? 'geri-sayim-banner -mx-[var(--container-pad,1rem)] rounded-none px-6 py-8 sm:px-12'
-      : gt === 'kompakt'
-        ? 'geri-sayim-kompakt rounded-2xl px-4 py-6'
-        : 'geri-sayim-blok rounded-3xl px-6 py-12 sm:px-12';
+  const arkaPlanSinif: Record<string, string> = {
+    'koyu-buyuk': 'geri-sayim-blok bg-gradient-to-br from-slate-900 via-slate-800 to-primary-dark text-white',
+    'kompakt-serit': 'geri-sayim-kompakt bg-slate-100 text-slate-900 border border-slate-200',
+    'tam-banner': 'geri-sayim-banner bg-gradient-to-r from-orange-500 via-amber-500 to-orange-600 text-white',
+    'mor-gradient': 'geri-sayim-blok bg-gradient-to-br from-violet-700 via-purple-600 to-fuchsia-700 text-white',
+    'okyanus-sade': 'geri-sayim-blok bg-gradient-to-br from-sky-50 to-blue-100 text-blue-950 border border-blue-200',
+    'yesil-kampanya': 'geri-sayim-banner bg-gradient-to-r from-emerald-600 to-teal-600 text-white',
+  };
+
+  const kompakt = gt === 'kompakt-serit';
+  const banner = gt === 'tam-banner' || gt === 'yesil-kampanya';
+  const acikTema = gt === 'okyanus-sade' || kompakt;
 
   return (
     <WidgetKabuk widget={widget}>
-      <div className={`overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-primary-dark text-center text-white ${wrapSinif}`}>
-        {widget.altBaslik && gt !== 'kompakt' && (
-          <p className="text-sm font-semibold uppercase tracking-widest text-blue-200">{widget.altBaslik}</p>
+      <div
+        className={`overflow-hidden text-center ${
+          banner ? '-mx-[var(--container-pad,1rem)] rounded-none px-6 py-8 sm:px-12' : kompakt ? 'rounded-2xl px-4 py-6' : 'rounded-3xl px-6 py-12 sm:px-12'
+        } ${arkaPlanSinif[gt] ?? arkaPlanSinif['koyu-buyuk']}`}
+      >
+        {widget.altBaslik && !kompakt && (
+          <p className={`text-sm font-semibold uppercase tracking-widest ${acikTema ? 'text-blue-600' : 'text-blue-200'}`}>
+            {widget.altBaslik}
+          </p>
         )}
         {widget.baslik && (
-          <h2 className={`${gt === 'kompakt' ? 'text-xl' : baslikSinifi(cfg)} mt-2 font-bold`}>{widget.baslik}</h2>
+          <h2 className={`${kompakt ? 'text-xl' : baslikSinifi(cfg)} mt-2 font-bold`}>{widget.baslik}</h2>
         )}
-        {widget.aciklama && gt !== 'kompakt' && (
-          <p className="mx-auto mt-3 max-w-xl text-blue-100/90">{widget.aciklama}</p>
+        {widget.aciklama && !kompakt && (
+          <p className={`mx-auto mt-3 max-w-xl ${acikTema ? 'text-slate-600' : 'text-blue-100/90'}`}>{widget.aciklama}</p>
         )}
-        <div className={`flex flex-wrap justify-center ${gt === 'kompakt' ? 'mt-4 gap-2' : 'mt-10 gap-4'}`}>
+        <div className={`flex flex-wrap justify-center ${kompakt ? 'mt-4 gap-2' : 'mt-10 gap-4'}`}>
           {kutular.map((k) => (
-            <div key={k.etiket} className={gt === 'kompakt' ? 'geri-sayim-kutu-kompakt' : 'geri-sayim-kutu'}>
+            <div key={k.etiket} className={kompakt ? 'geri-sayim-kutu-kompakt' : acikTema ? 'geri-sayim-kutu-acik' : 'geri-sayim-kutu'}>
               <span className="geri-sayim-rakam">{String(k.deger).padStart(2, '0')}</span>
-              {gt !== 'kompakt' && <span className="geri-sayim-etiket">{k.etiket}</span>}
+              {!kompakt && <span className="geri-sayim-etiket">{k.etiket}</span>}
             </div>
           ))}
         </div>
-        {widget.butonMetni && widget.butonLink && gt !== 'kompakt' && (
+        {widget.butonMetni && widget.butonLink && !kompakt && (
           <Link
             to={widget.butonLink}
-            className="mt-10 inline-flex rounded-xl bg-white px-8 py-3 text-sm font-bold text-slate-900 shadow-lg transition hover:bg-blue-50"
+            className={`mt-10 inline-flex rounded-xl px-8 py-3 text-sm font-bold shadow-lg transition ${
+              acikTema
+                ? 'bg-blue-600 text-white hover:bg-blue-700'
+                : 'bg-white text-slate-900 hover:bg-blue-50'
+            }`}
           >
             {widget.butonMetni}
           </Link>

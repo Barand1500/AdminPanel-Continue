@@ -50,7 +50,7 @@ export function VideoBannerWidget({ widget }: { widget: Widget }) {
   const embed = tip === 'youtube' ? youtubeEmbedUrl(videoUrl) : null;
   const gt = widgetGorunumTipiAl(widget);
 
-  if (gt === 'bol-split') {
+  if (gt === 'bolunmus-metin') {
     return (
       <WidgetKabuk widget={widget}>
         <div className="grid min-h-[320px] gap-0 overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm md:grid-cols-2">
@@ -72,8 +72,13 @@ export function VideoBannerWidget({ widget }: { widget: Widget }) {
     );
   }
 
-  const minH = gt === 'kart' ? 'min-h-[280px]' : 'min-h-[420px]';
-  const rounded = gt === 'kart' ? 'rounded-2xl border border-slate-200' : 'rounded-3xl shadow-xl';
+  const minH = gt === 'cerceveli-kart' || gt === 'mint-minimal' ? 'min-h-[280px]' : 'min-h-[420px]';
+  const rounded =
+    gt === 'cerceveli-kart'
+      ? 'rounded-2xl border border-slate-200'
+      : gt === 'mint-minimal'
+        ? 'rounded-xl border border-teal-200'
+        : 'rounded-3xl shadow-xl';
 
   return (
     <WidgetKabuk widget={widget}>

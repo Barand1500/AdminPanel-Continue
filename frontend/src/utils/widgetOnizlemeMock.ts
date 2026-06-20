@@ -161,6 +161,35 @@ function mockConfig(tip: string): WidgetConfig {
         ],
         otomatikKaydir: true,
       };
+    case 'YORUM_KARTLARI':
+      return {
+        yorumlar: [
+          {
+            id: id(),
+            metin: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+            ad: 'Hayrettin Elalmış',
+            firma: 'Seda Makina',
+            yildiz: 5,
+            gorselUrl: ONIZLEME_GORSEL,
+          },
+          {
+            id: id(),
+            metin: 'Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+            ad: 'Hüseyin Fidan',
+            firma: 'Fidan Danışmanlık',
+            yildiz: 5,
+            gorselUrl: ONIZLEME_GORSEL,
+          },
+          {
+            id: id(),
+            metin: 'Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur.',
+            ad: 'Selma Güroğlu',
+            firma: 'Hakimiyet Hukuk Bürosu',
+            yildiz: 4,
+            gorselUrl: ONIZLEME_GORSEL,
+          },
+        ],
+      };
     case 'FIYATLANDIRMA':
       return {
         paketler: [
@@ -585,6 +614,7 @@ function mockBaslik(tip: string): string {
     EKIP_KARUSEL: 'Ekibimiz',
     SAYAC_BLOK: 'Rakamlarla Biz',
     YORUM_KARUSEL: 'Müşteri Yorumları',
+    YORUM_KARTLARI: 'Müşterilerimizin Görüşleri',
     FIYATLANDIRMA: 'Paketlerimiz',
     GALERI: 'Galeri',
     SSS: 'Sık Sorulan Sorular',

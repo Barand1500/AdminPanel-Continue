@@ -39,6 +39,7 @@ export const YENI_WIDGET_TIPLERI = [
   'EKIP_KARUSEL',
   'SAYAC_BLOK',
   'YORUM_KARUSEL',
+  'YORUM_KARTLARI',
   'FIYATLANDIRMA',
 ] as const;
 
@@ -108,6 +109,7 @@ export const WIDGET_GORUNUM_GORSEL_TIPLERI = new Set([
   'EKIP_KARUSEL',
   'YORUM_KARUSEL',
   'BLOK_OLUSTURUCU',
+  'YORUM_KARTLARI',
 ]);
 
 export const WIDGET_GORUNUM_HABER_TIPLERI = new Set<string>([...HABER_PORTAL_WIDGET_TIPLERI, 'SLIDER', 'BLOG_KARUSEL', 'EKIP_KARUSEL']);
@@ -124,6 +126,7 @@ export const WIDGET_GORUNUM_GRID_TIPLERI = new Set([
   'EKIP_KARUSEL',
   'SAYAC_BLOK',
   'YORUM_KARUSEL',
+  'YORUM_KARTLARI',
   'FIYATLANDIRMA',
   'BLOK_OLUSTURUCU',
   'KARSILASTIRMA_TABLOSU',
@@ -139,6 +142,7 @@ export const WIDGET_GORUNUM_METIN_TIPLERI = new Set([
   'POPUP',
   'KARSILASTIRMA_TABLOSU',
   'BLOK_OLUSTURUCU',
+  'YORUM_KARTLARI',
 ]);
 
 export interface WidgetGorunumAyarlari {
@@ -170,9 +174,13 @@ export interface WidgetGorunumAyarlari {
   baslikCizgi?: boolean;
   /** Bölüm başlık ikonu (emoji) */
   baslikIkon?: string;
+  /** Yorum kartları: yıldız puanı göster */
   yildizGoster?: boolean;
+  /** Yorum kartları: dolu yıldız rengi */
   yildizRengi?: string;
+  /** Yorum kartları: alt bilgi (yazar) arka planı */
   kartFooterArkaPlan?: string;
+  /** Yorum kartları: kart gölgesi */
   kartGolge?: boolean;
   /** normal: yan boşluklu container; tam_ekran: viewport genişliği */
   bolumGenisligi?: WidgetBolumGenisligi;
@@ -275,6 +283,7 @@ export interface WidgetYorum {
   ad: string;
   firma: string;
   gorselUrl?: string;
+  /** 1–5 yıldız puanı */
   yildiz?: number;
 }
 
@@ -503,6 +512,21 @@ export function varsayilanConfig(tip: string): WidgetConfig {
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4 }, ek, sayaclar: [] };
     case 'YORUM_KARUSEL':
       return { yerlesim, gorunum, ek, yorumlar: [], otomatikKaydir: true };
+    case 'YORUM_KARTLARI':
+      return {
+        yerlesim,
+        gorunum: {
+          ...gorunum,
+          kolonSayisi: 3,
+          yildizGoster: true,
+          yildizRengi: '#facc15',
+          kartFooterArkaPlan: '#f1f5f9',
+          kartGolge: true,
+          borderRadius: 12,
+        },
+        ek,
+        yorumlar: [],
+      };
     case 'FIYATLANDIRMA':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3 }, ek, paketler: [] };
     case 'ZAMAN_CIZELGESI':

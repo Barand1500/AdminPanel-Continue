@@ -10,11 +10,11 @@ export function HaritaWidget({ widget }: { widget: Widget }) {
 
   const gt = widgetGorunumTipiAl(widget);
   const iframeClass =
-    gt === 'kart'
+    gt === 'kart-golge'
       ? 'h-72 w-full rounded-2xl border border-slate-200 shadow-lg'
       : 'h-80 w-full rounded-xl border-0';
 
-  if (gt === 'bol-split') {
+  if (gt === 'bolunmus-bilgi') {
     return (
       <WidgetKabuk widget={widget}>
         <div className="grid gap-6 md:grid-cols-2 md:items-center">
