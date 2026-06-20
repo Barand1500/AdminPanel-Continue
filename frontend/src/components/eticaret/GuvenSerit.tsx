@@ -35,26 +35,22 @@ export function GuvenSerit({ heroJson }: GuvenSeritProps) {
   }
 
   const kartlar = [...hero.kartlar].sort((a, b) => a.sira - b.sira);
-  const listeSinifi =
-    kartlar.length >= 4
-      ? 'guven-serit-liste guven-serit-liste-dort'
-      : kartlar.length === 3
-        ? 'guven-serit-liste guven-serit-liste-uc'
-        : 'guven-serit-liste';
+  const adet = Math.min(kartlar.length, 4);
+  const listeSinifi = `guven-serit-liste guven-serit-liste-${adet}`;
 
   return (
-    <section className="guven-serit border-y border-primary/10 bg-white">
-      <div className="container-site guven-serit-icerik">
+    <section className="guven-serit" aria-label="Güven kartları">
+      <div className="guven-serit-icerik">
         <ul className={listeSinifi}>
           {kartlar.map((o) => (
-            <li key={o.id}>
+            <li key={o.id} className="guven-serit-hucre">
               <KartSarmalayici kart={o}>
                 <span className="guven-serit-ikon" aria-hidden>
                   {o.ikon}
                 </span>
                 <div className="guven-serit-metin min-w-0">
                   <p className="guven-serit-baslik">{o.baslik}</p>
-                  <p className="guven-serit-aciklama">{o.aciklama}</p>
+                  {o.aciklama?.trim() ? <p className="guven-serit-aciklama">{o.aciklama}</p> : null}
                 </div>
               </KartSarmalayici>
             </li>

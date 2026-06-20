@@ -391,10 +391,10 @@ async function main() {
         configJson: {
           yerlesim: { bolge: 'urunler_alti' },
           sayaclar: [
-            { id: 's1', deger: 250, sonEk: '+', etiket: 'PROJE' },
-            { id: 's2', deger: 45, sonEk: '', etiket: 'DİJİTAL ÜRÜN' },
-            { id: 's3', deger: 18, sonEk: '+', etiket: 'HİZMET ÇEŞİDİ' },
-            { id: 's4', deger: 1200, sonEk: '+', etiket: 'YARDIM TALEBİ' },
+            { id: 's1', deger: 250, sonEk: '+', etiket: 'PROJE', ikon: '⚡' },
+            { id: 's2', deger: 45, sonEk: '', etiket: 'DİJİTAL ÜRÜN', ikon: '🔌' },
+            { id: 's3', deger: 18, sonEk: '+', etiket: 'HİZMET ÇEŞİDİ', ikon: '💳' },
+            { id: 's4', deger: 1200, sonEk: '+', etiket: 'YARDIM TALEBİ', ikon: '🎨' },
           ],
           gorunum: { kolonSayisi: 4 },
         },

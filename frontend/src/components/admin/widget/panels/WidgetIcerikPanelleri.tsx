@@ -22,6 +22,7 @@ import {
   type WidgetSssOgesi,
 } from '@/types/widget';
 import { ListeSiralayici, SecimAlani } from './WidgetPanelOrtak';
+import { SAYAC_VARSAYILAN_IKONLAR, sayacDegerInput, sayacDegerKaydet } from '@/utils/sayacYardimci';
 import { FiltreEtiketYonetici } from './FiltreEtiketYonetici';
 import {
   BultenKayitIcerik,
@@ -616,21 +617,63 @@ export function SayacBlokIcerik({ form, onChange }: WidgetPanelProps) {
       <ListeSiralayici<WidgetSayac>
         ogeler={sayaclar}
         onDegistir={(s) => onChange(configGuncelle(form, (c) => ({ ...c, sayaclar: s })))}
-        yeniEkle={() => ({ id: uid(), deger: 0, sonEk: '+', etiket: '' })}
+        yeniEkle={() => {
+          const ikon = SAYAC_VARSAYILAN_IKONLAR[sayaclar.length % SAYAC_VARSAYILAN_IKONLAR.length];
+          return { id: uid(), deger: '', sonEk: '+', etiket: '', ikon };
+        }}
         renderOge={(s, i) => (
-          <div className="grid gap-2 sm:grid-cols-3">
-            <input type="number" className={formInputSinifi} placeholder="Değer" value={s.deger} onChange={(e) => {
-              const kopya = [...sayaclar]; kopya[i] = { ...s, deger: Number(e.target.value) };
-              onChange(configGuncelle(form, (c) => ({ ...c, sayaclar: kopya })));
-            }} />
-            <input className={formInputSinifi} placeholder="Son ek (+)" value={s.sonEk} onChange={(e) => {
-              const kopya = [...sayaclar]; kopya[i] = { ...s, sonEk: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, sayaclar: kopya })));
-            }} />
-            <input className={formInputSinifi} placeholder="Etiket" value={s.etiket} onChange={(e) => {
-              const kopya = [...sayaclar]; kopya[i] = { ...s, etiket: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, sayaclar: kopya })));
-            }} />
+          <div className="space-y-3">
+            <FormAlani etiket="İkon">
+              <EmojiSecici
+                sadeceSecim
+                deger={s.ikon ?? '⚡'}
+                onChange={(emoji) => {
+                  const kopya = [...sayaclar];
+                  kopya[i] = { ...s, ikon: emoji };
+                  onChange(configGuncelle(form, (c) => ({ ...c, sayaclar: kopya })));
+                }}
+              />
+            </FormAlani>
+            <div className="grid gap-2 sm:grid-cols-3">
+              <FormAlani etiket="Değer">
+                <input
+                  type="text"
+                  inputMode="decimal"
+                  className={formInputSinifi}
+                  placeholder="1 · 1.2 · 100"
+                  value={sayacDegerInput(s.deger)}
+                  onChange={(e) => {
+                    const kopya = [...sayaclar];
+                    kopya[i] = { ...s, deger: sayacDegerKaydet(e.target.value) };
+                    onChange(configGuncelle(form, (c) => ({ ...c, sayaclar: kopya })));
+                  }}
+                />
+              </FormAlani>
+              <FormAlani etiket="Son ek">
+                <input
+                  className={formInputSinifi}
+                  placeholder="+ · % · K"
+                  value={s.sonEk}
+                  onChange={(e) => {
+                    const kopya = [...sayaclar];
+                    kopya[i] = { ...s, sonEk: e.target.value };
+                    onChange(configGuncelle(form, (c) => ({ ...c, sayaclar: kopya })));
+                  }}
+                />
+              </FormAlani>
+              <FormAlani etiket="Etiket">
+                <input
+                  className={formInputSinifi}
+                  placeholder="Platform Özelliği"
+                  value={s.etiket}
+                  onChange={(e) => {
+                    const kopya = [...sayaclar];
+                    kopya[i] = { ...s, etiket: e.target.value };
+                    onChange(configGuncelle(form, (c) => ({ ...c, sayaclar: kopya })));
+                  }}
+                />
+              </FormAlani>
+            </div>
           </div>
         )}
       />

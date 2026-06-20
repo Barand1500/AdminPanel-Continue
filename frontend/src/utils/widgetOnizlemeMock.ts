@@ -147,10 +147,10 @@ function mockConfig(tip: string): WidgetConfig {
     case 'SAYAC_BLOK':
       return {
         sayaclar: [
-          { id: id(), deger: 500, sonEk: '+', etiket: 'Mutlu Müşteri' },
-          { id: id(), deger: 1200, sonEk: '', etiket: 'Tamamlanan Proje' },
-          { id: id(), deger: 15, sonEk: '', etiket: 'Yıllık Deneyim' },
-          { id: id(), deger: 98, sonEk: '%', etiket: 'Memnuniyet' },
+          { id: id(), deger: 500, sonEk: '+', etiket: 'Mutlu Müşteri', ikon: '⚡' },
+          { id: id(), deger: 1200, sonEk: '', etiket: 'Tamamlanan Proje', ikon: '🔌' },
+          { id: id(), deger: 15, sonEk: '', etiket: 'Yıllık Deneyim', ikon: '💳' },
+          { id: id(), deger: 98, sonEk: '%', etiket: 'Memnuniyet', ikon: '🎨' },
         ],
       };
     case 'YORUM_KARUSEL':

@@ -257,9 +257,11 @@ export interface WidgetEkipUyesi {
 
 export interface WidgetSayac {
   id: string;
-  deger: number;
+  /** Tam sayı, ondalık (1.2) veya metin olarak saklanabilir */
+  deger: number | string;
   sonEk: string;
   etiket: string;
+  ikon?: string;
 }
 
 export interface WidgetYorum {
