@@ -33,6 +33,7 @@ model Site {
   yedekKayitlari     YedekKaydi[]
   navKategoriler     NavKategori[]
   seoYonlendirmeler  SeoYonlendirme[]
+  siteEklentiler     SiteEklenti[]
 
   @@map("siteler")
 }
@@ -406,6 +407,25 @@ model SekmeAyari {
   @@unique([siteId, kod])
   @@index([siteId, aktif, sira])
   @@map("sekme_ayarlari")
+}
+
+model SiteEklenti {
+  id            Int      @id @default(autoincrement())
+  siteId        Int
+  site          Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  kod           String
+  ad            String
+  surum         String
+  durum         String   @default("kurulu")
+  kaynak        String   @default("katalog")
+  manifestJson  Json?
+  ayarlarJson   Json?
+  kurulumTarihi DateTime @default(now())
+  guncelleme    DateTime @updatedAt
+
+  @@unique([siteId, kod])
+  @@index([siteId, durum])
+  @@map("site_eklentiler")
 }
 
 model AdminLog {

@@ -42,6 +42,7 @@ import { KriptoController } from '../controllers/KriptoController.js';
 import { KisayolController } from '../controllers/KisayolController.js';
 import { SekmeController } from '../controllers/SekmeController.js';
 import { NavKategoriController } from '../controllers/NavKategoriController.js';
+import { EklentiController } from '../controllers/EklentiController.js';
 import {
   navKategoriGuncelleSchema,
   navKategoriOlusturSchema,
@@ -50,6 +51,7 @@ import { rolMiddleware } from '../middleware/rolMiddleware.js';
 import { yetkiMiddleware } from '../middleware/yetkiMiddleware.js';
 import { medyaYukle } from '../middleware/medyaYukle.js';
 import { yedekYukle } from '../middleware/yedekYukle.js';
+import { eklentiYukle } from '../middleware/eklentiYukle.js';
 import { validateBySchema } from '../middleware/dogrulama.js';
 
 const router = Router();
@@ -74,6 +76,7 @@ const kriptoController = new KriptoController();
 const kisayolController = new KisayolController();
 const sekmeController = new SekmeController();
 const navKategoriController = new NavKategoriController();
+const eklentiController = new EklentiController();
 
 const yG = yetkiMiddleware('goruntuleme');
 const yE = yetkiMiddleware('ekleme');
@@ -183,6 +186,15 @@ router.get('/sistem-ayarlari', authMiddleware, yG, (req, res) => sistemAyarlariC
 router.put('/sistem-ayarlari', authMiddleware, yD, validateBySchema(sistemAyarlariGuncelleSchema), (req, res) =>
   sistemAyarlariController.guncelle(req, res)
 );
+
+router.get('/eklentiler', authMiddleware, yG, (req, res) => eklentiController.listele(req, res));
+router.post('/eklentiler/yukle', authMiddleware, yE, eklentiYukle.single('dosya'), (req, res) =>
+  eklentiController.yukle(req, res)
+);
+router.post('/eklentiler/:kod/kur', authMiddleware, yE, (req, res) => eklentiController.kur(req, res));
+router.patch('/eklentiler/:kod/aktif', authMiddleware, yD, (req, res) => eklentiController.aktif(req, res));
+router.patch('/eklentiler/:kod/pasif', authMiddleware, yD, (req, res) => eklentiController.pasif(req, res));
+router.delete('/eklentiler/:kod', authMiddleware, yS, (req, res) => eklentiController.kaldir(req, res));
 
 router.get('/kullanicilar', authMiddleware, yK, (req, res) =>
   kullaniciController.listele(req, res)
