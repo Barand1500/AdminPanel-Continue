@@ -1,5 +1,6 @@
 import type { SitePublicData } from '@/types/site';
 import { bosSiteVerisi } from '@/data/bosSiteVerisi';
+import { jsonYanitOku } from '@/utils/jsonFetch';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '/api';
 const SITE_SLUG = import.meta.env.VITE_SITE_SLUG ?? 'demo';
@@ -7,8 +8,11 @@ const SITE_SLUG = import.meta.env.VITE_SITE_SLUG ?? 'demo';
 export async function siteVerisiGetir(signal?: AbortSignal): Promise<SitePublicData> {
   try {
     const yanit = await fetch(`${API_URL}/site?site=${SITE_SLUG}`, { signal });
-    if (!yanit.ok) return bosSiteVerisi;
-    const veri = (await yanit.json()) as SitePublicData;
+    if (!yanit.ok) {
+      console.error('[siteVerisiGetir] API hatasi:', yanit.status, yanit.statusText);
+      return bosSiteVerisi;
+    }
+    const veri = await jsonYanitOku<SitePublicData>(yanit);
     return {
       ...bosSiteVerisi,
       ...veri,
@@ -28,7 +32,8 @@ export async function siteVerisiGetir(signal?: AbortSignal): Promise<SitePublicD
       })),
       seoYonlendirmeler: veri.seoYonlendirmeler ?? [],
     };
-  } catch {
+  } catch (err) {
+    console.error('[siteVerisiGetir]', err instanceof Error ? err.message : err);
     return bosSiteVerisi;
   }
 }

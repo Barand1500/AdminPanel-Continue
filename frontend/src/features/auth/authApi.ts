@@ -1,4 +1,5 @@
 import type { AuthKullanici, AuthYanit, KullaniciTercihleri } from '@/types/admin';
+import { jsonYanitOku } from '@/utils/jsonFetch';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '/api';
 const TOKEN_KEY = 'gt_admin_token';
@@ -35,7 +36,7 @@ export async function girisYap(email: string, sifre: string): Promise<AuthYanit>
     body: JSON.stringify({ email, sifre }),
   });
 
-  const veri = await yanit.json();
+  const veri = await jsonYanitOku<{ mesaj?: string } & AuthYanit>(yanit);
   if (!yanit.ok) throw new Error(veri.mesaj ?? 'Giris basarisiz');
   return veri;
 }
@@ -48,7 +49,7 @@ export async function benGetir(): Promise<AuthKullanici> {
     headers: { Authorization: `Bearer ${token}` },
   });
 
-  const veri = await yanit.json();
+  const veri = await jsonYanitOku<{ mesaj?: string; kullanici: AuthKullanici }>(yanit);
   if (!yanit.ok) throw new Error(veri.mesaj ?? 'Oturum gecersiz');
   return veri.kullanici;
 }
@@ -69,7 +70,7 @@ export async function profilGuncelle(form: ProfilGuncelleForm): Promise<AuthKull
     body: JSON.stringify(payload),
   });
 
-  const veri = await yanit.json();
+  const veri = await jsonYanitOku<{ mesaj?: string; kullanici: AuthKullanici }>(yanit);
   if (!yanit.ok) throw new Error(veri.mesaj ?? 'Profil güncellenemedi');
   return veri.kullanici;
 }
@@ -81,7 +82,7 @@ export async function tercihlerKaydet(tercihler: KullaniciTercihleri): Promise<A
     body: JSON.stringify(tercihler),
   });
 
-  const veri = await yanit.json();
+  const veri = await jsonYanitOku<{ mesaj?: string; kullanici: AuthKullanici }>(yanit);
   if (!yanit.ok) throw new Error(veri.mesaj ?? 'Tercihler kaydedilemedi');
   return veri.kullanici;
 }

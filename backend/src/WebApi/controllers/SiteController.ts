@@ -15,14 +15,20 @@ async function siteIdFromSlug(siteSlug: string): Promise<number | null> {
 
 export class SiteController {
   async getPublicSite(req: Request, res: Response) {
-    const siteSlug = (req.query.site as string) ?? config.defaultSiteSlug;
-    const data = await siteService.getSitePublicData(siteSlug);
+    try {
+      const siteSlug = (req.query.site as string) ?? config.defaultSiteSlug;
+      const data = await siteService.getSitePublicData(siteSlug);
 
-    if (!data) {
-      return res.status(404).json({ mesaj: 'Site bulunamadi' });
+      if (!data) {
+        return res.status(404).json({ mesaj: 'Site bulunamadi' });
+      }
+
+      return res.json(data);
+    } catch (err) {
+      console.error('[SiteController.getPublicSite]', err);
+      const detay = err instanceof Error ? err.message : 'Site verisi alinamadi';
+      return res.status(500).json({ mesaj: detay });
     }
-
-    return res.json(data);
   }
 
   async getSayfa(req: Request, res: Response, slugYolu?: string) {

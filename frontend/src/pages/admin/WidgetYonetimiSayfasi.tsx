@@ -16,6 +16,7 @@ import { widgetGuncelle, widgetOlustur, widgetSil, widgetlariGetir } from '@/fea
 import { adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 import { sonrakiWidgetSira, siraCakismasiBul } from '@/utils/widgetSiraYardimci';
+import { siteVerisiGuncellendiYayinla } from '@/utils/siteVerisiOlaylari';
 import { configOku } from '@/types/widget';
 import { olusturucuOku } from '@/types/blokOlusturucu';
 import { olusturucuDoluMu } from '@/components/admin/widget/olusturucu/blokOlusturucuYardimci';
@@ -174,8 +175,8 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
       throw new Error('Widget adı veya içerik başlığı gerekli');
     }
     let kayitDegeri = deger.ad.trim() ? deger : { ...deger, ad };
-    if (deger.tip === 'BLOK_OLUSTURUCU') {
-      kayitDegeri = { ...kayitDegeri, aktif: Boolean(opts?.hizli) };
+    if (deger.tip === 'BLOK_OLUSTURUCU' && opts?.hizli) {
+      kayitDegeri = { ...kayitDegeri, aktif: true };
     }
     setKaydediliyor(true);
     setHata('');
@@ -183,14 +184,22 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
       if (widgetId) {
         const guncel = await widgetGuncelle(widgetId, kayitDegeri);
         setWidgetlar((onceki) => onceki.map((w) => (w.id === guncel.id ? guncel : w)));
+        setForm(widgettenForma(guncel));
         setBasari(opts?.hizli ? 'Widget siteye eklendi.' : 'Widget güncellendi.');
       } else {
         const yeni = await widgetOlustur(kayitDegeri);
         setWidgetlar((onceki) => [yeni, ...onceki]);
         setSeciliId(yeni.id);
         setForm(widgettenForma(yeni));
-        setBasari(opts?.hizli ? 'Widget siteye eklendi.' : 'Yeni widget oluşturuldu (pasif).');
+        setBasari(
+          opts?.hizli
+            ? 'Widget siteye eklendi.'
+            : yeni.aktif
+              ? 'Yeni widget oluşturuldu (aktif).'
+              : 'Yeni widget oluşturuldu (pasif).'
+        );
       }
+      siteVerisiGuncellendiYayinla();
     } finally {
       setKaydediliyor(false);
     }

@@ -13,6 +13,11 @@ set -e
 # Calistirma:
 #   chmod +x deploy.sh
 #   ./deploy.sh
+#
+# Nginx: /api ve /uploads istekleri Node'a (port 4000) gitmeli.
+# Ornek:
+#   location /api { proxy_pass http://127.0.0.1:4000; ... }
+#   location /uploads { proxy_pass http://127.0.0.1:4000; ... }
 
 # --- AYARLAR ---
 SITE="/home/guzelteknoloji-admin/htdocs/admin.guzelteknoloji.com"
@@ -58,6 +63,7 @@ echo "[4/5] Frontend build & kopyalandi"
 cd "$SITE/backend"
 npm install --omit=dev
 npx prisma generate
+npx prisma migrate deploy
 pm2 restart "$PM2_NAME" 2>/dev/null || pm2 start ecosystem.config.cjs
 echo "[5/5] PM2 restart tamam"
 

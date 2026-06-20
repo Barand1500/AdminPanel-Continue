@@ -1,5 +1,6 @@
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
 import { tokenAl } from '@/features/auth/authApi';
+import { jsonYanitOku } from '@/utils/jsonFetch';
 import { AKTIF_WIDGET_TIPLERI, DEPRECATED_WIDGET_TIPLERI } from '@/types/widget';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 
@@ -84,7 +85,7 @@ export async function widgetlariGetir(tip?: string): Promise<AdminWidget[]> {
   const yanit = await fetch(`${API_URL}/admin/widgetlar${query}`, {
     headers: authHeaders(),
   });
-  const veri = await yanit.json();
+  const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widgetlar?: AdminWidget[] }>(yanit);
   if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widgetlar alinamadi'));
   return veri.widgetlar as AdminWidget[];
 }
@@ -95,7 +96,7 @@ export async function widgetOlustur(form: WidgetFormDegeri): Promise<AdminWidget
     headers: authHeaders(),
     body: JSON.stringify(payloadHazirla(form)),
   });
-  const veri = await yanit.json();
+  const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widget?: AdminWidget }>(yanit);
   if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widget olusturulamadi'));
   return veri.widget as AdminWidget;
 }
@@ -106,7 +107,7 @@ export async function widgetGuncelle(id: string, form: WidgetFormDegeri): Promis
     headers: authHeaders(),
     body: JSON.stringify(payloadHazirla(form, true)),
   });
-  const veri = await yanit.json();
+  const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widget?: AdminWidget }>(yanit);
   if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widget guncellenemedi'));
   return veri.widget as AdminWidget;
 }
@@ -116,6 +117,6 @@ export async function widgetSil(id: string): Promise<void> {
     method: 'DELETE',
     headers: authHeaders(),
   });
-  const veri = await yanit.json();
+  const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined> }>(yanit);
   if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widget silinemedi'));
 }

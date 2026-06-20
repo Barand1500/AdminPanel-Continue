@@ -1,4 +1,5 @@
 import { tokenAl } from '@/features/auth/authApi';
+import { jsonYanitOku } from '@/utils/jsonFetch';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '/api';
 
@@ -12,7 +13,7 @@ export function adminHeaders(json = true): HeadersInit {
 
 export async function adminJsonFetch<T>(path: string, init?: RequestInit): Promise<T> {
   const yanit = await fetch(`${API_URL}/admin${path}`, init);
-  const veri = await yanit.json();
+  const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined> }>(yanit);
   if (!yanit.ok) {
     const hatalar = veri.hatalar as Record<string, string[] | undefined> | undefined;
     const detay = hatalar
