@@ -50,12 +50,12 @@ function gt(
 /** Her widget tipi için 6 benzersiz görünüm varyantı (layout + renk teması) */
 export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunumTipTanimi[]> = {
   SLIDER: [
-    gt('sinematik', 'Sinematik', 'Tam ekran koyu slayt', 'gece', 'Netflix'),
-    gt('kart-golge', 'Kart Gölge', 'Yuvarlak kart içinde slayt', 'notr', 'Stripe'),
-    gt('bolunmus-metin', 'Bölünmüş Metin', 'Sol yazı, sağ görsel', 'okyanus'),
-    gt('minimal-cizgi', 'Minimal Çizgi', 'İnce alt çizgi navigasyon', 'lavanta'),
-    gt('gradient-hero', 'Gradient Hero', 'Renkli gradient arka plan', 'mor'),
-    gt('kenar-cerceve', 'Kenar Çerçeve', 'Kalın renkli çerçeve', 'altin'),
+    gt('split-ozellik-vitrin', 'Split Özellik Vitrin', 'Sol metin + özellik chip, sağ orbit görsel', 'notr'),
+    gt('cam-hero-beyaz', 'Cam Hero Beyaz', 'Beyaz zemin cam efektli hero kart', 'okyanus'),
+    gt('orbit-merkez', 'Orbit Merkez', 'Ortada görsel, etrafında orbit halka', 'lavanta'),
+    gt('badge-modern', 'Badge Modern', 'Badge + başlık + mini özellik kartları', 'gunes'),
+    gt('sinematik-acik', 'Sinematik Açık', 'Açık tema sinematik split slayt', 'mint'),
+    gt('gradient-split', 'Gradient Split', 'Gradient zemin bölünmüş hero', 'mor'),
   ],
   HIZMET_KARTLARI: [
     gt('masonry-duvar', 'Masonry Duvar', 'Farklı yükseklikte Pinterest tarzı duvar', 'notr'),
@@ -452,7 +452,18 @@ const LEGACY_GORUNUM_TIPI: Partial<Record<AktifWidgetTipi, Record<string, string
     'altin-cizgi': 'accordion-liste',
   },
   SAYAC_BLOK: { klasik: 'buyuk-rakam', kapsul: 'pill-serit', 'cam-kart': 'cam-kartlar' },
-  SLIDER: { klasik: 'sinematik', kart: 'kart-golge', bolunmus: 'bolunmus-metin' },
+  SLIDER: {
+    klasik: 'split-ozellik-vitrin',
+    sinematik: 'sinematik-acik',
+    'kart-golge': 'cam-hero-beyaz',
+    kart: 'cam-hero-beyaz',
+    'bolunmus-metin': 'split-ozellik-vitrin',
+    bolunmus: 'split-ozellik-vitrin',
+    'minimal-cizgi': 'badge-modern',
+    minimal: 'badge-modern',
+    'gradient-hero': 'gradient-split',
+    'kenar-cerceve': 'orbit-merkez',
+  },
   GALERI: {
     'klasik-grid': 'hover-zoom-etiket',
     'esit-grid': 'hover-zoom-etiket',

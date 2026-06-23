@@ -71,44 +71,61 @@ export function WidgetGorunumTipWireframe({
         <div className="h-1 w-6 rounded bg-white/80" />
       </div>
     ),
-    'SLIDER:sinematik': (
-      <div className="rounded p-1" style={{ background: '#0f172a' }}>
-        <div className="h-4 rounded-sm" style={{ background: 'linear-gradient(to top, #1e293b, transparent)' }} />
-        <div className="mx-1 mt-0.5 h-1 w-4 rounded bg-white/60" />
-      </div>
-    ),
-    'SLIDER:kart-golge': (
-      <div className="p-2" style={{ background: renk.bg }}>
-        <div className="mx-auto h-5 w-3/4 rounded-md shadow-md ring-1 ring-slate-200" style={{ background: renk.accent }} />
-      </div>
-    ),
-    'SLIDER:bolunmus-metin': (
+    'SLIDER:split-ozellik-vitrin': (
       <div className="flex gap-0.5 p-1">
-        <div className="h-5 flex-1 rounded-l p-1" style={{ background: renk.surface }}>
-          <div className="h-0.5 w-3 rounded" style={{ background: renk.accent }} />
+        <div className="h-5 flex-1 rounded-l p-1" style={{ background: renk.bg }}>
+          <div className="h-0.5 w-2 rounded" style={{ background: renk.accent }} />
+          <div className="mt-0.5 h-0.5 w-4 rounded" style={{ background: renk.text, opacity: 0.2 }} />
+          <div className="mt-1 flex gap-0.5">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-1.5 flex-1 rounded" style={{ background: renk.surface }} />
+            ))}
+          </div>
         </div>
-        <div className="h-5 flex-1 rounded-r" style={{ background: renk.accent }} />
+        <div className="relative h-5 w-5 rounded-full" style={{ background: renk.surface }}>
+          <div className="absolute inset-1 rounded-full border border-dashed" style={{ borderColor: `${renk.accent}55` }} />
+        </div>
       </div>
     ),
-    'SLIDER:minimal-cizgi': (
-      <div className="p-1">
-        <div className="h-3 rounded-t" style={{ background: renk.surface }} />
-        <div className="flex gap-1 border-t border-slate-200 pt-0.5">
+    'SLIDER:cam-hero-beyaz': (
+      <div className="relative h-6 overflow-hidden rounded p-1" style={{ background: renk.bg }}>
+        <div className="absolute inset-0 opacity-40" style={{ background: renk.accent }} />
+        <div className="relative mx-2 mt-2 rounded bg-white/70 p-1 backdrop-blur">
+          <div className="h-0.5 w-4 rounded" style={{ background: renk.text, opacity: 0.3 }} />
+        </div>
+      </div>
+    ),
+    'SLIDER:orbit-merkez': (
+      <div className="relative flex h-6 items-center justify-center p-1" style={{ background: renk.bg }}>
+        <div className="absolute h-5 w-5 rounded-full border border-dashed" style={{ borderColor: `${renk.accent}44` }} />
+        <div className="h-2 w-2 rounded-full" style={{ background: renk.accent }} />
+      </div>
+    ),
+    'SLIDER:badge-modern': (
+      <div className="space-y-1 p-1" style={{ background: renk.bg }}>
+        <div className="h-0.5 w-2 rounded" style={{ background: renk.accent }} />
+        <div className="h-1 w-5 rounded" style={{ background: renk.text, opacity: 0.25 }} />
+        <div className="flex gap-0.5">
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-0.5 w-2 rounded" style={{ background: i === 1 ? renk.accent : '#e2e8f0' }} />
+            <div key={i} className="h-2 flex-1 rounded" style={{ background: renk.surface }} />
           ))}
         </div>
       </div>
     ),
-    'SLIDER:gradient-hero': (
-      <div className="rounded p-2 text-center" style={{ background: `linear-gradient(135deg, ${renk.accent}, #ec4899)` }}>
-        <div className="mx-auto h-1 w-4 rounded bg-white/70" />
-        <div className="mx-auto mt-1 h-0.5 w-6 rounded bg-white/40" />
+    'SLIDER:sinematik-acik': (
+      <div className="flex gap-0.5 p-1">
+        <div className="h-5 flex-1 rounded-l" style={{ background: `linear-gradient(135deg, ${renk.surface}, ${renk.accent}44)` }} />
+        <div className="h-5 flex-1 rounded-r p-1" style={{ background: renk.bg }}>
+          <div className="h-0.5 w-3 rounded" style={{ background: renk.accent }} />
+        </div>
       </div>
     ),
-    'SLIDER:kenar-cerceve': (
-      <div className="rounded border-2 p-0.5" style={{ borderColor: renk.accent, background: renk.bg }}>
-        <div className="h-4 rounded-sm" style={{ background: renk.surface }} />
+    'SLIDER:gradient-split': (
+      <div className="flex gap-0.5 rounded p-1" style={{ background: `linear-gradient(135deg, ${renk.accent}, #6366f1)` }}>
+        <div className="h-5 flex-1 rounded-l p-1">
+          <div className="h-0.5 w-3 rounded bg-white/70" />
+        </div>
+        <div className="h-5 w-3 rounded-r bg-white/20" />
       </div>
     ),
   };

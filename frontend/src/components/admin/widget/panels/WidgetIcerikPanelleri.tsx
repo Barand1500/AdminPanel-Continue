@@ -142,37 +142,44 @@ export function SliderIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const slides = cfg.slides ?? [];
   return (
-    <AdminFormBolumu baslik="Slaytlar" aciklama="Her slayt için görsel ve metin">
-      <ListeSiralayici<WidgetSlide>
-        ogeler={slides}
-        onDegistir={(slidesYeni) => onChange(configGuncelle(form, (c) => ({ ...c, slides: slidesYeni })))}
-        yeniEkle={() => ({ id: uid(), gorselUrl: '', baslik: '', altBaslik: '', butonMetni: '', butonLink: '', aktif: true })}
-        renderOge={(s, i) => (
-          <div className="grid gap-2 sm:grid-cols-2">
-            <GorselAlan etiket={`Slayt ${i + 1} görsel`} deger={s.gorselUrl} onChange={(v) => {
-              const kopya = [...slides]; kopya[i] = { ...s, gorselUrl: v };
-              onChange(configGuncelle(form, (c) => ({ ...c, slides: kopya })));
-            }} />
-            <input className={formInputSinifi} placeholder="Başlık" value={s.baslik} onChange={(e) => {
-              const kopya = [...slides]; kopya[i] = { ...s, baslik: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, slides: kopya })));
-            }} />
-            <input className={formInputSinifi} placeholder="Alt başlık" value={s.altBaslik} onChange={(e) => {
-              const kopya = [...slides]; kopya[i] = { ...s, altBaslik: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, slides: kopya })));
-            }} />
-            <input className={formInputSinifi} placeholder="Buton metni" value={s.butonMetni} onChange={(e) => {
-              const kopya = [...slides]; kopya[i] = { ...s, butonMetni: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, slides: kopya })));
-            }} />
-            <input className={formInputSinifi} placeholder="Buton link" value={s.butonLink} onChange={(e) => {
-              const kopya = [...slides]; kopya[i] = { ...s, butonLink: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, slides: kopya })));
-            }} />
-          </div>
-        )}
-      />
-    </AdminFormBolumu>
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Slaytlar" aciklama="Her slayt için görsel ve metin">
+        <ListeSiralayici<WidgetSlide>
+          ogeler={slides}
+          onDegistir={(slidesYeni) => onChange(configGuncelle(form, (c) => ({ ...c, slides: slidesYeni })))}
+          yeniEkle={() => ({ id: uid(), gorselUrl: '', baslik: '', altBaslik: '', aciklama: '', butonMetni: '', butonLink: '', aktif: true })}
+          renderOge={(s, i) => (
+            <div className="grid gap-2 sm:grid-cols-2">
+              <GorselAlan etiket={`Slayt ${i + 1} görsel`} deger={s.gorselUrl} onChange={(v) => {
+                const kopya = [...slides]; kopya[i] = { ...s, gorselUrl: v };
+                onChange(configGuncelle(form, (c) => ({ ...c, slides: kopya })));
+              }} />
+              <input className={formInputSinifi} placeholder="Başlık" value={s.baslik} onChange={(e) => {
+                const kopya = [...slides]; kopya[i] = { ...s, baslik: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, slides: kopya })));
+              }} />
+              <input className={formInputSinifi} placeholder="Alt başlık / badge" value={s.altBaslik} onChange={(e) => {
+                const kopya = [...slides]; kopya[i] = { ...s, altBaslik: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, slides: kopya })));
+              }} />
+              <textarea className={`${formInputSinifi} sm:col-span-2`} placeholder="Açıklama" rows={2} value={s.aciklama ?? ''} onChange={(e) => {
+                const kopya = [...slides]; kopya[i] = { ...s, aciklama: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, slides: kopya })));
+              }} />
+              <input className={formInputSinifi} placeholder="Buton metni" value={s.butonMetni} onChange={(e) => {
+                const kopya = [...slides]; kopya[i] = { ...s, butonMetni: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, slides: kopya })));
+              }} />
+              <input className={formInputSinifi} placeholder="Buton link" value={s.butonLink} onChange={(e) => {
+                const kopya = [...slides]; kopya[i] = { ...s, butonLink: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, slides: kopya })));
+              }} />
+            </div>
+          )}
+        />
+      </AdminFormBolumu>
+    </>
   );
 }
 

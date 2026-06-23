@@ -205,6 +205,7 @@ export interface WidgetSlide {
   gorselUrl: string;
   baslik: string;
   altBaslik: string;
+  aciklama?: string;
   butonMetni: string;
   butonLink: string;
   aktif: boolean;

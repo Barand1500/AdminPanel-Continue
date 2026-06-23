@@ -34,6 +34,15 @@ export const WIDGET_GORUNUM_ICERIK_ALANLARI: Record<string, WidgetIcerikAlanHari
     'flip-kart': ['baslik', 'aciklama'],
     'sol-panel': ['solBaslik', 'solAciklama', 'filtreler'],
   },
+  SLIDER: {
+    _varsayilan: ['baslik'],
+    'split-ozellik-vitrin': ['baslik', 'aciklama', 'filtreler'],
+    'cam-hero-beyaz': ['baslik', 'altBaslik', 'aciklama'],
+    'orbit-merkez': ['baslik', 'altBaslik'],
+    'badge-modern': ['baslik', 'aciklama', 'filtreler'],
+    'sinematik-acik': ['baslik', 'aciklama'],
+    'gradient-split': ['baslik', 'altBaslik', 'aciklama', 'heroBannerMetin'],
+  },
   BLOG_KARUSEL: {
     _varsayilan: ['baslik', 'tumunuGor'],
     'snap-serit': ['baslik', 'tumunuGor'],
