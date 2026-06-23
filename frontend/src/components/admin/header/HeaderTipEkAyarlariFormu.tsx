@@ -75,6 +75,12 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
                 <option value="ikon">Yalnızca ikon</option>
               </select>
             </FormAlani>
+            <ToggleSatir
+              etiket="Kullanıcı alanı göster"
+              aciklama="Header sağındaki hesap / giriş ikonu"
+              acik={tipEk.kullaniciGoster !== false}
+              onDegistir={(kullaniciGoster) => guncelle({ kullaniciGoster })}
+            />
           </>
         )}
 
@@ -193,6 +199,15 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
               </select>
             </FormAlani>
           </>
+        )}
+
+        {tip !== 'sade' && tip !== 'kompakt' && tip !== 'arama-odakli' && tip !== 'split' && (
+          <ToggleSatir
+            etiket="Kullanıcı alanı göster"
+            aciklama="Header sağındaki hesap / giriş ikonu"
+            acik={tipEk.kullaniciGoster !== false}
+            onDegistir={(kullaniciGoster) => guncelle({ kullaniciGoster })}
+          />
         )}
       </div>
     </AdminPanelKarti>

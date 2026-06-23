@@ -52,6 +52,7 @@ export function varsayilanTipEk(tip: HeaderTipi): HeaderTipEkAyarlari {
   const ortak: HeaderTipEkAyarlari = {
     aramaGoster: true,
     aramaModu: 'tam',
+    kullaniciGoster: true,
     kompaktYukseklik: 48,
     ctaMetni: '',
     ctaLink: '',

@@ -76,6 +76,8 @@ export interface DilDestegiAyarlari {
 export interface HeaderTipEkAyarlari {
   aramaGoster?: boolean;
   aramaModu?: 'tam' | 'ikon';
+  /** false ise header sağındaki hesap / giriş ikonu gizlenir */
+  kullaniciGoster?: boolean;
   kompaktYukseklik?: 40 | 48 | 56;
   ctaMetni?: string;
   ctaLink?: string;
@@ -253,4 +255,8 @@ export function headerAyarlariBirlestir(
 
 export function headerMarkaMetni(header: HeaderAyarlari): string {
   return header.markaMetni?.trim() ?? '';
+}
+
+export function kullaniciAlaniGoster(tipEk?: HeaderTipEkAyarlari | null): boolean {
+  return tipEk?.kullaniciGoster !== false;
 }

@@ -47,6 +47,7 @@ export const headerAyarlariSchema = z.object({
     .object({
       aramaGoster: z.boolean().optional(),
       aramaModu: z.enum(['tam', 'ikon']).optional(),
+      kullaniciGoster: z.boolean().optional(),
       kompaktYukseklik: z.union([z.literal(40), z.literal(48), z.literal(56)]).optional(),
       ctaMetni: z.string().max(120).optional(),
       ctaLink: z.string().max(500).optional(),

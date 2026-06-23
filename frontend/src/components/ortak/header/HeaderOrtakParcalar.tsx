@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { CSSProperties, ReactNode } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
+import { kullaniciAlaniGoster } from '@/types/header';
 import type { HeaderVeri } from './useHeaderVeri';
 import { aramaSinifi, kurDegeri } from './useHeaderVeri';
 import { KategoriMenu } from '../KategoriMenu';
@@ -162,7 +163,7 @@ export function IkonGrubu({
         <HeaderDilSecici ayar={veri.header.dilDestegi} />
       )}
       {!sadeceHamburger && <TemaToggle tema={veri.header.ikonlar?.tema} />}
-      {!sadeceHamburger && (
+      {!sadeceHamburger && kullaniciAlaniGoster(veri.tipEk) && (
         <Link
           to="/hesabim"
           className="rounded-full p-2 transition hover:bg-accent hover:text-primary"
@@ -233,16 +234,21 @@ export function KompaktPillMenu({ menu }: { menu: MenuOgesi[] }) {
 }
 
 export function SadeMinimalIkonlar({ veri }: { veri: HeaderVeri }) {
+  const kullaniciGoster = kullaniciAlaniGoster(veri.tipEk);
+  if (!kullaniciGoster && veri.tipEk.aramaGoster === false) return null;
+
   return (
     <div className="site-header-sade-ikonlar flex items-center gap-1">
       <AramaAlani veri={veri} />
-      <Link
-        to="/hesabim"
-        className="rounded-full p-2 opacity-80 transition hover:opacity-100"
-        aria-label="Hesabım"
-      >
-        <HeaderIkon ikon={veri.header.ikonlar!.hesap} grup="hesap" className="h-[18px] w-[18px]" />
-      </Link>
+      {kullaniciGoster && (
+        <Link
+          to="/hesabim"
+          className="rounded-full p-2 opacity-80 transition hover:opacity-100"
+          aria-label="Hesabım"
+        >
+          <HeaderIkon ikon={veri.header.ikonlar!.hesap} grup="hesap" className="h-[18px] w-[18px]" />
+        </Link>
+      )}
     </div>
   );
 }
@@ -301,9 +307,11 @@ export function MobilMenuPanel({
         style={{ borderColor: 'var(--color-border)' }}
       >
         <TemaToggle tema={veri.header.ikonlar?.tema} />
-        <Link to="/hesabim" onClick={onMenuKapat} className="text-primary">
-          Hesabım
-        </Link>
+        {kullaniciAlaniGoster(veri.tipEk) && (
+          <Link to="/hesabim" onClick={onMenuKapat} className="text-primary">
+            Hesabım
+          </Link>
+        )}
       </div>
     </nav>
   );

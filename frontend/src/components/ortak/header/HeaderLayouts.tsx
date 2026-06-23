@@ -2,6 +2,7 @@ import type { Dispatch, SetStateAction } from 'react';
 import { Link } from 'react-router-dom';
 import type { SiteAyarlari } from '@/types/site';
 import { headerMarkaKapSinifi, logoBoyutuNormalize } from '@/types/logo';
+import { kullaniciAlaniGoster } from '@/types/header';
 import type { HeaderVeri } from './useHeaderVeri';
 import {
   UstBant,
@@ -88,13 +89,15 @@ export function HeaderKompakt({ veri, menuAcik, setMenuAcik }: HeaderLayoutProps
         <KompaktPillMenu menu={veri.cevrilmisMenu} />
         <div className="ml-auto flex shrink-0 items-center gap-0.5">
           <AramaAlani veri={veri} />
-          <Link
-            to="/hesabim"
-            className="rounded p-1.5 opacity-90 transition hover:opacity-100"
-            aria-label="Hesabım"
-          >
-            <HeaderIkon ikon={veri.header.ikonlar!.hesap} grup="hesap" className="h-4 w-4" />
-          </Link>
+          {kullaniciAlaniGoster(veri.tipEk) && (
+            <Link
+              to="/hesabim"
+              className="rounded p-1.5 opacity-90 transition hover:opacity-100"
+              aria-label="Hesabım"
+            >
+              <HeaderIkon ikon={veri.header.ikonlar!.hesap} grup="hesap" className="h-4 w-4" />
+            </Link>
+          )}
           <IkonGrubu
             veri={veri}
             menuAcik={menuAcik}
