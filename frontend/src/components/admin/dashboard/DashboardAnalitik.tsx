@@ -1,15 +1,28 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  ButonTiklamaGrafik,
+  CubukGrafik,
   DonemSecici,
   KpiKart,
   VeriTablosu,
-  ZiyaretGrafik,
 } from '@/components/admin/dashboard/DashboardBilesenleri';
 import { DashboardHizliErisim } from '@/components/admin/dashboard/DashboardHizliErisim';
-import { dashboardAnalitikMock, type DashboardDonem } from '@/data/dashboardAnalitikMock';
-import type { DashboardOzet } from '@/features/admin/dashboardApi';
+import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
+import { dashboardOzetGetir, type DashboardOzet } from '@/features/admin/dashboardApi';
 import type { AdminModul } from '@/types/admin';
+import type { DashboardDonem } from '@/types/dashboard';
+
+function tarihKisa(iso: string) {
+  try {
+    return new Intl.DateTimeFormat('tr-TR', {
+      day: 'numeric',
+      month: 'short',
+      hour: '2-digit',
+      minute: '2-digit',
+    }).format(new Date(iso));
+  } catch {
+    return '';
+  }
+}
 
 export function DashboardAnalitik({
   ozet,
@@ -21,10 +34,28 @@ export function DashboardAnalitik({
   onModulAc: (modulId: string) => void;
 }) {
   const [donem, setDonem] = useState<DashboardDonem>('bugun');
-  const analitik = useMemo(() => dashboardAnalitikMock(donem), [donem]);
+  const [analitikOzet, setAnalitikOzet] = useState<DashboardOzet>(ozet);
+  const [yukleniyor, setYukleniyor] = useState(false);
 
-  const formToplam = ozet.istatistikler.gonderimSayisi;
-  const formYeni = ozet.istatistikler.okunmamisGonderim;
+  useEffect(() => {
+    let iptal = false;
+    void (async () => {
+      setYukleniyor(true);
+      try {
+        const veri = await dashboardOzetGetir(donem);
+        if (!iptal) setAnalitikOzet(veri);
+      } finally {
+        if (!iptal) setYukleniyor(false);
+      }
+    })();
+    return () => {
+      iptal = true;
+    };
+  }, [donem]);
+
+  const s = analitikOzet.istatistikler;
+  const analitik = analitikOzet.analitik;
+  const formDonem = analitik?.donemGonderimSayisi ?? 0;
 
   return (
     <>
@@ -32,48 +63,95 @@ export function DashboardAnalitik({
         <DonemSecici aktif={donem} onDegistir={setDonem} />
       </div>
 
-      <p className="ap-dash-ornek-not">
-        Örnek analitik veriler gösteriliyor. Gerçek ziyaret ve tıklama takibi sonraki aşamada eklenecek.
-      </p>
-
       <div className="ap-dash-kpi-grid" data-ap-kesif="dash-kpi">
-        <KpiKart etiket="Ziyaretçi" deger={analitik.ziyaret.toLocaleString('tr-TR')} />
-        <KpiKart etiket="Sayfa Görüntüleme" deger={analitik.sayfaGoruntulenme.toLocaleString('tr-TR')} />
         <KpiKart
           etiket="Form Gönderimi"
-          deger={formToplam.toLocaleString('tr-TR')}
-          alt={formYeni > 0 ? `${formYeni} yeni` : 'Tümü okundu'}
+          deger={formDonem.toLocaleString('tr-TR')}
+          alt={`${s.gonderimSayisi.toLocaleString('tr-TR')} toplam`}
         />
+        <KpiKart
+          etiket="Yayında Sayfa"
+          deger={s.yayindaSayfa.toLocaleString('tr-TR')}
+          alt={s.sayfaSayisi > s.yayindaSayfa ? `${s.sayfaSayisi} toplam` : undefined}
+        />
+        <KpiKart
+          etiket="Yayında Blog"
+          deger={s.yayindaBlog.toLocaleString('tr-TR')}
+          alt={s.blogSayisi > s.yayindaBlog ? `${s.blogSayisi} toplam` : undefined}
+        />
+        <KpiKart etiket="Widget" deger={s.widgetSayisi.toLocaleString('tr-TR')} />
       </div>
 
       <div className="ap-dash-analitik-grid">
         <div className="ap-dash-panel ap-dash-panel-genis">
-          <h3 className="ap-dash-panel-baslik">Ziyaret Grafiği</h3>
-          <ZiyaretGrafik veriler={analitik.ziyaretGrafik} />
+          <h3 className="ap-dash-panel-baslik">Form Gönderimleri</h3>
+          {yukleniyor ? (
+            <p className="ap-dash-panel-bos">Güncelleniyor…</p>
+          ) : (
+            <CubukGrafik veriler={analitik?.formGrafik ?? []} />
+          )}
         </div>
 
         <VeriTablosu
-          baslik="Ülkelere Göre Ziyaret"
-          sutunlar={['Ülke', 'Ziyaret']}
-          satirlar={analitik.ulkeler.map((u) => ({ birincil: u.ulke, ikincil: u.ziyaret }))}
+          baslik="Sayfalar"
+          sutunlar={['Sayfa', 'Widget']}
+          satirlar={(analitik?.sayfalar ?? []).map((sayfa) => ({
+            birincil: sayfa.ad,
+            ikincil: sayfa.widgetSayisi,
+          }))}
+          bosMesaj="Henüz sayfa yok"
         />
       </div>
 
       <div className="ap-dash-analitik-grid">
         <VeriTablosu
-          baslik="En Çok Okunan Bloglar"
-          sutunlar={['Yazı', 'Okuma']}
-          satirlar={analitik.bloglar.map((b) => ({ birincil: b.baslik, ikincil: b.okuma }))}
+          baslik="Aktif Widget Tipleri"
+          sutunlar={['Tip', 'Adet']}
+          satirlar={(analitik?.widgetDagilimi ?? []).map((w) => ({
+            birincil: tipEtiketi(w.tip),
+            ikincil: w.adet,
+          }))}
+          bosMesaj="Henüz widget yok"
         />
-        <VeriTablosu
-          baslik="En Çok Görüntülenen Sayfalar"
-          sutunlar={['Sayfa', 'Görüntüleme']}
-          satirlar={analitik.sayfalar.map((s) => ({ birincil: s.ad, ikincil: s.goruntulenme }))}
-        />
+
+        <div className="ap-dash-panel">
+          <h3 className="ap-dash-panel-baslik">Son Blog Yazıları</h3>
+          {analitikOzet.sonBloglar.length === 0 ? (
+            <p className="ap-dash-panel-bos">Henüz blog yazısı yok.</p>
+          ) : (
+            <ul className="ap-dash-sade-liste">
+              {analitikOzet.sonBloglar.map((blog) => (
+                <li key={blog.id} className="ap-dash-sade-liste-oge">
+                  <span className="ap-dash-sade-liste-baslik">{blog.baslik}</span>
+                  <span className="ap-dash-sade-liste-meta">
+                    {blog.yayinda ? 'Yayında' : 'Taslak'} · {tarihKisa(blog.olusturma)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
       <div className="ap-dash-analitik-grid">
-        <ButonTiklamaGrafik veriler={analitik.butonlar} />
+        <div className="ap-dash-panel ap-dash-panel-genis">
+          <h3 className="ap-dash-panel-baslik">Son Form Gönderimleri</h3>
+          {analitikOzet.sonGonderimler.length === 0 ? (
+            <p className="ap-dash-panel-bos">Henüz form gönderimi yok.</p>
+          ) : (
+            <ul className="ap-dash-sade-liste">
+              {analitikOzet.sonGonderimler.map((g) => (
+                <li key={g.id} className="ap-dash-sade-liste-oge">
+                  <span className="ap-dash-sade-liste-baslik">{g.formAd}</span>
+                  <span className="ap-dash-sade-liste-meta">
+                    {!g.okundu && <span className="ap-dash-sade-rozet">Yeni</span>}
+                    {g.okundu ? 'Okundu' : 'Bekliyor'} · {tarihKisa(g.olusturma)}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </div>
 
       <DashboardHizliErisim moduller={hizliModuller} onModulAc={onModulAc} />

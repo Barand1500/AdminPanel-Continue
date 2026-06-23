@@ -1,7 +1,13 @@
 import { prisma } from '../database/prismaClient.js';
+import {
+  donemBaslangic,
+  formGonderimGrafik,
+  gecerliDonem,
+  type DashboardDonem,
+} from './dashboardAnalitikYardimci.js';
 
 export class DashboardRepository {
-  async ozet(siteId: number) {
+  async ozet(siteId: number, donem?: DashboardDonem) {
     const [
       sayfaSayisi,
       blogSayisi,
@@ -43,7 +49,22 @@ export class DashboardRepository {
       }),
     ]);
 
-    return {
+    const sonuc: {
+      istatistikler: {
+        sayfaSayisi: number;
+        blogSayisi: number;
+        formSayisi: number;
+        medyaSayisi: number;
+        widgetSayisi: number;
+        gonderimSayisi: number;
+        okunmamisGonderim: number;
+        yayindaSayfa: number;
+        yayindaBlog: number;
+      };
+      sonBloglar: { id: string; baslik: string; yayinda: boolean; olusturma: string }[];
+      sonGonderimler: { id: string; formAd: string; okundu: boolean; olusturma: string }[];
+      analitik?: Awaited<ReturnType<DashboardRepository['analitik']>>;
+    } = {
       istatistikler: {
         sayfaSayisi,
         blogSayisi,
@@ -68,5 +89,61 @@ export class DashboardRepository {
         olusturma: g.olusturma.toISOString(),
       })),
     };
+
+    if (donem) {
+      sonuc.analitik = await this.analitik(siteId, donem);
+    }
+
+    return sonuc;
+  }
+
+  async analitik(siteId: number, donem: DashboardDonem) {
+    const baslangic = donemBaslangic(donem);
+
+    const [donemGonderimleri, donemGonderimSayisi, sayfalar, widgetGruplari] = await Promise.all([
+      prisma.formGonderim.findMany({
+        where: { form: { siteId }, olusturma: { gte: baslangic } },
+        select: { olusturma: true },
+      }),
+      prisma.formGonderim.count({
+        where: { form: { siteId }, olusturma: { gte: baslangic } },
+      }),
+      prisma.sayfa.findMany({
+        where: { siteId },
+        orderBy: [{ yayinda: 'desc' }, { sira: 'asc' }],
+        take: 8,
+        select: {
+          baslik: true,
+          _count: { select: { widgetlar: true } },
+        },
+      }),
+      prisma.widget.groupBy({
+        by: ['tip'],
+        where: { siteId, aktif: true },
+        _count: { tip: true },
+      }),
+    ]);
+
+    return {
+      donem,
+      donemGonderimSayisi,
+      formGrafik: formGonderimGrafik(
+        donemGonderimleri.map((g) => g.olusturma),
+        donem
+      ),
+      sayfalar: sayfalar.map((s) => ({
+        ad: s.baslik,
+        widgetSayisi: s._count.widgetlar,
+      })),
+      widgetDagilimi: widgetGruplari
+        .map((w) => ({
+          tip: w.tip,
+          adet: w._count.tip,
+        }))
+        .sort((a, b) => b.adet - a.adet)
+        .slice(0, 8),
+    };
   }
 }
+
+export { gecerliDonem };

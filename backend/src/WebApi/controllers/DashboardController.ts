@@ -1,5 +1,5 @@
 import type { Request, Response } from 'express';
-import { DashboardService } from '../../Services/DashboardService.js';
+import { DashboardService, gecerliDonem } from '../../Services/DashboardService.js';
 import { cozulenSiteId } from '../utils/cozulenSiteId.js';
 import { veritabaniHataMesaji } from '../utils/veritabaniHataMesaji.js';
 
@@ -10,7 +10,8 @@ export class DashboardController {
     try {
       const siteId = cozulenSiteId(req);
       if (!siteId) return res.status(400).json({ mesaj: 'Site secimi gerekli' });
-      const ozet = await service.ozet(siteId);
+      const donem = req.query.donem ? gecerliDonem(req.query.donem) : undefined;
+      const ozet = await service.ozet(siteId, donem);
       return res.json(ozet);
     } catch (err) {
       const ozel = veritabaniHataMesaji(err);

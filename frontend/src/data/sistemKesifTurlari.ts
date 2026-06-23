@@ -77,7 +77,7 @@ const dashboardAdimlari = [
     okYonu: 'alt' as const,
     baslik: 'Özet Kartları — Sitenizin Durumu',
     aciklama:
-      'Yayında kaç sayfa var, kaç form gönderildi, kaç medya yüklendi gibi bilgileri tek bakışta görürsünüz. Analitik modda ziyaret grafikleri de eklenir.',
+      'Yayında kaç sayfa var, kaç form gönderildi, kaç medya yüklendi gibi bilgileri tek bakışta görürsünüz. Analitik modda form gönderim grafiği ve içerik dağılımı da gösterilir.',
     ipuclari: [
       'Analitik görünümde Bugün / Bu Hafta / Bu Ay seçebilirsiniz',
       'Sade görünüm daha az grafik, daha çok özet sunar',

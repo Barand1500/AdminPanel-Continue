@@ -1,5 +1,5 @@
-import type { DashboardDonem } from '@/data/dashboardAnalitikMock';
-import { DONEM_ETIKETLERI } from '@/data/dashboardAnalitikMock';
+import type { DashboardDonem } from '@/types/dashboard';
+import { DONEM_ETIKETLERI } from '@/types/dashboard';
 
 export function DonemSecici({
   aktif,
@@ -36,7 +36,7 @@ export function KpiKart({ etiket, deger, alt }: { etiket: string; deger: string 
   );
 }
 
-export function ZiyaretGrafik({ veriler }: { veriler: { etiket: string; deger: number }[] }) {
+export function CubukGrafik({ veriler }: { veriler: { etiket: string; deger: number }[] }) {
   const max = Math.max(...veriler.map((v) => v.deger), 1);
 
   return (
@@ -100,29 +100,6 @@ export function VeriTablosu({
           </tbody>
         </table>
       )}
-    </div>
-  );
-}
-
-export function ButonTiklamaGrafik({ veriler }: { veriler: { ad: string; tiklama: number }[] }) {
-  const max = Math.max(...veriler.map((v) => v.tiklama), 1);
-
-  return (
-    <div className="ap-dash-panel">
-      <h3 className="ap-dash-panel-baslik">Buton Tıklamaları</h3>
-      <div className="ap-dash-buton-liste">
-        {veriler.map((v) => (
-          <div key={v.ad} className="ap-dash-buton-satir">
-            <div className="ap-dash-buton-ust">
-              <span className="ap-dash-buton-ad">{v.ad}</span>
-              <span className="ap-dash-buton-sayi">{v.tiklama}</span>
-            </div>
-            <div className="ap-dash-buton-track">
-              <div className="ap-dash-buton-dolgu" style={{ width: `${(v.tiklama / max) * 100}%` }} />
-            </div>
-          </div>
-        ))}
-      </div>
     </div>
   );
 }
