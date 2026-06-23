@@ -359,7 +359,10 @@ function mockConfig(tip: string): WidgetConfig {
     case 'GERI_SAYIM':
       return { bitisTarihi: new Date(Date.now() + 7 * 86400000).toISOString() };
     case 'VIDEO_BANNER':
-      return { videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ', videoTip: 'youtube' };
+      return {
+        videoUrl: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+        videoTip: 'youtube',
+      };
     case 'ONCESI_SONRASI':
       return { onceGorsel: ONIZLEME_GORSEL, sonraGorsel: ONIZLEME_GORSEL };
     case 'BULTEN_KAYIT':
@@ -719,7 +722,7 @@ function mockBaslik(tip: string): string {
     MARKA_SERIDI: 'Güvenen Markalar',
     KARSILASTIRMA_TABLOSU: 'Paket Karşılaştırması',
     GERI_SAYIM: 'Kampanya Bitiyor!',
-    VIDEO_BANNER: 'Tanıtım Videosu',
+    VIDEO_BANNER: 'Kurucumuzdan Dinle',
     ONCESI_SONRASI: 'Farkı Görün',
     BULTEN_KAYIT: 'Bültenimize Katılın',
     UCRETSIZ_DENEME: 'Hemen Ücretsiz Deneyin',

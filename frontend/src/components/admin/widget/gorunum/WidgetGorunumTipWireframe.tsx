@@ -189,6 +189,59 @@ export function WidgetGorunumTipWireframe({
         </div>
       </div>
     ),
+    'VIDEO_BANNER:tam-video': (
+      <div className="relative h-6 overflow-hidden rounded p-1" style={{ background: '#0f172a' }}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className="h-2 w-2 rounded-full bg-white/90" />
+        </div>
+        <div className="absolute bottom-0.5 left-1 h-0.5 w-3 rounded bg-white/50" />
+      </div>
+    ),
+    'VIDEO_BANNER:bolunmus-metin': (
+      <div className="flex gap-0.5 p-1">
+        <div className="h-5 flex-1 rounded-l p-1" style={{ background: renk.bg }}>
+          <div className="h-0.5 w-0.5 rounded-full" style={{ background: renk.accent }} />
+          <div className="mt-0.5 h-0.5 w-3 rounded" style={{ background: renk.text, opacity: 0.3 }} />
+        </div>
+        <div className="h-5 w-3 rounded-r shadow-sm" style={{ background: renk.surface }} />
+      </div>
+    ),
+    'VIDEO_BANNER:cerceveli-kart': (
+      <div className="rounded p-1" style={{ background: renk.surface }}>
+        <div className="mb-0.5 flex gap-0.5">
+          {['#f87171', '#fbbf24', '#4ade80'].map((c) => (
+            <div key={c} className="h-0.5 w-0.5 rounded-full" style={{ background: c }} />
+          ))}
+        </div>
+        <div className="h-3 rounded" style={{ background: renk.accent, opacity: 0.35 }} />
+      </div>
+    ),
+    'VIDEO_BANNER:mor-overlay': (
+      <div className="flex h-5 overflow-hidden rounded">
+        <div className="h-full w-2/5 p-1" style={{ background: renk.accent }}>
+          <div className="h-0.5 w-2 rounded bg-white/70" />
+        </div>
+        <div className="h-full flex-1" style={{ background: renk.surface }} />
+      </div>
+    ),
+    'VIDEO_BANNER:kurucu-merkez': (
+      <div className="relative space-y-1 p-1 text-center" style={{ background: '#fff' }}>
+        <div className="mx-auto h-0.5 w-4 rounded" style={{ background: renk.text, opacity: 0.25 }} />
+        <div className="mx-auto h-3 w-5 rounded-lg shadow-sm" style={{ background: renk.surface }} />
+      </div>
+    ),
+    'VIDEO_BANNER:yan-playlist': (
+      <div className="flex h-5 overflow-hidden rounded" style={{ background: '#1e293b' }}>
+        <div className="w-2/5 space-y-0.5 border-r border-white/10 p-0.5">
+          {[1, 2].map((i) => (
+            <div key={i} className="h-1 rounded" style={{ background: i === 1 ? `${renk.accent}88` : 'rgba(255,255,255,0.1)' }} />
+          ))}
+        </div>
+        <div className="flex-1 p-0.5">
+          <div className="h-full rounded" style={{ background: renk.accent, opacity: 0.4 }} />
+        </div>
+      </div>
+    ),
   };
 
   const icerik =

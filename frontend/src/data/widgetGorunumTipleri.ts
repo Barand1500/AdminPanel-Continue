@@ -258,12 +258,12 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('yesil-kampanya', 'Yeşil Kampanya', 'Yeşil kampanya bandı', 'yesil'),
   ],
   VIDEO_BANNER: [
-    gt('tam-video', 'Tam Video', 'Tam genişlik video arka plan', 'gece'),
-    gt('bolunmus-metin', 'Bölünmüş Metin', 'Sol metin, sağ video', 'okyanus'),
-    gt('cerceveli-kart', 'Çerçeveli Kart', 'Çerçeveli video kart', 'notr'),
-    gt('mor-overlay', 'Mor Overlay', 'Mor gradient overlay', 'mor'),
-    gt('turuncu-cta', 'Turuncu CTA', 'Turuncu CTA vurgusu', 'gunes'),
-    gt('mint-minimal', 'Mint Minimal', 'Küçük mint video kart', 'mint'),
+    gt('tam-video', 'Sinematik Hero', 'Koyu tam ekran + merkez play düğmesi', 'gece'),
+    gt('bolunmus-metin', 'Editoryal Split', 'Asimetrik tipografi + yüzen video kartı', 'okyanus'),
+    gt('cerceveli-kart', 'Tarayıcı Çerçevesi', 'Browser penceresi mockup çerçeve', 'notr'),
+    gt('mor-overlay', 'Diyagonal Mor', 'Mor metin paneli + keskin video kesiti', 'mor'),
+    gt('kurucu-merkez', 'Kurucudan Dinle', 'Ortalı başlık + yuvarlak video kartı', 'okyanus'),
+    gt('yan-playlist', 'Yan Playlist', 'Koyu playlist + büyük oynatıcı', 'gece'),
   ],
   ONCESI_SONRASI: [
     gt('surukle-slider', 'Sürükle Slider', 'Kaydırmalı önce/sonra karşılaştırma', 'notr'),
@@ -397,7 +397,13 @@ export function widgetGorunumTipleriBul(widgetTip: string): WidgetGorunumTipTani
 const LEGACY_GORUNUM_TIPI: Partial<Record<AktifWidgetTipi, Record<string, string>>> = {
   GERI_SAYIM: { klasik: 'koyu-buyuk', kompakt: 'kompakt-serit', banner: 'tam-banner' },
   REFERANSLAR: { klasik: 'logo-grid', carousel: 'kayan-serit', quote: 'buyuk-alinti' },
-  VIDEO_BANNER: { klasik: 'tam-video', 'bol-split': 'bolunmus-metin', kart: 'cerceveli-kart' },
+  VIDEO_BANNER: {
+    klasik: 'tam-video',
+    'bol-split': 'bolunmus-metin',
+    kart: 'cerceveli-kart',
+    'turuncu-cta': 'kurucu-merkez',
+    'mint-minimal': 'yan-playlist',
+  },
   HARITA: {
     klasik: 'split-sol-bilgi',
     'tam-genislik': 'kompakt-kart',
