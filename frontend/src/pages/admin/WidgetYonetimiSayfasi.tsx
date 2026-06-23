@@ -86,14 +86,14 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
   useEffect(() => {
     if (seciliId != null) return;
     setForm((onceki) => {
-      const sonraki = sonrakiWidgetSira(widgetlar);
-      const cakisma = siraCakismasiBul(widgetlar, onceki.sira);
+      const sonraki = sonrakiWidgetSira(widgetlar, onceki.sayfaId);
+      const cakisma = siraCakismasiBul(widgetlar, onceki.sira, onceki.sayfaId);
       const varsayilanCakisma =
-        widgetlar.length > 0 && onceki.sira === 1 && sonraki > 1;
+        sonraki > 1 && onceki.sira === 1;
       if (!cakisma && !varsayilanCakisma) return onceki;
       return onceki.sira === sonraki ? onceki : { ...onceki, sira: sonraki };
     });
-  }, [widgetlar, seciliId]);
+  }, [widgetlar, seciliId, form.sayfaId]);
 
   useEffect(() => {
     setOnizlemeHazir(Boolean(form.tip && (seciliId || yeniMod)));

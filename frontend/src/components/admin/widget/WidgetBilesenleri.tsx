@@ -280,9 +280,13 @@ export function WidgetEditorPanel({
 
   const seciliTipMeta = WIDGET_TIPLERI.find((t) => t.id === form.tip);
   const IcerikPanel = ICERIK_PANEL_MAP[form.tip];
+  const sayfaEtiketi = useMemo(() => {
+    if (!form.sayfaId) return 'Ana Sayfa';
+    return sayfalar.find((s) => idString(s.id) === idString(form.sayfaId))?.baslik ?? 'Sayfa';
+  }, [form.sayfaId, sayfalar]);
   const siraCakisma = useMemo(
-    () => siraCakismasiBul(tumWidgetlar, form.sira, seciliWidget?.id),
-    [tumWidgetlar, form.sira, seciliWidget?.id]
+    () => siraCakismasiBul(tumWidgetlar, form.sira, form.sayfaId, seciliWidget?.id),
+    [tumWidgetlar, form.sira, form.sayfaId, seciliWidget?.id]
   );
 
   return (
@@ -371,7 +375,10 @@ export function WidgetEditorPanel({
                   )}
                 </FormAlani>
               )}
-              <FormAlani etiket="Sıra" aciklama="Küçük numara önce render edilir. Yeni widgetlarda otomatik atanır.">
+              <FormAlani
+                etiket={`Sıra — ${sayfaEtiketi}`}
+                aciklama={`${sayfaEtiketi} sayfasındaki görüntüleme sırası. Her sayfanın kendi 1, 2, 3… dizisi vardır.`}
+              >
                 <input
                   type="number"
                   min={1}
@@ -382,7 +389,8 @@ export function WidgetEditorPanel({
               </FormAlani>
               {siraCakisma && (
                 <div className="ap-sira-uyari" role="alert">
-                  <strong>⚠️ Sıra çakışması:</strong> Sıra <strong>{form.sira}</strong> zaten{' '}
+                  <strong>⚠️ Sıra çakışması:</strong> <strong>{sayfaEtiketi}</strong> sayfasında sıra{' '}
+                  <strong>{form.sira}</strong> zaten{' '}
                   <strong>&quot;{siraCakisma.ad}&quot;</strong> ({tipEtiketi(siraCakisma.tip)}) widgetında kullanılıyor.
                   Lütfen birinin sırasını değiştirin, aksi halde görüntüleme sırası belirsiz olur.
                 </div>

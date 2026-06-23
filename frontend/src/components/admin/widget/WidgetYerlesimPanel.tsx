@@ -8,6 +8,7 @@ import {
 } from '@/utils/widgetYerlesim';
 import { idString } from '@/utils/idKarsilastir';
 import { formSayfaId } from '@/utils/widgetFormYardimci';
+import { sonrakiWidgetSira } from '@/utils/widgetSiraYardimci';
 import { AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { FormAlani, formSelectSinifi } from '@/components/form/FormAlani';
 import { SecimAlani } from './panels/WidgetPanelOrtak';
@@ -49,9 +50,10 @@ export function WidgetYerlesimPanel({
     const temizSayfaId = formSayfaId(sayfaId);
     const yeniAnaSayfa = !temizSayfaId;
     const yeniBolge = yeniAnaSayfa ? 'icerik_alani' : 'sayfa_ustu';
+    const yeniSira = sonrakiWidgetSira(digerWidgetlar, temizSayfaId, mevcutWidgetId ?? undefined);
     onChange(
       configGuncelle(
-        { ...form, sayfaId: temizSayfaId },
+        { ...form, sayfaId: temizSayfaId, sira: yeniSira },
         (c) => ({
           ...c,
           yerlesim: {

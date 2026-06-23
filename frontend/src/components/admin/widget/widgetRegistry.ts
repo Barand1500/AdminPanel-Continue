@@ -122,13 +122,15 @@ export function widgetTipleriKategoriyeGore(tipFiltre?: string) {
 
 export function varsayilanWidgetForm(
   tip: AktifWidgetTipi | string = 'SLIDER',
-  widgetlar: AdminWidget[] = []
+  widgetlar: AdminWidget[] = [],
+  sayfaId = ''
 ): WidgetFormDegeri {
   const safeTip = tipOlusturulabilirMi(tip) ? tip : 'SLIDER';
+  const temizSayfaId = formSayfaId(sayfaId);
   return {
     ad: safeTip === 'BLOK_OLUSTURUCU' ? 'Özel Grid Widget' : '',
     tip: safeTip,
-    sira: sonrakiWidgetSira(widgetlar),
+    sira: sonrakiWidgetSira(widgetlar, temizSayfaId),
     aktif: true,
     baslik: '',
     altBaslik: '',
@@ -141,7 +143,7 @@ export function varsayilanWidgetForm(
     mobilGoster: true,
     masaustuGoster: true,
     configJsonMetin: JSON.stringify(varsayilanConfig(safeTip), null, 2),
-    sayfaId: '',
+    sayfaId: temizSayfaId,
   };
 }
 
