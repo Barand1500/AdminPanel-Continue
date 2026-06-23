@@ -27,8 +27,8 @@ import {
   WIDGET_TIP_KATEGORILERI,
 } from './widgetRegistry';
 import { WidgetTipSecici } from './WidgetTipSecici';
-import { yerlesimEtiketi, yerlesimOku, widgetSayfaFiltrele, widgetSayfaFiltreOgeleri } from '@/utils/widgetYerlesim';
-import { siraCakismasiBul } from '@/utils/widgetSiraYardimci';
+import { yerlesimEtiketi, yerlesimOku, widgetSayfaFiltreOgeleri } from '@/utils/widgetYerlesim';
+import { sayfaFiltreWidgetlari, siraCakismasiBul } from '@/utils/widgetSiraYardimci';
 import type { AdminSayfa } from '@/features/admin/sayfaApi';
 import { idString } from '@/utils/idKarsilastir';
 import { widgettenForma } from '@/utils/widgetFormYardimci';
@@ -51,6 +51,9 @@ interface WidgetListesiPanelProps {
   seciliId: string | null;
   tipFiltre?: string;
   sayfalar?: AdminSayfa[];
+  siraSikistirildi?: Record<string, boolean>;
+  siraIsleniyor?: boolean;
+  onSayfaSiraToggle?: (sayfaFiltreId: string) => void | Promise<void>;
   onSec: (widget: AdminWidget) => void;
 }
 
@@ -59,6 +62,9 @@ export function WidgetListesiPanel({
   seciliId,
   tipFiltre,
   sayfalar = [],
+  siraSikistirildi = {},
+  siraIsleniyor = false,
+  onSayfaSiraToggle,
   onSec,
 }: WidgetListesiPanelProps) {
   const [arama, setArama] = useState('');
@@ -77,8 +83,12 @@ export function WidgetListesiPanel({
 
   const gruplu = useMemo(() => {
     const q = arama.toLowerCase().trim();
-    let liste = widgetSayfaFiltrele(widgetlar, sayfaFiltre) as AdminWidget[];
-    if (tipFiltre) liste = liste.filter((w) => w.tip === tipFiltre);
+    let liste =
+      sayfaFiltre != null
+        ? sayfaFiltreWidgetlari(widgetlar, sayfaFiltre, tipFiltre)
+        : ([...widgetlar] as AdminWidget[])
+            .filter((w) => !tipFiltre || w.tip === tipFiltre)
+            .sort((a, b) => Number(a.sira) - Number(b.sira) || a.ad.localeCompare(b.ad, 'tr'));
     if (q) {
       liste = liste.filter(
         (w) =>
@@ -95,8 +105,15 @@ export function WidgetListesiPanel({
       if (!gruplar.has(grup)) gruplar.set(grup, []);
       gruplar.get(grup)!.push(w);
     }
+    for (const arr of gruplar.values()) {
+      arr.sort((a, b) => Number(a.sira) - Number(b.sira) || a.ad.localeCompare(b.ad, 'tr'));
+    }
     return [...gruplar.entries()];
   }, [widgetlar, arama, tipFiltre, sayfaFiltre]);
+
+  const sayfaWidgetSayisi =
+    sayfaFiltre != null ? sayfaFiltreWidgetlari(widgetlar, sayfaFiltre, tipFiltre).length : 0;
+  const siraTusAktif = sayfaFiltre != null && sayfaWidgetSayisi >= 2 && !siraIsleniyor;
 
   function sayfaEtiketi(sayfaId?: string | null) {
     if (!sayfaId) return 'Ana Sayfa';
@@ -106,7 +123,26 @@ export function WidgetListesiPanel({
   return (
     <aside className="ap-sidebar-panel ap-widget-sidebar">
       <div className="ap-sidebar-baslik ap-sidebar-baslik-dikey">
-        <h2 className="ap-heading text-sm font-semibold">Widgetlar</h2>
+        <div className="flex items-center gap-2">
+          <h2 className="ap-heading text-sm font-semibold">Widgetlar</h2>
+          {sayfaFiltre && onSayfaSiraToggle && (
+            <button
+              type="button"
+              className={`ap-widget-sira-tus${siraSikistirildi[sayfaFiltre] ? ' ap-widget-sira-tus--aktif' : ''}`}
+              disabled={!siraTusAktif}
+              title={
+                sayfaWidgetSayisi < 2
+                  ? 'Sıralamak için en az 2 widget gerekir'
+                  : siraSikistirildi[sayfaFiltre]
+                    ? 'Eski sıra numaralarına dön'
+                    : 'Sıraları 1’den başlayarak düzenle (mevcut sıra düzeni korunur)'
+              }
+              onClick={() => void onSayfaSiraToggle(sayfaFiltre)}
+            >
+              {siraIsleniyor ? '…' : siraSikistirildi[sayfaFiltre] ? 'Geri al' : 'Sırala'}
+            </button>
+          )}
+        </div>
         <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Widget ara..." />
         {sayfaRozetleri.length > 0 && (
           <div className="ap-widget-sayfa-filtreler" role="tablist" aria-label="Sayfaya göre filtre">
