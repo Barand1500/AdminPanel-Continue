@@ -51,9 +51,8 @@ interface WidgetListesiPanelProps {
   seciliId: string | null;
   tipFiltre?: string;
   sayfalar?: AdminSayfa[];
-  siraSikistirildi?: Record<string, boolean>;
-  siraIsleniyor?: boolean;
-  onSayfaSiraToggle?: (sayfaFiltreId: string) => void | Promise<void>;
+  siraDuzListe?: Record<string, boolean>;
+  onSayfaSiraToggle?: (sayfaFiltreId: string) => void;
   onSec: (widget: AdminWidget) => void;
 }
 
@@ -62,8 +61,7 @@ export function WidgetListesiPanel({
   seciliId,
   tipFiltre,
   sayfalar = [],
-  siraSikistirildi = {},
-  siraIsleniyor = false,
+  siraDuzListe = {},
   onSayfaSiraToggle,
   onSec,
 }: WidgetListesiPanelProps) {
@@ -81,7 +79,7 @@ export function WidgetListesiPanel({
     [widgetlar, sayfaAdlari]
   );
 
-  const gruplu = useMemo(() => {
+  const listeGorunumu = useMemo(() => {
     const q = arama.toLowerCase().trim();
     let liste =
       sayfaFiltre != null
@@ -98,6 +96,15 @@ export function WidgetListesiPanel({
       );
     }
 
+    if (sayfaFiltre != null && siraDuzListe[sayfaFiltre]) {
+      return {
+        mod: 'duz' as const,
+        liste: [...liste].sort(
+          (a, b) => Number(a.sira) - Number(b.sira) || a.ad.localeCompare(b.ad, 'tr')
+        ),
+      };
+    }
+
     const gruplar = new Map<string, AdminWidget[]>();
     for (const w of liste) {
       const meta = WIDGET_TIPLERI.find((t) => t.id === w.tip);
@@ -108,12 +115,43 @@ export function WidgetListesiPanel({
     for (const arr of gruplar.values()) {
       arr.sort((a, b) => Number(a.sira) - Number(b.sira) || a.ad.localeCompare(b.ad, 'tr'));
     }
-    return [...gruplar.entries()];
-  }, [widgetlar, arama, tipFiltre, sayfaFiltre]);
+    return { mod: 'gruplu' as const, gruplar: [...gruplar.entries()] };
+  }, [widgetlar, arama, tipFiltre, sayfaFiltre, siraDuzListe]);
 
   const sayfaWidgetSayisi =
     sayfaFiltre != null ? sayfaFiltreWidgetlari(widgetlar, sayfaFiltre, tipFiltre).length : 0;
-  const siraTusAktif = sayfaFiltre != null && sayfaWidgetSayisi >= 2 && !siraIsleniyor;
+  const siraTusAktif = sayfaFiltre != null && sayfaWidgetSayisi >= 1;
+
+  function widgetSatiri(w: AdminWidget) {
+    return (
+      <button
+        key={w.id}
+        type="button"
+        onClick={() => onSec(w)}
+        className={`ap-liste-oge mb-1 ${seciliId === w.id ? 'ap-liste-oge-secili' : ''}`}
+      >
+        <div className="flex items-start gap-2">
+          <span className="text-base">{tipIkon(w.tip)}</span>
+          <div className="min-w-0 flex-1">
+            <p className="ap-liste-oge-baslik truncate">{w.ad}</p>
+            <p className="ap-liste-oge-alt">
+              {sayfaEtiketi(w.sayfaId)} · {tipEtiketi(w.tip)} · {yerlesimEtiketi(yerlesimOku(w))} · Sıra {w.sira}
+            </p>
+            <div className="ap-liste-oge-etiketler">
+              {w.aktif ? (
+                <AdminDurumEtiketi tur="aktif">Aktif</AdminDurumEtiketi>
+              ) : (
+                <AdminDurumEtiketi tur="pasif">Pasif</AdminDurumEtiketi>
+              )}
+              {GIZLI_WIDGET_TIPLERI.has(w.tip) && (
+                <AdminDurumEtiketi tur="pasif">Eski tip</AdminDurumEtiketi>
+              )}
+            </div>
+          </div>
+        </div>
+      </button>
+    );
+  }
 
   function sayfaEtiketi(sayfaId?: string | null) {
     if (!sayfaId) return 'Ana Sayfa';
@@ -128,18 +166,16 @@ export function WidgetListesiPanel({
           {sayfaFiltre && onSayfaSiraToggle && (
             <button
               type="button"
-              className={`ap-widget-sira-tus${siraSikistirildi[sayfaFiltre] ? ' ap-widget-sira-tus--aktif' : ''}`}
+              className={`ap-widget-sira-tus${siraDuzListe[sayfaFiltre] ? ' ap-widget-sira-tus--aktif' : ''}`}
               disabled={!siraTusAktif}
               title={
-                sayfaWidgetSayisi < 2
-                  ? 'Sıralamak için en az 2 widget gerekir'
-                  : siraSikistirildi[sayfaFiltre]
-                    ? 'Eski sıra numaralarına dön'
-                    : 'Sıraları 1’den başlayarak düzenle (mevcut sıra düzeni korunur)'
+                siraDuzListe[sayfaFiltre]
+                  ? 'Kategori görünümüne dön'
+                  : 'Kategorileri gizle, sıra numarasına göre listele (1, 2, 3…)'
               }
-              onClick={() => void onSayfaSiraToggle(sayfaFiltre)}
+              onClick={() => onSayfaSiraToggle(sayfaFiltre)}
             >
-              {siraIsleniyor ? '…' : siraSikistirildi[sayfaFiltre] ? 'Geri al' : 'Sırala'}
+              {siraDuzListe[sayfaFiltre] ? 'Geri al' : 'Sırala'}
             </button>
           )}
         </div>
@@ -162,40 +198,19 @@ export function WidgetListesiPanel({
         )}
       </div>
       <div className="ap-scroll ap-sidebar-icerik ap-widget-sidebar-icerik">
-        {gruplu.length === 0 ? (
+        {listeGorunumu.mod === 'duz' ? (
+          listeGorunumu.liste.length === 0 ? (
+            <AdminBosDurum ikon="🧩" baslik="Widget yok" aciklama="Alt bardan Yeni Ekle ile widget oluşturun" />
+          ) : (
+            <div className="mb-3">{listeGorunumu.liste.map(widgetSatiri)}</div>
+          )
+        ) : listeGorunumu.gruplar.length === 0 ? (
           <AdminBosDurum ikon="🧩" baslik="Widget yok" aciklama="Alt bardan Yeni Ekle ile widget oluşturun" />
         ) : (
-          gruplu.map(([grup, liste]) => (
+          listeGorunumu.gruplar.map(([grup, liste]) => (
             <div key={grup} className="mb-3">
               <p className="ap-widget-grup-baslik">{grup}</p>
-              {liste.map((w) => (
-                <button
-                  key={w.id}
-                  type="button"
-                  onClick={() => onSec(w)}
-                  className={`ap-liste-oge mb-1 ${seciliId === w.id ? 'ap-liste-oge-secili' : ''}`}
-                >
-                  <div className="flex items-start gap-2">
-                    <span className="text-base">{tipIkon(w.tip)}</span>
-                    <div className="min-w-0 flex-1">
-                      <p className="ap-liste-oge-baslik truncate">{w.ad}</p>
-                      <p className="ap-liste-oge-alt">
-                        {sayfaEtiketi(w.sayfaId)} · {tipEtiketi(w.tip)} · {yerlesimEtiketi(yerlesimOku(w))} · Sıra {w.sira}
-                      </p>
-                      <div className="ap-liste-oge-etiketler">
-                        {w.aktif ? (
-                          <AdminDurumEtiketi tur="aktif">Aktif</AdminDurumEtiketi>
-                        ) : (
-                          <AdminDurumEtiketi tur="pasif">Pasif</AdminDurumEtiketi>
-                        )}
-                        {GIZLI_WIDGET_TIPLERI.has(w.tip) && (
-                          <AdminDurumEtiketi tur="pasif">Eski tip</AdminDurumEtiketi>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </button>
-              ))}
+              {liste.map(widgetSatiri)}
             </div>
           ))
         )}

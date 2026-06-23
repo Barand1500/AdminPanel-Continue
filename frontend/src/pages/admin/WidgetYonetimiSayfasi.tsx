@@ -15,7 +15,7 @@ import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import { widgetGuncelle, widgetOlustur, widgetSil, widgetlariGetir } from '@/features/admin/widgetApi';
 import { adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
-import { sonrakiWidgetSira, siraCakismasiBul, sayfaFiltreWidgetlari, sayfaSiraSikistirMap } from '@/utils/widgetSiraYardimci';
+import { sonrakiWidgetSira, siraCakismasiBul } from '@/utils/widgetSiraYardimci';
 import { siteVerisiGuncellendiYayinla } from '@/utils/siteVerisiOlaylari';
 import { widgetFormNormalize } from '@/utils/widgetFormYardimci';
 import { configOku } from '@/types/widget';
@@ -59,9 +59,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
   const [onizlemeHazir, setOnizlemeHazir] = useState(false);
   const [otomatikDoldur, setOtomatikDoldur] = useState(false);
   const kaydetFnRef = useRef<(() => Promise<void>) | null>(null);
-  const [siraYedek, setSiraYedek] = useState<Record<string, Record<string, number>>>({});
-  const [siraSikistirildi, setSiraSikistirildi] = useState<Record<string, boolean>>({});
-  const [siraIsleniyor, setSiraIsleniyor] = useState(false);
+  const [siraDuzListe, setSiraDuzListe] = useState<Record<string, boolean>>({});
 
   const yeniMod = seciliId === null;
 
@@ -218,67 +216,11 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
     setOnizlemeHazir(true);
   }
 
-  async function sayfaSiraToggle(sayfaFiltreId: string) {
-    const liste = sayfaFiltreWidgetlari(widgetlar, sayfaFiltreId, varsayilanTip);
-    if (liste.length < 2) return;
-
-    setSiraIsleniyor(true);
-    setHata('');
-    setBasari('');
-
-    try {
-      let hedefSiralar: Map<string, number>;
-
-      if (siraSikistirildi[sayfaFiltreId]) {
-        const yedek = siraYedek[sayfaFiltreId];
-        if (!yedek) return;
-        hedefSiralar = new Map(liste.map((w) => [w.id, yedek[w.id] ?? w.sira]));
-      } else {
-        const yedek: Record<string, number> = {};
-        for (const w of liste) yedek[w.id] = w.sira;
-        setSiraYedek((onceki) => ({ ...onceki, [sayfaFiltreId]: yedek }));
-        hedefSiralar = sayfaSiraSikistirMap(liste);
-      }
-
-      const guncellenecek = liste.filter((w) => hedefSiralar.get(w.id) !== w.sira);
-      if (guncellenecek.length === 0) {
-        setSiraSikistirildi((onceki) => ({
-          ...onceki,
-          [sayfaFiltreId]: !siraSikistirildi[sayfaFiltreId],
-        }));
-        return;
-      }
-
-      const guncelWidgetlar = await Promise.all(
-        guncellenecek.map(async (w) => {
-          const form = { ...widgettenForma(w), sira: hedefSiralar.get(w.id)! };
-          return widgetGuncelle(w.id, form);
-        })
-      );
-
-      setWidgetlar((onceki) => {
-        const map = new Map(guncelWidgetlar.map((w) => [w.id, w]));
-        return onceki.map((w) => map.get(w.id) ?? w);
-      });
-
-      if (seciliId && hedefSiralar.has(seciliId)) {
-        const guncel = guncelWidgetlar.find((w) => w.id === seciliId);
-        if (guncel) setForm((f) => ({ ...f, sira: guncel.sira }));
-      }
-
-      const yeniDurum = !siraSikistirildi[sayfaFiltreId];
-      setSiraSikistirildi((onceki) => ({ ...onceki, [sayfaFiltreId]: yeniDurum }));
-      setBasari(
-        yeniDurum
-          ? `${liste.length} widget sırası 1–${liste.length} olarak düzenlendi.`
-          : 'Sıra numaraları eski haline getirildi.'
-      );
-      siteVerisiGuncellendiYayinla();
-    } catch (err) {
-      setHata(err instanceof Error ? err.message : 'Sıra güncellenemedi');
-    } finally {
-      setSiraIsleniyor(false);
-    }
+  function sayfaSiraToggle(sayfaFiltreId: string) {
+    setSiraDuzListe((onceki) => ({
+      ...onceki,
+      [sayfaFiltreId]: !onceki[sayfaFiltreId],
+    }));
   }
 
   const baslik = varsayilanTip === 'SLIDER'
@@ -306,8 +248,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
               seciliId={seciliId}
               tipFiltre={varsayilanTip}
               sayfalar={sayfalar}
-              siraSikistirildi={siraSikistirildi}
-              siraIsleniyor={siraIsleniyor}
+              siraDuzListe={siraDuzListe}
               onSayfaSiraToggle={sayfaSiraToggle}
               onSec={widgetSec}
             />
