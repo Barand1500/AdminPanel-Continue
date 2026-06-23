@@ -1,120 +1,195 @@
-import { useState } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
-import type { WidgetGaleriOgesi } from '@/types/widget';
+import type { WidgetConfig, WidgetGaleriOgesi } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
-import { configOkuFromWidget, gorselSinifi, gridStyle, medyaUrl } from './widgetHelpers';
+import { configOkuFromWidget, gridStyle, medyaUrl } from './widgetHelpers';
 
 type Cfg = ReturnType<typeof configOkuFromWidget>;
 
-function GaleriBaslik({ widget, cfg }: { widget: Widget; cfg: Cfg }) {
-  if (!widget.baslik) return null;
-  return <h2 className={`${baslikSinifi(cfg)} mb-8 text-center font-bold`}>{widget.baslik}</h2>;
+function renkler(cfg: WidgetConfig) {
+  const g = cfg.gorunum ?? {};
+  return {
+    baslik: g.baslikRengi || '#0f172a',
+    metin: g.metinRengi || '#64748b',
+    vurgu: g.vurguRengi || '#7c3aed',
+    radius: g.borderRadius ?? 14,
+  };
 }
 
-function GaleriOge({
+function heroMetin(cfg: WidgetConfig, widget: Widget) {
+  return (cfg.gorunum?.tipEk?.heroBannerMetin as string) || widget.aciklama || '';
+}
+
+function galeriFiltrele(galeri: WidgetGaleriOgesi[], filtreler: string[], seciliIndeks: number) {
+  if (filtreler.length === 0 || seciliIndeks === 0) return galeri;
+  const secili = filtreler[seciliIndeks];
+  return galeri.filter((g) => !g.kategori || g.kategori === secili);
+}
+
+function GorselLink({
   g,
-  cfg,
-  sinif,
-  kap,
+  className,
+  style,
+  children,
 }: {
   g: WidgetGaleriOgesi;
-  cfg: Cfg;
-  sinif: string;
-  kap?: (node: React.ReactNode) => React.ReactNode;
+  className?: string;
+  style?: CSSProperties;
+  children: ReactNode;
 }) {
-  const icerik = (
-    <>
-      {g.gorselUrl && <img src={medyaUrl(g.gorselUrl)} alt={g.baslik} className={gorselSinifi(cfg)} />}
-      {g.baslik && <figcaption className="p-3 text-sm font-medium">{g.baslik}</figcaption>}
-    </>
-  );
   const link = g.link?.trim();
-  const wrapped = kap ? kap(icerik) : icerik;
-  if (link) {
-    const href = link.startsWith('http') || link.startsWith('/') ? link : `https://${link}`;
-    const dis = href.startsWith('http');
+  if (!link) return <div className={className} style={style}>{children}</div>;
+  const href = link.startsWith('http') || link.startsWith('/') ? link : `https://${link}`;
+  if (href.startsWith('/')) {
     return (
-      <a
-        key={g.id}
-        href={href}
-        className={sinif}
-        {...(dis ? { target: '_blank', rel: 'noopener noreferrer' } : {})}
-      >
-        {wrapped}
-      </a>
+      <Link to={href} className={className} style={style}>
+        {children}
+      </Link>
     );
   }
   return (
-    <figure key={g.id} className={sinif}>
-      {wrapped}
-    </figure>
+    <a href={href} className={className} style={style} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
   );
 }
 
-function EsitGrid({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
+function BolumBaslik({ widget, cfg }: { widget: Widget; cfg: Cfg }) {
+  const renk = renkler(cfg);
+  if (!widget.baslik && !widget.altBaslik && !widget.aciklama) return null;
+  return (
+    <div className="gl-bolum-baslik">
+      {widget.altBaslik && (
+        <p className="gl-alt-baslik" style={{ color: renk.vurgu }}>
+          {widget.altBaslik}
+        </p>
+      )}
+      {widget.baslik && (
+        <h2 className={`${baslikSinifi(cfg)} gl-baslik`} style={{ color: renk.baslik }}>
+          {widget.baslik}
+        </h2>
+      )}
+      {widget.aciklama && (
+        <p className="gl-aciklama" style={{ color: renk.metin }}>
+          {widget.aciklama}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function SnapYataySerit({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
+  const renk = renkler(cfg);
   return (
     <>
-      <GaleriBaslik widget={widget} cfg={cfg} />
-      <div className="galeri-esit-grid grid gap-4" style={gridStyle(cfg)}>
+      <BolumBaslik widget={widget} cfg={cfg} />
+      <div className="gl-snap-scroll">
         {galeri.map((g) => (
-          <GaleriOge key={g.id} g={g} cfg={cfg} sinif="overflow-hidden rounded-xl bg-white text-slate-700 shadow-sm transition hover:shadow-md" />
+          <GorselLink key={g.id} g={g} className="gl-snap-kart" style={{ borderRadius: renk.radius }}>
+            {g.gorselUrl && <img src={medyaUrl(g.gorselUrl)} alt={g.baslik} className="gl-kart-gorsel" />}
+            {g.baslik && <span className="gl-snap-etiket">{g.baslik}</span>}
+          </GorselLink>
         ))}
       </div>
     </>
   );
 }
 
-function MasonryMor({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
+function HeroVitrin({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
+  const [aktif, setAktif] = useState(0);
+  const renk = renkler(cfg);
+  const hero = galeri[aktif] ?? galeri[0];
+  const altlar = galeri.filter((_, i) => i !== aktif);
+  const metin = heroMetin(cfg, widget);
+
   return (
     <>
-      <GaleriBaslik widget={widget} cfg={cfg} />
-      <div className="galeri-masonry-mor columns-2 gap-4 md:columns-3">
-        {galeri.map((g, i) => (
-          <GaleriOge
-            key={g.id}
-            g={g}
-            cfg={cfg}
-            sinif={`galeri-masonry-oge mb-4 break-inside-avoid overflow-hidden rounded-2xl border-2 border-violet-200 bg-violet-50 text-violet-950 shadow-sm ${i % 2 ? 'mt-6' : ''}`}
-          />
-        ))}
+      <BolumBaslik widget={widget} cfg={cfg} />
+      <div className="gl-hero-vitrin">
+        <GorselLink g={hero} className="gl-hero-ana" style={{ borderRadius: renk.radius }}>
+          {hero.gorselUrl && <img src={medyaUrl(hero.gorselUrl)} alt={hero.baslik} className="gl-hero-gorsel" />}
+          <div className="gl-hero-overlay" />
+          <div className="gl-hero-metin">
+            {hero.baslik && <span className="gl-hero-baslik">{hero.baslik}</span>}
+            {metin && <p>{metin}</p>}
+          </div>
+        </GorselLink>
+        {altlar.length > 0 && (
+          <div className="gl-hero-serit">
+            {galeri.map((g, i) => (
+              <button
+                key={g.id}
+                type="button"
+                className={`gl-hero-thumb ${i === aktif ? 'gl-hero-thumb-aktif' : ''}`}
+                style={{ borderRadius: renk.radius }}
+                onClick={() => setAktif(i)}
+              >
+                {g.gorselUrl && <img src={medyaUrl(g.gorselUrl)} alt={g.baslik} className="gl-thumb-gorsel" />}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
 }
 
-function LightboxKoyu({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
+function LightboxOdak({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
   const [acik, setAcik] = useState<WidgetGaleriOgesi | null>(null);
+  const [indeks, setIndeks] = useState(0);
+  const renk = renkler(cfg);
+
+  function ac(k: WidgetGaleriOgesi, i: number) {
+    setAcik(k);
+    setIndeks(i);
+  }
+
+  function kaydir(yon: 'onceki' | 'sonraki') {
+    const yeni = yon === 'onceki' ? (indeks - 1 + galeri.length) % galeri.length : (indeks + 1) % galeri.length;
+    setIndeks(yeni);
+    setAcik(galeri[yeni]);
+  }
+
   return (
     <>
-      <GaleriBaslik widget={widget} cfg={cfg} />
-      <div className="galeri-lightbox-koyu rounded-2xl bg-slate-900 p-6 md:p-8">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3" style={gridStyle(cfg)}>
-          {galeri.map((g) => (
+      <BolumBaslik widget={widget} cfg={cfg} />
+      <div className="gl-lightbox-wrap" style={{ borderRadius: renk.radius }}>
+        <div className="gl-lightbox-grid" style={gridStyle(cfg)}>
+          {galeri.map((g, i) => (
             <button
               key={g.id}
               type="button"
-              onClick={() => setAcik(g)}
-              className="group relative aspect-[4/3] overflow-hidden rounded-xl ring-1 ring-white/10"
+              className="gl-lightbox-tus"
+              style={{ borderRadius: renk.radius }}
+              onClick={() => ac(g, i)}
             >
-              {g.gorselUrl && (
-                <img src={medyaUrl(g.gorselUrl)} alt={g.baslik} className="h-full w-full object-cover transition group-hover:scale-105" />
-              )}
-              <div className="absolute inset-0 bg-black/40 opacity-0 transition group-hover:opacity-100" />
-              {g.baslik && (
-                <span className="absolute bottom-2 left-2 text-xs font-semibold text-white opacity-0 transition group-hover:opacity-100">
-                  {g.baslik}
-                </span>
-              )}
+              {g.gorselUrl && <img src={medyaUrl(g.gorselUrl)} alt={g.baslik} className="gl-kart-gorsel" />}
+              <div className="gl-lightbox-tus-overlay" />
+              {g.baslik && <span className="gl-lightbox-tus-etiket">{g.baslik}</span>}
             </button>
           ))}
         </div>
       </div>
       {acik && (
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/90 p-4" onClick={() => setAcik(null)}>
-          <figure className="max-h-[90vh] max-w-4xl" onClick={(e) => e.stopPropagation()}>
-            {acik.gorselUrl && <img src={medyaUrl(acik.gorselUrl)} alt={acik.baslik} className="max-h-[80vh] rounded-lg object-contain" />}
-            {acik.baslik && <figcaption className="mt-3 text-center text-white">{acik.baslik}</figcaption>}
+        <div className="gl-lightbox-modal" onClick={() => setAcik(null)}>
+          <button type="button" className="gl-lightbox-kapat" onClick={() => setAcik(null)} aria-label="Kapat">
+            ×
+          </button>
+          {galeri.length > 1 && (
+            <>
+              <button type="button" className="gl-lightbox-ok gl-lightbox-ok-sol" onClick={(e) => { e.stopPropagation(); kaydir('onceki'); }} aria-label="Önceki">
+                ‹
+              </button>
+              <button type="button" className="gl-lightbox-ok gl-lightbox-ok-sag" onClick={(e) => { e.stopPropagation(); kaydir('sonraki'); }} aria-label="Sonraki">
+                ›
+              </button>
+            </>
+          )}
+          <figure className="gl-lightbox-icerik" onClick={(e) => e.stopPropagation()}>
+            {acik.gorselUrl && <img src={medyaUrl(acik.gorselUrl)} alt={acik.baslik} className="gl-lightbox-buyuk" />}
+            {acik.baslik && <figcaption>{acik.baslik}</figcaption>}
           </figure>
         </div>
       )}
@@ -122,58 +197,126 @@ function LightboxKoyu({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galer
   );
 }
 
-function CerceveliAltin({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
+function SekmeliKategori({
+  widget,
+  cfg,
+  galeri,
+  filtreler,
+}: {
+  widget: Widget;
+  cfg: Cfg;
+  galeri: WidgetGaleriOgesi[];
+  filtreler: string[];
+}) {
+  const [secili, setSecili] = useState(0);
+  const renk = renkler(cfg);
+  const gorunen = galeriFiltrele(galeri, filtreler, secili);
+
   return (
     <>
-      <GaleriBaslik widget={widget} cfg={cfg} />
-      <div className="galeri-cerceveli-altin rounded-2xl border-4 border-amber-500 bg-amber-50 p-4 md:p-6">
-        <div className="grid gap-4" style={gridStyle(cfg)}>
-          {galeri.map((g) => (
-            <GaleriOge
+      <BolumBaslik widget={widget} cfg={cfg} />
+      {filtreler.length > 0 && (
+        <div className="gl-sekme-liste">
+          {filtreler.map((f, i) => (
+            <button
+              key={f}
+              type="button"
+              className={`gl-sekme ${i === secili ? 'gl-sekme-aktif' : ''}`}
+              style={i === secili ? { backgroundColor: renk.vurgu, borderColor: renk.vurgu } : undefined}
+              onClick={() => setSecili(i)}
+            >
+              {f}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="gl-sekme-grid" style={gridStyle(cfg)}>
+        {gorunen.map((g) => (
+          <GorselLink key={g.id} g={g} className="gl-sekme-kart" style={{ borderRadius: renk.radius }}>
+            {g.gorselUrl && <img src={medyaUrl(g.gorselUrl)} alt={g.baslik} className="gl-kart-gorsel" />}
+            {g.baslik && <span className="gl-sekme-etiket">{g.baslik}</span>}
+          </GorselLink>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function HoverZoomEtiket({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
+  const renk = renkler(cfg);
+  return (
+    <>
+      <BolumBaslik widget={widget} cfg={cfg} />
+      <div className="gl-zoom-grid" style={gridStyle(cfg)}>
+        {galeri.map((g) => (
+          <GorselLink key={g.id} g={g} className="gl-zoom-kart" style={{ borderRadius: renk.radius }}>
+            {g.gorselUrl && <img src={medyaUrl(g.gorselUrl)} alt={g.baslik} className="gl-zoom-gorsel" />}
+            {g.baslik && <span className="gl-zoom-etiket">{g.baslik}</span>}
+          </GorselLink>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function KaruselMerkez({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
+  const [aktif, setAktif] = useState(0);
+  const renk = renkler(cfg);
+  const n = galeri.length;
+
+  function kaydir(yon: 'onceki' | 'sonraki') {
+    setAktif((i) => (yon === 'onceki' ? (i - 1 + n) % n : (i + 1) % n));
+  }
+
+  const onceki = galeri[(aktif - 1 + n) % n];
+  const merkez = galeri[aktif];
+  const sonraki = galeri[(aktif + 1) % n];
+
+  return (
+    <>
+      <BolumBaslik widget={widget} cfg={cfg} />
+      <div className="gl-karusel-wrap">
+        {n > 1 && (
+          <button type="button" className="gl-karusel-ok" onClick={() => kaydir('onceki')} aria-label="Önceki">
+            ‹
+          </button>
+        )}
+        <div className="gl-karusel-uc">
+          {n > 1 && (
+            <button type="button" className="gl-karusel-yan gl-karusel-sol" onClick={() => kaydir('onceki')}>
+              {onceki.gorselUrl && <img src={medyaUrl(onceki.gorselUrl)} alt={onceki.baslik} />}
+            </button>
+          )}
+          <GorselLink g={merkez} className="gl-karusel-merkez" style={{ borderRadius: renk.radius }}>
+            {merkez.gorselUrl && <img src={medyaUrl(merkez.gorselUrl)} alt={merkez.baslik} className="gl-karusel-merkez-gorsel" />}
+            {merkez.baslik && <span className="gl-karusel-merkez-etiket">{merkez.baslik}</span>}
+          </GorselLink>
+          {n > 1 && (
+            <button type="button" className="gl-karusel-yan gl-karusel-sag" onClick={() => kaydir('sonraki')}>
+              {sonraki.gorselUrl && <img src={medyaUrl(sonraki.gorselUrl)} alt={sonraki.baslik} />}
+            </button>
+          )}
+        </div>
+        {n > 1 && (
+          <button type="button" className="gl-karusel-ok" onClick={() => kaydir('sonraki')} aria-label="Sonraki">
+            ›
+          </button>
+        )}
+      </div>
+      {n > 1 && (
+        <div className="gl-karusel-noktalar">
+          {galeri.map((g, i) => (
+            <button
               key={g.id}
-              g={g}
-              cfg={cfg}
-              sinif="overflow-hidden rounded-lg border-2 border-amber-400 bg-white text-amber-950 shadow-md"
+              type="button"
+              className={`gl-karusel-nokta ${i === aktif ? 'gl-karusel-nokta-aktif' : ''}`}
+              style={i === aktif ? { backgroundColor: renk.vurgu } : undefined}
+              onClick={() => setAktif(i)}
+              aria-label={`Slayt ${i + 1}`}
             />
           ))}
         </div>
-      </div>
-    </>
-  );
-}
-
-function YesilHover({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
-  return (
-    <>
-      <GaleriBaslik widget={widget} cfg={cfg} />
-      <div className="galeri-yesil-hover grid gap-4" style={gridStyle(cfg)}>
-        {galeri.map((g) => (
-          <GaleriOge
-            key={g.id}
-            g={g}
-            cfg={cfg}
-            sinif="galeri-yesil-kart overflow-hidden rounded-2xl border border-emerald-200 bg-emerald-50 text-emerald-900 transition hover:scale-[1.02] hover:border-emerald-500 hover:shadow-lg hover:shadow-emerald-200"
-          />
-        ))}
-      </div>
-    </>
-  );
-}
-
-function GenisSerit({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
-  return (
-    <>
-      <GaleriBaslik widget={widget} cfg={cfg} />
-      <div className="galeri-genis-serit flex snap-x snap-mandatory gap-4 overflow-x-auto pb-4">
-        {galeri.map((g) => (
-          <GaleriOge
-            key={g.id}
-            g={g}
-            cfg={cfg}
-            sinif="galeri-serit-oge min-w-[280px] shrink-0 snap-center overflow-hidden rounded-2xl border border-sky-200 bg-sky-50 text-sky-950 shadow-sm md:min-w-[360px]"
-          />
-        ))}
-      </div>
+      )}
     </>
   );
 }
@@ -181,6 +324,7 @@ function GenisSerit({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri:
 export function GaleriWidget({ widget }: { widget: Widget }) {
   const cfg = configOkuFromWidget(widget);
   const galeri = cfg.galeri ?? [];
+  const filtreler = cfg.filtreler ?? [];
   const gt = widgetGorunumTipiAl(widget);
   if (galeri.length === 0) return null;
 
@@ -188,23 +332,23 @@ export function GaleriWidget({ widget }: { widget: Widget }) {
 
   let icerik;
   switch (gt) {
-    case 'masonry-mor':
-      icerik = <MasonryMor {...props} />;
+    case 'hero-vitrin':
+      icerik = <HeroVitrin {...props} />;
       break;
-    case 'lightbox-koyu':
-      icerik = <LightboxKoyu {...props} />;
+    case 'lightbox-odak':
+      icerik = <LightboxOdak {...props} />;
       break;
-    case 'cerceveli-altin':
-      icerik = <CerceveliAltin {...props} />;
+    case 'sekmeli-kategori':
+      icerik = <SekmeliKategori {...props} filtreler={filtreler} />;
       break;
-    case 'yesil-hover':
-      icerik = <YesilHover {...props} />;
+    case 'hover-zoom-etiket':
+      icerik = <HoverZoomEtiket {...props} />;
       break;
-    case 'genis-serit':
-      icerik = <GenisSerit {...props} />;
+    case 'karusel-merkez':
+      icerik = <KaruselMerkez {...props} />;
       break;
     default:
-      icerik = <EsitGrid {...props} />;
+      icerik = <SnapYataySerit {...props} />;
   }
 
   return <WidgetKabuk widget={widget}>{icerik}</WidgetKabuk>;

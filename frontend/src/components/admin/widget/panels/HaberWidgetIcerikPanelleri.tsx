@@ -16,6 +16,7 @@ import type {
   WidgetHaberSekmesi,
   WidgetAcilisKapanisSaati,
 } from '@/types/haberWidget';
+import { WidgetGorunumIcerikAlanlari } from './WidgetGorunumIcerikAlanlari';
 import { ListeSiralayici } from './WidgetPanelOrtak';
 import type { WidgetPanelProps } from './types';
 import { useEffect, useState } from 'react';
@@ -132,10 +133,9 @@ export function IletisimBlokIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const kartlar = cfg.iletisimKartlari ?? [];
   return (
-    <AdminFormBolumu baslik="İletişim + Harita">
-      <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} placeholder="Bizimle Çalışmaya Hazır mısınız?" /></FormAlani>
-      <FormAlani etiket="Üst etiket"><input className={formInputSinifi} value={form.altBaslik} onChange={(e) => onChange({ ...form, altBaslik: e.target.value })} placeholder="İLETİŞİM" /></FormAlani>
-      <FormAlani etiket="Açıklama"><textarea className={formInputSinifi} rows={2} value={form.aciklama} onChange={(e) => onChange({ ...form, aciklama: e.target.value })} /></FormAlani>
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="İletişim + Harita">
       <FormAlani etiket="Harita linki / adres"><input className={formInputSinifi} value={cfg.haritaUrl ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, haritaUrl: e.target.value })))} /></FormAlani>
       <ListeSiralayici<WidgetIletisimKarti>
         ogeler={kartlar}
@@ -159,16 +159,18 @@ export function IletisimBlokIcerik({ form, onChange }: WidgetPanelProps) {
         )}
       />
     </AdminFormBolumu>
+    </>
   );
 }
 
 export function KategoriHaberListesiIcerik(props: WidgetPanelProps) {
   return (
-    <AdminFormBolumu baslik="Kategori Haber Listesi">
-      <FormAlani etiket="Kategori başlığı"><input className={formInputSinifi} value={props.form.baslik} onChange={(e) => props.onChange({ ...props.form, baslik: e.target.value })} /></FormAlani>
-      <TumunuGorAlanlari {...props} />
+    <>
+      <WidgetGorunumIcerikAlanlari form={props.form} onChange={props.onChange} />
+      <AdminFormBolumu baslik="Kategori Haber Listesi">
       <HaberKartEditor {...props} />
     </AdminFormBolumu>
+    </>
   );
 }
 
@@ -218,7 +220,9 @@ export function SekmeliHaberIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const sekmeler = cfg.haberSekmeler ?? [];
   return (
-    <AdminFormBolumu baslik="Sekmeli Haber">
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Sekmeli Haber">
       <ListeSiralayici<WidgetHaberSekmesi>
         ogeler={sekmeler}
         onDegistir={(s) => onChange(configGuncelle(form, (c) => ({ ...c, haberSekmeler: s })))}
@@ -256,6 +260,7 @@ export function SekmeliHaberIcerik({ form, onChange }: WidgetPanelProps) {
         )}
       />
     </AdminFormBolumu>
+    </>
   );
 }
 
@@ -303,7 +308,9 @@ export function HavaDurumuIcerik({ form, onChange }: WidgetPanelProps) {
   const anlik = onizleme?.anlik;
 
   return (
-    <AdminFormBolumu baslik="Hava Durumu" aciklama="Konum seçin; sıcaklık ve tahmin Open-Meteo API üzerinden otomatik gelir.">
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Hava Durumu" aciklama="Konum seçin; sıcaklık ve tahmin Open-Meteo API üzerinden otomatik gelir.">
       <div className="grid gap-3 sm:grid-cols-2">
         <FormAlani etiket="İl">
           <select
@@ -350,6 +357,7 @@ export function HavaDurumuIcerik({ form, onChange }: WidgetPanelProps) {
         </div>
       )}
     </AdminFormBolumu>
+    </>
   );
 }
 
@@ -395,11 +403,9 @@ export function KriptoListesiIcerik({ form, onChange }: WidgetPanelProps) {
   };
 
   return (
-    <AdminFormBolumu baslik="Kripto Paralar">
-      <FormAlani etiket="Başlık">
-        <input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} />
-      </FormAlani>
-      <TumunuGorAlanlari form={form} onChange={onChange} />
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Kripto Paralar">
       <AdminAnahtarDugme
         etiket="Otomatik API'den güncelle"
         acik={apiMod}
@@ -478,15 +484,18 @@ export function KriptoListesiIcerik({ form, onChange }: WidgetPanelProps) {
         />
       )}
     </AdminFormBolumu>
+    </>
   );
 }
 
 export function GuncelKonularIcerik(props: WidgetPanelProps) {
   return (
-    <AdminFormBolumu baslik="Güncel Konular">
-      <FormAlani etiket="Başlık"><input className={formInputSinifi} value={props.form.baslik} onChange={(e) => props.onChange({ ...props.form, baslik: e.target.value })} placeholder="GÜNCEL KONULAR" /></FormAlani>
+    <>
+      <WidgetGorunumIcerikAlanlari form={props.form} onChange={props.onChange} />
+      <AdminFormBolumu baslik="Güncel Konular">
       <HaberKartEditor {...props} />
     </AdminFormBolumu>
+    </>
   );
 }
 
@@ -517,7 +526,9 @@ export function SirketGirisCikisIcerik({ form, onChange }: WidgetPanelProps) {
   };
 
   return (
-    <AdminFormBolumu baslik="Şirket Açılış / Kapanış">
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Şirket Açılış / Kapanış">
       <FormAlani etiket="Konum / birim">
         <input className={formInputSinifi} value={cfg.sirketKonum ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, sirketKonum: e.target.value })))} placeholder="Merkez Ofis — İstanbul" />
       </FormAlani>
@@ -541,15 +552,17 @@ export function SirketGirisCikisIcerik({ form, onChange }: WidgetPanelProps) {
         <input className={formInputSinifi} value={cfg.kapanisaKalan ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, kapanisaKalan: e.target.value })))} placeholder="08:09:32" />
       </FormAlani>
     </AdminFormBolumu>
+    </>
   );
 }
 
 export function HaberMagazinIcerik(props: WidgetPanelProps) {
   return (
-    <AdminFormBolumu baslik="Haber Magazin Grid">
-      <FormAlani etiket="Kategori başlığı"><input className={formInputSinifi} value={props.form.baslik} onChange={(e) => props.onChange({ ...props.form, baslik: e.target.value })} /></FormAlani>
-      <TumunuGorAlanlari {...props} />
+    <>
+      <WidgetGorunumIcerikAlanlari form={props.form} onChange={props.onChange} />
+      <AdminFormBolumu baslik="Haber Magazin">
       <HaberKartEditor {...props} />
     </AdminFormBolumu>
+    </>
   );
 }

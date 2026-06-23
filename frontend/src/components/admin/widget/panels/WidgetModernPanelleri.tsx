@@ -13,6 +13,7 @@ import {
   type WidgetTimelineOgesi,
 } from '@/types/widget';
 import { ListeSiralayici, SecimAlani } from './WidgetPanelOrtak';
+import { WidgetGorunumIcerikAlanlari } from './WidgetGorunumIcerikAlanlari';
 import type { WidgetPanelProps } from './types';
 
 export function ZamanCizelgesiIcerik({ form, onChange }: WidgetPanelProps) {
@@ -172,7 +173,7 @@ export function KarsilastirmaTablosuIcerik({ form, onChange }: WidgetPanelProps)
 
   return (
     <AdminFormBolumu baslik="Karşılaştırma Tablosu">
-      <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} /></FormAlani>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
       <p className="ap-muted mb-2 text-xs font-semibold uppercase">Paket sütunları</p>
       <ListeSiralayici<WidgetKarsilastirmaPaket>
         ogeler={paketler}
@@ -264,11 +265,13 @@ export function VideoBannerIcerik({ form, onChange }: WidgetPanelProps) {
 export function OncesiSonrasiIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   return (
-    <AdminFormBolumu baslik="Öncesi / Sonrası">
-      <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} /></FormAlani>
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Öncesi / Sonrası görselleri">
       <GorselAlan etiket="Önce görseli" deger={cfg.onceGorsel ?? ''} onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, onceGorsel: v })))} />
       <GorselAlan etiket="Sonra görseli" deger={cfg.sonraGorsel ?? ''} onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, sonraGorsel: v })))} />
     </AdminFormBolumu>
+    </>
   );
 }
 

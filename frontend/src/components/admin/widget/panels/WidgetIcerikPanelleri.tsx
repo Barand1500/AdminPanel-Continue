@@ -16,6 +16,7 @@ import {
   type WidgetYorum,
   type WidgetFiyatPaketi,
   type WidgetIkonKart,
+  type WidgetHaritaSube,
   type WidgetKartOgesi,
   type WidgetLinkOgesi,
   type WidgetSlide,
@@ -23,7 +24,7 @@ import {
 } from '@/types/widget';
 import { ListeSiralayici, SecimAlani } from './WidgetPanelOrtak';
 import { SAYAC_VARSAYILAN_IKONLAR, sayacDegerInput, sayacDegerKaydet } from '@/utils/sayacYardimci';
-import { FiltreEtiketYonetici } from './FiltreEtiketYonetici';
+import { WidgetGorunumIcerikAlanlari } from './WidgetGorunumIcerikAlanlari';
 import {
   BultenKayitIcerik,
   GeriSayimIcerik,
@@ -180,12 +181,7 @@ export function HizmetKartlariIcerik({ form, onChange }: WidgetPanelProps) {
   const kartlar = cfg.kartlar ?? [];
   return (
     <AdminFormBolumu baslik="Hizmet Kartları">
-      <FormAlani etiket="Bölüm başlığı">
-        <input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} />
-      </FormAlani>
-      <FormAlani etiket="Açıklama">
-        <textarea className={formInputSinifi} rows={2} value={form.aciklama} onChange={(e) => onChange({ ...form, aciklama: e.target.value })} />
-      </FormAlani>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
       <ListeSiralayici<WidgetKartOgesi>
         ogeler={kartlar}
         onDegistir={(k) => onChange(configGuncelle(form, (c) => ({ ...c, kartlar: k })))}
@@ -228,72 +224,78 @@ export function HizmetKartlariIcerik({ form, onChange }: WidgetPanelProps) {
 export function GaleriIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const galeri = cfg.galeri ?? [];
+  const gt = cfg.gorunum?.gorunumTipi;
+  const sekmeMod = gt === 'sekmeli-kategori';
   return (
-    <AdminFormBolumu baslik="Görsel Galerisi" aciklama="Birden fazla görsel ekleyin ve düzeni ayarlayın">
-      <FormAlani etiket="Bölüm başlığı">
-        <input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} />
-      </FormAlani>
-      <SecimAlani
-        etiket="Düzen"
-        deger={cfg.galeriDuzeni ?? 'grid'}
-        secenekler={[
-          { id: 'grid', etiket: 'Grid' },
-          { id: 'yan_yana', etiket: 'Yan yana' },
-          { id: 'alt_alta', etiket: 'Alt alta' },
-        ]}
-        onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, galeriDuzeni: v as 'grid' | 'yan_yana' | 'alt_alta' })))}
-      />
-      <ListeSiralayici<WidgetGaleriOgesi>
-        ogeler={galeri}
-        onDegistir={(g) => onChange(configGuncelle(form, (c) => ({ ...c, galeri: g })))}
-        yeniEkle={() => ({ id: uid(), gorselUrl: '', baslik: '', link: '' })}
-        renderOge={(g, i) => (
-          <div className="space-y-2">
-            <GorselAlan etiket="Görsel" deger={g.gorselUrl} onChange={(v) => {
-              const kopya = [...galeri]; kopya[i] = { ...g, gorselUrl: v };
-              onChange(configGuncelle(form, (c) => ({ ...c, galeri: kopya })));
-            }} />
-            <input className={formInputSinifi} placeholder="Başlık" value={g.baslik} onChange={(e) => {
-              const kopya = [...galeri]; kopya[i] = { ...g, baslik: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, galeri: kopya })));
-            }} />
-            <input className={formInputSinifi} placeholder="Link" value={g.link} onChange={(e) => {
-              const kopya = [...galeri]; kopya[i] = { ...g, link: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, galeri: kopya })));
-            }} />
-          </div>
-        )}
-      />
-    </AdminFormBolumu>
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Görseller" aciklama="Galeride gösterilecek görseller">
+        <ListeSiralayici<WidgetGaleriOgesi>
+          ogeler={galeri}
+          onDegistir={(g) => onChange(configGuncelle(form, (c) => ({ ...c, galeri: g })))}
+          yeniEkle={() => ({ id: uid(), gorselUrl: '', baslik: '', link: '', kategori: '' })}
+          renderOge={(g, i) => (
+            <div className="space-y-2">
+              <GorselAlan etiket="Görsel" deger={g.gorselUrl} onChange={(v) => {
+                const kopya = [...galeri]; kopya[i] = { ...g, gorselUrl: v };
+                onChange(configGuncelle(form, (c) => ({ ...c, galeri: kopya })));
+              }} />
+              <input className={formInputSinifi} placeholder="Başlık" value={g.baslik} onChange={(e) => {
+                const kopya = [...galeri]; kopya[i] = { ...g, baslik: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, galeri: kopya })));
+              }} />
+              {sekmeMod && (
+                <input className={formInputSinifi} placeholder="Kategori (filtre etiketi ile eşleşmeli)" value={g.kategori ?? ''} onChange={(e) => {
+                  const kopya = [...galeri]; kopya[i] = { ...g, kategori: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, galeri: kopya })));
+                }} />
+              )}
+              <input className={formInputSinifi} placeholder="Link (isteğe bağlı)" value={g.link} onChange={(e) => {
+                const kopya = [...galeri]; kopya[i] = { ...g, link: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, galeri: kopya })));
+              }} />
+            </div>
+          )}
+        />
+      </AdminFormBolumu>
+    </>
   );
 }
 
 export function SssIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const sorular = cfg.sorular ?? [];
+  const gt = cfg.gorunum?.gorunumTipi;
+  const sekmeMod = gt === 'sekmeli-kategori';
   return (
-    <AdminFormBolumu baslik="Sık Sorulan Sorular">
-      <FormAlani etiket="Bölüm başlığı">
-        <input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} />
-      </FormAlani>
-      <ListeSiralayici<WidgetSssOgesi>
-        ogeler={sorular}
-        onDegistir={(s) => onChange(configGuncelle(form, (c) => ({ ...c, sorular: s })))}
-        yeniEkle={() => ({ id: uid(), soru: '', cevap: '' })}
-        renderOge={(s, i) => (
-          <div className="space-y-2">
-            <input className={formInputSinifi} placeholder="Soru" value={s.soru} onChange={(e) => {
-              const kopya = [...sorular]; kopya[i] = { ...s, soru: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, sorular: kopya })));
-            }} />
-            <textarea className={formInputSinifi} placeholder="Cevap" rows={2} value={s.cevap} onChange={(e) => {
-              const kopya = [...sorular]; kopya[i] = { ...s, cevap: e.target.value };
-              onChange(configGuncelle(form, (c) => ({ ...c, sorular: kopya })));
-            }} />
-          </div>
-        )}
-      />
-    </AdminFormBolumu>
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Sorular">
+        <ListeSiralayici<WidgetSssOgesi>
+          ogeler={sorular}
+          onDegistir={(s) => onChange(configGuncelle(form, (c) => ({ ...c, sorular: s })))}
+          yeniEkle={() => ({ id: uid(), soru: '', cevap: '', kategori: '' })}
+          renderOge={(s, i) => (
+            <div className="space-y-2">
+              <input className={formInputSinifi} placeholder="Soru" value={s.soru} onChange={(e) => {
+                const kopya = [...sorular]; kopya[i] = { ...s, soru: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, sorular: kopya })));
+              }} />
+              <textarea className={formInputSinifi} placeholder="Cevap" rows={2} value={s.cevap} onChange={(e) => {
+                const kopya = [...sorular]; kopya[i] = { ...s, cevap: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, sorular: kopya })));
+              }} />
+              {sekmeMod && (
+                <input className={formInputSinifi} placeholder="Kategori (filtre etiketi ile eşleşmeli)" value={s.kategori ?? ''} onChange={(e) => {
+                  const kopya = [...sorular]; kopya[i] = { ...s, kategori: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, sorular: kopya })));
+                }} />
+              )}
+            </div>
+          )}
+        />
+      </AdminFormBolumu>
+    </>
   );
 }
 
@@ -324,22 +326,13 @@ export function BlogKaruselIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const kartlar = cfg.blogKartlari ?? [];
   return (
-    <AdminFormBolumu baslik="Blog Karuseli">
-      <FormAlani etiket="Bölüm başlığı">
-        <input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} />
-      </FormAlani>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <FormAlani etiket="Tümünü gör metni">
-          <input className={formInputSinifi} value={cfg.tumunuGorMetin ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, tumunuGorMetin: e.target.value })))} />
-        </FormAlani>
-        <FormAlani etiket="Tümünü gör linki">
-          <input className={formInputSinifi} value={cfg.tumunuGorLink ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, tumunuGorLink: e.target.value })))} />
-        </FormAlani>
-      </div>
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Blog kartları">
       <ListeSiralayici<WidgetBlogKart>
         ogeler={kartlar}
         onDegistir={(k) => onChange(configGuncelle(form, (c) => ({ ...c, blogKartlari: k })))}
-        yeniEkle={() => ({ id: uid(), baslik: '', gorselUrl: '', link: '', butonMetni: 'Daha Fazla Oku' })}
+        yeniEkle={() => ({ id: uid(), baslik: '', gorselUrl: '', link: '', butonMetni: 'Daha Fazla Oku', kategori: '', ozet: '' })}
         renderOge={(k, i) => (
           <div className="space-y-2">
             <GorselAlan etiket="Kapak" deger={k.gorselUrl} onChange={(v) => {
@@ -350,6 +343,14 @@ export function BlogKaruselIcerik({ form, onChange }: WidgetPanelProps) {
               const kopya = [...kartlar]; kopya[i] = { ...k, baslik: e.target.value };
               onChange(configGuncelle(form, (c) => ({ ...c, blogKartlari: kopya })));
             }} />
+            <input className={formInputSinifi} placeholder="Kategori (sekmeli görünüm)" value={k.kategori ?? ''} onChange={(e) => {
+              const kopya = [...kartlar]; kopya[i] = { ...k, kategori: e.target.value };
+              onChange(configGuncelle(form, (c) => ({ ...c, blogKartlari: kopya })));
+            }} />
+            <textarea className={formInputSinifi} placeholder="Kısa özet" rows={2} value={k.ozet ?? ''} onChange={(e) => {
+              const kopya = [...kartlar]; kopya[i] = { ...k, ozet: e.target.value };
+              onChange(configGuncelle(form, (c) => ({ ...c, blogKartlari: kopya })));
+            }} />
             <input className={formInputSinifi} placeholder="Link" value={k.link} onChange={(e) => {
               const kopya = [...kartlar]; kopya[i] = { ...k, link: e.target.value };
               onChange(configGuncelle(form, (c) => ({ ...c, blogKartlari: kopya })));
@@ -358,6 +359,7 @@ export function BlogKaruselIcerik({ form, onChange }: WidgetPanelProps) {
         )}
       />
     </AdminFormBolumu>
+    </>
   );
 }
 
@@ -410,25 +412,17 @@ export function GorselGridBlokIcerik({ form, onChange }: WidgetPanelProps) {
   const gridKartlar = cfg.gridKartlar ?? [];
   const filtreler = cfg.filtreler ?? [];
   const altKategoriler = filtreler.slice(1);
+  const gt = cfg.gorunum?.gorunumTipi;
+  const flipMod = gt === 'flip-kart';
 
   return (
-    <AdminFormBolumu baslik="Görsel Grid Bloğu">
-      <FormAlani etiket="Sol panel başlık">
-        <input className={formInputSinifi} value={cfg.solBaslik ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, solBaslik: e.target.value })))} />
-      </FormAlani>
-      <FormAlani etiket="Sol panel açıklama">
-        <textarea className={formInputSinifi} rows={2} value={cfg.solAciklama ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, solAciklama: e.target.value })))} />
-      </FormAlani>
-      <FormAlani etiket="Filtre kategorileri" aciklama="Sitede sol panelde açılır liste olarak görünür">
-        <FiltreEtiketYonetici
-          filtreler={filtreler}
-          onChange={(yeni) => onChange(configGuncelle(form, (c) => ({ ...c, filtreler: yeni })))}
-        />
-      </FormAlani>
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Görsel kartları" aciklama="Grid içinde gösterilecek görseller ve etiketler">
       <ListeSiralayici<WidgetGorselGridKart>
         ogeler={gridKartlar}
         onDegistir={(g) => onChange(configGuncelle(form, (c) => ({ ...c, gridKartlar: g })))}
-        yeniEkle={() => ({ id: uid(), etiket: '', gorselUrl: '', link: '' })}
+        yeniEkle={() => ({ id: uid(), etiket: '', gorselUrl: '', link: '', aciklama: '' })}
         renderOge={(g, i) => (
           <div className="space-y-2">
             <GorselAlan etiket="Görsel" deger={g.gorselUrl} onChange={(v) => {
@@ -437,6 +431,16 @@ export function GorselGridBlokIcerik({ form, onChange }: WidgetPanelProps) {
             }} />
             <input className={formInputSinifi} placeholder="Etiket" value={g.etiket} onChange={(e) => {
               const kopya = [...gridKartlar]; kopya[i] = { ...g, etiket: e.target.value };
+              onChange(configGuncelle(form, (c) => ({ ...c, gridKartlar: kopya })));
+            }} />
+            {(flipMod || gt === 'flip-kart') && (
+              <textarea className={formInputSinifi} placeholder="Arka yüz açıklaması (flip görünüm)" rows={2} value={g.aciklama ?? ''} onChange={(e) => {
+                const kopya = [...gridKartlar]; kopya[i] = { ...g, aciklama: e.target.value };
+                onChange(configGuncelle(form, (c) => ({ ...c, gridKartlar: kopya })));
+              }} />
+            )}
+            <input className={formInputSinifi} placeholder="Link" value={g.link} onChange={(e) => {
+              const kopya = [...gridKartlar]; kopya[i] = { ...g, link: e.target.value };
               onChange(configGuncelle(form, (c) => ({ ...c, gridKartlar: kopya })));
             }} />
             {altKategoriler.length > 0 && (
@@ -462,28 +466,96 @@ export function GorselGridBlokIcerik({ form, onChange }: WidgetPanelProps) {
         )}
       />
     </AdminFormBolumu>
+    </>
   );
 }
 
 export function HaritaIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
+  const gt = cfg.gorunum?.gorunumTipi;
+  const sekmeMod = gt === 'sekme-subeler';
+  const ikonMod = gt === 'yan-ikon-liste';
+  const subeler = cfg.haritaSubeler ?? [];
+  const ikonlar = cfg.ikonKartlar ?? [];
+
   return (
-    <AdminFormBolumu baslik="Harita">
-      <FormAlani etiket="Harita linki veya adres" aciklama="Google Maps paylaşım linki, adres veya embed URL yapıştırın. www.google.com gibi genel linkler çalışmaz.">
-        <input className={formInputSinifi} value={cfg.haritaUrl ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, haritaUrl: e.target.value })))} placeholder="Adres, maps linki veya embed URL" />
-      </FormAlani>
-      <div className="grid gap-3 sm:grid-cols-3">
-        <FormAlani etiket="Enlem">
-          <input className={formInputSinifi} value={cfg.haritaLat ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, haritaLat: e.target.value })))} />
-        </FormAlani>
-        <FormAlani etiket="Boylam">
-          <input className={formInputSinifi} value={cfg.haritaLng ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, haritaLng: e.target.value })))} />
-        </FormAlani>
-        <FormAlani etiket="Zoom">
-          <input type="number" className={formInputSinifi} value={cfg.haritaZoom ?? 14} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, haritaZoom: Number(e.target.value) })))} />
-        </FormAlani>
-      </div>
-    </AdminFormBolumu>
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      {!sekmeMod && (
+        <AdminFormBolumu baslik="Harita konumu" aciklama="Google Maps paylaşım linki, adres veya embed URL">
+          <FormAlani etiket="Harita linki veya adres" aciklama="www.google.com gibi genel linkler çalışmaz.">
+            <input className={formInputSinifi} value={cfg.haritaUrl ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, haritaUrl: e.target.value })))} placeholder="Adres, maps linki veya embed URL" />
+          </FormAlani>
+          <div className="grid gap-3 sm:grid-cols-3">
+            <FormAlani etiket="Enlem">
+              <input className={formInputSinifi} value={cfg.haritaLat ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, haritaLat: e.target.value })))} />
+            </FormAlani>
+            <FormAlani etiket="Boylam">
+              <input className={formInputSinifi} value={cfg.haritaLng ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, haritaLng: e.target.value })))} />
+            </FormAlani>
+            <FormAlani etiket="Zoom">
+              <input type="number" className={formInputSinifi} value={cfg.haritaZoom ?? 14} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, haritaZoom: Number(e.target.value) })))} />
+            </FormAlani>
+          </div>
+        </AdminFormBolumu>
+      )}
+      {sekmeMod && (
+        <AdminFormBolumu baslik="Şubeler" aciklama="Her şube için ayrı harita konumu tanımlayın">
+          <ListeSiralayici<WidgetHaritaSube>
+            ogeler={subeler}
+            onDegistir={(s) => onChange(configGuncelle(form, (c) => ({ ...c, haritaSubeler: s })))}
+            yeniEkle={() => ({ id: uid(), ad: '', haritaUrl: '', haritaLat: '', haritaLng: '', haritaZoom: 14 })}
+            renderOge={(s, i) => (
+              <div className="space-y-2">
+                <input className={formInputSinifi} placeholder="Şube adı" value={s.ad} onChange={(e) => {
+                  const kopya = [...subeler]; kopya[i] = { ...s, ad: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, haritaSubeler: kopya })));
+                }} />
+                <input className={formInputSinifi} placeholder="Harita linki veya adres" value={s.haritaUrl ?? ''} onChange={(e) => {
+                  const kopya = [...subeler]; kopya[i] = { ...s, haritaUrl: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, haritaSubeler: kopya })));
+                }} />
+                <div className="grid gap-2 sm:grid-cols-3">
+                  <input className={formInputSinifi} placeholder="Enlem" value={s.haritaLat ?? ''} onChange={(e) => {
+                    const kopya = [...subeler]; kopya[i] = { ...s, haritaLat: e.target.value };
+                    onChange(configGuncelle(form, (c) => ({ ...c, haritaSubeler: kopya })));
+                  }} />
+                  <input className={formInputSinifi} placeholder="Boylam" value={s.haritaLng ?? ''} onChange={(e) => {
+                    const kopya = [...subeler]; kopya[i] = { ...s, haritaLng: e.target.value };
+                    onChange(configGuncelle(form, (c) => ({ ...c, haritaSubeler: kopya })));
+                  }} />
+                  <input type="number" className={formInputSinifi} placeholder="Zoom" value={s.haritaZoom ?? 14} onChange={(e) => {
+                    const kopya = [...subeler]; kopya[i] = { ...s, haritaZoom: Number(e.target.value) };
+                    onChange(configGuncelle(form, (c) => ({ ...c, haritaSubeler: kopya })));
+                  }} />
+                </div>
+              </div>
+            )}
+          />
+        </AdminFormBolumu>
+      )}
+      {ikonMod && (
+        <AdminFormBolumu baslik="İletişim satırları" aciklama="Haritanın yanında gösterilecek ikon + metin listesi">
+          <ListeSiralayici<WidgetIkonKart>
+            ogeler={ikonlar}
+            onDegistir={(k) => onChange(configGuncelle(form, (c) => ({ ...c, ikonKartlar: k })))}
+            yeniEkle={() => ({ id: uid(), ikon: '📍', metin: '' })}
+            renderOge={(k, i) => (
+              <div className="grid gap-2 sm:grid-cols-2">
+                <input className={formInputSinifi} placeholder="İkon (emoji)" value={k.ikon} onChange={(e) => {
+                  const kopya = [...ikonlar]; kopya[i] = { ...k, ikon: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, ikonKartlar: kopya })));
+                }} />
+                <input className={formInputSinifi} placeholder="Metin (adres, telefon vb.)" value={k.metin} onChange={(e) => {
+                  const kopya = [...ikonlar]; kopya[i] = { ...k, metin: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, ikonKartlar: kopya })));
+                }} />
+              </div>
+            )}
+          />
+        </AdminFormBolumu>
+      )}
+    </>
   );
 }
 
@@ -503,13 +575,14 @@ export function IletisimIcerik({ form, onChange }: WidgetPanelProps) {
 export function PopupIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   return (
-    <AdminFormBolumu baslik="Popup">
-      <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} /></FormAlani>
-      <FormAlani etiket="İçerik"><textarea className={formInputSinifi} rows={3} value={form.aciklama} onChange={(e) => onChange({ ...form, aciklama: e.target.value })} /></FormAlani>
-      <FormAlani etiket="Gecikme (sn)">
-        <input type="number" min={0} className={formInputSinifi} value={cfg.popupGecikme ?? 3} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, popupGecikme: Number(e.target.value) })))} />
-      </FormAlani>
-    </AdminFormBolumu>
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Popup zamanlama">
+        <FormAlani etiket="Gecikme (sn)" aciklama="Sayfa yüklendikten kaç saniye sonra gösterilsin">
+          <input type="number" min={0} className={formInputSinifi} value={cfg.popupGecikme ?? 3} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, popupGecikme: Number(e.target.value) })))} />
+        </FormAlani>
+      </AdminFormBolumu>
+    </>
   );
 }
 
@@ -579,13 +652,13 @@ export function EkipKaruselIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const uyeler = cfg.uyeler ?? [];
   return (
-    <AdminFormBolumu baslik="Ekip Üyeleri">
-      <FormAlani etiket="Üst etiket"><input className={formInputSinifi} value={form.altBaslik} onChange={(e) => onChange({ ...form, altBaslik: e.target.value })} /></FormAlani>
-      <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} /></FormAlani>
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Ekip üyeleri">
       <ListeSiralayici<WidgetEkipUyesi>
         ogeler={uyeler}
         onDegistir={(u) => onChange(configGuncelle(form, (c) => ({ ...c, uyeler: u })))}
-        yeniEkle={() => ({ id: uid(), ad: '', unvan: '', gorselUrl: '' })}
+        yeniEkle={() => ({ id: uid(), ad: '', unvan: '', gorselUrl: '', departman: '', aciklama: '', linkedin: '' })}
         renderOge={(u, i) => (
           <div className="space-y-2">
             <GorselAlan etiket="Fotoğraf" deger={u.gorselUrl} onChange={(v) => {
@@ -600,10 +673,23 @@ export function EkipKaruselIcerik({ form, onChange }: WidgetPanelProps) {
               const kopya = [...uyeler]; kopya[i] = { ...u, unvan: e.target.value };
               onChange(configGuncelle(form, (c) => ({ ...c, uyeler: kopya })));
             }} />
+            <input className={formInputSinifi} placeholder="Departman (sekmeli görünüm)" value={u.departman ?? ''} onChange={(e) => {
+              const kopya = [...uyeler]; kopya[i] = { ...u, departman: e.target.value };
+              onChange(configGuncelle(form, (c) => ({ ...c, uyeler: kopya })));
+            }} />
+            <textarea className={formInputSinifi} placeholder="Kısa biyografi" rows={2} value={u.aciklama ?? ''} onChange={(e) => {
+              const kopya = [...uyeler]; kopya[i] = { ...u, aciklama: e.target.value };
+              onChange(configGuncelle(form, (c) => ({ ...c, uyeler: kopya })));
+            }} />
+            <input className={formInputSinifi} placeholder="LinkedIn URL" value={u.linkedin ?? ''} onChange={(e) => {
+              const kopya = [...uyeler]; kopya[i] = { ...u, linkedin: e.target.value };
+              onChange(configGuncelle(form, (c) => ({ ...c, uyeler: kopya })));
+            }} />
           </div>
         )}
       />
     </AdminFormBolumu>
+    </>
   );
 }
 
@@ -717,9 +803,9 @@ export function YorumKartlariIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const yorumlar = cfg.yorumlar ?? [];
   return (
-    <AdminFormBolumu baslik="Müşteri Yorumları (Grid)">
-      <FormAlani etiket="Üst etiket"><input className={formInputSinifi} value={form.altBaslik} onChange={(e) => onChange({ ...form, altBaslik: e.target.value })} placeholder="YORUMLAR" /></FormAlani>
-      <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} placeholder="Müşterilerimizin Görüşleri" /></FormAlani>
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Müşteri Yorumları">
       <ListeSiralayici<WidgetYorum>
         ogeler={yorumlar}
         onDegistir={(y) => onChange(configGuncelle(form, (c) => ({ ...c, yorumlar: y })))}
@@ -766,6 +852,7 @@ export function YorumKartlariIcerik({ form, onChange }: WidgetPanelProps) {
         )}
       />
     </AdminFormBolumu>
+    </>
   );
 }
 
@@ -775,33 +862,7 @@ export function ModulLogoBlokIcerik({ form, onChange }: WidgetPanelProps) {
   const logolar = cfg.logoKartlar ?? [];
   return (
     <>
-      <AdminFormBolumu baslik="Modül Bilgileri" aciklama="Sol taraftaki başlık, açıklama ve özellik listesi">
-        <FormAlani etiket="Modül ikonu (emoji)">
-          <input
-            className={formInputSinifi}
-            placeholder="💳"
-            value={cfg.modulIkon ?? ''}
-            onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, modulIkon: e.target.value })))}
-          />
-        </FormAlani>
-        <FormAlani etiket="Başlık">
-          <input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} />
-        </FormAlani>
-        <FormAlani etiket="Alt etiket (isteğe bağlı)">
-          <input className={formInputSinifi} value={form.altBaslik} onChange={(e) => onChange({ ...form, altBaslik: e.target.value })} />
-        </FormAlani>
-        <FormAlani etiket="Açıklama">
-          <textarea className={formInputSinifi} rows={3} value={form.aciklama} onChange={(e) => onChange({ ...form, aciklama: e.target.value })} />
-        </FormAlani>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <FormAlani etiket="CTA buton metni">
-            <input className={formInputSinifi} value={form.butonMetni} onChange={(e) => onChange({ ...form, butonMetni: e.target.value })} />
-          </FormAlani>
-          <FormAlani etiket="CTA buton link">
-            <input className={formInputSinifi} value={form.butonLink} onChange={(e) => onChange({ ...form, butonLink: e.target.value })} />
-          </FormAlani>
-        </div>
-      </AdminFormBolumu>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
       <AdminFormBolumu baslik="Özellikler" aciklama="Modül özellik listesi (✓ işaretli)">
         <ListeSiralayici<WidgetIkonKart>
           ogeler={ozellikler}
@@ -872,23 +933,6 @@ export function ModulLogoBlokIcerik({ form, onChange }: WidgetPanelProps) {
             </div>
           )}
         />
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <FormAlani etiket="“Daha fazla” metni">
-            <input
-              className={formInputSinifi}
-              placeholder="+ Daha Fazlası"
-              value={cfg.dahaFazlaMetin ?? ''}
-              onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, dahaFazlaMetin: e.target.value })))}
-            />
-          </FormAlani>
-          <FormAlani etiket="“Daha fazla” link">
-            <input
-              className={formInputSinifi}
-              value={cfg.dahaFazlaLink ?? ''}
-              onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, dahaFazlaLink: e.target.value })))}
-            />
-          </FormAlani>
-        </div>
       </AdminFormBolumu>
     </>
   );
@@ -898,9 +942,9 @@ export function FiyatlandirmaIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const paketler = cfg.paketler ?? [];
   return (
-    <AdminFormBolumu baslik="Fiyat Paketleri">
-      <FormAlani etiket="Üst etiket"><input className={formInputSinifi} value={form.altBaslik} onChange={(e) => onChange({ ...form, altBaslik: e.target.value })} /></FormAlani>
-      <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} /></FormAlani>
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Fiyat paketleri">
       <ListeSiralayici<WidgetFiyatPaketi>
         ogeler={paketler}
         onDegistir={(p) => onChange(configGuncelle(form, (c) => ({ ...c, paketler: p })))}
@@ -948,6 +992,7 @@ export function FiyatlandirmaIcerik({ form, onChange }: WidgetPanelProps) {
         )}
       />
     </AdminFormBolumu>
+    </>
   );
 }
 

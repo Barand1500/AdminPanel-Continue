@@ -106,6 +106,9 @@ export function DinamikSayfaSayfasi() {
         ? 'mx-auto mt-12 max-w-4xl'
         : 'sayfa-icerik-tam-wrap';
 
+  const altSayfaGoster = altSayfalar.length > 0;
+  const ortaBolumGoster = baslikGoster || icerikVar || altSayfaGoster;
+
   if (tamGenis) {
     return (
       <>
@@ -126,7 +129,7 @@ export function DinamikSayfaSayfasi() {
             />
           </section>
         )}
-        {altSayfalar.length > 0 && (
+        {altSayfaGoster && (
           <section className="py-12 sm:py-16">
             <div className="container-site">
               <AltSayfaGrid altSayfalar={altSayfalar} ustBasliksiz={ozelHtml && icerikVar} />
@@ -141,23 +144,25 @@ export function DinamikSayfaSayfasi() {
   return (
     <>
       <WidgetBolge widgetlar={bolgeWidgetlar} bolge="sayfa_ustu" />
-      <section className="py-12 sm:py-16">
-        <div className="container-site">
-          {baslikGoster && (
-            <SayfaBaslikBlok sayfa={sayfa} altSayfalar={altSayfalar} icerikVar={icerikVar} />
-          )}
+      {ortaBolumGoster && (
+        <section className="py-12 sm:py-16">
+          <div className="container-site">
+            {baslikGoster && (
+              <SayfaBaslikBlok sayfa={sayfa} altSayfalar={altSayfalar} icerikVar={icerikVar} />
+            )}
 
-          {icerikVar && (
-            <div className={icerikKapsayiciSinif}>
-              <SayfaIcerikParcalari html={sayfa.icerik} widgetlar={tumSayfaWidgetlar} />
-            </div>
-          )}
+            {icerikVar && (
+              <div className={icerikKapsayiciSinif}>
+                <SayfaIcerikParcalari html={sayfa.icerik} widgetlar={tumSayfaWidgetlar} />
+              </div>
+            )}
 
-          {altSayfalar.length > 0 && (
-            <AltSayfaGrid altSayfalar={altSayfalar} ustBasliksiz={!icerikVar} />
-          )}
-        </div>
-      </section>
+            {altSayfaGoster && (
+              <AltSayfaGrid altSayfalar={altSayfalar} ustBasliksiz={!icerikVar} />
+            )}
+          </div>
+        </section>
+      )}
       <WidgetBolge widgetlar={bolgeWidgetlar} bolge="sayfa_alti" />
     </>
   );

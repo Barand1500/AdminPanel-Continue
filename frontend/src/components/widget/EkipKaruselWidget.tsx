@@ -1,277 +1,412 @@
-import { useState } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetEkipUyesi } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
-import { configOkuFromWidget, gorselSinifi, medyaUrl } from './widgetHelpers';
+import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
 
-function Baslik({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
+function renkler(cfg: WidgetConfig) {
+  const g = cfg.gorunum ?? {};
+  return {
+    baslik: g.baslikRengi || '#0f172a',
+    metin: g.metinRengi || '#64748b',
+    vurgu: g.vurguRengi || g.baslikRengi || '#7c3aed',
+    radius: g.borderRadius ?? 16,
+  };
+}
+
+function Baslik({ widget, cfg, ortala = true }: { widget: Widget; cfg: WidgetConfig; ortala?: boolean }) {
+  const renk = renkler(cfg);
+  if (!widget.baslik && !widget.altBaslik) return null;
   return (
-    <div className="mb-8 text-center">
-      {widget.altBaslik && <p className="text-sm font-semibold uppercase tracking-wide text-primary">{widget.altBaslik}</p>}
-      {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-slate-900`}>{widget.baslik}</h2>}
+    <div className={`ek-baslik${ortala ? ' ek-baslik-orta' : ''}`}>
+      {widget.altBaslik && (
+        <p className="ek-alt-baslik" style={{ color: renk.vurgu }}>
+          {widget.altBaslik}
+        </p>
+      )}
+      {widget.baslik && (
+        <h2 className={`${baslikSinifi(cfg)} ek-baslik-metin`} style={{ color: renk.baslik }}>
+          {widget.baslik}
+        </h2>
+      )}
     </div>
   );
 }
 
-function Navigasyon({
-  baslangic,
-  gorunen,
-  toplam,
-  sayfaSayisi,
-  setBaslangic,
-}: {
-  baslangic: number;
-  gorunen: number;
-  toplam: number;
-  sayfaSayisi: number;
-  setBaslangic: (fn: (b: number) => number) => void;
-}) {
-  if (sayfaSayisi <= 1) return null;
+function UyeAvatar({ u, boyut = 'md' }: { u: WidgetEkipUyesi; boyut?: 'sm' | 'md' | 'lg' | 'xl' }) {
+  const sinif = `ek-avatar ek-avatar-${boyut}`;
+  if (u.gorselUrl) {
+    return <img src={medyaUrl(u.gorselUrl)} alt={u.ad} className={sinif} />;
+  }
   return (
-    <div className="mt-6 flex justify-center gap-3">
-      <button
-        type="button"
-        className="rounded-lg border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50"
-        onClick={() => setBaslangic((b) => Math.max(0, b - gorunen))}
-        disabled={baslangic === 0}
-      >
-        ←
-      </button>
-      <button
-        type="button"
-        className="rounded-lg border border-slate-300 px-3 py-1 text-sm hover:bg-slate-50"
-        onClick={() => setBaslangic((b) => Math.min(toplam - gorunen, b + gorunen))}
-        disabled={baslangic + gorunen >= toplam}
-      >
-        →
-      </button>
+    <div className={`${sinif} ek-avatar-bos`}>
+      {u.ad.charAt(0) || '?'}
     </div>
   );
 }
 
-function YuvarlakFoto({
-  widget,
-  cfg,
-  uyeler,
-  baslangic,
-  gorunen,
-  sayfaSayisi,
-  setBaslangic,
-}: {
-  widget: Widget;
-  cfg: WidgetConfig;
-  uyeler: WidgetEkipUyesi[];
-  baslangic: number;
-  gorunen: number;
-  sayfaSayisi: number;
-  setBaslangic: (fn: (b: number) => number) => void;
-}) {
+function departmanlariTopla(uyeler: WidgetEkipUyesi[], filtreler?: string[]) {
+  const deps = [...new Set(uyeler.map((u) => u.departman?.trim()).filter(Boolean))] as string[];
+  if (filtreler?.length) {
+    const sirali = filtreler.filter((f) => deps.includes(f));
+    const ek = deps.filter((d) => !sirali.includes(d));
+    return [...sirali, ...ek];
+  }
+  return deps;
+}
+
+function SosyalLink({ href, children, className }: { href: string; className?: string; children: ReactNode }) {
+  if (href.startsWith('/')) {
+    return (
+      <Link to={href} className={className}>
+        {children}
+      </Link>
+    );
+  }
   return (
-    <>
-      <Baslik widget={widget} cfg={cfg} />
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-        {uyeler.slice(baslangic, baslangic + gorunen).map((u) => (
-          <article key={u.id} className="text-center">
-            {u.gorselUrl && (
-              <img
-                src={medyaUrl(u.gorselUrl)}
-                alt={u.ad}
-                className="mx-auto h-32 w-32 rounded-full object-cover shadow-md"
-              />
-            )}
-            <h3 className="mt-4 text-lg font-bold text-slate-900">{u.ad}</h3>
-            <p className="text-sm text-slate-500">{u.unvan}</p>
-          </article>
-        ))}
-      </div>
-      <Navigasyon baslangic={baslangic} gorunen={gorunen} toplam={uyeler.length} sayfaSayisi={sayfaSayisi} setBaslangic={setBaslangic} />
-    </>
+    <a href={href} className={className} target="_blank" rel="noopener noreferrer">
+      {children}
+    </a>
   );
 }
 
-function KareKart({
+function HeroMerkez({
   widget,
   cfg,
   uyeler,
-  baslangic,
-  gorunen,
-  sayfaSayisi,
-  setBaslangic,
 }: {
   widget: Widget;
   cfg: WidgetConfig;
   uyeler: WidgetEkipUyesi[];
-  baslangic: number;
-  gorunen: number;
-  sayfaSayisi: number;
-  setBaslangic: (fn: (b: number) => number) => void;
 }) {
+  const [hero, ...mini] = uyeler;
+  const renk = renkler(cfg);
+
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {uyeler.slice(baslangic, baslangic + gorunen).map((u) => (
-          <article key={u.id} className="overflow-hidden rounded-2xl border border-violet-200 bg-violet-50/30 shadow-sm">
-            {u.gorselUrl && (
-              <img src={medyaUrl(u.gorselUrl)} alt={u.ad} className={`aspect-square w-full ${gorselSinifi(cfg)}`} />
-            )}
-            <div className="p-4 text-center">
-              <h3 className="font-bold text-slate-900">{u.ad}</h3>
-              <p className="text-sm text-violet-700">{u.unvan}</p>
+      <div className="ek-hero-mini">
+        {hero && (
+          <article className="ek-hero-kart" style={{ borderRadius: `${renk.radius}px` }}>
+            <UyeAvatar u={hero} boyut="xl" />
+            <div className="ek-hero-icerik">
+              <h3 className="ek-uye-ad" style={{ color: renk.baslik }}>
+                {hero.ad}
+              </h3>
+              <p className="ek-uye-unvan" style={{ color: renk.vurgu }}>
+                {hero.unvan}
+              </p>
+              {hero.departman && <p className="ek-uye-dep">{hero.departman}</p>}
+              {hero.aciklama && (
+                <p className="ek-uye-aciklama" style={{ color: renk.metin }}>
+                  {hero.aciklama}
+                </p>
+              )}
             </div>
           </article>
-        ))}
+        )}
+        <div className="ek-mini-grid">
+          {mini.slice(0, 6).map((u) => (
+            <article key={u.id} className="ek-mini-kart" style={{ borderRadius: `${Math.max(10, renk.radius - 4)}px` }}>
+              <UyeAvatar u={u} boyut="sm" />
+              <div>
+                <h4 className="ek-mini-ad" style={{ color: renk.baslik }}>
+                  {u.ad}
+                </h4>
+                <p className="ek-mini-unvan" style={{ color: renk.metin }}>
+                  {u.unvan}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
       </div>
-      <Navigasyon baslangic={baslangic} gorunen={gorunen} toplam={uyeler.length} sayfaSayisi={sayfaSayisi} setBaslangic={setBaslangic} />
     </>
   );
 }
 
-function SadeIsim({
+function KartDestesi({
   widget,
   cfg,
   uyeler,
-  baslangic,
-  gorunen,
-  sayfaSayisi,
-  setBaslangic,
 }: {
   widget: Widget;
   cfg: WidgetConfig;
   uyeler: WidgetEkipUyesi[];
-  baslangic: number;
-  gorunen: number;
-  sayfaSayisi: number;
-  setBaslangic: (fn: (b: number) => number) => void;
 }) {
+  const renk = renkler(cfg);
+  const n = uyeler.length;
+
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="flex flex-wrap justify-center gap-6">
-        {uyeler.slice(baslangic, baslangic + gorunen).map((u) => (
-          <article key={u.id} className="w-28 text-center">
-            {u.gorselUrl && (
-              <img src={medyaUrl(u.gorselUrl)} alt={u.ad} className="mx-auto h-20 w-20 rounded-full object-cover" />
-            )}
-            <h3 className="mt-2 text-sm font-semibold text-slate-900">{u.ad}</h3>
-          </article>
-        ))}
+      <div className="ek-deste-wrap">
+        <div className="ek-deste" style={{ '--ek-deste-n': n } as CSSProperties}>
+          {uyeler.map((u, i) => (
+            <article
+              key={u.id}
+              className="ek-deste-kart"
+              style={
+                {
+                  '--ek-deste-i': i,
+                  borderRadius: `${renk.radius}px`,
+                  borderColor: `${renk.vurgu}33`,
+                } as CSSProperties
+              }
+            >
+              <UyeAvatar u={u} boyut="md" />
+              <h3 className="ek-uye-ad" style={{ color: renk.baslik }}>
+                {u.ad}
+              </h3>
+              <p className="ek-uye-unvan" style={{ color: renk.vurgu }}>
+                {u.unvan}
+              </p>
+            </article>
+          ))}
+        </div>
       </div>
-      <Navigasyon baslangic={baslangic} gorunen={gorunen} toplam={uyeler.length} sayfaSayisi={sayfaSayisi} setBaslangic={setBaslangic} />
     </>
   );
 }
 
-function KoyuProfil({
+function SekmeliDepartman({
   widget,
   cfg,
   uyeler,
-  baslangic,
-  gorunen,
-  sayfaSayisi,
-  setBaslangic,
 }: {
   widget: Widget;
   cfg: WidgetConfig;
   uyeler: WidgetEkipUyesi[];
-  baslangic: number;
-  gorunen: number;
-  sayfaSayisi: number;
-  setBaslangic: (fn: (b: number) => number) => void;
 }) {
-  return (
-    <div className="rounded-2xl bg-slate-900 px-6 py-12">
-      <div className="mb-8 text-center">
-        {widget.altBaslik && <p className="text-sm font-semibold uppercase tracking-wide text-slate-400">{widget.altBaslik}</p>}
-        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-white`}>{widget.baslik}</h2>}
-      </div>
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {uyeler.slice(baslangic, baslangic + gorunen).map((u) => (
-          <article key={u.id} className="rounded-xl bg-slate-800 p-4 text-center">
-            {u.gorselUrl && (
-              <img src={medyaUrl(u.gorselUrl)} alt={u.ad} className="mx-auto h-28 w-28 rounded-full object-cover ring-2 ring-slate-600" />
-            )}
-            <h3 className="mt-3 font-bold text-white">{u.ad}</h3>
-            <p className="text-sm text-slate-400">{u.unvan}</p>
-          </article>
-        ))}
-      </div>
-      <Navigasyon baslangic={baslangic} gorunen={gorunen} toplam={uyeler.length} sayfaSayisi={sayfaSayisi} setBaslangic={setBaslangic} />
-    </div>
-  );
-}
+  const departmanlar = departmanlariTopla(uyeler, cfg.filtreler);
+  const [aktif, setAktif] = useState('__tumu__');
+  const renk = renkler(cfg);
+  const filtreli =
+    aktif === '__tumu__' ? uyeler : uyeler.filter((u) => (u.departman ?? '').trim() === aktif);
 
-function MorUnvan({
-  widget,
-  cfg,
-  uyeler,
-  baslangic,
-  gorunen,
-  sayfaSayisi,
-  setBaslangic,
-}: {
-  widget: Widget;
-  cfg: WidgetConfig;
-  uyeler: WidgetEkipUyesi[];
-  baslangic: number;
-  gorunen: number;
-  sayfaSayisi: number;
-  setBaslangic: (fn: (b: number) => number) => void;
-}) {
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-        {uyeler.slice(baslangic, baslangic + gorunen).map((u) => (
-          <article key={u.id} className="text-center">
-            {u.gorselUrl && (
-              <img src={medyaUrl(u.gorselUrl)} alt={u.ad} className={`mx-auto aspect-[3/4] w-full max-w-[200px] ${gorselSinifi(cfg)}`} />
-            )}
-            <h3 className="mt-3 font-bold text-slate-900">{u.ad}</h3>
-            <p className="text-sm font-semibold text-violet-600">{u.unvan}</p>
+      {departmanlar.length > 0 && (
+        <div className="ek-sekme-liste">
+          <button
+            type="button"
+            className={`ek-sekme${aktif === '__tumu__' ? ' ek-sekme-aktif' : ''}`}
+            style={aktif === '__tumu__' ? { borderColor: renk.vurgu, color: renk.vurgu, background: `${renk.vurgu}12` } : undefined}
+            onClick={() => setAktif('__tumu__')}
+          >
+            Tümü
+          </button>
+          {departmanlar.map((d) => (
+            <button
+              key={d}
+              type="button"
+              className={`ek-sekme${aktif === d ? ' ek-sekme-aktif' : ''}`}
+              style={aktif === d ? { borderColor: renk.vurgu, color: renk.vurgu, background: `${renk.vurgu}12` } : undefined}
+              onClick={() => setAktif(d)}
+            >
+              {d}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="ek-sekme-grid">
+        {filtreli.map((u) => (
+          <article key={u.id} className="ek-sekme-kart" style={{ borderRadius: `${renk.radius}px` }}>
+            <UyeAvatar u={u} boyut="lg" />
+            <h3 className="ek-uye-ad" style={{ color: renk.baslik }}>
+              {u.ad}
+            </h3>
+            <p className="ek-uye-unvan" style={{ color: renk.vurgu }}>
+              {u.unvan}
+            </p>
+            {u.departman && <p className="ek-uye-dep">{u.departman}</p>}
           </article>
         ))}
       </div>
-      <Navigasyon baslangic={baslangic} gorunen={gorunen} toplam={uyeler.length} sayfaSayisi={sayfaSayisi} setBaslangic={setBaslangic} />
     </>
   );
 }
 
-function TuruncuCerceve({
+function OrbitDuzen({
   widget,
   cfg,
   uyeler,
-  baslangic,
-  gorunen,
-  sayfaSayisi,
-  setBaslangic,
 }: {
   widget: Widget;
   cfg: WidgetConfig;
   uyeler: WidgetEkipUyesi[];
-  baslangic: number;
-  gorunen: number;
-  sayfaSayisi: number;
-  setBaslangic: (fn: (b: number) => number) => void;
 }) {
+  const renk = renkler(cfg);
+  const n = uyeler.length;
+
+  return (
+    <>
+      <div className="ek-orbit-alan">
+        <div className="ek-orbit-halka" style={{ '--ek-orbit-n': n } as CSSProperties}>
+          <div className="ek-orbit-merkez">
+            <Baslik widget={widget} cfg={cfg} ortala />
+          </div>
+          {uyeler.map((u, i) => (
+            <article
+              key={u.id}
+              className="ek-orbit-oge"
+              style={{ '--ek-orbit-i': i } as CSSProperties}
+            >
+              <div className="ek-orbit-kart" style={{ borderColor: `${renk.vurgu}44`, borderRadius: `${renk.radius}px` }}>
+                <UyeAvatar u={u} boyut="sm" />
+                <h3 className="ek-orbit-ad" style={{ color: renk.baslik }}>
+                  {u.ad}
+                </h3>
+                <p className="ek-orbit-unvan" style={{ color: renk.metin }}>
+                  {u.unvan}
+                </p>
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="ek-orbit-mobil">
+          <Baslik widget={widget} cfg={cfg} />
+          <div className="ek-sekme-grid">
+            {uyeler.map((u) => (
+              <article key={u.id} className="ek-sekme-kart" style={{ borderRadius: `${renk.radius}px` }}>
+                <UyeAvatar u={u} boyut="md" />
+                <h3 className="ek-uye-ad" style={{ color: renk.baslik }}>
+                  {u.ad}
+                </h3>
+                <p className="ek-uye-unvan" style={{ color: renk.vurgu }}>
+                  {u.unvan}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+function HoverFlip({
+  widget,
+  cfg,
+  uyeler,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  uyeler: WidgetEkipUyesi[];
+}) {
+  const renk = renkler(cfg);
+
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {uyeler.slice(baslangic, baslangic + gorunen).map((u) => (
-          <article key={u.id} className="group relative overflow-hidden rounded-xl border-4 border-orange-400">
-            {u.gorselUrl && (
-              <img src={medyaUrl(u.gorselUrl)} alt={u.ad} className={`aspect-[3/4] w-full ${gorselSinifi(cfg)}`} />
-            )}
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-orange-900/90 to-transparent p-4">
-              <h3 className="text-lg font-bold text-white">{u.ad}</h3>
-              <p className="text-sm text-orange-100">{u.unvan}</p>
+      <div className="ek-flip-grid">
+        {uyeler.map((u) => (
+          <div key={u.id} className="ek-flip-kapsul" style={{ borderRadius: `${renk.radius}px` }}>
+            <div className="ek-flip-inner">
+              <div className="ek-flip-on" style={{ borderRadius: `${renk.radius}px` }}>
+                {u.gorselUrl ? (
+                  <img src={medyaUrl(u.gorselUrl)} alt={u.ad} className="ek-flip-gorsel" />
+                ) : (
+                  <div className="ek-flip-gorsel ek-avatar-bos ek-avatar-xl">{u.ad.charAt(0)}</div>
+                )}
+                <div className="ek-flip-on-alt">
+                  <h3 className="ek-uye-ad">{u.ad}</h3>
+                  <p className="ek-uye-unvan">{u.unvan}</p>
+                </div>
+              </div>
+              <div className="ek-flip-arka" style={{ borderRadius: `${renk.radius}px`, background: renk.vurgu }}>
+                <h3 className="ek-flip-arka-ad">{u.ad}</h3>
+                <p className="ek-flip-arka-unvan">{u.unvan}</p>
+                {u.aciklama && <p className="ek-flip-arka-aciklama">{u.aciklama}</p>}
+                {u.linkedin && (
+                  <SosyalLink href={u.linkedin} className="ek-flip-link">
+                    LinkedIn →
+                  </SosyalLink>
+                )}
+              </div>
             </div>
-          </article>
+          </div>
         ))}
       </div>
-      <Navigasyon baslangic={baslangic} gorunen={gorunen} toplam={uyeler.length} sayfaSayisi={sayfaSayisi} setBaslangic={setBaslangic} />
+    </>
+  );
+}
+
+function MarqueeSpotlight({
+  widget,
+  cfg,
+  uyeler,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  uyeler: WidgetEkipUyesi[];
+}) {
+  const [aktif, setAktif] = useState(0);
+  const secili = uyeler[aktif] ?? uyeler[0];
+  const ticker = uyeler.slice(0, 10);
+  const cift = [...ticker, ...ticker];
+  const renk = renkler(cfg);
+
+  return (
+    <>
+      <Baslik widget={widget} cfg={cfg} />
+      {ticker.length > 1 && (
+        <div className="ek-ticker-alan">
+          <div className="ek-ticker-iz">
+            {cift.map((u, i) => (
+              <button
+                key={`${u.id}-${i}`}
+                type="button"
+                className="ek-ticker-tus"
+                onClick={() => setAktif(i % uyeler.length)}
+              >
+                <span className="ek-ticker-nokta" style={{ background: renk.vurgu }} />
+                {u.ad}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+      {secili && (
+        <article className="ek-spotlight" style={{ borderRadius: `${renk.radius}px` }}>
+          <div className="ek-spotlight-gorsel">
+            <UyeAvatar u={secili} boyut="xl" />
+          </div>
+          <div className="ek-spotlight-icerik">
+            <h3 className="ek-spotlight-ad" style={{ color: renk.baslik }}>
+              {secili.ad}
+            </h3>
+            <p className="ek-uye-unvan" style={{ color: renk.vurgu }}>
+              {secili.unvan}
+            </p>
+            {secili.departman && <p className="ek-uye-dep">{secili.departman}</p>}
+            {secili.aciklama && (
+              <p className="ek-uye-aciklama" style={{ color: renk.metin }}>
+                {secili.aciklama}
+              </p>
+            )}
+            {uyeler.length > 1 && (
+              <div className="ek-spotlight-secici">
+                {uyeler.map((u, i) => (
+                  <button
+                    key={u.id}
+                    type="button"
+                    className={`ek-spotlight-nokta${i === aktif ? ' ek-spotlight-nokta-aktif' : ''}`}
+                    style={i === aktif ? { borderColor: renk.vurgu } : undefined}
+                    onClick={() => setAktif(i)}
+                    aria-label={u.ad}
+                  >
+                    <UyeAvatar u={u} boyut="sm" />
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </article>
+      )}
     </>
   );
 }
@@ -279,23 +414,20 @@ function TuruncuCerceve({
 export function EkipKaruselWidget({ widget }: { widget: Widget }) {
   const cfg = configOkuFromWidget(widget);
   const uyeler = cfg.uyeler ?? [];
-  const [baslangic, setBaslangic] = useState(0);
-  const gorunen = 4;
   const gt = widgetGorunumTipiAl(widget);
 
   if (uyeler.length === 0) return null;
 
-  const sayfaSayisi = Math.ceil(uyeler.length / gorunen);
-  const ortak = { widget, cfg, uyeler, baslangic, gorunen, sayfaSayisi, setBaslangic };
+  const ortak = { widget, cfg, uyeler };
 
   return (
     <WidgetKabuk widget={widget}>
-      {gt === 'kare-kart' && <KareKart {...ortak} />}
-      {gt === 'sade-isim' && <SadeIsim {...ortak} />}
-      {gt === 'koyu-profil' && <KoyuProfil {...ortak} />}
-      {gt === 'mor-unvan' && <MorUnvan {...ortak} />}
-      {gt === 'turuncu-cerceve' && <TuruncuCerceve {...ortak} />}
-      {gt === 'yuvarlak-foto' && <YuvarlakFoto {...ortak} />}
+      {gt === 'kart-destesi' && <KartDestesi {...ortak} />}
+      {gt === 'sekmeli-departman' && <SekmeliDepartman {...ortak} />}
+      {gt === 'orbit-duzen' && <OrbitDuzen {...ortak} />}
+      {gt === 'hover-flip' && <HoverFlip {...ortak} />}
+      {gt === 'marquee-spotlight' && <MarqueeSpotlight {...ortak} />}
+      {(gt === 'hero-merkez' || !gt) && <HeroMerkez {...ortak} />}
     </WidgetKabuk>
   );
 }

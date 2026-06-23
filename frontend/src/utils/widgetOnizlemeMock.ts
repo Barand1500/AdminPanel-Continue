@@ -99,10 +99,13 @@ function mockConfig(tip: string): WidgetConfig {
     case 'BLOG_KARUSEL':
       return {
         blogKartlari: [
-          { id: id(), baslik: 'Yeni Ürün Lansmanı', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku' },
-          { id: id(), baslik: 'Sektör Trendleri 2026', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku' },
-          { id: id(), baslik: 'Müşteri Başarı Hikayesi', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku' },
+          { id: id(), baslik: 'Yeni Ürün Lansmanı', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku', kategori: 'Teknoloji', ozet: 'Yeni nesil ürünümüz piyasaya çıktı.' },
+          { id: id(), baslik: 'Sektör Trendleri 2026', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku', kategori: 'Analiz', ozet: '2026 yılında öne çıkan teknoloji trendleri.' },
+          { id: id(), baslik: 'Müşteri Başarı Hikayesi', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku', kategori: 'Teknoloji', ozet: 'Kurumsal müşterimizin dijital dönüşüm yolculuğu.' },
+          { id: id(), baslik: 'E-Ticaret Rehberi', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku', kategori: 'Rehber', ozet: 'Online satışa başlamak için adım adım kılavuz.' },
+          { id: id(), baslik: 'Güvenlik İpuçları', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku', kategori: 'Analiz', ozet: 'Siber güvenlik için temel öneriler.' },
         ],
+        filtreler: ['Teknoloji', 'Analiz', 'Rehber'],
         tumunuGorMetin: 'Tümünü Gör',
         tumunuGorLink: '/blog',
       };
@@ -138,10 +141,13 @@ function mockConfig(tip: string): WidgetConfig {
     case 'EKIP_KARUSEL':
       return {
         uyeler: [
-          { id: id(), ad: 'Ayşe Yılmaz', unvan: 'Genel Müdür', gorselUrl: ONIZLEME_GORSEL, aciklama: '15 yıllık sektör deneyimi' },
-          { id: id(), ad: 'Mehmet Kaya', unvan: 'Yazılım Lideri', gorselUrl: ONIZLEME_GORSEL },
-          { id: id(), ad: 'Zeynep Demir', unvan: 'Tasarım Uzmanı', gorselUrl: ONIZLEME_GORSEL },
+          { id: id(), ad: 'Ayşe Yılmaz', unvan: 'Genel Müdür', departman: 'Yönetim', gorselUrl: ONIZLEME_GORSEL, aciklama: '15 yıllık sektör deneyimi', linkedin: '#' },
+          { id: id(), ad: 'Mehmet Kaya', unvan: 'Yazılım Lideri', departman: 'Teknik', gorselUrl: ONIZLEME_GORSEL, aciklama: 'Full-stack ve bulut mimarisi uzmanı' },
+          { id: id(), ad: 'Zeynep Demir', unvan: 'Tasarım Uzmanı', departman: 'Tasarım', gorselUrl: ONIZLEME_GORSEL },
+          { id: id(), ad: 'Can Öztürk', unvan: 'Satış Müdürü', departman: 'Satış', gorselUrl: ONIZLEME_GORSEL },
+          { id: id(), ad: 'Elif Arslan', unvan: 'UX Araştırmacı', departman: 'Tasarım', gorselUrl: ONIZLEME_GORSEL },
         ],
+        filtreler: ['Yönetim', 'Teknik', 'Tasarım', 'Satış'],
         otomatikKaydir: true,
       };
     case 'SAYAC_BLOK':
@@ -260,18 +266,24 @@ function mockConfig(tip: string): WidgetConfig {
     case 'GALERI':
       return {
         galeri: [
-          { id: id(), gorselUrl: ONIZLEME_GORSEL, baslik: 'Proje 1', link: '#' },
-          { id: id(), gorselUrl: ONIZLEME_GORSEL, baslik: 'Proje 2', link: '#' },
-          { id: id(), gorselUrl: ONIZLEME_GORSEL, baslik: 'Proje 3', link: '#' },
+          { id: id(), gorselUrl: ONIZLEME_GORSEL, baslik: 'Proje 1', link: '#', kategori: 'Ofis' },
+          { id: id(), gorselUrl: ONIZLEME_GORSEL, baslik: 'Proje 2', link: '#', kategori: 'Etkinlik' },
+          { id: id(), gorselUrl: ONIZLEME_GORSEL, baslik: 'Proje 3', link: '#', kategori: 'Ofis' },
+          { id: id(), gorselUrl: ONIZLEME_GORSEL, baslik: 'Proje 4', link: '#', kategori: 'Etkinlik' },
+          { id: id(), gorselUrl: ONIZLEME_GORSEL, baslik: 'Proje 5', link: '#', kategori: 'Ofis' },
         ],
-        galeriDuzeni: 'grid',
+        filtreler: ['Tümü', 'Ofis', 'Etkinlik'],
       };
     case 'SSS':
       return {
         sorular: [
-          { id: id(), soru: 'Teslimat süresi ne kadar?', cevap: 'Proje kapsamına göre 1-4 hafta arasında değişmektedir.' },
-          { id: id(), soru: 'Destek hizmeti var mı?', cevap: 'Evet, tüm paketlerimizde e-posta ve telefon desteği sunuyoruz.' },
+          { id: id(), soru: 'Teslimat süresi ne kadar?', cevap: 'Proje kapsamına göre 1-4 hafta arasında değişmektedir.', kategori: 'Sipariş' },
+          { id: id(), soru: 'Destek hizmeti var mı?', cevap: 'Evet, tüm paketlerimizde e-posta ve telefon desteği sunuyoruz.', kategori: 'Destek' },
+          { id: id(), soru: 'İade politikanız nedir?', cevap: '14 gün içinde koşulsuz iade hakkınız bulunmaktadır.', kategori: 'Sipariş' },
+          { id: id(), soru: 'Kurulum ücretsiz mi?', cevap: 'Temel kurulum tüm paketlerde ücretsizdir.', kategori: 'Destek' },
         ],
+        filtreler: ['Tümü', 'Sipariş', 'Destek'],
+        solBaslik: 'Konu seçin',
       };
     case 'REFERANSLAR':
       return { referanslar: ['Acme Corp', 'TechStart', 'GlobalSoft', 'InnovateLab', 'DataFlow'] };
@@ -284,7 +296,21 @@ function mockConfig(tip: string): WidgetConfig {
         ],
       };
     case 'HARITA':
-      return { haritaLat: '41.0082', haritaLng: '28.9784', haritaZoom: 14 };
+      return {
+        haritaLat: '41.0082',
+        haritaLng: '28.9784',
+        haritaZoom: 14,
+        ikonKartlar: [
+          { id: id(), ikon: '📍', metin: 'Maslak Mah. Büyükdere Cad. No:1 İstanbul' },
+          { id: id(), ikon: '📞', metin: '+90 212 000 00 00' },
+          { id: id(), ikon: '🕐', metin: 'Pzt–Cum 09:00–18:00' },
+        ],
+        haritaSubeler: [
+          { id: id(), ad: 'İstanbul', haritaLat: '41.0082', haritaLng: '28.9784', haritaZoom: 14 },
+          { id: id(), ad: 'Ankara', haritaLat: '39.9334', haritaLng: '32.8597', haritaZoom: 14 },
+          { id: id(), ad: 'İzmir', haritaLat: '38.4237', haritaLng: '27.1428', haritaZoom: 14 },
+        ],
+      };
     case 'ILETISIM_FORMU':
       return {};
     case 'POPUP':
@@ -551,6 +577,7 @@ function configBirlestir(mevcut: WidgetConfig, mock: WidgetConfig, tip?: string)
   sonuc.yorumlar = dizi(sonuc.yorumlar, mock.yorumlar ?? []);
   sonuc.paketler = dizi(sonuc.paketler, mock.paketler ?? []);
   sonuc.ikonKartlar = dizi(sonuc.ikonKartlar, mock.ikonKartlar ?? []);
+  sonuc.haritaSubeler = dizi(sonuc.haritaSubeler, mock.haritaSubeler ?? []);
   sonuc.logoKartlar = dizi(sonuc.logoKartlar, mock.logoKartlar ?? []);
   sonuc.kategoriler = dizi(sonuc.kategoriler, mock.kategoriler ?? []);
   sonuc.filtreler = dizi(sonuc.filtreler, mock.filtreler ?? []);

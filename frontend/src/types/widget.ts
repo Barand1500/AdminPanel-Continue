@@ -215,6 +215,7 @@ export interface WidgetGaleriOgesi {
   gorselUrl: string;
   baslik: string;
   link: string;
+  kategori?: string;
 }
 
 export interface WidgetKartOgesi {
@@ -231,6 +232,7 @@ export interface WidgetSssOgesi {
   id: string;
   soru: string;
   cevap: string;
+  kategori?: string;
 }
 
 export interface WidgetLinkOgesi {
@@ -246,6 +248,10 @@ export interface WidgetBlogKart {
   gorselUrl: string;
   link: string;
   butonMetni: string;
+  /** Sekmeli kategori görünümü için */
+  kategori?: string;
+  /** Kısa özet (hero / ticker görünümleri) */
+  ozet?: string;
 }
 
 export interface WidgetGorselGridKart {
@@ -255,6 +261,8 @@ export interface WidgetGorselGridKart {
   link: string;
   /** Hangi filtre kategorisine ait (ilk filtre = tümü, boş = her yerde) */
   filtreEtiketi?: string;
+  /** Flip kart arka yüz metni */
+  aciklama?: string;
 }
 
 export interface WidgetEtiketKarti {
@@ -270,6 +278,8 @@ export interface WidgetEkipUyesi {
   unvan: string;
   gorselUrl: string;
   aciklama?: string;
+  departman?: string;
+  linkedin?: string;
 }
 
 export interface WidgetSayac {
@@ -311,6 +321,15 @@ export interface WidgetIkonKart {
   id: string;
   ikon: string;
   metin: string;
+}
+
+export interface WidgetHaritaSube {
+  id: string;
+  ad: string;
+  haritaUrl?: string;
+  haritaLat?: string;
+  haritaLng?: string;
+  haritaZoom?: number;
 }
 
 export interface WidgetTimelineOgesi {
@@ -383,6 +402,7 @@ export interface WidgetConfig {
   haritaLat?: string;
   haritaLng?: string;
   haritaZoom?: number;
+  haritaSubeler?: WidgetHaritaSube[];
   popupGecikme?: number;
   popupTetikleyici?: 'sayfa_yukle' | 'cikis';
   formSlug?: string;
@@ -486,6 +506,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
         gorunum,
         ek,
         blogKartlari: [],
+        filtreler: [],
         blogKaynagi: 'manuel',
         blogAdet: 3,
         otomatikKaydir: false,
@@ -515,7 +536,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     case 'GORSEL_ETIKET_KARTLARI':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3 }, ek, etiketKartlar: [] };
     case 'EKIP_KARUSEL':
-      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4 }, ek, uyeler: [], otomatikKaydir: true };
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4 }, ek, uyeler: [], filtreler: [], otomatikKaydir: true };
     case 'SAYAC_BLOK':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4 }, ek, sayaclar: [] };
     case 'YORUM_KARUSEL':

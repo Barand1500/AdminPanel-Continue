@@ -1,5 +1,7 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
+import type { WidgetConfig } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { configOkuFromWidget } from './widgetHelpers';
 
@@ -8,31 +10,100 @@ interface PopupWidgetProps {
   onizleme?: boolean;
 }
 
-function PopupIcerik({
+function popupRenkler(cfg: WidgetConfig, widget: Widget) {
+  const g = cfg.gorunum ?? {};
+  return {
+    panel: widget.arkaPlanRenk || '#ffffff',
+    baslik: g.baslikRengi || widget.yaziRenk || '#0f172a',
+    metin: g.metinRengi || '#64748b',
+    vurgu: g.vurguRengi || 'var(--color-primary, #7c3aed)',
+    radius: g.borderRadius ?? 16,
+  };
+}
+
+function KapatTusu({ kapat, renk }: { kapat: () => void; renk?: string }) {
+  return (
+    <button
+      type="button"
+      onClick={kapat}
+      className="pp-kapat"
+      style={{ color: renk ?? '#94a3b8' }}
+      aria-label="Kapat"
+    >
+      ✕
+    </button>
+  );
+}
+
+function PopupGovde({
   widget,
+  cfg,
   kapat,
-  sinifKutu,
-  sinifBaslik = 'text-lg font-semibold text-slate-900',
-  sinifMetin = 'mt-2 text-sm text-slate-600',
+  stil,
+  className,
+  baslikSinif = 'pp-baslik',
+  metinSinif = 'pp-metin',
+  yatay,
 }: {
   widget: Widget;
+  cfg: WidgetConfig;
   kapat: () => void;
-  sinifKutu: string;
-  sinifBaslik?: string;
-  sinifMetin?: string;
+  stil?: CSSProperties;
+  className?: string;
+  baslikSinif?: string;
+  metinSinif?: string;
+  yatay?: boolean;
 }) {
+  const renk = popupRenkler(cfg, widget);
+  const link = widget.butonLink?.trim();
+
+  const cta = widget.butonMetni ? (
+    link?.startsWith('/') ? (
+      <Link to={link} className="pp-cta" style={{ backgroundColor: renk.vurgu, borderRadius: renk.radius }}>
+        {widget.butonMetni}
+      </Link>
+    ) : link ? (
+      <a
+        href={link.startsWith('http') ? link : `https://${link}`}
+        className="pp-cta"
+        style={{ backgroundColor: renk.vurgu, borderRadius: renk.radius }}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {widget.butonMetni}
+      </a>
+    ) : (
+      <span className="pp-cta" style={{ backgroundColor: renk.vurgu, borderRadius: renk.radius }}>
+        {widget.butonMetni}
+      </span>
+    )
+  ) : null;
+
   return (
-    <div className={sinifKutu}>
-      <button type="button" onClick={kapat} className="absolute right-3 top-3 text-slate-400 hover:text-slate-600" aria-label="Kapat">
-        ✕
-      </button>
-      {widget.baslik && <h3 className={`pr-8 ${sinifBaslik}`}>{widget.baslik}</h3>}
-      {widget.aciklama && <p className={sinifMetin}>{widget.aciklama}</p>}
-      {widget.butonMetni && widget.butonLink && (
-        <a href={widget.butonLink} className="mt-4 inline-block rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-white">
-          {widget.butonMetni}
-        </a>
-      )}
+    <div className={`pp-govde ${yatay ? 'pp-govde-yatay' : ''} ${className ?? ''}`} style={{ ...stil, borderRadius: renk.radius, backgroundColor: renk.panel }}>
+      <KapatTusu kapat={kapat} renk={renk.metin} />
+      <div className="pp-icerik">
+        {widget.baslik && (
+          <h3 className={baslikSinif} style={{ color: renk.baslik }}>
+            {widget.baslik}
+          </h3>
+        )}
+        {widget.aciklama && (
+          <p className={metinSinif} style={{ color: renk.metin }}>
+            {widget.aciklama}
+          </p>
+        )}
+        {cta}
+      </div>
+    </div>
+  );
+}
+
+function Overlay({ kapat, children }: { kapat: () => void; children: ReactNode }) {
+  return (
+    <div className="pp-overlay-wrap">
+      <button type="button" className="pp-overlay" aria-label="Kapat" onClick={kapat} />
+      {children}
     </div>
   );
 }
@@ -42,6 +113,7 @@ export function PopupWidget({ widget, onizleme }: PopupWidgetProps) {
   const gecikme = (cfg.popupGecikme ?? 3) * 1000;
   const [acik, setAcik] = useState(onizleme ?? false);
   const gt = widgetGorunumTipiAl(widget);
+  const renk = popupRenkler(cfg, widget);
   const kapat = () => setAcik(false);
 
   useEffect(() => {
@@ -57,78 +129,93 @@ export function PopupWidget({ widget, onizleme }: PopupWidgetProps) {
 
   if (gt === 'alt-kaydirma') {
     return (
-      <div className="popup-alt-kaydirma fixed inset-x-0 bottom-0 z-50 p-4">
-        <button type="button" className="fixed inset-0 bg-black/40" aria-label="Kapat" onClick={kapat} />
-        <PopupIcerik
-          widget={widget}
-          kapat={kapat}
-          sinifKutu="popup-alt-panel relative mx-auto max-w-2xl rounded-t-2xl bg-white p-6 shadow-2xl"
-        />
+      <div className="pp-alt-kaydirma">
+        <button type="button" className="pp-overlay" aria-label="Kapat" onClick={kapat} />
+        <PopupGovde widget={widget} cfg={cfg} kapat={kapat} className="pp-alt-panel" />
       </div>
     );
   }
 
   if (gt === 'sag-kose') {
     return (
-      <div className="popup-sag-kose fixed bottom-4 right-4 z-50 max-w-xs">
-        <PopupIcerik
+      <div className="pp-sag-kose">
+        <PopupGovde
           widget={widget}
+          cfg={cfg}
           kapat={kapat}
-          sinifKutu="relative rounded-xl border border-slate-200 bg-white p-4 shadow-xl"
-          sinifBaslik="text-base font-bold text-slate-900"
-          sinifMetin="mt-1 text-xs text-slate-600"
+          className="pp-kose-kart"
+          baslikSinif="pp-baslik pp-baslik-kucuk"
+          metinSinif="pp-metin pp-metin-kucuk"
         />
       </div>
     );
   }
 
-  if (gt === 'mor-kart') {
+  if (gt === 'cam-kart') {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <button type="button" className="absolute inset-0 bg-purple-900/40" aria-label="Kapat" onClick={kapat} />
-        <PopupIcerik
+      <Overlay kapat={kapat}>
+        <PopupGovde
           widget={widget}
+          cfg={cfg}
           kapat={kapat}
-          sinifKutu="relative max-w-md rounded-2xl border border-violet-300 bg-gradient-to-br from-violet-50 to-purple-100 p-6 shadow-xl"
-          sinifBaslik="text-lg font-bold text-violet-950"
-          sinifMetin="mt-2 text-sm text-violet-800"
+          className="pp-cam-kart"
+          stil={{
+            background: `linear-gradient(145deg, ${renk.panel}f5, ${renk.vurgu}18)`,
+            border: `1px solid ${renk.vurgu}44`,
+            boxShadow: `0 24px 64px ${renk.vurgu}33`,
+          }}
         />
-      </div>
+      </Overlay>
     );
   }
 
-  if (gt === 'turuncu-uyari') {
+  if (gt === 'ust-serit') {
     return (
-      <div className="popup-turuncu-uyari fixed inset-x-0 top-0 z-50">
-        <div className="relative bg-gradient-to-r from-orange-500 to-amber-500 px-6 py-4 text-white shadow-lg">
-          <button type="button" onClick={kapat} className="absolute right-4 top-3 text-white/80 hover:text-white" aria-label="Kapat">
-            ✕
-          </button>
-          {widget.baslik && <p className="pr-8 font-bold">{widget.baslik}</p>}
-          {widget.aciklama && <p className="mt-1 text-sm text-orange-50">{widget.aciklama}</p>}
+      <div className="pp-ust-serit" style={{ background: `linear-gradient(135deg, ${renk.vurgu}, ${renk.vurgu}cc)` }}>
+        <KapatTusu kapat={kapat} renk="rgba(255,255,255,0.85)" />
+        <div className="pp-ust-icerik">
+          {widget.baslik && <p className="pp-ust-baslik">{widget.baslik}</p>}
+          {widget.aciklama && <p className="pp-ust-metin">{widget.aciklama}</p>}
+          {widget.butonMetni && widget.butonLink && (
+            <a
+              href={widget.butonLink}
+              className="pp-ust-cta"
+              style={{ color: renk.vurgu, borderRadius: renk.radius }}
+            >
+              {widget.butonMetni}
+            </a>
+          )}
         </div>
       </div>
     );
   }
 
-  if (gt === 'mint-minimal') {
+  if (gt === 'pill-bildirim') {
     return (
-      <div className="popup-mint-minimal fixed bottom-4 left-1/2 z-50 -translate-x-1/2">
-        <PopupIcerik
+      <div className="pp-pill-wrap">
+        <PopupGovde
           widget={widget}
+          cfg={cfg}
           kapat={kapat}
-          sinifKutu="relative flex items-center gap-3 rounded-full border border-teal-200 bg-teal-50 px-5 py-3 shadow-lg"
-          sinifBaslik="text-sm font-semibold text-teal-900"
-          sinifMetin="text-xs text-teal-700"
+          className="pp-pill"
+          yatay
+          baslikSinif="pp-baslik pp-baslik-kucuk"
+          metinSinif="pp-metin pp-metin-kucuk"
+          stil={{ border: `1px solid ${renk.vurgu}33`, boxShadow: `0 8px 32px ${renk.vurgu}22` }}
         />
       </div>
     );
   }
 
   return (
-    <div className="popup-ortada-modal fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button type="button" className="absolute inset-0 bg-black/50" aria-label="Kapat" onClick={kapat} />
-      <PopupIcerik widget={widget} kapat={kapat} sinifKutu="relative max-w-md rounded-xl bg-white p-6 shadow-xl" />
-    </div>
+    <Overlay kapat={kapat}>
+      <PopupGovde
+        widget={widget}
+        cfg={cfg}
+        kapat={kapat}
+        className="pp-modal"
+        stil={{ boxShadow: '0 24px 64px rgba(15, 23, 42, 0.2)' }}
+      />
+    </Overlay>
   );
 }

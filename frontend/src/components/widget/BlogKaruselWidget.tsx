@@ -1,10 +1,21 @@
-import { useState } from 'react';
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
 import type { WidgetBlogKart, WidgetConfig } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
-import { configOkuFromWidget, gorselSinifi, medyaUrl } from './widgetHelpers';
+import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
 import { useSiteDil } from '@/contexts/SiteDilContext';
+
+function renkler(cfg: WidgetConfig) {
+  const g = cfg.gorunum ?? {};
+  return {
+    baslik: g.baslikRengi || '#0f172a',
+    metin: g.metinRengi || '#64748b',
+    vurgu: g.vurguRengi || '#0d9488',
+    radius: g.borderRadius ?? 16,
+  };
+}
 
 function BaslikSatir({
   widget,
@@ -12,54 +23,73 @@ function BaslikSatir({
   tumunuGorLink,
   tumunuGorMetin,
   cevir,
+  ek,
 }: {
   widget: Widget;
   cfg: WidgetConfig;
   tumunuGorLink?: string;
   tumunuGorMetin?: string;
   cevir: (k: string, f: string) => string;
+  ek?: ReactNode;
 }) {
+  const renk = renkler(cfg);
   return (
-    <div className="mb-6 flex items-center justify-between gap-4">
-      {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold text-slate-900`}>{widget.baslik}</h2>}
-      {tumunuGorLink && (
-        <a href={tumunuGorLink} className="rounded-lg bg-teal-600 px-4 py-2 text-sm font-medium text-white hover:bg-teal-500">
-          {tumunuGorMetin ?? cevir('site.tumunuGor', 'Tümünü Gör')} —
-        </a>
-      )}
+    <div className="bk-baslik-satir">
+      <div>
+        {widget.baslik && (
+          <h2 className={`${baslikSinifi(cfg)} bk-baslik`} style={{ color: renk.baslik }}>
+            {widget.baslik}
+          </h2>
+        )}
+      </div>
+      <div className="bk-baslik-sag">
+        {ek}
+        {tumunuGorLink && (
+          <a href={tumunuGorLink} className="bk-tumunu-gor" style={{ background: renk.vurgu }}>
+            {tumunuGorMetin ?? cevir('site.tumunuGor', 'Tümünü Gör')}
+          </a>
+        )}
+      </div>
     </div>
   );
 }
 
-function BlogKartIcerik({
-  k,
-  cfg,
-  cevir,
-  sinif,
-  butonSinif,
+function KartLink({
+  href,
+  className,
+  style,
+  children,
 }: {
-  k: WidgetBlogKart;
-  cfg: WidgetConfig;
-  cevir: (k: string, f: string) => string;
-  sinif?: string;
-  butonSinif?: string;
+  href: string;
+  className?: string;
+  style?: CSSProperties;
+  children: ReactNode;
 }) {
+  if (href.startsWith('/')) {
+    return (
+      <Link to={href} className={className} style={style}>
+        {children}
+      </Link>
+    );
+  }
   return (
-    <article className={sinif}>
-      {k.gorselUrl && <img src={medyaUrl(k.gorselUrl)} alt="" className={`w-full ${gorselSinifi(cfg)}`} />}
-      <div className="p-4">
-        <h3 className="font-semibold text-slate-900">{k.baslik}</h3>
-        {k.link && (
-          <a href={k.link} className={butonSinif ?? 'mt-4 inline-block rounded-lg border border-slate-300 px-4 py-2 text-sm text-slate-700'}>
-            — {k.butonMetni || cevir('site.dahaFazlaOku', 'Daha Fazla Oku')}
-          </a>
-        )}
-      </div>
-    </article>
+    <a href={href} className={className} style={style}>
+      {children}
+    </a>
   );
 }
 
-function YatayKart({
+function kategorileriTopla(kartlar: WidgetBlogKart[], filtreler?: string[]) {
+  const kartKat = [...new Set(kartlar.map((k) => k.kategori?.trim()).filter(Boolean))] as string[];
+  if (filtreler?.length) {
+    const sirali = filtreler.filter((f) => kartKat.includes(f) || kartlar.some((k) => k.kategori === f));
+    const ek = kartKat.filter((k) => !sirali.includes(k));
+    return [...sirali, ...ek];
+  }
+  return kartKat;
+}
+
+function SnapSerit({
   widget,
   cfg,
   kartlar,
@@ -70,31 +100,83 @@ function YatayKart({
   kartlar: WidgetBlogKart[];
   cevir: (k: string, f: string) => string;
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
   const [aktif, setAktif] = useState(0);
+  const renk = renkler(cfg);
+
+  function kaydir(yon: 'sol' | 'sag') {
+    const el = scrollRef.current;
+    if (!el) return;
+    const kart = el.querySelector<HTMLElement>('.bk-snap-kart');
+    const genislik = kart ? kart.offsetWidth + 16 : 320;
+    el.scrollBy({ left: yon === 'sol' ? -genislik : genislik, behavior: 'smooth' });
+  }
+
+  function scrollIzle() {
+    const el = scrollRef.current;
+    if (!el) return;
+    const kart = el.querySelector<HTMLElement>('.bk-snap-kart');
+    const genislik = kart ? kart.offsetWidth + 16 : 1;
+    setAktif(Math.round(el.scrollLeft / genislik));
+  }
 
   return (
     <>
-      <BaslikSatir widget={widget} cfg={cfg} tumunuGorLink={cfg.tumunuGorLink} tumunuGorMetin={cfg.tumunuGorMetin} cevir={cevir} />
-      <div className="grid gap-4 md:grid-cols-3">
-        {kartlar.slice(aktif, aktif + 3).map((k) => (
-          <BlogKartIcerik
+      <BaslikSatir
+        widget={widget}
+        cfg={cfg}
+        tumunuGorLink={cfg.tumunuGorLink}
+        tumunuGorMetin={cfg.tumunuGorMetin}
+        cevir={cevir}
+        ek={
+          kartlar.length > 1 ? (
+            <div className="bk-serit-nav">
+              <button type="button" className="bk-serit-ok" onClick={() => kaydir('sol')} aria-label="Önceki">
+                ‹
+              </button>
+              <button type="button" className="bk-serit-ok" onClick={() => kaydir('sag')} aria-label="Sonraki">
+                ›
+              </button>
+            </div>
+          ) : null
+        }
+      />
+      <div className="bk-snap-scroll" ref={scrollRef} onScroll={scrollIzle}>
+        {kartlar.map((k) => (
+          <article
             key={k.id}
-            k={k}
-            cfg={cfg}
-            cevir={cevir}
-            sinif="overflow-hidden rounded-2xl bg-white shadow-md"
-          />
+            className="bk-snap-kart"
+            style={{ borderRadius: `${renk.radius}px` }}
+          >
+            {k.gorselUrl && (
+              <img src={medyaUrl(k.gorselUrl)} alt="" className="bk-snap-gorsel" />
+            )}
+            <div className="bk-snap-icerik">
+              {k.kategori && (
+                <span className="bk-kategori-etiket" style={{ color: renk.vurgu }}>
+                  {k.kategori}
+                </span>
+              )}
+              <h3 className="bk-kart-baslik" style={{ color: renk.baslik }}>
+                {k.baslik}
+              </h3>
+              {k.ozet && <p className="bk-kart-ozet" style={{ color: renk.metin }}>{k.ozet}</p>}
+              {k.link && (
+                <KartLink href={k.link} className="bk-kart-link" style={{ color: renk.vurgu }}>
+                  {k.butonMetni || cevir('site.dahaFazlaOku', 'Daha Fazla Oku')} →
+                </KartLink>
+              )}
+            </div>
+          </article>
         ))}
       </div>
-      {kartlar.length > 3 && (
-        <div className="mt-6 flex justify-center gap-2">
-          {Array.from({ length: Math.ceil(kartlar.length / 3) }).map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setAktif(i * 3)}
-              className={`h-2.5 w-2.5 rounded-full ${i === Math.floor(aktif / 3) ? 'bg-teal-500' : 'bg-slate-300'}`}
-              aria-label={`Sayfa ${i + 1}`}
+      {kartlar.length > 1 && (
+        <div className="bk-progress">
+          {kartlar.map((k, i) => (
+            <span
+              key={k.id}
+              className={`bk-progress-nokta${i === aktif ? ' bk-progress-aktif' : ''}`}
+              style={i === aktif ? { background: renk.vurgu } : undefined}
             />
           ))}
         </div>
@@ -103,7 +185,7 @@ function YatayKart({
   );
 }
 
-function BuyukOnizleme({
+function HeroMiniGrid({
   widget,
   cfg,
   kartlar,
@@ -114,34 +196,59 @@ function BuyukOnizleme({
   kartlar: WidgetBlogKart[];
   cevir: (k: string, f: string) => string;
 }) {
-  const [hero, ...diger] = kartlar;
+  const [hero, ...mini] = kartlar;
+  const renk = renkler(cfg);
 
   return (
     <>
       <BaslikSatir widget={widget} cfg={cfg} tumunuGorLink={cfg.tumunuGorLink} tumunuGorMetin={cfg.tumunuGorMetin} cevir={cevir} />
-      <div className="grid gap-4 md:grid-cols-4 md:grid-rows-2">
+      <div className="bk-hero-mini">
         {hero && (
-          <article className="overflow-hidden rounded-2xl bg-white shadow-lg md:col-span-2 md:row-span-2">
-            {hero.gorselUrl && <img src={medyaUrl(hero.gorselUrl)} alt="" className="h-64 w-full object-cover md:h-full" />}
-            <div className="p-6">
-              <h3 className="text-xl font-bold text-slate-900">{hero.baslik}</h3>
+          <article className="bk-hero-buyuk" style={{ borderRadius: `${renk.radius}px` }}>
+            {hero.gorselUrl && (
+              <img src={medyaUrl(hero.gorselUrl)} alt="" className="bk-hero-buyuk-gorsel" />
+            )}
+            <div className="bk-hero-buyuk-icerik">
+              {hero.kategori && (
+                <span className="bk-kategori-etiket" style={{ color: renk.vurgu }}>
+                  {hero.kategori}
+                </span>
+              )}
+              <h3 className="bk-hero-buyuk-baslik" style={{ color: renk.baslik }}>
+                {hero.baslik}
+              </h3>
+              {hero.ozet && <p className="bk-kart-ozet" style={{ color: renk.metin }}>{hero.ozet}</p>}
               {hero.link && (
-                <a href={hero.link} className="mt-4 inline-block text-sm font-semibold text-sky-600 hover:underline">
-                  {hero.butonMetni || cevir('site.dahaFazlaOku', 'Daha Fazla Oku')} →
-                </a>
+                <KartLink href={hero.link} className="bk-btn" style={{ background: renk.vurgu }}>
+                  {hero.butonMetni || cevir('site.dahaFazlaOku', 'Daha Fazla Oku')}
+                </KartLink>
               )}
             </div>
           </article>
         )}
-        {diger.slice(0, 2).map((k) => (
-          <BlogKartIcerik key={k.id} k={k} cfg={cfg} cevir={cevir} sinif="overflow-hidden rounded-xl bg-white shadow-sm" />
-        ))}
+        <div className="bk-mini-grid">
+          {mini.slice(0, 4).map((k) => (
+            <KartLink
+              key={k.id}
+              href={k.link || '#'}
+              className="bk-mini-kart"
+              style={{ borderRadius: `${Math.max(10, renk.radius - 4)}px` }}
+            >
+              {k.gorselUrl && (
+                <img src={medyaUrl(k.gorselUrl)} alt="" className="bk-mini-gorsel" />
+              )}
+              <h4 className="bk-mini-baslik" style={{ color: renk.baslik }}>
+                {k.baslik}
+              </h4>
+            </KartLink>
+          ))}
+        </div>
       </div>
     </>
   );
 }
 
-function KompaktListe({
+function KartDestesi({
   widget,
   cfg,
   kartlar,
@@ -152,27 +259,45 @@ function KompaktListe({
   kartlar: WidgetBlogKart[];
   cevir: (k: string, f: string) => string;
 }) {
+  const renk = renkler(cfg);
+  const n = kartlar.length;
+
   return (
     <>
       <BaslikSatir widget={widget} cfg={cfg} tumunuGorLink={cfg.tumunuGorLink} tumunuGorMetin={cfg.tumunuGorMetin} cevir={cevir} />
-      <div className="divide-y divide-violet-100 rounded-xl border border-violet-100">
-        {kartlar.map((k) => (
-          <a key={k.id} href={k.link || '#'} className="flex items-center gap-4 p-4 transition hover:bg-violet-50/50">
-            {k.gorselUrl && (
-              <img src={medyaUrl(k.gorselUrl)} alt="" className="h-16 w-24 shrink-0 rounded-lg object-cover" />
-            )}
-            <div className="min-w-0 flex-1">
-              <h3 className="truncate font-semibold text-slate-900">{k.baslik}</h3>
-              <span className="text-xs text-violet-600">{k.butonMetni || cevir('site.dahaFazlaOku', 'Oku')} →</span>
-            </div>
-          </a>
-        ))}
+      <div className="bk-deste-wrap">
+        <div className="bk-deste" style={{ '--bk-deste-n': n } as CSSProperties}>
+          {kartlar.map((k, i) => (
+            <article
+              key={k.id}
+              className="bk-deste-kart"
+              style={
+                {
+                  '--bk-deste-i': i,
+                  borderRadius: `${renk.radius}px`,
+                } as CSSProperties
+              }
+            >
+              {k.gorselUrl && (
+                <img src={medyaUrl(k.gorselUrl)} alt="" className="bk-deste-gorsel" />
+              )}
+              <h3 className="bk-kart-baslik" style={{ color: renk.baslik }}>
+                {k.baslik}
+              </h3>
+              {k.link && (
+                <KartLink href={k.link} className="bk-kart-link" style={{ color: renk.vurgu }}>
+                  {k.butonMetni || cevir('site.dahaFazlaOku', 'Oku')} →
+                </KartLink>
+              )}
+            </article>
+          ))}
+        </div>
       </div>
     </>
   );
 }
 
-function KoyuKart({
+function SekmeliKategori({
   widget,
   cfg,
   kartlar,
@@ -183,31 +308,58 @@ function KoyuKart({
   kartlar: WidgetBlogKart[];
   cevir: (k: string, f: string) => string;
 }) {
+  const kategoriler = kategorileriTopla(kartlar, cfg.filtreler);
+  const [aktifKat, setAktifKat] = useState<string>('__tumu__');
+  const renk = renkler(cfg);
+  const filtreli =
+    aktifKat === '__tumu__' ? kartlar : kartlar.filter((k) => (k.kategori ?? '').trim() === aktifKat);
+
   return (
-    <div className="rounded-2xl bg-slate-900 p-6">
-      <div className="mb-6">
-        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold text-white`}>{widget.baslik}</h2>}
-      </div>
-      <div className="grid gap-4 md:grid-cols-3">
-        {kartlar.slice(0, 3).map((k) => (
-          <article key={k.id} className="overflow-hidden rounded-xl bg-slate-800">
-            {k.gorselUrl && <img src={medyaUrl(k.gorselUrl)} alt="" className="h-40 w-full object-cover opacity-90" />}
-            <div className="p-4">
-              <h3 className="font-semibold text-white">{k.baslik}</h3>
+    <>
+      <BaslikSatir widget={widget} cfg={cfg} tumunuGorLink={cfg.tumunuGorLink} tumunuGorMetin={cfg.tumunuGorMetin} cevir={cevir} />
+      {kategoriler.length > 0 && (
+        <div className="bk-sekme-liste">
+          <button
+            type="button"
+            className={`bk-sekme${aktifKat === '__tumu__' ? ' bk-sekme-aktif' : ''}`}
+            style={aktifKat === '__tumu__' ? { borderColor: renk.vurgu, color: renk.vurgu, background: `${renk.vurgu}12` } : undefined}
+            onClick={() => setAktifKat('__tumu__')}
+          >
+            Tümü
+          </button>
+          {kategoriler.map((kat) => (
+            <button
+              key={kat}
+              type="button"
+              className={`bk-sekme${aktifKat === kat ? ' bk-sekme-aktif' : ''}`}
+              style={aktifKat === kat ? { borderColor: renk.vurgu, color: renk.vurgu, background: `${renk.vurgu}12` } : undefined}
+              onClick={() => setAktifKat(kat)}
+            >
+              {kat}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="bk-sekme-grid">
+        {filtreli.map((k) => (
+          <article key={k.id} className="bk-sekme-kart" style={{ borderRadius: `${renk.radius}px` }}>
+            {k.gorselUrl && <img src={medyaUrl(k.gorselUrl)} alt="" className="bk-sekme-gorsel" />}
+            <div className="bk-sekme-icerik">
+              <h3 className="bk-kart-baslik" style={{ color: renk.baslik }}>{k.baslik}</h3>
               {k.link && (
-                <a href={k.link} className="mt-3 inline-block text-sm text-sky-400 hover:underline">
+                <KartLink href={k.link} className="bk-kart-link" style={{ color: renk.vurgu }}>
                   {k.butonMetni || cevir('site.dahaFazlaOku', 'Oku')} →
-                </a>
+                </KartLink>
               )}
             </div>
           </article>
         ))}
       </div>
-    </div>
+    </>
   );
 }
 
-function TuruncuVurgu({
+function OverlaySinematik({
   widget,
   cfg,
   kartlar,
@@ -218,26 +370,55 @@ function TuruncuVurgu({
   kartlar: WidgetBlogKart[];
   cevir: (k: string, f: string) => string;
 }) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const renk = renkler(cfg);
+
+  function kaydir(yon: 'sol' | 'sag') {
+    scrollRef.current?.scrollBy({ left: yon === 'sol' ? -400 : 400, behavior: 'smooth' });
+  }
+
   return (
     <>
-      <BaslikSatir widget={widget} cfg={cfg} tumunuGorLink={cfg.tumunuGorLink} tumunuGorMetin={cfg.tumunuGorMetin} cevir={cevir} />
-      <div className="grid gap-4 md:grid-cols-3">
-        {kartlar.slice(0, 3).map((k) => (
-          <BlogKartIcerik
+      <BaslikSatir
+        widget={widget}
+        cfg={cfg}
+        tumunuGorLink={cfg.tumunuGorLink}
+        tumunuGorMetin={cfg.tumunuGorMetin}
+        cevir={cevir}
+        ek={
+          <div className="bk-serit-nav">
+            <button type="button" className="bk-serit-ok bk-serit-ok-koyu" onClick={() => kaydir('sol')} aria-label="Önceki">‹</button>
+            <button type="button" className="bk-serit-ok bk-serit-ok-koyu" onClick={() => kaydir('sag')} aria-label="Sonraki">›</button>
+          </div>
+        }
+      />
+      <div className="bk-overlay-scroll" ref={scrollRef}>
+        {kartlar.map((k) => (
+          <KartLink
             key={k.id}
-            k={k}
-            cfg={cfg}
-            cevir={cevir}
-            sinif="overflow-hidden rounded-2xl border border-orange-200 bg-white shadow-sm"
-            butonSinif="mt-4 inline-block rounded-lg bg-orange-500 px-4 py-2 text-sm font-semibold text-white hover:bg-orange-400"
-          />
+            href={k.link || '#'}
+            className="bk-overlay-kart"
+            style={{ borderRadius: `${renk.radius}px` }}
+          >
+            {k.gorselUrl && (
+              <img src={medyaUrl(k.gorselUrl)} alt="" className="bk-overlay-gorsel" />
+            )}
+            <div className="bk-overlay-gradient" />
+            <div className="bk-overlay-metin">
+              {k.kategori && <span className="bk-overlay-kat">{k.kategori}</span>}
+              <h3 className="bk-overlay-baslik">{k.baslik}</h3>
+              <span className="bk-overlay-oku">
+                {k.butonMetni || cevir('site.dahaFazlaOku', 'Oku')} →
+              </span>
+            </div>
+          </KartLink>
         ))}
       </div>
     </>
   );
 }
 
-function YesilMinimal({
+function TickerHero({
   widget,
   cfg,
   kartlar,
@@ -248,21 +429,49 @@ function YesilMinimal({
   kartlar: WidgetBlogKart[];
   cevir: (k: string, f: string) => string;
 }) {
+  const hero = kartlar[0];
+  const ticker = kartlar.slice(0, 8);
+  const cift = [...ticker, ...ticker];
+  const renk = renkler(cfg);
+
   return (
     <>
       <BaslikSatir widget={widget} cfg={cfg} tumunuGorLink={cfg.tumunuGorLink} tumunuGorMetin={cfg.tumunuGorMetin} cevir={cevir} />
-      <div className="space-y-3">
-        {kartlar.map((k) => (
-          <a
-            key={k.id}
-            href={k.link || '#'}
-            className="flex items-center justify-between rounded-lg border border-emerald-100 px-4 py-3 transition hover:border-emerald-300 hover:bg-emerald-50/50"
-          >
-            <span className="font-medium text-slate-800">{k.baslik}</span>
-            <span className="text-sm text-emerald-600">→</span>
-          </a>
-        ))}
-      </div>
+      {ticker.length > 0 && (
+        <div className="bk-ticker-alan">
+          <div className="bk-ticker-iz">
+            {cift.map((k, i) => (
+              <a key={`${k.id}-${i}`} href={k.link || '#'} className="bk-ticker-oge">
+                <span className="bk-ticker-nokta" style={{ background: renk.vurgu }} />
+                {k.baslik}
+              </a>
+            ))}
+          </div>
+        </div>
+      )}
+      {hero && (
+        <article className="bk-ticker-hero" style={{ borderRadius: `${renk.radius}px` }}>
+          {hero.gorselUrl && (
+            <img src={medyaUrl(hero.gorselUrl)} alt="" className="bk-ticker-hero-gorsel" />
+          )}
+          <div className="bk-ticker-hero-icerik">
+            {hero.kategori && (
+              <span className="bk-kategori-etiket" style={{ color: renk.vurgu }}>
+                {hero.kategori}
+              </span>
+            )}
+            <h3 className="bk-ticker-hero-baslik" style={{ color: renk.baslik }}>
+              {hero.baslik}
+            </h3>
+            {hero.ozet && <p className="bk-kart-ozet" style={{ color: renk.metin }}>{hero.ozet}</p>}
+            {hero.link && (
+              <KartLink href={hero.link} className="bk-btn" style={{ background: renk.vurgu }}>
+                {hero.butonMetni || cevir('site.dahaFazlaOku', 'Daha Fazla Oku')}
+              </KartLink>
+            )}
+          </div>
+        </article>
+      )}
     </>
   );
 }
@@ -279,12 +488,12 @@ export function BlogKaruselWidget({ widget }: { widget: Widget }) {
 
   return (
     <WidgetKabuk widget={widget}>
-      {gt === 'buyuk-onizleme' && <BuyukOnizleme {...ortak} />}
-      {gt === 'kompakt-liste' && <KompaktListe {...ortak} />}
-      {gt === 'koyu-kart' && <KoyuKart {...ortak} />}
-      {gt === 'turuncu-vurgu' && <TuruncuVurgu {...ortak} />}
-      {gt === 'yesil-minimal' && <YesilMinimal {...ortak} />}
-      {gt === 'yatay-kart' && <YatayKart {...ortak} />}
+      {gt === 'hero-mini-grid' && <HeroMiniGrid {...ortak} />}
+      {gt === 'kart-destesi' && <KartDestesi {...ortak} />}
+      {gt === 'sekmeli-kategori' && <SekmeliKategori {...ortak} />}
+      {gt === 'overlay-sinematik' && <OverlaySinematik {...ortak} />}
+      {gt === 'ticker-hero' && <TickerHero {...ortak} />}
+      {(gt === 'snap-serit' || !gt) && <SnapSerit {...ortak} />}
     </WidgetKabuk>
   );
 }
