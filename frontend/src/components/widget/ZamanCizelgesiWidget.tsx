@@ -3,8 +3,19 @@ import type { WidgetConfig } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget } from './widgetHelpers';
+import { YatayKaydirmaCubugu } from './YatayKaydirmaCubugu';
 
 type ZamanOgesi = { id: string; tarih: string; baslik: string; aciklama?: string };
+
+function renkler(cfg: WidgetConfig) {
+  const g = cfg.gorunum ?? {};
+  return {
+    baslik: g.baslikRengi || '#0f172a',
+    metin: g.metinRengi || '#64748b',
+    vurgu: g.vurguRengi || g.baslikRengi || '#7c3aed',
+    radius: g.borderRadius ?? 14,
+  };
+}
 
 function BaslikBolumu({ widget, cfg, sinif = '' }: { widget: Widget; cfg: WidgetConfig; sinif?: string }) {
   return (
@@ -41,23 +52,56 @@ function DikeyCizgi({ widget, cfg, ogeler }: { widget: Widget; cfg: WidgetConfig
 }
 
 function YatayAdim({ widget, cfg, ogeler }: { widget: Widget; cfg: WidgetConfig; ogeler: ZamanOgesi[] }) {
+  const renk = renkler(cfg);
   return (
-    <>
-      <div className="mx-auto max-w-3xl text-center">
-        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold text-slate-900`}>{widget.baslik}</h2>}
+    <div className="zc-yatay">
+      <div className="zc-yatay-baslik">
+        {widget.altBaslik && (
+          <p className="zc-yatay-etiket" style={{ color: renk.vurgu }}>
+            {widget.altBaslik}
+          </p>
+        )}
+        {widget.baslik && (
+          <h2 className={`${baslikSinifi(cfg)} zc-yatay-baslik-metin`} style={{ color: renk.baslik }}>
+            {widget.baslik}
+          </h2>
+        )}
+        {widget.aciklama && (
+          <p className="zc-yatay-aciklama" style={{ color: renk.metin }}>
+            {widget.aciklama}
+          </p>
+        )}
       </div>
-      <div className="mt-10 flex gap-6 overflow-x-auto pb-4">
+      <YatayKaydirmaCubugu sinif="zc-yatay-serit" vurguRenk={renk.vurgu}>
         {ogeler.map((o, i) => (
-          <div key={o.id} className="min-w-[200px] flex-shrink-0 rounded-xl border border-slate-200 bg-white p-4 text-center">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-xs font-bold text-white">
+          <article
+            key={o.id}
+            className="zc-yatay-kart"
+            style={{ borderRadius: renk.radius, borderColor: `${renk.vurgu}22` }}
+          >
+            <span
+              className="zc-yatay-numara"
+              style={{ backgroundColor: renk.vurgu, borderRadius: renk.radius >= 12 ? 9999 : renk.radius }}
+            >
               {i + 1}
             </span>
-            <time className="mt-2 block text-xs font-bold text-primary">{o.tarih}</time>
-            <h3 className="mt-1 text-sm font-semibold">{o.baslik}</h3>
-          </div>
+            {o.tarih && (
+              <time className="zc-yatay-tarih" style={{ color: renk.vurgu }}>
+                {o.tarih}
+              </time>
+            )}
+            <h3 className="zc-yatay-kart-baslik" style={{ color: renk.baslik }}>
+              {o.baslik}
+            </h3>
+            {o.aciklama && (
+              <p className="zc-yatay-kart-aciklama" style={{ color: renk.metin }}>
+                {o.aciklama}
+              </p>
+            )}
+          </article>
         ))}
-      </div>
-    </>
+      </YatayKaydirmaCubugu>
+    </div>
   );
 }
 

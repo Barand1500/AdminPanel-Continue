@@ -2655,7 +2655,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .kr-split-sembol { font-weight: 800; }
 .kr-split-fiyat { font-weight: 700; text-align: right; }
 
-/* Güncel Konular ? gk */
+/* G?ncel Konular ? gk */
 .gk-etiket { margin-bottom: 0.25rem; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
 .gk-numara { display: inline-flex; height: 1.75rem; width: 1.75rem; shrink: 0; align-items: center; justify-content: center; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 800; color: #fff; }
 .gk-numara--buyuk { height: 2.5rem; width: 2.5rem; font-size: 1.125rem; border-radius: 0.5rem; }
@@ -2695,7 +2695,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .gk-buyuk-baslik { font-size: 1rem; font-weight: 700; line-height: 1.35; }
 .gk-buyuk-ozet { margin-top: 0.25rem; font-size: 0.8rem; line-height: 1.5; }
 
-/* ?irket Aç?l??/Kapan?? ? sg */
+/* ?irket A??l??/Kapan?? ? sg */
 .sg-etiket { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.25rem; }
 .sg-baslik { margin: 0 0 0.5rem; font-size: 1.25rem; font-weight: 800; }
 .sg-aciklama { margin-bottom: 0.75rem; font-size: 0.9rem; line-height: 1.5; }
@@ -2760,6 +2760,104 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .hm-spotlight-liste { display: flex; flex-direction: column; gap: 0.75rem; }
 .hm-asimetrik { display: grid; gap: 0.75rem; grid-template-columns: 1fr; }
 @media (min-width: 768px) { .hm-asimetrik { grid-template-columns: 1.2fr 1fr 1fr; grid-template-rows: auto auto; } .hm-asimetrik-hero { grid-row: span 2; } .hm-asimetrik-buyuk { grid-column: span 1; } }
+
+/* Yatay kayd?rma ?ubu?u ? ykc */
+.ykc-wrap { width: 100%; }
+.ykc-serit {
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 0.25rem;
+}
+.ykc-serit::-webkit-scrollbar { display: none; }
+.ykc-cubuk-alan {
+  display: flex;
+  justify-content: center;
+  margin-top: 1.25rem;
+  padding: 0 1rem;
+}
+.ykc-track {
+  position: relative;
+  width: min(280px, 55%);
+  height: 5px;
+  border-radius: 9999px;
+  background: #e2e8f0;
+  cursor: pointer;
+  overflow: hidden;
+  transition: background 0.2s ease;
+}
+.ykc-track:hover { background: #cbd5e1; }
+.ykc-thumb {
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  border-radius: 9999px;
+  cursor: grab;
+  touch-action: none;
+  transition: left 0.12s ease-out, width 0.2s ease, opacity 0.2s ease;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.15);
+}
+.ykc-thumb:active { cursor: grabbing; transition: none; }
+
+/* Zaman ?izelgesi yatay ? zc */
+.zc-yatay-baslik { margin-bottom: 1.5rem; text-align: center; }
+.zc-yatay-etiket {
+  margin-bottom: 0.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.zc-yatay-baslik-metin { margin: 0; font-weight: 800; }
+.zc-yatay-aciklama { margin-top: 0.5rem; font-size: 0.95rem; line-height: 1.6; }
+.zc-yatay-serit { gap: 1rem; scroll-snap-type: x proximity; }
+.zc-yatay-kart {
+  flex: 0 0 min(220px, 78vw);
+  scroll-snap-align: start;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  background: #fff;
+  border: 1px solid;
+  box-shadow: 0 4px 20px rgba(15, 23, 42, 0.06);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.zc-yatay-kart:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.1);
+}
+.zc-yatay-numara {
+  display: inline-flex;
+  height: 2.25rem;
+  width: 2.25rem;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 800;
+  color: #fff;
+}
+.zc-yatay-tarih {
+  display: block;
+  margin-top: 0.75rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.zc-yatay-kart-baslik {
+  margin-top: 0.5rem;
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.35;
+}
+.zc-yatay-kart-aciklama {
+  margin-top: 0.35rem;
+  font-size: 0.8rem;
+  line-height: 1.45;
+}
 
 .sp-eklenti-cerez {
   position: fixed;
