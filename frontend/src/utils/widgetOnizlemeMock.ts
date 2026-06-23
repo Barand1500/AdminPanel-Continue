@@ -198,7 +198,11 @@ function mockConfig(tip: string): WidgetConfig {
             ad: 'Başlangıç',
             fiyat: '₺999',
             aciklama: 'Küçük işletmeler için',
-            ozellikler: [{ metin: '5 sayfa', dahil: true }, { metin: 'E-posta desteği', dahil: true }],
+            ozellikler: [
+              { metin: '5 sayfa', dahil: true },
+              { metin: 'E-posta desteği', dahil: true },
+              { metin: 'API erişimi', dahil: false },
+            ],
             butonMetni: 'Seç',
             butonLink: '#',
             oneCikan: false,
@@ -208,11 +212,49 @@ function mockConfig(tip: string): WidgetConfig {
             ad: 'Profesyonel',
             fiyat: '₺2.499',
             aciklama: 'Büyüyen ekipler için',
-            ozellikler: [{ metin: 'Sınırsız sayfa', dahil: true }, { metin: 'Öncelikli destek', dahil: true }],
+            ozellikler: [
+              { metin: 'Sınırsız sayfa', dahil: true },
+              { metin: 'Öncelikli destek', dahil: true },
+              { metin: 'API erişimi', dahil: true },
+            ],
             butonMetni: 'Seç',
             butonLink: '#',
             oneCikan: true,
           },
+          {
+            id: id(),
+            ad: 'Kurumsal',
+            fiyat: '₺4.999',
+            aciklama: 'Büyük organizasyonlar',
+            ozellikler: [
+              { metin: 'Özel entegrasyon', dahil: true },
+              { metin: '7/24 destek', dahil: true },
+              { metin: 'SLA garantisi', dahil: true },
+            ],
+            butonMetni: 'İletişime Geç',
+            butonLink: '#',
+            oneCikan: false,
+          },
+        ],
+      };
+    case 'MODUL_LOGO_BLOK':
+      return {
+        modulIkon: '💳',
+        dahaFazlaMetin: '+ Daha Fazlası',
+        dahaFazlaLink: '#',
+        ikonKartlar: [
+          { id: id(), ikon: '✓', metin: 'Tüm bankalarla entegrasyon' },
+          { id: id(), ikon: '✓', metin: 'Sanal POS ve taksit desteği' },
+          { id: id(), ikon: '✓', metin: 'Güvenli ödeme altyapısı' },
+        ],
+        logoKartlar: [
+          { id: id(), etiket: 'PayTR', gorselUrl: ONIZLEME_GORSEL, link: '#' },
+          { id: id(), etiket: 'iyzico', gorselUrl: ONIZLEME_GORSEL, link: '#' },
+          { id: id(), etiket: 'Tosla', gorselUrl: ONIZLEME_GORSEL, link: '#' },
+          { id: id(), etiket: 'Ziraat', gorselUrl: ONIZLEME_GORSEL, link: '#' },
+          { id: id(), etiket: 'İş Bankası', gorselUrl: ONIZLEME_GORSEL, link: '#' },
+          { id: id(), etiket: 'ING', gorselUrl: ONIZLEME_GORSEL, link: '#' },
+          { id: id(), etiket: 'VakıfBank', gorselUrl: ONIZLEME_GORSEL, link: '#' },
         ],
       };
     case 'GALERI':
@@ -485,7 +527,9 @@ const HABER_PORTAL_TIPLERI = new Set([
 function configBirlestir(mevcut: WidgetConfig, mock: WidgetConfig, tip?: string): WidgetConfig {
   const sonuc: WidgetConfig = { ...mevcut };
 
-  if (!sonuc.metin?.trim() && mock.metin) sonuc.metin = mock.metin;
+  if (!sonuc.modulIkon && mock.modulIkon) sonuc.modulIkon = mock.modulIkon;
+  if (!sonuc.dahaFazlaMetin && mock.dahaFazlaMetin) sonuc.dahaFazlaMetin = mock.dahaFazlaMetin;
+  if (!sonuc.dahaFazlaLink && mock.dahaFazlaLink) sonuc.dahaFazlaLink = mock.dahaFazlaLink;
   if (!sonuc.solBaslik?.trim() && mock.solBaslik) sonuc.solBaslik = mock.solBaslik;
   if (!sonuc.solAciklama?.trim() && mock.solAciklama) sonuc.solAciklama = mock.solAciklama;
   if (!sonuc.haritaLat && mock.haritaLat) sonuc.haritaLat = mock.haritaLat;
@@ -507,6 +551,7 @@ function configBirlestir(mevcut: WidgetConfig, mock: WidgetConfig, tip?: string)
   sonuc.yorumlar = dizi(sonuc.yorumlar, mock.yorumlar ?? []);
   sonuc.paketler = dizi(sonuc.paketler, mock.paketler ?? []);
   sonuc.ikonKartlar = dizi(sonuc.ikonKartlar, mock.ikonKartlar ?? []);
+  sonuc.logoKartlar = dizi(sonuc.logoKartlar, mock.logoKartlar ?? []);
   sonuc.kategoriler = dizi(sonuc.kategoriler, mock.kategoriler ?? []);
   sonuc.filtreler = dizi(sonuc.filtreler, mock.filtreler ?? []);
   sonuc.timeline = dizi(sonuc.timeline, mock.timeline ?? []);
@@ -588,7 +633,9 @@ export function onizlemeMockVerisiUygula(widget: Widget): Widget {
       widget.aciklama,
       widget.tip === 'ILETISIM_FORMU'
         ? 'Sorularınız için bize ulaşın, en kısa sürede dönüş yapalım.'
-        : 'Bu bölüm önizleme amaçlı örnek içerik göstermektedir.'
+        : widget.tip === 'MODUL_LOGO_BLOK'
+          ? 'Güvenli ve hızlı ödeme altyapısı ile tüm banka ve ödeme kuruluşlarıyla entegre çalışın.'
+          : 'Bu bölüm önizleme amaçlı örnek içerik göstermektedir.'
     ),
     gorselUrl: widget.gorselUrl?.trim()
       ? widget.gorselUrl
@@ -616,6 +663,7 @@ function mockBaslik(tip: string): string {
     YORUM_KARUSEL: 'Müşteri Yorumları',
     YORUM_KARTLARI: 'Müşterilerimizin Görüşleri',
     FIYATLANDIRMA: 'Paketlerimiz',
+    MODUL_LOGO_BLOK: '1. Ödeme Sistemleri ve Finans Modülü',
     GALERI: 'Galeri',
     SSS: 'Sık Sorulan Sorular',
     REFERANSLAR: 'Referanslarımız',

@@ -41,6 +41,7 @@ export const YENI_WIDGET_TIPLERI = [
   'YORUM_KARUSEL',
   'YORUM_KARTLARI',
   'FIYATLANDIRMA',
+  'MODUL_LOGO_BLOK',
 ] as const;
 
 export const MODERN_WIDGET_TIPLERI = [
@@ -110,6 +111,7 @@ export const WIDGET_GORUNUM_GORSEL_TIPLERI = new Set([
   'YORUM_KARUSEL',
   'BLOK_OLUSTURUCU',
   'YORUM_KARTLARI',
+  'MODUL_LOGO_BLOK',
 ]);
 
 export const WIDGET_GORUNUM_HABER_TIPLERI = new Set<string>([...HABER_PORTAL_WIDGET_TIPLERI, 'SLIDER', 'BLOG_KARUSEL', 'EKIP_KARUSEL']);
@@ -128,6 +130,7 @@ export const WIDGET_GORUNUM_GRID_TIPLERI = new Set([
   'YORUM_KARUSEL',
   'YORUM_KARTLARI',
   'FIYATLANDIRMA',
+  'MODUL_LOGO_BLOK',
   'BLOK_OLUSTURUCU',
   'KARSILASTIRMA_TABLOSU',
   ...HABER_PORTAL_WIDGET_TIPLERI,
@@ -143,6 +146,7 @@ export const WIDGET_GORUNUM_METIN_TIPLERI = new Set([
   'KARSILASTIRMA_TABLOSU',
   'BLOK_OLUSTURUCU',
   'YORUM_KARTLARI',
+  'MODUL_LOGO_BLOK',
 ]);
 
 export interface WidgetGorunumAyarlari {
@@ -387,6 +391,10 @@ export interface WidgetConfig {
   timeline?: WidgetTimelineOgesi[];
   surecAdimlari?: WidgetSurecAdimi[];
   markalar?: WidgetMarkaLogosu[];
+  modulIkon?: string;
+  logoKartlar?: WidgetEtiketKarti[];
+  dahaFazlaMetin?: string;
+  dahaFazlaLink?: string;
   markaHizi?: 'yavas' | 'normal' | 'hizli';
   karsilastirmaPaketler?: WidgetKarsilastirmaPaket[];
   karsilastirmaSatirlari?: WidgetKarsilastirmaSatiri[];
@@ -529,6 +537,17 @@ export function varsayilanConfig(tip: string): WidgetConfig {
       };
     case 'FIYATLANDIRMA':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3 }, ek, paketler: [] };
+    case 'MODUL_LOGO_BLOK':
+      return {
+        yerlesim,
+        gorunum: { ...gorunum, kolonSayisi: 4, icerikDuzeni: 'sol' },
+        ek,
+        modulIkon: '💳',
+        ikonKartlar: [],
+        logoKartlar: [],
+        dahaFazlaMetin: '+ Daha Fazlası',
+        dahaFazlaLink: '',
+      };
     case 'ZAMAN_CIZELGESI':
       return { yerlesim, gorunum, ek, timeline: [] };
     case 'SUREC_ADIMLARI':

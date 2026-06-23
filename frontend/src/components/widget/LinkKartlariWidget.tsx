@@ -1,168 +1,357 @@
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetLinkOgesi } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
-import { configOkuFromWidget, gridStyle, linkKartIkonu } from './widgetHelpers';
+import { configOkuFromWidget, linkKartIkonu } from './widgetHelpers';
 
-function Baslik({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
-  if (!widget.baslik) return null;
+function renkler(cfg: WidgetConfig) {
   const g = cfg.gorunum ?? {};
+  return {
+    baslik: g.baslikRengi || 'var(--widget-baslik-renk, #0f172a)',
+    metin: g.metinRengi || '#334155',
+    vurgu: g.vurguRengi || g.baslikRengi || 'var(--color-primary, #7c3aed)',
+  };
+}
+
+function Baslik({ widget, cfg, sinif = '' }: { widget: Widget; cfg: WidgetConfig; sinif?: string }) {
+  if (!widget.baslik) return null;
+  const renk = renkler(cfg);
   return (
-    <h2
-      className={`${baslikSinifi(cfg)} mb-6 font-bold`}
-      style={{ color: g.baslikRengi || widget.yaziRenk || undefined }}
-    >
+    <h2 className={`${baslikSinifi(cfg)} lk-baslik ${sinif}`.trim()} style={{ color: renk.baslik }}>
       {widget.baslik}
     </h2>
   );
 }
 
-function LinkOge({
+function LinkHref({
   l,
-  cfg,
-  sinif,
-  ikonSinif,
+  className,
+  style,
+  children,
 }: {
   l: WidgetLinkOgesi;
-  cfg: WidgetConfig;
-  sinif: string;
-  ikonSinif: string;
+  className?: string;
+  style?: CSSProperties;
+  children: ReactNode;
 }) {
-  const g = cfg.gorunum ?? {};
+  const href = l.link || '#';
+  if (href.startsWith('/')) {
+    return (
+      <Link to={href} className={className} style={style}>
+        {children}
+      </Link>
+    );
+  }
   return (
-    <a key={l.id} href={l.link || '#'} className={sinif}>
-      <span className={ikonSinif} aria-hidden>
-        {linkKartIkonu(l.ikon)}
-      </span>
-      <span
-        className="min-w-0 flex-1 text-sm font-medium"
-        style={{ color: g.metinRengi || undefined }}
-      >
-        {l.metin}
-      </span>
-      <span className="shrink-0 text-slate-400">→</span>
+    <a href={href} className={className} style={style}>
+      {children}
     </a>
   );
 }
 
-function IkonGrid({ widget, cfg, linkler, kolon }: { widget: Widget; cfg: WidgetConfig; linkler: WidgetLinkOgesi[]; kolon: number }) {
+const METRO_BOYUT: Record<number, string> = {
+  0: 'lk-metro-buyuk',
+  3: 'lk-metro-genis',
+  5: 'lk-metro-yuksek',
+};
+
+function metroRenk(vurgu: string, i: number) {
+  const tonlar = [vurgu, '#0ea5e9', '#8b5cf6', '#f59e0b', '#10b981', '#ec4899'];
+  return tonlar[i % tonlar.length];
+}
+
+function MetroTile({
+  widget,
+  cfg,
+  linkler,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  linkler: WidgetLinkOgesi[];
+}) {
+  const renk = renkler(cfg);
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
-        {linkler.map((l) => (
-          <LinkOge
+      <div className="lk-metro-grid">
+        {linkler.map((l, i) => (
+          <LinkHref
             key={l.id}
             l={l}
-            cfg={cfg}
-            sinif="flex items-center gap-3 rounded-xl bg-white p-4 shadow-sm transition hover:shadow-md"
-            ikonSinif="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-teal-100 text-lg"
-          />
-        ))}
-      </div>
-    </>
-  );
-}
-
-function CamPanel({ widget, cfg, linkler, kolon }: { widget: Widget; cfg: WidgetConfig; linkler: WidgetLinkOgesi[]; kolon: number }) {
-  return (
-    <div className="rounded-3xl border border-white/50 bg-gradient-to-br from-sky-50 to-blue-100 p-6 shadow-lg backdrop-blur-sm md:p-8">
-      <Baslik widget={widget} cfg={cfg} />
-      <div
-        className="grid gap-3 rounded-2xl border border-white/60 bg-white/40 p-4 backdrop-blur-md"
-        style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}
-      >
-        {linkler.map((l) => (
-          <LinkOge
-            key={l.id}
-            l={l}
-            cfg={cfg}
-            sinif="flex items-center gap-3 rounded-xl bg-white/70 p-4 transition hover:bg-white"
-            ikonSinif="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sky-100 text-lg"
-          />
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function DikeyListe({ widget, cfg, linkler }: { widget: Widget; cfg: WidgetConfig; linkler: WidgetLinkOgesi[] }) {
-  return (
-    <>
-      <Baslik widget={widget} cfg={cfg} />
-      <div className="mx-auto max-w-xl divide-y divide-teal-100 rounded-2xl border border-teal-100 bg-white">
-        {linkler.map((l) => (
-          <LinkOge
-            key={l.id}
-            l={l}
-            cfg={cfg}
-            sinif="flex items-center gap-4 px-5 py-4 transition hover:bg-teal-50/50"
-            ikonSinif="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-teal-50 text-base"
-          />
-        ))}
-      </div>
-    </>
-  );
-}
-
-function MorKare({ widget, cfg, linkler, kolon }: { widget: Widget; cfg: WidgetConfig; linkler: WidgetLinkOgesi[]; kolon: number }) {
-  return (
-    <>
-      <Baslik widget={widget} cfg={cfg} />
-      <div className="grid gap-4" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
-        {linkler.map((l) => (
-          <a
-            key={l.id}
-            href={l.link || '#'}
-            className="flex aspect-square flex-col items-center justify-center gap-3 rounded-2xl border-2 border-violet-300 bg-violet-50 p-4 text-center transition hover:border-violet-500 hover:bg-violet-100"
+            className={`lk-metro-kutu ${METRO_BOYUT[i] ?? ''}`}
+            style={{
+              background: `linear-gradient(145deg, ${metroRenk(renk.vurgu, i)}ee, ${metroRenk(renk.vurgu, i)}bb)`,
+            }}
           >
-            <span className="text-2xl">{linkKartIkonu(l.ikon)}</span>
-            <span className="text-sm font-semibold text-violet-900">{l.metin}</span>
-          </a>
+            <span className="lk-metro-ikon">{linkKartIkonu(l.ikon)}</span>
+            <span className="lk-metro-metin">{l.metin}</span>
+          </LinkHref>
         ))}
       </div>
     </>
   );
 }
 
-function KoyuIkon({ widget, cfg, linkler, kolon }: { widget: Widget; cfg: WidgetConfig; linkler: WidgetLinkOgesi[]; kolon: number }) {
+function ChipSerit({
+  widget,
+  cfg,
+  linkler,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  linkler: WidgetLinkOgesi[];
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const renk = renkler(cfg);
+
+  function kaydir(yon: 'sol' | 'sag') {
+    const el = scrollRef.current;
+    if (!el) return;
+    el.scrollBy({ left: yon === 'sol' ? -240 : 240, behavior: 'smooth' });
+  }
+
   return (
-    <div className="rounded-2xl bg-slate-900 p-6 md:p-8">
-      <Baslik widget={widget} cfg={cfg} />
-      <div className="grid gap-4" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
+    <>
+      <div className="lk-chip-baslik">
+        <Baslik widget={widget} cfg={cfg} />
+        {linkler.length > 2 && (
+          <div className="lk-chip-nav">
+            <button type="button" className="lk-chip-ok" onClick={() => kaydir('sol')} aria-label="Önceki">
+              ‹
+            </button>
+            <button type="button" className="lk-chip-ok" onClick={() => kaydir('sag')} aria-label="Sonraki">
+              ›
+            </button>
+          </div>
+        )}
+      </div>
+      <div ref={scrollRef} className="lk-chip-scroll">
         {linkler.map((l) => (
-          <a
+          <LinkHref
             key={l.id}
-            href={l.link || '#'}
-            className="flex flex-col items-center gap-2 rounded-xl border border-slate-700 bg-slate-800 p-5 text-center transition hover:border-sky-500"
+            l={l}
+            className="lk-chip"
+            style={{
+              borderColor: `${renk.vurgu}44`,
+              color: renk.metin,
+              background: `${renk.vurgu}10`,
+            }}
           >
-            <span className="flex h-12 w-12 items-center justify-center rounded-full bg-slate-700 text-xl text-sky-400">
-              {linkKartIkonu(l.ikon)}
+            <span style={{ color: renk.vurgu }}>{linkKartIkonu(l.ikon)}</span>
+            {l.metin}
+          </LinkHref>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function SidebarNav({
+  widget,
+  cfg,
+  linkler,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  linkler: WidgetLinkOgesi[];
+}) {
+  const [aktif, setAktif] = useState(0);
+  const renk = renkler(cfg);
+  const secili = linkler[aktif] ?? linkler[0];
+
+  return (
+    <>
+      <Baslik widget={widget} cfg={cfg} />
+      <div className="lk-sidebar">
+        <nav className="lk-sidebar-nav" aria-label="Hızlı linkler">
+          {linkler.map((l, i) => (
+            <button
+              key={l.id}
+              type="button"
+              className={`lk-sidebar-tus${i === aktif ? ' lk-sidebar-tus-aktif' : ''}`}
+              style={
+                i === aktif
+                  ? { borderColor: renk.vurgu, color: renk.vurgu, background: `${renk.vurgu}10` }
+                  : { color: renk.metin }
+              }
+              onClick={() => setAktif(i)}
+            >
+              <span className="lk-sidebar-cizgi" style={{ background: renk.vurgu }} />
+              <span>{linkKartIkonu(l.ikon)}</span>
+              <span>{l.metin}</span>
+            </button>
+          ))}
+        </nav>
+        {secili && (
+          <div className="lk-sidebar-panel" style={{ borderColor: `${renk.vurgu}33` }}>
+            <span className="lk-sidebar-panel-ikon" style={{ color: renk.vurgu }}>
+              {linkKartIkonu(secili.ikon)}
             </span>
-            <span className="text-sm font-medium text-slate-200">{l.metin}</span>
-          </a>
+            <h3 style={{ color: renk.baslik }}>{secili.metin}</h3>
+            <p className="lk-sidebar-panel-yol" style={{ color: renk.metin }}>
+              {secili.link || '/'}
+            </p>
+            <LinkHref l={secili} className="lk-sidebar-git" style={{ background: renk.vurgu }}>
+              Sayfaya git →
+            </LinkHref>
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function OrbitIkon({
+  widget,
+  cfg,
+  linkler,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  linkler: WidgetLinkOgesi[];
+}) {
+  const renk = renkler(cfg);
+  const n = linkler.length;
+
+  return (
+    <div className="lk-orbit-alan">
+      <div className="lk-orbit-merkez">
+        <Baslik widget={widget} cfg={cfg} sinif="lk-baslik-orta" />
+      </div>
+      <div className="lk-orbit-halka" style={{ '--lk-orbit-n': n } as CSSProperties}>
+        {linkler.map((l, i) => (
+          <LinkHref
+            key={l.id}
+            l={l}
+            className="lk-orbit-oge"
+            style={{ '--lk-orbit-i': i } as CSSProperties}
+          >
+            <span className="lk-orbit-kart" style={{ borderColor: `${renk.vurgu}44`, color: renk.metin }}>
+              <span className="lk-orbit-ikon" style={{ color: renk.vurgu }}>
+                {linkKartIkonu(l.ikon)}
+              </span>
+              <span className="lk-orbit-metin">{l.metin}</span>
+            </span>
+          </LinkHref>
+        ))}
+      </div>
+      <div className="lk-orbit-mobil">
+        {linkler.map((l) => (
+          <LinkHref
+            key={l.id}
+            l={l}
+            className="lk-orbit-mobil-oge"
+            style={{ borderColor: `${renk.vurgu}33`, color: renk.metin }}
+          >
+            <span style={{ color: renk.vurgu }}>{linkKartIkonu(l.ikon)}</span>
+            {l.metin}
+            <span className="lk-ok">→</span>
+          </LinkHref>
         ))}
       </div>
     </div>
   );
 }
 
-function AltinCizgi({ widget, cfg, linkler }: { widget: Widget; cfg: WidgetConfig; linkler: WidgetLinkOgesi[] }) {
+function KartDestesi({
+  widget,
+  cfg,
+  linkler,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  linkler: WidgetLinkOgesi[];
+}) {
+  const renk = renkler(cfg);
+
+  return (
+    <>
+      <Baslik widget={widget} cfg={cfg} sinif="lk-baslik-orta" />
+      <div className="lk-deste-wrap">
+        <div className="lk-deste" style={{ '--lk-deste-n': linkler.length } as CSSProperties}>
+          {linkler.map((l, i) => (
+            <LinkHref
+              key={l.id}
+              l={l}
+              className="lk-deste-kart"
+              style={
+                {
+                  '--lk-deste-i': i,
+                  borderColor: `${renk.vurgu}44`,
+                  zIndex: linkler.length - i,
+                } as CSSProperties
+              }
+            >
+              <span className="lk-deste-ikon" style={{ color: renk.vurgu }}>
+                {linkKartIkonu(l.ikon)}
+              </span>
+              <span className="lk-deste-metin" style={{ color: renk.baslik }}>
+                {l.metin}
+              </span>
+              <span className="lk-ok" style={{ color: renk.vurgu }}>
+                →
+              </span>
+            </LinkHref>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function AccordionListe({
+  widget,
+  cfg,
+  linkler,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  linkler: WidgetLinkOgesi[];
+}) {
+  const [acikId, setAcikId] = useState<string | null>(linkler[0]?.id ?? null);
+  const renk = renkler(cfg);
+
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="mx-auto max-w-2xl">
-        {linkler.map((l) => (
-          <a
-            key={l.id}
-            href={l.link || '#'}
-            className="group flex items-center gap-4 border-b-2 border-amber-200 py-4 transition hover:border-amber-500"
-          >
-            <span className="text-lg text-amber-600">{linkKartIkonu(l.ikon)}</span>
-            <span className="flex-1 text-sm font-semibold text-slate-800 group-hover:text-amber-700">{l.metin}</span>
-            <span className="text-amber-400 opacity-0 transition group-hover:opacity-100">→</span>
-          </a>
-        ))}
+      <div className="lk-accordion">
+        {linkler.map((l) => {
+          const acik = acikId === l.id;
+          return (
+            <div
+              key={l.id}
+              className={`lk-accordion-oge${acik ? ' lk-accordion-oge-acik' : ''}`}
+              style={{ borderColor: acik ? renk.vurgu : 'rgba(15,23,42,0.1)' }}
+            >
+              <button
+                type="button"
+                className="lk-accordion-tus"
+                aria-expanded={acik}
+                onClick={() => setAcikId(acik ? null : l.id)}
+              >
+                <span className="lk-accordion-ikon" style={{ color: renk.vurgu }}>
+                  {linkKartIkonu(l.ikon)}
+                </span>
+                <span className="lk-accordion-baslik" style={{ color: renk.baslik }}>
+                  {l.metin}
+                </span>
+                <span className="lk-accordion-ok" style={{ color: renk.vurgu }}>
+                  {acik ? '−' : '+'}
+                </span>
+              </button>
+              {acik && (
+                <div className="lk-accordion-icerik">
+                  <p style={{ color: renk.metin }}>Hedef: {l.link || '/'}</p>
+                  <LinkHref l={l} className="lk-accordion-git" style={{ color: renk.vurgu }}>
+                    {l.metin} sayfasına git →
+                  </LinkHref>
+                </div>
+              )}
+            </div>
+          );
+        })}
       </div>
     </>
   );
@@ -171,21 +360,35 @@ function AltinCizgi({ widget, cfg, linkler }: { widget: Widget; cfg: WidgetConfi
 export function LinkKartlariWidget({ widget }: { widget: Widget }) {
   const cfg = configOkuFromWidget(widget);
   const linkler = cfg.linkler ?? [];
-  const kolon = cfg.gorunum?.kolonSayisi ?? 5;
   const gt = widgetGorunumTipiAl(widget);
 
   if (linkler.length === 0) return null;
 
-  const ortak = { widget, cfg, linkler, kolon };
+  const ortak = { widget, cfg, linkler };
+  let icerik: ReactNode;
 
-  return (
-    <WidgetKabuk widget={widget}>
-      {gt === 'cam-panel' && <CamPanel {...ortak} />}
-      {gt === 'dikey-liste' && <DikeyListe widget={widget} cfg={cfg} linkler={linkler} />}
-      {gt === 'mor-kare' && <MorKare {...ortak} />}
-      {gt === 'koyu-ikon' && <KoyuIkon {...ortak} />}
-      {gt === 'altin-cizgi' && <AltinCizgi widget={widget} cfg={cfg} linkler={linkler} />}
-      {gt === 'ikon-grid' && <IkonGrid {...ortak} />}
-    </WidgetKabuk>
-  );
+  switch (gt) {
+    case 'metro-tile':
+      icerik = <MetroTile {...ortak} />;
+      break;
+    case 'chip-serit':
+      icerik = <ChipSerit {...ortak} />;
+      break;
+    case 'sidebar-nav':
+      icerik = <SidebarNav {...ortak} />;
+      break;
+    case 'orbit-ikon':
+      icerik = <OrbitIkon {...ortak} />;
+      break;
+    case 'kart-destesi':
+      icerik = <KartDestesi {...ortak} />;
+      break;
+    case 'accordion-liste':
+      icerik = <AccordionListe {...ortak} />;
+      break;
+    default:
+      icerik = <MetroTile {...ortak} />;
+  }
+
+  return <WidgetKabuk widget={widget}>{icerik}</WidgetKabuk>;
 }

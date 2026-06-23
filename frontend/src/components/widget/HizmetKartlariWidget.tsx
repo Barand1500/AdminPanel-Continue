@@ -1,8 +1,10 @@
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetKartOgesi } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
-import { configOkuFromWidget, gridStyle } from './widgetHelpers';
+import { configOkuFromWidget } from './widgetHelpers';
 import { useSiteDil } from '@/contexts/SiteDilContext';
 
 const eskiIkonHaritasi: Record<string, string> = {
@@ -20,19 +22,32 @@ function ikonGoster(ikon: string): string {
   return eskiIkonHaritasi[ikon] ?? ikon;
 }
 
-function Baslik({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
+function renkler(cfg: WidgetConfig) {
+  const g = cfg.gorunum ?? {};
+  return {
+    baslik: g.baslikRengi || 'var(--widget-baslik-renk, #0f172a)',
+    metin: g.metinRengi || '#64748b',
+    vurgu: g.vurguRengi || g.baslikRengi || 'var(--color-primary, #7c3aed)',
+  };
+}
+
+function Baslik({ widget, cfg, ortala = true }: { widget: Widget; cfg: WidgetConfig; ortala?: boolean }) {
+  const renk = renkler(cfg);
+  if (!widget.baslik && !widget.altBaslik && !widget.aciklama) return null;
   return (
-    <div className="mx-auto max-w-2xl text-center">
+    <div className={ortala ? 'hk-baslik hk-baslik-orta' : 'hk-baslik'}>
       {widget.altBaslik && (
-        <p className="text-sm font-semibold uppercase tracking-wide text-primary">{widget.altBaslik}</p>
+        <p className="hk-alt-baslik" style={{ color: renk.vurgu }}>
+          {widget.altBaslik}
+        </p>
       )}
       {widget.baslik && (
-        <h2 className={`${baslikSinifi(cfg)} font-bold`} style={{ color: cfg.gorunum?.baslikRengi }}>
+        <h2 className={`${baslikSinifi(cfg)} hk-baslik-metin`} style={{ color: renk.baslik }}>
           {widget.baslik}
         </h2>
       )}
       {widget.aciklama && (
-        <p className="mt-3 text-slate-600" style={{ color: cfg.gorunum?.metinRengi }}>
+        <p className="hk-aciklama" style={{ color: renk.metin }}>
           {widget.aciklama}
         </p>
       )}
@@ -40,128 +55,65 @@ function Baslik({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
   );
 }
 
-function KartButon({ kart, cevir }: { kart: WidgetKartOgesi; cevir: (k: string, f: string) => string }) {
+function KartButon({
+  kart,
+  cevir,
+  sinif = 'hk-kart-cta',
+  vurgu,
+}: {
+  kart: WidgetKartOgesi;
+  cevir: (k: string, f: string) => string;
+  sinif?: string;
+  vurgu?: string;
+}) {
   if (!kart.link) return null;
+  const metin = `${kart.butonMetni || cevir('site.detaylariGor', 'Detayları Gör')} →`;
+  const stil = vurgu ? { backgroundColor: vurgu } : undefined;
+  if (kart.link.startsWith('/')) {
+    return (
+      <Link to={kart.link} className={sinif} style={stil}>
+        {metin}
+      </Link>
+    );
+  }
   return (
-    <a
-      href={kart.link}
-      className="mt-5 inline-block rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-white transition hover:opacity-90"
-    >
-      {kart.butonMetni || cevir('site.detaylariGor', 'Detayları Gör')} →
+    <a href={kart.link} className={sinif} style={stil}>
+      {metin}
     </a>
   );
 }
 
-function BeyazGrid({
-  widget,
+function KartGovde({
+  kart,
   cfg,
-  kartlar,
-  kolon,
   cevir,
+  kompakt,
 }: {
-  widget: Widget;
+  kart: WidgetKartOgesi;
   cfg: WidgetConfig;
-  kartlar: WidgetKartOgesi[];
-  kolon: number;
   cevir: (k: string, f: string) => string;
+  kompakt?: boolean;
 }) {
+  const renk = renkler(cfg);
   return (
     <>
-      <Baslik widget={widget} cfg={cfg} />
-      <div className="mt-10 grid gap-6" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
-        {kartlar.map((kart) => (
-          <article key={kart.id} className="flex flex-col rounded-xl border border-slate-200 bg-white p-6 text-center shadow-sm">
-            <span className="text-4xl text-primary">{ikonGoster(kart.ikon)}</span>
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">{kart.baslik}</h3>
-            <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{kart.aciklama}</p>
-            <KartButon kart={kart} cevir={cevir} />
-          </article>
-        ))}
-      </div>
+      <span className="hk-kart-ikon" style={{ color: renk.vurgu }}>
+        {ikonGoster(kart.ikon)}
+      </span>
+      <h3 className="hk-kart-baslik" style={{ color: renk.baslik }}>
+        {kart.baslik}
+      </h3>
+      {!kompakt && kart.aciklama && (
+        <p className="hk-kart-aciklama" style={{ color: renk.metin }}>
+          {kart.aciklama}
+        </p>
+      )}
+      <KartButon kart={kart} cevir={cevir} vurgu={renk.vurgu} />
     </>
   );
 }
 
-function CamYuzey({
-  widget,
-  cfg,
-  kartlar,
-  kolon,
-  cevir,
-}: {
-  widget: Widget;
-  cfg: WidgetConfig;
-  kartlar: WidgetKartOgesi[];
-  kolon: number;
-  cevir: (k: string, f: string) => string;
-}) {
-  return (
-    <div className="rounded-3xl bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 p-6 md:p-10">
-      <Baslik widget={widget} cfg={cfg} />
-      <div className="mt-10 grid gap-5" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
-        {kartlar.map((kart) => (
-          <article
-            key={kart.id}
-            className="flex flex-col rounded-2xl border border-white/60 bg-white/50 p-6 text-center shadow-lg backdrop-blur-md"
-          >
-            <span className="text-4xl">{ikonGoster(kart.ikon)}</span>
-            <h3 className="mt-4 text-lg font-semibold text-slate-900">{kart.baslik}</h3>
-            <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-600">{kart.aciklama}</p>
-            <KartButon kart={kart} cevir={cevir} />
-          </article>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function KoyuPremium({
-  widget,
-  cfg,
-  kartlar,
-  kolon,
-  cevir,
-}: {
-  widget: Widget;
-  cfg: WidgetConfig;
-  kartlar: WidgetKartOgesi[];
-  kolon: number;
-  cevir: (k: string, f: string) => string;
-}) {
-  return (
-    <div className="rounded-2xl bg-slate-900 px-6 py-12 md:px-10">
-      <div className="mx-auto max-w-2xl text-center">
-        {widget.altBaslik && (
-          <p className="text-sm font-semibold uppercase tracking-wide text-sky-400">{widget.altBaslik}</p>
-        )}
-        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-white`}>{widget.baslik}</h2>}
-        {widget.aciklama && <p className="mt-3 text-slate-400">{widget.aciklama}</p>}
-      </div>
-      <div className="mt-10 grid gap-5" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
-        {kartlar.map((kart) => (
-          <article
-            key={kart.id}
-            className="flex flex-col rounded-xl border border-slate-700 bg-slate-800/80 p-6 text-center"
-          >
-            <span className="text-4xl drop-shadow-[0_0_12px_rgba(56,189,248,0.6)]">{ikonGoster(kart.ikon)}</span>
-            <h3 className="mt-4 text-lg font-semibold text-white">{kart.baslik}</h3>
-            <p className="mt-2 flex-1 text-sm leading-relaxed text-slate-400">{kart.aciklama}</p>
-            {kart.link && (
-              <a
-                href={kart.link}
-                className="mt-5 inline-block rounded-lg bg-sky-500 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-sky-400"
-              >
-                {kart.butonMetni || cevir('site.detaylariGor', 'Detayları Gör')} →
-              </a>
-            )}
-          </article>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function YesilCizgi({
+function MasonryDuvar({
   widget,
   cfg,
   kartlar,
@@ -172,68 +124,18 @@ function YesilCizgi({
   kartlar: WidgetKartOgesi[];
   cevir: (k: string, f: string) => string;
 }) {
+  const renk = renkler(cfg);
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="mt-10 flex flex-col gap-4">
-        {kartlar.map((kart) => (
-          <article
-            key={kart.id}
-            className="flex flex-col rounded-r-xl border border-l-4 border-l-emerald-500 border-slate-200 bg-white p-5 text-left shadow-sm sm:flex-row sm:items-center sm:gap-5"
-          >
-            <span className="text-3xl text-emerald-600">{ikonGoster(kart.ikon)}</span>
-            <div className="min-w-0 flex-1">
-              <h3 className="text-lg font-semibold text-slate-900">{kart.baslik}</h3>
-              <p className="mt-1 text-sm leading-relaxed text-slate-600">{kart.aciklama}</p>
-            </div>
-            {kart.link && (
-              <a
-                href={kart.link}
-                className="shrink-0 text-sm font-semibold text-emerald-600 hover:text-emerald-700"
-              >
-                {kart.butonMetni || cevir('site.detaylariGor', 'Detayları Gör')} →
-              </a>
-            )}
-          </article>
-        ))}
-      </div>
-    </>
-  );
-}
-
-const GRADIENT_KART_RENK = [
-  'from-violet-50 to-purple-100 border-violet-200',
-  'from-indigo-50 to-blue-100 border-indigo-200',
-  'from-fuchsia-50 to-pink-100 border-fuchsia-200',
-  'from-violet-50 to-indigo-100 border-violet-200',
-];
-
-function GradientKart({
-  widget,
-  cfg,
-  kartlar,
-  kolon,
-  cevir,
-}: {
-  widget: Widget;
-  cfg: WidgetConfig;
-  kartlar: WidgetKartOgesi[];
-  kolon: number;
-  cevir: (k: string, f: string) => string;
-}) {
-  return (
-    <>
-      <Baslik widget={widget} cfg={cfg} />
-      <div className="mt-10 grid gap-5" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
+      <div className="hk-masonry">
         {kartlar.map((kart, i) => (
           <article
             key={kart.id}
-            className={`flex flex-col rounded-2xl border bg-gradient-to-br p-6 text-center ${GRADIENT_KART_RENK[i % GRADIENT_KART_RENK.length]}`}
+            className={`hk-masonry-kart hk-masonry-kart-${(i % 3) + 1}`}
+            style={{ borderColor: `${renk.vurgu}22` }}
           >
-            <span className="text-4xl">{ikonGoster(kart.ikon)}</span>
-            <h3 className="mt-4 text-lg font-semibold text-violet-900">{kart.baslik}</h3>
-            <p className="mt-2 flex-1 text-sm leading-relaxed text-violet-700/80">{kart.aciklama}</p>
-            <KartButon kart={kart} cevir={cevir} />
+            <KartGovde kart={kart} cfg={cfg} cevir={cevir} />
           </article>
         ))}
       </div>
@@ -241,7 +143,7 @@ function GradientKart({
   );
 }
 
-function YatayListe({
+function HoverFlip({
   widget,
   cfg,
   kartlar,
@@ -252,24 +154,237 @@ function YatayListe({
   kartlar: WidgetKartOgesi[];
   cevir: (k: string, f: string) => string;
 }) {
+  const renk = renkler(cfg);
+  const kolon = cfg.gorunum?.kolonSayisi ?? 3;
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="mx-auto mt-10 max-w-3xl divide-y divide-slate-200 rounded-2xl border border-slate-200 bg-white">
+      <div className={`hk-flip-grid hk-flip-grid-${Math.min(kolon, 4)}`}>
         {kartlar.map((kart) => (
-          <article key={kart.id} className="flex items-start gap-4 p-5 text-left sm:items-center">
-            <span className="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-teal-50 text-2xl">
-              {ikonGoster(kart.ikon)}
-            </span>
-            <div className="min-w-0 flex-1">
-              <h3 className="font-semibold text-slate-900">{kart.baslik}</h3>
-              <p className="mt-1 text-sm text-slate-600">{kart.aciklama}</p>
+          <article key={kart.id} className="hk-flip-kart">
+            <div className="hk-flip-ic">
+              <div
+                className="hk-flip-on"
+                style={{ background: `linear-gradient(145deg, ${renk.vurgu}12, ${renk.vurgu}28)` }}
+              >
+                <span className="hk-flip-ikon" style={{ color: renk.vurgu }}>
+                  {ikonGoster(kart.ikon)}
+                </span>
+                <h3 style={{ color: renk.baslik }}>{kart.baslik}</h3>
+              </div>
+              <div className="hk-flip-arka" style={{ background: renk.vurgu }}>
+                <p>{kart.aciklama}</p>
+                <KartButon kart={kart} cevir={cevir} sinif="hk-kart-cta hk-kart-cta-acik" />
+              </div>
             </div>
-            {kart.link && (
-              <a href={kart.link} className="shrink-0 text-sm font-medium text-teal-600 hover:underline">
-                {kart.butonMetni || cevir('site.detaylariGor', 'Detay')} →
-              </a>
-            )}
+          </article>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function SekmeliPanel({
+  widget,
+  cfg,
+  kartlar,
+  cevir,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  kartlar: WidgetKartOgesi[];
+  cevir: (k: string, f: string) => string;
+}) {
+  const [aktif, setAktif] = useState(0);
+  const renk = renkler(cfg);
+  const secili = kartlar[aktif] ?? kartlar[0];
+
+  return (
+    <>
+      <Baslik widget={widget} cfg={cfg} />
+      <div className="hk-sekme-wrap">
+        <div className="hk-sekme-liste" role="tablist">
+          {kartlar.map((kart, i) => (
+            <button
+              key={kart.id}
+              type="button"
+              role="tab"
+              aria-selected={i === aktif}
+              className={`hk-sekme-tus${i === aktif ? ' hk-sekme-tus-aktif' : ''}`}
+              style={
+                i === aktif
+                  ? { borderColor: renk.vurgu, color: renk.vurgu, background: `${renk.vurgu}12` }
+                  : undefined
+              }
+              onClick={() => setAktif(i)}
+            >
+              <span>{ikonGoster(kart.ikon)}</span>
+              <span>{kart.baslik}</span>
+            </button>
+          ))}
+        </div>
+        {secili && (
+          <div
+            className="hk-sekme-panel"
+            role="tabpanel"
+            style={{ borderColor: `${renk.vurgu}33` }}
+          >
+            <span className="hk-sekme-panel-ikon" style={{ color: renk.vurgu }}>
+              {ikonGoster(secili.ikon)}
+            </span>
+            <h3 style={{ color: renk.baslik }}>{secili.baslik}</h3>
+            <p style={{ color: renk.metin }}>{secili.aciklama}</p>
+            <KartButon kart={secili} cevir={cevir} vurgu={renk.vurgu} />
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function OrbitDuzen({
+  widget,
+  cfg,
+  kartlar,
+  cevir,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  kartlar: WidgetKartOgesi[];
+  cevir: (k: string, f: string) => string;
+}) {
+  const renk = renkler(cfg);
+  const n = kartlar.length;
+
+  return (
+    <>
+      <div className="hk-orbit-alan">
+        <div className="hk-orbit-merkez">
+          <Baslik widget={widget} cfg={cfg} ortala />
+        </div>
+        <div className="hk-orbit-halka" style={{ '--hk-orbit-n': n } as CSSProperties}>
+          {kartlar.map((kart, i) => (
+            <article
+              key={kart.id}
+              className="hk-orbit-oge"
+              style={{ '--hk-orbit-i': i } as CSSProperties}
+            >
+              <div className="hk-orbit-kart" style={{ borderColor: `${renk.vurgu}44` }}>
+                <span style={{ color: renk.vurgu }}>{ikonGoster(kart.ikon)}</span>
+                <h3 style={{ color: renk.baslik }}>{kart.baslik}</h3>
+                <p style={{ color: renk.metin }}>{kart.aciklama}</p>
+                <KartButon kart={kart} cevir={cevir} sinif="hk-kart-cta hk-kart-cta-kucuk" vurgu={renk.vurgu} />
+              </div>
+            </article>
+          ))}
+        </div>
+        <div className="hk-orbit-mobil-liste">
+          {kartlar.map((kart) => (
+            <article key={kart.id} className="hk-orbit-mobil-kart" style={{ borderColor: `${renk.vurgu}33` }}>
+              <KartGovde kart={kart} cfg={cfg} cevir={cevir} />
+            </article>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function HeroMiniGrid({
+  widget,
+  cfg,
+  kartlar,
+  cevir,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  kartlar: WidgetKartOgesi[];
+  cevir: (k: string, f: string) => string;
+}) {
+  const renk = renkler(cfg);
+  const [hero, ...mini] = kartlar;
+  const kolon = Math.min(cfg.gorunum?.kolonSayisi ?? 3, 4);
+
+  return (
+    <>
+      <Baslik widget={widget} cfg={cfg} />
+      <div className="hk-hero-grid">
+        <article
+          className="hk-hero-kart"
+          style={{ background: `linear-gradient(135deg, ${renk.vurgu}18, ${renk.vurgu}08)` }}
+        >
+          <span className="hk-hero-ikon" style={{ color: renk.vurgu }}>
+            {ikonGoster(hero.ikon)}
+          </span>
+          <h3 className="hk-hero-baslik" style={{ color: renk.baslik }}>
+            {hero.baslik}
+          </h3>
+          <p className="hk-hero-aciklama" style={{ color: renk.metin }}>
+            {hero.aciklama}
+          </p>
+          <KartButon kart={hero} cevir={cevir} sinif="hk-kart-cta hk-kart-cta-buyuk" vurgu={renk.vurgu} />
+        </article>
+        {mini.length > 0 && (
+          <div className={`hk-mini-grid hk-mini-grid-${kolon}`}>
+            {mini.map((kart) => (
+              <article key={kart.id} className="hk-mini-kart" style={{ borderColor: `${renk.vurgu}22` }}>
+                <span style={{ color: renk.vurgu }}>{ikonGoster(kart.ikon)}</span>
+                <h4 style={{ color: renk.baslik }}>{kart.baslik}</h4>
+                <p style={{ color: renk.metin }}>{kart.aciklama}</p>
+                <KartButon kart={kart} cevir={cevir} sinif="hk-kart-cta hk-kart-cta-kucuk" vurgu={renk.vurgu} />
+              </article>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function YataySerit({
+  widget,
+  cfg,
+  kartlar,
+  cevir,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  kartlar: WidgetKartOgesi[];
+  cevir: (k: string, f: string) => string;
+}) {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const renk = renkler(cfg);
+
+  function kaydir(yon: 'sol' | 'sag') {
+    const el = scrollRef.current;
+    if (!el) return;
+    const miktar = Math.min(el.clientWidth * 0.85, 360);
+    el.scrollBy({ left: yon === 'sol' ? -miktar : miktar, behavior: 'smooth' });
+  }
+
+  return (
+    <>
+      <div className="hk-serit-baslik">
+        <Baslik widget={widget} cfg={cfg} ortala={false} />
+        {kartlar.length > 1 && (
+          <div className="hk-serit-nav">
+            <button type="button" className="hk-serit-ok" onClick={() => kaydir('sol')} aria-label="Önceki">
+              ‹
+            </button>
+            <button type="button" className="hk-serit-ok" onClick={() => kaydir('sag')} aria-label="Sonraki">
+              ›
+            </button>
+          </div>
+        )}
+      </div>
+      <div ref={scrollRef} className="hk-serit-scroll">
+        {kartlar.map((kart) => (
+          <article
+            key={kart.id}
+            className="hk-serit-kart"
+            style={{ borderColor: `${renk.vurgu}33`, boxShadow: `0 12px 32px ${renk.vurgu}14` }}
+          >
+            <KartGovde kart={kart} cfg={cfg} cevir={cevir} />
           </article>
         ))}
       </div>
@@ -285,21 +400,35 @@ export function HizmetKartlariWidget({ widget }: HizmetKartlariWidgetProps) {
   const { cevir } = useSiteDil();
   const cfg = configOkuFromWidget(widget);
   const kartlar = cfg.kartlar ?? [];
-  const kolon = cfg.gorunum?.kolonSayisi ?? 3;
   const gt = widgetGorunumTipiAl(widget);
 
   if (kartlar.length === 0) return null;
 
   const ortak = { widget, cfg, kartlar, cevir };
+  let icerik: ReactNode;
 
-  return (
-    <WidgetKabuk widget={widget}>
-      {gt === 'cam-yuzey' && <CamYuzey {...ortak} kolon={kolon} />}
-      {gt === 'koyu-premium' && <KoyuPremium {...ortak} kolon={kolon} />}
-      {gt === 'yesil-cizgi' && <YesilCizgi {...ortak} />}
-      {gt === 'gradient-kart' && <GradientKart {...ortak} kolon={kolon} />}
-      {gt === 'yatay-liste' && <YatayListe {...ortak} />}
-      {gt === 'beyaz-grid' && <BeyazGrid {...ortak} kolon={kolon} />}
-    </WidgetKabuk>
-  );
+  switch (gt) {
+    case 'masonry-duvar':
+      icerik = <MasonryDuvar {...ortak} />;
+      break;
+    case 'hover-flip':
+      icerik = <HoverFlip {...ortak} />;
+      break;
+    case 'sekmeli-panel':
+      icerik = <SekmeliPanel {...ortak} />;
+      break;
+    case 'orbit-duzen':
+      icerik = <OrbitDuzen {...ortak} />;
+      break;
+    case 'hero-mini-grid':
+      icerik = <HeroMiniGrid {...ortak} />;
+      break;
+    case 'yatay-serit':
+      icerik = <YataySerit {...ortak} />;
+      break;
+    default:
+      icerik = <MasonryDuvar {...ortak} />;
+  }
+
+  return <WidgetKabuk widget={widget}>{icerik}</WidgetKabuk>;
 }

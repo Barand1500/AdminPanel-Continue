@@ -217,6 +217,7 @@ enum WidgetTipi {
   GUNCEL_KONULAR
   SIRKET_GIRIS_CIKIS
   HABER_MAGAZIN
+  MODUL_LOGO_BLOK
 }
 
 model Medya {

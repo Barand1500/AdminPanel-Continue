@@ -769,6 +769,131 @@ export function YorumKartlariIcerik({ form, onChange }: WidgetPanelProps) {
   );
 }
 
+export function ModulLogoBlokIcerik({ form, onChange }: WidgetPanelProps) {
+  const cfg = configOku(form);
+  const ozellikler = cfg.ikonKartlar ?? [];
+  const logolar = cfg.logoKartlar ?? [];
+  return (
+    <>
+      <AdminFormBolumu baslik="Modül Bilgileri" aciklama="Sol taraftaki başlık, açıklama ve özellik listesi">
+        <FormAlani etiket="Modül ikonu (emoji)">
+          <input
+            className={formInputSinifi}
+            placeholder="💳"
+            value={cfg.modulIkon ?? ''}
+            onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, modulIkon: e.target.value })))}
+          />
+        </FormAlani>
+        <FormAlani etiket="Başlık">
+          <input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} />
+        </FormAlani>
+        <FormAlani etiket="Alt etiket (isteğe bağlı)">
+          <input className={formInputSinifi} value={form.altBaslik} onChange={(e) => onChange({ ...form, altBaslik: e.target.value })} />
+        </FormAlani>
+        <FormAlani etiket="Açıklama">
+          <textarea className={formInputSinifi} rows={3} value={form.aciklama} onChange={(e) => onChange({ ...form, aciklama: e.target.value })} />
+        </FormAlani>
+        <div className="grid gap-3 sm:grid-cols-2">
+          <FormAlani etiket="CTA buton metni">
+            <input className={formInputSinifi} value={form.butonMetni} onChange={(e) => onChange({ ...form, butonMetni: e.target.value })} />
+          </FormAlani>
+          <FormAlani etiket="CTA buton link">
+            <input className={formInputSinifi} value={form.butonLink} onChange={(e) => onChange({ ...form, butonLink: e.target.value })} />
+          </FormAlani>
+        </div>
+      </AdminFormBolumu>
+      <AdminFormBolumu baslik="Özellikler" aciklama="Modül özellik listesi (✓ işaretli)">
+        <ListeSiralayici<WidgetIkonKart>
+          ogeler={ozellikler}
+          onDegistir={(k) => onChange(configGuncelle(form, (c) => ({ ...c, ikonKartlar: k })))}
+          yeniEkle={() => ({ id: uid(), ikon: '✓', metin: '' })}
+          renderOge={(k, i) => (
+            <div className="grid gap-2 sm:grid-cols-2">
+              <input
+                className={formInputSinifi}
+                placeholder="İkon (✓)"
+                value={k.ikon}
+                onChange={(e) => {
+                  const kopya = [...ozellikler];
+                  kopya[i] = { ...k, ikon: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, ikonKartlar: kopya })));
+                }}
+              />
+              <input
+                className={formInputSinifi}
+                placeholder="Özellik metni"
+                value={k.metin}
+                onChange={(e) => {
+                  const kopya = [...ozellikler];
+                  kopya[i] = { ...k, metin: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, ikonKartlar: kopya })));
+                }}
+              />
+            </div>
+          )}
+        />
+      </AdminFormBolumu>
+      <AdminFormBolumu baslik="Logo Kartları" aciklama="Sağ taraftaki partner / entegrasyon logoları">
+        <ListeSiralayici<WidgetEtiketKarti>
+          ogeler={logolar}
+          onDegistir={(k) => onChange(configGuncelle(form, (c) => ({ ...c, logoKartlar: k })))}
+          yeniEkle={() => ({ id: uid(), etiket: '', gorselUrl: '', link: '' })}
+          renderOge={(k, i) => (
+            <div className="grid gap-2 sm:grid-cols-2">
+              <GorselAlan
+                etiket="Logo görseli"
+                deger={k.gorselUrl}
+                onChange={(v) => {
+                  const kopya = [...logolar];
+                  kopya[i] = { ...k, gorselUrl: v };
+                  onChange(configGuncelle(form, (c) => ({ ...c, logoKartlar: kopya })));
+                }}
+              />
+              <input
+                className={formInputSinifi}
+                placeholder="Etiket (örn: Sanal POS)"
+                value={k.etiket}
+                onChange={(e) => {
+                  const kopya = [...logolar];
+                  kopya[i] = { ...k, etiket: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, logoKartlar: kopya })));
+                }}
+              />
+              <input
+                className={formInputSinifi}
+                placeholder="Link (isteğe bağlı)"
+                value={k.link}
+                onChange={(e) => {
+                  const kopya = [...logolar];
+                  kopya[i] = { ...k, link: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, logoKartlar: kopya })));
+                }}
+              />
+            </div>
+          )}
+        />
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <FormAlani etiket="“Daha fazla” metni">
+            <input
+              className={formInputSinifi}
+              placeholder="+ Daha Fazlası"
+              value={cfg.dahaFazlaMetin ?? ''}
+              onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, dahaFazlaMetin: e.target.value })))}
+            />
+          </FormAlani>
+          <FormAlani etiket="“Daha fazla” link">
+            <input
+              className={formInputSinifi}
+              value={cfg.dahaFazlaLink ?? ''}
+              onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, dahaFazlaLink: e.target.value })))}
+            />
+          </FormAlani>
+        </div>
+      </AdminFormBolumu>
+    </>
+  );
+}
+
 export function FiyatlandirmaIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const paketler = cfg.paketler ?? [];
@@ -891,6 +1016,7 @@ export const ICERIK_PANEL_MAP: Record<string, ComponentType<WidgetPanelProps>> =
   YORUM_KARUSEL: YorumKaruselIcerik,
   YORUM_KARTLARI: YorumKartlariIcerik,
   FIYATLANDIRMA: FiyatlandirmaIcerik,
+  MODUL_LOGO_BLOK: ModulLogoBlokIcerik,
   HARITA: HaritaIcerik,
   ILETISIM_FORMU: IletisimIcerik,
   POPUP: PopupIcerik,

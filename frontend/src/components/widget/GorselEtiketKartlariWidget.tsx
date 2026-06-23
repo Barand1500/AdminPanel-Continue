@@ -1,146 +1,314 @@
+import { useState, type CSSProperties, type ReactNode } from 'react';
+import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
+import type { WidgetConfig, WidgetEtiketKarti } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
-import { configOkuFromWidget, gorselSinifi, gridStyle, medyaUrl } from './widgetHelpers';
+import { configOkuFromWidget, gorselSinifi, medyaUrl } from './widgetHelpers';
+
+function renkler(cfg: WidgetConfig) {
+  const g = cfg.gorunum ?? {};
+  return {
+    baslik: g.baslikRengi || '#0f172a',
+    metin: g.metinRengi || '#64748b',
+    vurgu: g.vurguRengi || g.baslikRengi || 'var(--color-primary, #7c3aed)',
+  };
+}
+
+function Baslik({ widget, cfg, ortala = true }: { widget: Widget; cfg: WidgetConfig; ortala?: boolean }) {
+  if (!widget.baslik) return null;
+  const renk = renkler(cfg);
+  return (
+    <h2
+      className={`${baslikSinifi(cfg)} gek-baslik${ortala ? ' gek-baslik-orta' : ''}`}
+      style={{ color: renk.baslik }}
+    >
+      {widget.baslik}
+    </h2>
+  );
+}
+
+function KartLink({
+  k,
+  className,
+  style,
+  children,
+}: {
+  k: WidgetEtiketKarti;
+  className?: string;
+  style?: CSSProperties;
+  children: ReactNode;
+}) {
+  const href = k.link || '#';
+  if (href.startsWith('/')) {
+    return (
+      <Link to={href} className={className} style={style}>
+        {children}
+      </Link>
+    );
+  }
+  return (
+    <a href={href} className={className} style={style}>
+      {children}
+    </a>
+  );
+}
+
+function GorselImg({ k, cfg, sinif = '' }: { k: WidgetEtiketKarti; cfg: WidgetConfig; sinif?: string }) {
+  if (!k.gorselUrl) return null;
+  return (
+    <img
+      src={medyaUrl(k.gorselUrl)}
+      alt={k.etiket}
+      className={`gek-gorsel ${gorselSinifi(cfg)} ${sinif}`.trim()}
+    />
+  );
+}
+
+function MasonryGaleri({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
+  const renk = renkler(cfg);
+  return (
+    <>
+      <Baslik widget={widget} cfg={cfg} />
+      <div className="gek-masonry">
+        {kartlar.map((k, i) => (
+          <KartLink
+            key={k.id}
+            k={k}
+            className={`gek-masonry-kart gek-masonry-kart-${(i % 3) + 1}`}
+          >
+            <div className="gek-masonry-gorsel-wrap">
+              {k.gorselUrl ? (
+                <GorselImg k={k} cfg={cfg} />
+              ) : (
+                <div className="gek-gorsel-bos">Görsel</div>
+              )}
+              <div className="gek-masonry-overlay">
+                <span style={{ color: '#fff' }}>{k.etiket}</span>
+                <span className="gek-ok-beyaz">→</span>
+              </div>
+            </div>
+            <span className="gek-masonry-etiket" style={{ color: renk.baslik }}>
+              {k.etiket}
+            </span>
+          </KartLink>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function HeroMiniGrid({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
+  const renk = renkler(cfg);
+  const [hero, ...mini] = kartlar;
+
+  return (
+    <>
+      <Baslik widget={widget} cfg={cfg} />
+      <div className="gek-hero-grid">
+        <KartLink
+          k={hero}
+          className="gek-hero-kart"
+          style={{ background: `linear-gradient(135deg, ${renk.vurgu}14, ${renk.vurgu}06)` }}
+        >
+          <div className="gek-hero-gorsel">
+            {hero.gorselUrl ? <GorselImg k={hero} cfg={cfg} /> : <div className="gek-gorsel-bos">Görsel</div>}
+          </div>
+          <div className="gek-hero-metin">
+            <h3 style={{ color: renk.baslik }}>{hero.etiket}</h3>
+            <span className="gek-hero-git" style={{ color: renk.vurgu }}>
+              Keşfet →
+            </span>
+          </div>
+        </KartLink>
+        {mini.length > 0 && (
+          <div className="gek-mini-grid">
+            {mini.map((k) => (
+              <KartLink key={k.id} k={k} className="gek-mini-kart" style={{ borderColor: `${renk.vurgu}33` }}>
+                <div className="gek-mini-gorsel">
+                  {k.gorselUrl ? <GorselImg k={k} cfg={cfg} /> : <div className="gek-gorsel-bos gek-gorsel-bos-kucuk">—</div>}
+                </div>
+                <span style={{ color: renk.baslik }}>{k.etiket}</span>
+              </KartLink>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
+  );
+}
+
+function HoverZoom({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
+  const renk = renkler(cfg);
+  const kolon = cfg.gorunum?.kolonSayisi ?? 3;
+
+  return (
+    <>
+      <Baslik widget={widget} cfg={cfg} />
+      <div className={`gek-zoom-grid gek-zoom-grid-${Math.min(kolon, 4)}`}>
+        {kartlar.map((k) => (
+          <KartLink key={k.id} k={k} className="gek-zoom-kart group">
+            <div className="gek-zoom-gorsel">
+              {k.gorselUrl ? (
+                <GorselImg k={k} cfg={cfg} sinif="gek-zoom-img" />
+              ) : (
+                <div className="gek-gorsel-bos">Görsel</div>
+              )}
+            </div>
+            <div className="gek-zoom-reveal" style={{ background: renk.vurgu }}>
+              <span>{k.etiket}</span>
+              <span>→</span>
+            </div>
+          </KartLink>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function PolaroidKolaj({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
+  const renk = renkler(cfg);
+
+  return (
+    <>
+      <Baslik widget={widget} cfg={cfg} />
+      <div className="gek-polaroid-grid">
+        {kartlar.map((k, i) => (
+          <KartLink
+            key={k.id}
+            k={k}
+            className={`gek-polaroid-oge${i % 2 === 1 ? ' gek-polaroid-ters' : ''}`}
+          >
+            <figure className="gek-polaroid-cerceve">
+              {k.gorselUrl ? (
+                <GorselImg k={k} cfg={cfg} />
+              ) : (
+                <div className="gek-gorsel-bos gek-polaroid-bos">Görsel</div>
+              )}
+              <figcaption className="gek-polaroid-etiket" style={{ color: renk.baslik }}>
+                {k.etiket}
+              </figcaption>
+            </figure>
+          </KartLink>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function SplitPanel({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
+  const [aktif, setAktif] = useState(0);
+  const renk = renkler(cfg);
+  const secili = kartlar[aktif] ?? kartlar[0];
+
+  return (
+    <>
+      <Baslik widget={widget} cfg={cfg} ortala={false} />
+      <div className="gek-split">
+        <KartLink k={secili} className="gek-split-buyuk">
+          {secili.gorselUrl ? (
+            <GorselImg k={secili} cfg={cfg} />
+          ) : (
+            <div className="gek-gorsel-bos">Görsel</div>
+          )}
+          <div className="gek-split-buyuk-etiket" style={{ background: `${renk.vurgu}ee` }}>
+            <span>{secili.etiket}</span>
+            <span>→</span>
+          </div>
+        </KartLink>
+        <div className="gek-split-liste" role="tablist">
+          {kartlar.map((k, i) => (
+            <button
+              key={k.id}
+              type="button"
+              role="tab"
+              aria-selected={i === aktif}
+              className={`gek-split-tus${i === aktif ? ' gek-split-tus-aktif' : ''}`}
+              style={
+                i === aktif
+                  ? { borderColor: renk.vurgu, background: `${renk.vurgu}10` }
+                  : undefined
+              }
+              onClick={() => setAktif(i)}
+            >
+              <span className="gek-split-thumb">
+                {k.gorselUrl ? (
+                  <img src={medyaUrl(k.gorselUrl)} alt="" className="h-full w-full object-cover" />
+                ) : (
+                  <span className="gek-thumb-bos">—</span>
+                )}
+              </span>
+              <span style={{ color: renk.baslik }}>{k.etiket}</span>
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function FlipKart({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
+  const renk = renkler(cfg);
+  const kolon = cfg.gorunum?.kolonSayisi ?? 3;
+
+  return (
+    <>
+      <Baslik widget={widget} cfg={cfg} />
+      <div className={`gek-flip-grid gek-flip-grid-${Math.min(kolon, 4)}`}>
+        {kartlar.map((k) => (
+          <KartLink key={k.id} k={k} className="gek-flip-kart">
+            <div className="gek-flip-ic">
+              <div className="gek-flip-on">
+                {k.gorselUrl ? (
+                  <GorselImg k={k} cfg={cfg} />
+                ) : (
+                  <div className="gek-gorsel-bos">Görsel</div>
+                )}
+              </div>
+              <div className="gek-flip-arka" style={{ background: renk.vurgu }}>
+                <span className="gek-flip-etiket">{k.etiket}</span>
+                <span className="gek-flip-git">Görüntüle →</span>
+              </div>
+            </div>
+          </KartLink>
+        ))}
+      </div>
+    </>
+  );
+}
 
 export function GorselEtiketKartlariWidget({ widget }: { widget: Widget }) {
   const cfg = configOkuFromWidget(widget);
   const kartlar = cfg.etiketKartlar ?? [];
-  const kolon = cfg.gorunum?.kolonSayisi ?? 3;
   const gt = widgetGorunumTipiAl(widget);
 
-  const baslik = widget.baslik ? (
-    <h2 className={`${baslikSinifi(cfg)} mb-8 text-center font-bold text-slate-900`}>{widget.baslik}</h2>
-  ) : null;
+  if (kartlar.length === 0) return null;
 
-  if (gt === 'ust-overlay') {
-    return (
-      <WidgetKabuk widget={widget}>
-        {baslik}
-        <div className="gek-ust-overlay grid gap-4" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
-          {kartlar.map((k) => (
-            <a key={k.id} href={k.link || '#'} className="group relative aspect-[4/3] overflow-hidden rounded-2xl bg-slate-900">
-              {k.gorselUrl && (
-                <img src={medyaUrl(k.gorselUrl)} alt={k.etiket} className={`h-full w-full ${gorselSinifi(cfg)} opacity-90`} />
-              )}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent" />
-              <span className="absolute bottom-4 left-4 text-lg font-bold text-white">{k.etiket}</span>
-            </a>
-          ))}
-        </div>
-      </WidgetKabuk>
-    );
+  const ortak = { widget, cfg, kartlar };
+  let icerik: ReactNode;
+
+  switch (gt) {
+    case 'masonry-galeri':
+      icerik = <MasonryGaleri {...ortak} />;
+      break;
+    case 'hero-mini-grid':
+      icerik = <HeroMiniGrid {...ortak} />;
+      break;
+    case 'hover-zoom':
+      icerik = <HoverZoom {...ortak} />;
+      break;
+    case 'polaroid-kolaj':
+      icerik = <PolaroidKolaj {...ortak} />;
+      break;
+    case 'split-panel':
+      icerik = <SplitPanel {...ortak} />;
+      break;
+    case 'flip-kart':
+      icerik = <FlipKart {...ortak} />;
+      break;
+    default:
+      icerik = <MasonryGaleri {...ortak} />;
   }
 
-  if (gt === 'mor-cerceve') {
-    return (
-      <WidgetKabuk widget={widget}>
-        {baslik}
-        <div className="gek-mor-cerceve grid gap-4 rounded-2xl border-2 border-violet-300 bg-violet-50/50 p-4" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
-          {kartlar.map((k) => (
-            <a key={k.id} href={k.link || '#'} className="overflow-hidden rounded-xl border-2 border-violet-400 bg-white shadow-sm">
-              {k.gorselUrl && (
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img src={medyaUrl(k.gorselUrl)} alt={k.etiket} className={`h-full w-full ${gorselSinifi(cfg)}`} />
-                </div>
-              )}
-              <div className="px-3 py-2 text-center text-sm font-semibold text-violet-800">{k.etiket}</div>
-            </a>
-          ))}
-        </div>
-      </WidgetKabuk>
-    );
-  }
-
-  if (gt === 'mint-kucuk') {
-    return (
-      <WidgetKabuk widget={widget}>
-        {baslik}
-        <div className="gek-mint-kucuk flex flex-wrap gap-2">
-          {kartlar.map((k) => (
-            <a
-              key={k.id}
-              href={k.link || '#'}
-              className="flex w-[calc(50%-0.25rem)] items-center gap-2 rounded-lg border border-teal-200 bg-teal-50 p-2 sm:w-[calc(33.333%-0.34rem)]"
-            >
-              {k.gorselUrl && (
-                <img src={medyaUrl(k.gorselUrl)} alt={k.etiket} className="h-12 w-12 shrink-0 rounded object-cover" />
-              )}
-              <span className="text-xs font-semibold text-teal-900">{k.etiket}</span>
-            </a>
-          ))}
-        </div>
-      </WidgetKabuk>
-    );
-  }
-
-  if (gt === 'okyanus-buyuk') {
-    return (
-      <WidgetKabuk widget={widget}>
-        {baslik}
-        <div className="gek-okyanus-buyuk grid gap-6 sm:grid-cols-2">
-          {kartlar.map((k) => (
-            <a key={k.id} href={k.link || '#'} className="overflow-hidden rounded-2xl bg-gradient-to-br from-sky-100 to-blue-200 shadow-md">
-              {k.gorselUrl && (
-                <div className="aspect-video overflow-hidden">
-                  <img src={medyaUrl(k.gorselUrl)} alt={k.etiket} className={`h-full w-full ${gorselSinifi(cfg)}`} />
-                </div>
-              )}
-              <div className="px-4 py-3 text-lg font-bold text-blue-900">{k.etiket}</div>
-            </a>
-          ))}
-        </div>
-      </WidgetKabuk>
-    );
-  }
-
-  if (gt === 'korall-hover') {
-    return (
-      <WidgetKabuk widget={widget}>
-        {baslik}
-        <div className="gek-korall-hover grid gap-4" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
-          {kartlar.map((k) => (
-            <a
-              key={k.id}
-              href={k.link || '#'}
-              className="group overflow-hidden rounded-xl bg-white shadow-sm transition hover:-translate-y-1 hover:border-rose-400 hover:shadow-rose-200/60 hover:shadow-lg"
-            >
-              {k.gorselUrl && (
-                <div className="aspect-[4/3] overflow-hidden">
-                  <img
-                    src={medyaUrl(k.gorselUrl)}
-                    alt={k.etiket}
-                    className={`h-full w-full transition group-hover:scale-105 ${gorselSinifi(cfg)}`}
-                  />
-                </div>
-              )}
-              <div className="border-t border-rose-100 bg-rose-50 px-4 py-3 text-center transition group-hover:bg-rose-100">
-                <span className="text-sm font-semibold text-rose-800">{k.etiket}</span>
-              </div>
-            </a>
-          ))}
-        </div>
-      </WidgetKabuk>
-    );
-  }
-
-  return (
-    <WidgetKabuk widget={widget}>
-      {baslik}
-      <div className="gek-alt-etiket grid gap-4" style={gridStyle({ ...cfg, gorunum: { ...cfg.gorunum, kolonSayisi: kolon } })}>
-        {kartlar.map((k) => (
-          <a key={k.id} href={k.link || '#'} className="group overflow-hidden rounded-xl bg-white shadow-sm">
-            {k.gorselUrl && (
-              <div className="aspect-[4/3] overflow-hidden">
-                <img src={medyaUrl(k.gorselUrl)} alt={k.etiket} className={`h-full w-full ${gorselSinifi(cfg)}`} />
-              </div>
-            )}
-            <div className="border-t border-slate-100 bg-white px-4 py-3 text-center">
-              <span className="text-sm font-semibold text-slate-800">{k.etiket}</span>
-            </div>
-          </a>
-        ))}
-      </div>
-    </WidgetKabuk>
-  );
+  return <WidgetKabuk widget={widget}>{icerik}</WidgetKabuk>;
 }

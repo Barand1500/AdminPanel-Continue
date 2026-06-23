@@ -40,6 +40,7 @@ export const WIDGET_TIPLERI = [
   { id: 'YORUM_KARUSEL', etiket: 'Yorum Karuseli', ikon: '💬', aciklama: 'Müşteri yorumları (karusel)', grup: 'İçerik', kategori: 'karusel' as const },
   { id: 'YORUM_KARTLARI', etiket: 'Yorum Kartları', ikon: '⭐', aciklama: 'Grid müşteri yorum kartları', grup: 'İçerik', kategori: 'kart' as const },
   { id: 'FIYATLANDIRMA', etiket: 'Fiyatlandırma', ikon: '💰', aciklama: 'Paket fiyat kartları', grup: 'İçerik', kategori: 'kart' as const },
+  { id: 'MODUL_LOGO_BLOK', etiket: 'Modül + Logo Blok', ikon: '🔌', aciklama: 'Modül açıklaması + partner logo grid', grup: 'İçerik', kategori: 'resim_metin' as const },
   { id: 'GALERI', etiket: 'Galeri', ikon: '🖼️', aciklama: 'Çoklu görsel galerisi', grup: 'İçerik', kategori: 'resimli' as const },
   { id: 'KATEGORI', etiket: 'Kategori', ikon: '📂', aciklama: 'Kategori navigasyonu', grup: 'İçerik', kategori: 'diger' as const },
   { id: 'REFERANSLAR', etiket: 'Referanslar', ikon: '⭐', aciklama: 'Müşteri referansları', grup: 'İçerik', kategori: 'diger' as const },
