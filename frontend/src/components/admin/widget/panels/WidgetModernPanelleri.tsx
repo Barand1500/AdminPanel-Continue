@@ -11,8 +11,10 @@ import {
   type WidgetMarkaLogosu,
   type WidgetSurecAdimi,
   type WidgetTimelineOgesi,
+  type WidgetIkonKart,
 } from '@/types/widget';
 import { ListeSiralayici, SecimAlani } from './WidgetPanelOrtak';
+import { FiltreEtiketYonetici } from './FiltreEtiketYonetici';
 import { WidgetGorunumIcerikAlanlari } from './WidgetGorunumIcerikAlanlari';
 import type { WidgetPanelProps } from './types';
 
@@ -285,5 +287,71 @@ export function BultenKayitIcerik({ form, onChange }: WidgetPanelProps) {
       <FormAlani etiket="Buton metni"><input className={formInputSinifi} value={form.butonMetni} onChange={(e) => onChange({ ...form, butonMetni: e.target.value })} /></FormAlani>
       <FormAlani etiket="KVKK / bilgilendirme metni"><textarea className={formInputSinifi} rows={2} value={cfg.bultenKvkk ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, bultenKvkk: e.target.value })))} /></FormAlani>
     </AdminFormBolumu>
+  );
+}
+
+export function UcretsizDenemeIcerik({ form, onChange }: WidgetPanelProps) {
+  const cfg = configOku(form);
+  const ozellikler = cfg.ikonKartlar ?? [];
+  const roller = cfg.rolSecenekleri ?? [];
+  return (
+    <>
+      <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <AdminFormBolumu baslik="Form Ayarları">
+        <FormAlani etiket="Form slug (API)">
+          <input
+            className={formInputSinifi}
+            placeholder="ucretsiz-deneme"
+            value={cfg.formSlug ?? ''}
+            onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, formSlug: e.target.value })))}
+          />
+        </FormAlani>
+        <FormAlani etiket="KVKK / bilgilendirme metni">
+          <textarea
+            className={formInputSinifi}
+            rows={2}
+            value={cfg.bultenKvkk ?? ''}
+            onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, bultenKvkk: e.target.value })))}
+          />
+        </FormAlani>
+      </AdminFormBolumu>
+      <AdminFormBolumu baslik="Özellikler" aciklama="Sol taraftaki avantaj listesi (ikon + metin)">
+        <ListeSiralayici<WidgetIkonKart>
+          ogeler={ozellikler}
+          onDegistir={(k) => onChange(configGuncelle(form, (c) => ({ ...c, ikonKartlar: k })))}
+          yeniEkle={() => ({ id: uid(), ikon: '🎧', metin: '' })}
+          renderOge={(k, i) => (
+            <div className="grid gap-2 sm:grid-cols-2">
+              <input
+                className={formInputSinifi}
+                placeholder="İkon (emoji)"
+                value={k.ikon}
+                onChange={(e) => {
+                  const kopya = [...ozellikler];
+                  kopya[i] = { ...k, ikon: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, ikonKartlar: kopya })));
+                }}
+              />
+              <input
+                className={formInputSinifi}
+                placeholder="Özellik metni"
+                value={k.metin}
+                onChange={(e) => {
+                  const kopya = [...ozellikler];
+                  kopya[i] = { ...k, metin: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, ikonKartlar: kopya })));
+                }}
+              />
+            </div>
+          )}
+        />
+      </AdminFormBolumu>
+      <AdminFormBolumu baslik="Rol Seçenekleri" aciklama="Formdaki 'İşinizdeki rolünüz' açılır listesi">
+        <FiltreEtiketYonetici
+          filtreler={roller}
+          onChange={(r) => onChange(configGuncelle(form, (c) => ({ ...c, rolSecenekleri: r })))}
+        />
+      </AdminFormBolumu>
+    </>
   );
 }

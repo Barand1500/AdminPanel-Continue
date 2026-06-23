@@ -137,6 +137,15 @@ export const WIDGET_GORUNUM_ICERIK_ALANLARI: Record<string, WidgetIcerikAlanHari
   BULTEN_KAYIT: {
     _varsayilan: ['baslik', 'aciklama'],
   },
+  UCRETSIZ_DENEME: {
+    _varsayilan: ['baslik', 'aciklama', 'butonMetni'],
+    'split-form-sol': ['baslik', 'aciklama', 'butonMetni'],
+    'split-form-ters': ['baslik', 'aciklama', 'butonMetni'],
+    'dikey-ortali': ['baslik', 'aciklama', 'butonMetni'],
+    'minimal-ortali': ['baslik', 'aciklama', 'butonMetni'],
+    'blob-arkaplan': ['baslik', 'aciklama', 'butonMetni'],
+    'kart-golge': ['baslik', 'aciklama', 'butonMetni'],
+  },
   ONCESI_SONRASI: {
     _varsayilan: ['baslik'],
     'surukle-slider': ['baslik'],

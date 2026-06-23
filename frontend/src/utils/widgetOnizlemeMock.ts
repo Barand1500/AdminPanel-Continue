@@ -364,6 +364,20 @@ function mockConfig(tip: string): WidgetConfig {
       return { onceGorsel: ONIZLEME_GORSEL, sonraGorsel: ONIZLEME_GORSEL };
     case 'BULTEN_KAYIT':
       return { formSlug: 'bulten', bultenPlaceholder: 'E-posta adresiniz', bultenKvkk: 'Abone olarak gizlilik politikasını kabul etmiş olursunuz.' };
+    case 'UCRETSIZ_DENEME':
+      return {
+        formSlug: 'ucretsiz-deneme',
+        bultenKvkk: 'Kişisel verileriniz gizlilik politikamız kapsamında korunmaktadır.',
+        rolSecenekleri: ['Kurucu / Sahip', 'Pazarlama', 'Satış', 'IT / Teknik', 'Diğer'],
+        ikonKartlar: [
+          { id: id(), ikon: '🎧', metin: '7/24 teknik destek' },
+          { id: id(), ikon: '📚', metin: 'Ücretsiz ve sınırsız eğitim' },
+          { id: id(), ikon: '👔', metin: 'VIP e-ticaret danışmanı' },
+          { id: id(), ikon: '📦', metin: 'Ücretsiz kargo entegrasyonu' },
+          { id: id(), ikon: '💳', metin: 'Ücretsiz sanal POS' },
+          { id: id(), ikon: '🔄', metin: 'Ücretsiz güncellemeler' },
+        ],
+      };
     case 'KOSE_YAZARLARI':
       return {
         koseYazarlari: [
@@ -662,7 +676,9 @@ export function onizlemeMockVerisiUygula(widget: Widget): Widget {
         ? 'Sorularınız için bize ulaşın, en kısa sürede dönüş yapalım.'
         : widget.tip === 'MODUL_LOGO_BLOK'
           ? 'Güvenli ve hızlı ödeme altyapısı ile tüm banka ve ödeme kuruluşlarıyla entegre çalışın.'
-          : 'Bu bölüm önizleme amaçlı örnek içerik göstermektedir.'
+          : widget.tip === 'UCRETSIZ_DENEME'
+            ? "2005'ten bu yana 50.000+ işletme yanılıyor olamaz — 15 gün ücretsiz deneyin."
+            : 'Bu bölüm önizleme amaçlı örnek içerik göstermektedir.'
     ),
     gorselUrl: widget.gorselUrl?.trim()
       ? widget.gorselUrl
@@ -706,6 +722,7 @@ function mockBaslik(tip: string): string {
     VIDEO_BANNER: 'Tanıtım Videosu',
     ONCESI_SONRASI: 'Farkı Görün',
     BULTEN_KAYIT: 'Bültenimize Katılın',
+    UCRETSIZ_DENEME: 'Hemen Ücretsiz Deneyin',
     KOSE_YAZARLARI: 'KÖŞE YAZARLARI',
     ILETISIM_BLOK: 'Bizimle Çalışmaya Hazır mısınız?',
     KATEGORI_HABER_LISTESI: 'OTOMOBİL',

@@ -53,6 +53,7 @@ export const MODERN_WIDGET_TIPLERI = [
   'VIDEO_BANNER',
   'ONCESI_SONRASI',
   'BULTEN_KAYIT',
+  'UCRETSIZ_DENEME',
   'BLOK_OLUSTURUCU',
   ...HABER_PORTAL_WIDGET_TIPLERI,
 ] as const;
@@ -147,6 +148,8 @@ export const WIDGET_GORUNUM_METIN_TIPLERI = new Set([
   'BLOK_OLUSTURUCU',
   'YORUM_KARTLARI',
   'MODUL_LOGO_BLOK',
+  'UCRETSIZ_DENEME',
+  'BULTEN_KAYIT',
 ]);
 
 export interface WidgetGorunumAyarlari {
@@ -426,6 +429,7 @@ export interface WidgetConfig {
   sonraGorsel?: string;
   bultenPlaceholder?: string;
   bultenKvkk?: string;
+  rolSecenekleri?: string[];
   haberKartlari?: WidgetHaberKarti[];
   koseYazarlari?: WidgetKoseYazari[];
   iletisimKartlari?: WidgetIletisimKarti[];
@@ -586,6 +590,23 @@ export function varsayilanConfig(tip: string): WidgetConfig {
       return { yerlesim, gorunum, ek, onceGorsel: '', sonraGorsel: '' };
     case 'BULTEN_KAYIT':
       return { yerlesim: { bolge: 'footer_ustu' }, gorunum, ek, formSlug: 'bulten', bultenPlaceholder: 'E-posta adresiniz' };
+    case 'UCRETSIZ_DENEME':
+      return {
+        yerlesim: { bolge: 'icerik_alani' },
+        gorunum: { ...gorunum, vurguRengi: '#7c3aed', borderRadius: 16 },
+        ek,
+        formSlug: 'ucretsiz-deneme',
+        bultenKvkk: 'Kişisel verileriniz gizlilik politikamız kapsamında korunmaktadır.',
+        rolSecenekleri: ['Kurucu / Sahip', 'Pazarlama', 'Satış', 'IT / Teknik', 'Diğer'],
+        ikonKartlar: [
+          { id: uid(), ikon: '🎧', metin: '7/24 teknik destek' },
+          { id: uid(), ikon: '📚', metin: 'Ücretsiz ve sınırsız eğitim' },
+          { id: uid(), ikon: '👔', metin: 'VIP e-ticaret danışmanı' },
+          { id: uid(), ikon: '📦', metin: 'Ücretsiz kargo entegrasyonu' },
+          { id: uid(), ikon: '💳', metin: 'Ücretsiz sanal POS' },
+          { id: uid(), ikon: '🔄', metin: 'Ücretsiz güncellemeler' },
+        ],
+      };
     case 'KOSE_YAZARLARI':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4, gorselKonumu: 'sol', sayfalamaStili: 'ok' }, ek, koseYazarlari: [], tumunuGorMetin: 'Tüm Yazarlar', tumunuGorLink: '/yazarlar' };
     case 'ILETISIM_BLOK':

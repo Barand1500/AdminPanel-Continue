@@ -32,6 +32,7 @@ import {
   MarkaSeridiIcerik,
   OncesiSonrasiIcerik,
   SurecAdimlariIcerik,
+  UcretsizDenemeIcerik,
   VideoBannerIcerik,
   ZamanCizelgesiIcerik,
 } from './WidgetModernPanelleri';
@@ -1081,6 +1082,7 @@ export const ICERIK_PANEL_MAP: Record<string, ComponentType<WidgetPanelProps>> =
   VIDEO_BANNER: VideoBannerIcerik,
   ONCESI_SONRASI: OncesiSonrasiIcerik,
   BULTEN_KAYIT: BultenKayitIcerik,
+  UCRETSIZ_DENEME: UcretsizDenemeIcerik,
   BLOK_OLUSTURUCU: BlokOlusturucuIcerik,
   KOSE_YAZARLARI: KoseYazarlariIcerik,
   ILETISIM_BLOK: IletisimBlokIcerik,

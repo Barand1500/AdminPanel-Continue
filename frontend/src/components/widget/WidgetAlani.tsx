@@ -26,6 +26,7 @@ import { GeriSayimWidget } from './GeriSayimWidget';
 import { VideoBannerWidget } from './VideoBannerWidget';
 import { OncesiSonrasiWidget } from './OncesiSonrasiWidget';
 import { BultenKayitWidget } from './BultenKayitWidget';
+import { UcretsizDenemeWidget } from './UcretsizDenemeWidget';
 import {
   GuncelKonularWidget,
   HaberMagazinWidget,
@@ -108,6 +109,8 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
         return <OncesiSonrasiWidget widget={widget} />;
       case 'BULTEN_KAYIT':
         return <BultenKayitWidget widget={widget} />;
+      case 'UCRETSIZ_DENEME':
+        return <UcretsizDenemeWidget widget={widget} />;
       case 'KOSE_YAZARLARI':
         return <KoseYazarlariWidget widget={widget} />;
       case 'ILETISIM_BLOK':

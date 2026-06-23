@@ -9454,3 +9454,179 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   border: 1px dashed rgba(255,255,255,0.25);
 }
 
+/* ?? Ücretsiz Deneme (ud-*) ?? */
+.ud-baslik {
+  margin: 0;
+  font-size: clamp(1.75rem, 3.5vw, 2.5rem);
+  font-weight: 800;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+.ud-aciklama {
+  margin: 0.75rem 0 0;
+  font-size: 0.95rem;
+  line-height: 1.65;
+  max-width: 36rem;
+}
+.ud-metin-ortala { text-align: center; }
+.ud-metin-ortala .ud-aciklama { margin-inline: auto; }
+
+.ud-ozellik-grid {
+  display: grid;
+  gap: 1rem 1.25rem;
+  margin: 1.5rem 0 0;
+  padding: 0;
+  list-style: none;
+  grid-template-columns: 1fr;
+}
+@media (min-width: 540px) {
+  .ud-ozellik-grid { grid-template-columns: 1fr 1fr; }
+}
+.ud-ozellik-grid--ortala { max-width: 40rem; margin-inline: auto; }
+.ud-ozellik {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+.ud-ozellik-ikon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 9999px;
+  background: #fff;
+  font-size: 1.125rem;
+  flex-shrink: 0;
+  box-shadow: 0 4px 16px rgba(15, 23, 42, 0.08);
+}
+.ud-ozellik-metin {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: #334155;
+  line-height: 1.4;
+  padding-top: 0.35rem;
+}
+
+.ud-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.ud-form--kart {
+  background: #fff;
+  padding: 1.5rem;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08);
+  border: 1px solid #f1f5f9;
+}
+.ud-form--duz { padding: 0; }
+.ud-form--dar { max-width: 28rem; margin-inline: auto; width: 100%; }
+.ud-form-satir {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: 1fr 1fr;
+}
+.ud-input {
+  width: 100%;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  padding: 0.7rem 0.9rem;
+  font-size: 0.875rem;
+  color: #0f172a;
+  background: #fff;
+  outline: none;
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+.ud-input:focus {
+  border-color: #a78bfa;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
+}
+.ud-select { color: #64748b; }
+.ud-submit {
+  margin-top: 0.5rem;
+  width: 100%;
+  border: none;
+  padding: 0.85rem 1.5rem;
+  font-size: 0.9375rem;
+  font-weight: 700;
+  color: #fff;
+  cursor: pointer;
+  transition: opacity 0.15s, transform 0.15s;
+}
+.ud-submit:hover:not(:disabled) { opacity: 0.92; transform: translateY(-1px); }
+.ud-submit:disabled { opacity: 0.6; cursor: not-allowed; }
+.ud-kvkk {
+  margin: 0.5rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.5;
+  color: #94a3b8;
+  text-align: center;
+}
+.ud-hata { margin: 0.5rem 0 0; font-size: 0.8125rem; color: #dc2626; text-align: center; }
+.ud-basari { margin: 0.5rem 0 0; font-size: 0.8125rem; color: #059669; font-weight: 600; text-align: center; }
+
+.ud-split { padding: 0.25rem; }
+.ud-split-grid {
+  display: grid;
+  gap: 2rem;
+  align-items: start;
+}
+@media (min-width: 900px) {
+  .ud-split-grid { grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: center; }
+  .ud-split-grid--ters .ud-split-sol { order: 1; }
+  .ud-split-grid--ters .ud-split-sag { order: 0; }
+}
+
+.ud-dikey { padding: 2rem 1rem; }
+.ud-dikey-form { margin-top: 2rem; }
+.ud-minimal {
+  max-width: 32rem;
+  margin-inline: auto;
+  padding: 2rem 1rem;
+}
+
+.ud-blob-wrap {
+  position: relative;
+  overflow: hidden;
+  padding: 2rem 1rem;
+  background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+}
+.ud-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(40px);
+  pointer-events: none;
+}
+.ud-blob--sol { width: 280px; height: 280px; top: -80px; left: -60px; }
+.ud-blob--sag { width: 320px; height: 320px; bottom: -100px; right: -80px; }
+.ud-blob-kart {
+  position: relative;
+  z-index: 1;
+  max-width: 56rem;
+  margin-inline: auto;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(12px);
+  padding: 2rem 1.5rem;
+  box-shadow: 0 12px 48px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.8);
+}
+@media (min-width: 768px) {
+  .ud-blob-kart { padding: 2.5rem; }
+}
+
+.ud-kart-golge {
+  padding: 1.5rem;
+  background: linear-gradient(135deg, #f8fafc, #eef2ff);
+}
+.ud-kart-golge-ic {
+  max-width: 56rem;
+  margin-inline: auto;
+  background: #fff;
+  padding: 2rem 1.5rem;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.1);
+  border: 1px solid #f1f5f9;
+}
+@media (min-width: 768px) {
+  .ud-kart-golge-ic { padding: 2.5rem 3rem; }
+}
+

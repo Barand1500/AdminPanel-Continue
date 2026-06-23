@@ -281,6 +281,14 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('turuncu-serit', 'Turuncu Şerit', 'Turuncu bülten şeridi', 'gunes'),
     gt('yesil-minimal', 'Yeşil Minimal', 'Sade yeşil form', 'yesil'),
   ],
+  UCRETSIZ_DENEME: [
+    gt('split-form-sol', 'Split Form Sol', 'Sol özellikler + sağ kayıt formu', 'lavanta', 'SaaS'),
+    gt('split-form-ters', 'Split Form Ters', 'Sol form + sağ özellikler', 'okyanus'),
+    gt('dikey-ortali', 'Dikey Ortalı', 'Üst başlık, orta özellikler, alt form', 'notr'),
+    gt('minimal-ortali', 'Minimal Ortalı', 'Sadece başlık ve form', 'mint'),
+    gt('blob-arkaplan', 'Blob Arka Plan', 'Dekoratif blob zemin + kart', 'mor'),
+    gt('kart-golge', 'Kart Gölge', 'Tek beyaz kart, gölge efektli', 'gunes'),
+  ],
   BLOK_OLUSTURUCU: [
     gt('standart-grid', 'Standart Grid', 'Standart grid parçalar', 'notr'),
     gt('cam-parca', 'Cam Parça', 'Glassmorphism parçalar', 'okyanus'),
@@ -404,6 +412,7 @@ const LEGACY_GORUNUM_TIPI: Partial<Record<AktifWidgetTipi, Record<string, string
   KATEGORI: { klasik: 'grid-ikon', pill: 'pill-renkli', 'buyuk-kart': 'buyuk-gorsel' },
   KARSILASTIRMA_TABLOSU: { klasik: 'tam-tablo', kart: 'mobil-kart', minimal: 'minimal-cizgi' },
   BULTEN_KAYIT: { klasik: 'ortalanmis-form', banner: 'tam-banner-mavi', kart: 'kart-golge' },
+  UCRETSIZ_DENEME: { klasik: 'split-form-sol' },
   ONCESI_SONRASI: {
     klasik: 'surukle-slider',
     'surukle-karsilastir': 'surukle-slider',

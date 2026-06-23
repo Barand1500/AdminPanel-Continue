@@ -56,6 +56,7 @@ export const WIDGET_TIPLERI = [
   { id: 'VIDEO_BANNER', etiket: 'Video Banner', ikon: '🎬', aciklama: 'YouTube veya video arka plan', grup: 'Modern', kategori: 'modern' as const },
   { id: 'ONCESI_SONRASI', etiket: 'Öncesi / Sonrası', ikon: '↔️', aciklama: 'Kaydırmalı görsel karşılaştırma', grup: 'Modern', kategori: 'modern' as const },
   { id: 'BULTEN_KAYIT', etiket: 'Bülten Kayıt', ikon: '✉️', aciklama: 'E-posta abonelik formu', grup: 'Modern', kategori: 'modern' as const },
+  { id: 'UCRETSIZ_DENEME', etiket: 'Ücretsiz Deneme', ikon: '🚀', aciklama: 'Lead generation kayıt formu + özellikler', grup: 'Modern', kategori: 'modern' as const },
   { id: 'BLOK_OLUSTURUCU', etiket: 'Özel Grid Widget', ikon: '🧱', aciklama: 'Grid parçalarıyla özel widget oluştur', grup: 'Oluşturucu', kategori: 'modern' as const },
   { id: 'KOSE_YAZARLARI', etiket: 'Köşe Yazarları', ikon: '✒️', aciklama: 'Yazar kartları karuseli', grup: 'Haber', kategori: 'haber' as const },
   { id: 'ILETISIM_BLOK', etiket: 'İletişim + Harita', ikon: '📍', aciklama: 'İletişim kartları ve harita', grup: 'Haber', kategori: 'haber' as const },

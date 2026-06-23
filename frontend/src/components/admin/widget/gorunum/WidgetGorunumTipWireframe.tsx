@@ -128,6 +128,67 @@ export function WidgetGorunumTipWireframe({
         <div className="h-5 w-3 rounded-r bg-white/20" />
       </div>
     ),
+    'UCRETSIZ_DENEME:split-form-sol': (
+      <div className="flex gap-0.5 p-1">
+        <div className="h-5 flex-1 rounded-l p-1" style={{ background: renk.bg }}>
+          <div className="h-0.5 w-3 rounded" style={{ background: renk.text, opacity: 0.25 }} />
+          <div className="mt-0.5 grid grid-cols-2 gap-0.5">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-1 rounded" style={{ background: renk.surface }} />
+            ))}
+          </div>
+        </div>
+        <div className="h-5 w-4 rounded-r p-0.5" style={{ background: renk.surface }}>
+          <div className="h-0.5 w-full rounded" style={{ background: renk.accent, opacity: 0.5 }} />
+          <div className="mt-0.5 h-1 w-full rounded" style={{ background: renk.accent }} />
+        </div>
+      </div>
+    ),
+    'UCRETSIZ_DENEME:split-form-ters': (
+      <div className="flex gap-0.5 p-1">
+        <div className="h-5 w-4 rounded-l p-0.5" style={{ background: renk.surface }}>
+          <div className="h-1 w-full rounded" style={{ background: renk.accent }} />
+        </div>
+        <div className="h-5 flex-1 rounded-r p-1" style={{ background: renk.bg }}>
+          <div className="h-0.5 w-3 rounded" style={{ background: renk.text, opacity: 0.25 }} />
+        </div>
+      </div>
+    ),
+    'UCRETSIZ_DENEME:dikey-ortali': (
+      <div className="space-y-0.5 p-1 text-center" style={{ background: renk.bg }}>
+        <div className="mx-auto h-0.5 w-4 rounded" style={{ background: renk.text, opacity: 0.3 }} />
+        <div className="mx-auto grid w-3/4 grid-cols-2 gap-0.5">
+          {[1, 2].map((i) => (
+            <div key={i} className="h-1 rounded" style={{ background: renk.surface }} />
+          ))}
+        </div>
+        <div className="mx-auto h-2 w-2/3 rounded" style={{ background: renk.surface }} />
+      </div>
+    ),
+    'UCRETSIZ_DENEME:minimal-ortali': (
+      <div className="space-y-1 p-1 text-center" style={{ background: renk.bg }}>
+        <div className="mx-auto h-0.5 w-4 rounded" style={{ background: renk.text, opacity: 0.3 }} />
+        <div className="mx-auto h-2 w-2/3 rounded" style={{ background: renk.surface }} />
+      </div>
+    ),
+    'UCRETSIZ_DENEME:blob-arkaplan': (
+      <div className="relative h-6 overflow-hidden rounded p-1" style={{ background: renk.surface }}>
+        <div className="relative z-10 flex gap-0.5">
+          <div className="h-4 flex-1 rounded bg-white/80 p-0.5">
+            <div className="h-0.5 w-2 rounded" style={{ background: renk.accent }} />
+          </div>
+          <div className="h-4 w-3 rounded bg-white/90" />
+        </div>
+      </div>
+    ),
+    'UCRETSIZ_DENEME:kart-golge': (
+      <div className="p-1" style={{ background: renk.surface }}>
+        <div className="flex gap-0.5 rounded bg-white p-1 shadow-sm">
+          <div className="h-4 flex-1 rounded" style={{ background: renk.bg }} />
+          <div className="h-4 w-3 rounded" style={{ background: `${renk.accent}33` }} />
+        </div>
+      </div>
+    ),
   };
 
   const icerik =

@@ -218,6 +218,7 @@ enum WidgetTipi {
   SIRKET_GIRIS_CIKIS
   HABER_MAGAZIN
   MODUL_LOGO_BLOK
+  UCRETSIZ_DENEME
 }
 
 model Medya {
