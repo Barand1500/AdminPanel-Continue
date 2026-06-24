@@ -8,6 +8,7 @@ import { BlogRepository } from '../Infrastructure/repositories/BlogRepository.js
 import { NavKategoriRepository } from '../Infrastructure/repositories/NavKategoriRepository.js';
 import { FormRepository } from '../Infrastructure/repositories/FormRepository.js';
 import { SeoYonlendirmeRepository } from '../Infrastructure/repositories/SeoYonlendirmeRepository.js';
+import { KonumluSliderRepository } from '../Infrastructure/repositories/KonumluSliderRepository.js';
 import { EklentiService } from './EklentiService.js';
 import {
   sistemAyariSatirdanJson,
@@ -23,6 +24,7 @@ const blogRepo = new BlogRepository();
 const navKategoriRepo = new NavKategoriRepository();
 const formRepo = new FormRepository();
 const yonlendirmeRepo = new SeoYonlendirmeRepository();
+const konumluSliderRepo = new KonumluSliderRepository();
 const sistemAyariRepo = new SistemAyariRepository();
 const eklentiService = new EklentiService();
 
@@ -55,9 +57,10 @@ export class SiteService {
 
     await sayfaService.hiyerarsiOnar(site.id);
 
-    const [sayfalar, widgetlar, bloglar, navKategoriler, formlar, seoYonlendirmeler, sistemSatiri] = await Promise.all([
+    const [sayfalar, widgetlar, konumluSliderlar, bloglar, navKategoriler, formlar, seoYonlendirmeler, sistemSatiri] = await Promise.all([
       sayfaRepo.findBySiteId(site.id),
       widgetRepo.findBySiteId(site.id),
+      konumluSliderRepo.findPublicBySiteId(site.id),
       blogRepo.findPublicBySiteId(site.id),
       navKategoriRepo.findPublicBySiteId(site.id),
       formRepo.findPublicBySiteId(site.id),
@@ -95,6 +98,12 @@ export class SiteService {
       },
       sayfalar,
       widgetlar,
+      konumluSliderlar: konumluSliderlar.map((s) => ({
+        ...s,
+        id: String(s.id),
+        siteId: String(s.siteId),
+        sayfaId: s.sayfaId != null ? String(s.sayfaId) : null,
+      })),
       navKategoriler,
       bloglar: bloglar.map((b) => ({
         ...b,

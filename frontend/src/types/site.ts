@@ -73,6 +73,7 @@ export interface SitePublicData {
   formlar?: import('@/utils/formYardimci').PublicFormKayit[];
   seoYonlendirmeler?: { kaynakUrl: string; hedefUrl: string; kod: number }[];
   aktifEklentiler?: import('./eklenti').AktifEklentiPublic[];
+  konumluSliderlar?: import('./konumluSlider').KonumluSliderKayit[];
 }
 
 export interface MenuOgesi {

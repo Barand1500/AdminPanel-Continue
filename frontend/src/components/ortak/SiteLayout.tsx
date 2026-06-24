@@ -22,6 +22,8 @@ import { SeoYonlendirmeKontrol } from '@/components/ortak/SeoYonlendirmeKontrol'
 import { SiteScriptEnjektor } from '@/components/ortak/SiteScriptEnjektor';
 import { EklentiYukleyici } from '@/components/ortak/eklentiler/EklentiYukleyici';
 import { useAktifEklentiler } from '@/hooks/useAktifEklentiler';
+import { KonumluSliderKatman } from '@/components/konumluSlider/KonumluSliderKatman';
+import { useAktifSayfaId } from '@/hooks/useAktifSayfaId';
 
 function SiteLayoutIcerik() {
   const { veri, yukleniyor } = useSiteVerisi();
@@ -38,6 +40,8 @@ function SiteLayoutIcerik() {
     [veri.navKategoriler]
   );
   const aktifEklentiler = useAktifEklentiler(veri);
+  const aktifSayfaId = useAktifSayfaId(veri.sayfalar);
+  const konumluSliderlar = veri.konumluSliderlar ?? [];
 
   useSiteTemaUygula(site.ayarlar, site.ad);
 
@@ -68,13 +72,25 @@ function SiteLayoutIcerik() {
       <SiteScriptEnjektor scriptAyarlari={sistem.scriptAyarlari} />
       <SeoYonlendirmeKontrol yonlendirmeler={veri.seoYonlendirmeler} />
       <div className="site-public flex min-h-screen flex-col">
+        <KonumluSliderKatman
+          konumluSliderlar={konumluSliderlar}
+          sayfaId={aktifSayfaId}
+          tip="header-ustu"
+        />
         {headerGoster && (
-          <SiteHeader
-            siteAdi={site.ad}
-            ayarlar={site.ayarlar}
-            menuOgeleri={menuOgeleri}
-            kategoriler={menuKategoriler}
-          />
+          <>
+            <SiteHeader
+              siteAdi={site.ad}
+              ayarlar={site.ayarlar}
+              menuOgeleri={menuOgeleri}
+              kategoriler={menuKategoriler}
+            />
+            <KonumluSliderKatman
+              konumluSliderlar={konumluSliderlar}
+              sayfaId={aktifSayfaId}
+              tip="header-alti"
+            />
+          </>
         )}
         <SiteFormBolge formlar={veri.formlar ?? []} konum="hero-alti" />
         <main className="flex-1">
@@ -83,7 +99,17 @@ function SiteLayoutIcerik() {
           <SiteFormBolge formlar={veri.formlar ?? []} konum="icerik-sonu" />
         </main>
         <SiteFormBolge formlar={veri.formlar ?? []} konum="footer-ustu" />
+        <KonumluSliderKatman
+          konumluSliderlar={konumluSliderlar}
+          sayfaId={aktifSayfaId}
+          tip="footer-ustu"
+        />
         {footerGoster && <SiteFooter siteAdi={site.ad} ayarlar={site.ayarlar} />}
+        <KonumluSliderKatman
+          konumluSliderlar={konumluSliderlar}
+          sayfaId={aktifSayfaId}
+          tip="footer-alti"
+        />
         <FloatingButonlar ayarlar={site.ayarlar} />
         <SiteYuzucuFormlar formlar={veri.formlar ?? []} />
         <EklentiYukleyici aktifEklentiler={aktifEklentiler} />

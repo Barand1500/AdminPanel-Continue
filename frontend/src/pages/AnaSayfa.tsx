@@ -6,8 +6,10 @@ import { HeroSlider } from '@/components/eticaret/HeroSlider';
 import { GuvenSerit } from '@/components/eticaret/GuvenSerit';
 import { BlogBolumu } from '@/components/blog/BlogBolumu';
 import { BlogHizmetBolumu } from '@/components/blog/BlogHizmetBolumu';
-import { PopupWidgetlar, WidgetBolge } from '@/components/widget/WidgetBolge';
+import { PopupWidgetlar } from '@/components/widget/WidgetBolge';
+import { KonumluWidgetBolge } from '@/components/konumluSlider/KonumluWidgetBolge';
 import { anaSayfaWidgetlari } from '@/utils/widgetYerlesim';
+import { konumluSliderlarSayfaFiltre } from '@/utils/konumluSliderYerlesim';
 
 function AnaSayfaHizmetBlog({
   widgetlar,
@@ -29,10 +31,14 @@ function AnaSayfaHizmetBlog({
 }
 
 export function AnaSayfa() {
-  const { widgetlar, site, bloglar } = useOutletContext<SitePublicData>();
+  const { widgetlar, site, bloglar, konumluSliderlar = [] } = useOutletContext<SitePublicData>();
   const blogAyarlari = blogAyarlariBirlestir(site.ayarlar);
   const blogOnizleme = blogOnizlemeListesi(bloglar, blogAyarlari.listeAdet);
   const anaWidgetlar = useMemo(() => anaSayfaWidgetlari(widgetlar), [widgetlar]);
+  const sayfaSliderlar = useMemo(
+    () => konumluSliderlarSayfaFiltre(konumluSliderlar, null),
+    [konumluSliderlar]
+  );
 
   const blogBolumu =
     blogAyarlari.anaSayfa && blogOnizleme.length > 0 ? (
@@ -41,17 +47,29 @@ export function AnaSayfa() {
 
   return (
     <>
-      <WidgetBolge widgetlar={anaWidgetlar} bolge="header_alti" />
+      <KonumluWidgetBolge
+        widgetlar={anaWidgetlar}
+        bolge="header_alti"
+        konumluSliderlar={sayfaSliderlar}
+      />
 
       <HeroSlider heroJson={site.ayarlar?.heroJson} />
       <GuvenSerit heroJson={site.ayarlar?.heroJson} />
 
-      <WidgetBolge widgetlar={anaWidgetlar} bolge="slider_alti" />
+      <KonumluWidgetBolge
+        widgetlar={anaWidgetlar}
+        bolge="slider_alti"
+        konumluSliderlar={sayfaSliderlar}
+      />
 
       {blogAyarlari.anaSayfaKonum === 'urunler-ustu' && blogBolumu}
       {blogAyarlari.anaSayfaKonum === 'widgetlar-ustu' && blogBolumu}
 
-      <WidgetBolge widgetlar={anaWidgetlar} bolge="icerik_alani" />
+      <KonumluWidgetBolge
+        widgetlar={anaWidgetlar}
+        bolge="icerik_alani"
+        konumluSliderlar={sayfaSliderlar}
+      />
       <AnaSayfaHizmetBlog
         widgetlar={anaWidgetlar}
         blogOnizleme={blogOnizleme}
@@ -59,7 +77,11 @@ export function AnaSayfa() {
       />
 
       {blogAyarlari.anaSayfaKonum === 'widgetlar-alti' && blogBolumu}
-      <WidgetBolge widgetlar={anaWidgetlar} bolge="footer_ustu" />
+      <KonumluWidgetBolge
+        widgetlar={anaWidgetlar}
+        bolge="footer_ustu"
+        konumluSliderlar={sayfaSliderlar}
+      />
 
       <PopupWidgetlar widgetlar={anaWidgetlar} />
     </>

@@ -34,6 +34,7 @@ model Site {
   navKategoriler     NavKategori[]
   seoYonlendirmeler  SeoYonlendirme[]
   siteEklentiler     SiteEklenti[]
+  konumluSliderlar   KonumluSlider[]
 
   @@map("siteler")
 }
@@ -136,6 +137,7 @@ model Sayfa {
   guncelleme         DateTime @updatedAt
 
   widgetlar                    Widget[]
+  konumluSliderlar             KonumluSlider[]
   onerilenOlduguSistemAyarlari SistemAyari[] @relation("SistemAyariOneriSayfa")
 
   @@unique([siteId, slug])
@@ -170,6 +172,23 @@ model Widget {
 
   @@index([siteId, aktif, sira])
   @@map("widgetlar")
+}
+
+model KonumluSlider {
+  id         Int      @id @default(autoincrement())
+  siteId     Int
+  site       Site     @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  sayfaId    Int?
+  sayfa      Sayfa?   @relation(fields: [sayfaId], references: [id], onDelete: SetNull)
+  ad         String
+  aktif      Boolean  @default(true)
+  sira       Int      @default(0)
+  configJson Json?
+  olusturma  DateTime @default(now())
+  guncelleme DateTime @updatedAt
+
+  @@index([siteId, sayfaId, aktif, sira])
+  @@map("konumlu_sliderlar")
 }
 
 enum WidgetTipi {

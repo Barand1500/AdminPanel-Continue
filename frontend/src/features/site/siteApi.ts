@@ -1,4 +1,5 @@
 import type { SitePublicData } from '@/types/site';
+import { konumluSliderConfigOku } from '@/types/konumluSlider';
 import { bosSiteVerisi } from '@/data/bosSiteVerisi';
 import { jsonYanitOku } from '@/utils/jsonFetch';
 
@@ -31,6 +32,13 @@ export async function siteVerisiGetir(signal?: AbortSignal): Promise<SitePublicD
         alanlarJson: Array.isArray(f.alanlarJson) ? f.alanlarJson : [],
       })),
       seoYonlendirmeler: veri.seoYonlendirmeler ?? [],
+      konumluSliderlar: (veri.konumluSliderlar ?? []).map((s) => ({
+        ...s,
+        id: String(s.id),
+        siteId: String(s.siteId),
+        sayfaId: s.sayfaId != null ? String(s.sayfaId) : null,
+        configJson: konumluSliderConfigOku(s.configJson),
+      })),
     };
   } catch (err) {
     console.error('[siteVerisiGetir]', err instanceof Error ? err.message : err);

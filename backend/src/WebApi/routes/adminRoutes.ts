@@ -42,11 +42,16 @@ import { KriptoController } from '../controllers/KriptoController.js';
 import { KisayolController } from '../controllers/KisayolController.js';
 import { SekmeController } from '../controllers/SekmeController.js';
 import { NavKategoriController } from '../controllers/NavKategoriController.js';
+import { KonumluSliderController } from '../controllers/KonumluSliderController.js';
 import { EklentiController } from '../controllers/EklentiController.js';
 import {
   navKategoriGuncelleSchema,
   navKategoriOlusturSchema,
 } from '../../Application/DTOs/NavKategoriDto.js';
+import {
+  konumluSliderGuncelleSchema,
+  konumluSliderOlusturSchema,
+} from '../../Application/DTOs/KonumluSliderDto.js';
 import { rolMiddleware } from '../middleware/rolMiddleware.js';
 import { yetkiMiddleware } from '../middleware/yetkiMiddleware.js';
 import { medyaYukle } from '../middleware/medyaYukle.js';
@@ -76,6 +81,7 @@ const kriptoController = new KriptoController();
 const kisayolController = new KisayolController();
 const sekmeController = new SekmeController();
 const navKategoriController = new NavKategoriController();
+const konumluSliderController = new KonumluSliderController();
 const eklentiController = new EklentiController();
 
 const yG = yetkiMiddleware('goruntuleme');
@@ -102,6 +108,15 @@ router.get('/widgetlar', authMiddleware, yG, (req, res) => widgetController.list
 router.post('/widgetlar', authMiddleware, yE, validateBySchema(widgetOlusturSchema), (req, res) => widgetController.olustur(req, res));
 router.put('/widgetlar/:id', authMiddleware, yD, validateBySchema(widgetGuncelleSchema), (req, res) => widgetController.guncelle(req, res));
 router.delete('/widgetlar/:id', authMiddleware, yS, (req, res) => widgetController.sil(req, res));
+
+router.get('/konumlu-sliderlar', authMiddleware, yG, (req, res) => konumluSliderController.listele(req, res));
+router.post('/konumlu-sliderlar', authMiddleware, yE, validateBySchema(konumluSliderOlusturSchema), (req, res) =>
+  konumluSliderController.olustur(req, res)
+);
+router.put('/konumlu-sliderlar/:id', authMiddleware, yD, validateBySchema(konumluSliderGuncelleSchema), (req, res) =>
+  konumluSliderController.guncelle(req, res)
+);
+router.delete('/konumlu-sliderlar/:id', authMiddleware, yS, (req, res) => konumluSliderController.sil(req, res));
 
 router.get('/site-ayarlari', authMiddleware, yG, (req, res) => siteAyarlariController.getir(req, res));
 router.put('/site-ayarlari', authMiddleware, yD, validateBySchema(siteAyarlariGuncelleSchema), (req, res) => siteAyarlariController.guncelle(req, res));

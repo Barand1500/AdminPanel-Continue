@@ -13,8 +13,9 @@ import {
   sayfaDuzenModuOku,
   sayfaTamGenisDuzenMi,
 } from '@/utils/sayfaIcerikIsle';
-import { WidgetBolge } from '@/components/widget/WidgetBolge';
+import { KonumluWidgetBolge } from '@/components/konumluSlider/KonumluWidgetBolge';
 import { sayfaBolgeWidgetlariHaric, sayfaWidgetlari } from '@/utils/widgetYerlesim';
+import { konumluSliderlarSayfaFiltre } from '@/utils/konumluSliderYerlesim';
 
 export interface DinamikSayfaLoaderVerisi {
   bulunamadi: boolean;
@@ -65,7 +66,7 @@ function AltSayfaGrid({ altSayfalar, ustBasliksiz }: { altSayfalar: PublicSayfa[
 
 export function DinamikSayfaSayfasi() {
   const { sayfa } = useLoaderData() as DinamikSayfaLoaderVerisi;
-  const { sayfalar, widgetlar } = useOutletContext<SitePublicData>();
+  const { sayfalar, widgetlar, konumluSliderlar = [] } = useOutletContext<SitePublicData>();
   const navigation = useNavigation();
   const yukleniyor = navigation.state === 'loading';
   const tumSayfaWidgetlar = useMemo(
@@ -75,6 +76,10 @@ export function DinamikSayfaSayfasi() {
   const bolgeWidgetlar = useMemo(
     () => (sayfa ? sayfaBolgeWidgetlariHaric(tumSayfaWidgetlar, sayfa.icerik) : []),
     [tumSayfaWidgetlar, sayfa]
+  );
+  const sayfaSliderlar = useMemo(
+    () => (sayfa ? konumluSliderlarSayfaFiltre(konumluSliderlar, sayfa.id) : []),
+    [konumluSliderlar, sayfa]
   );
 
   if (yukleniyor) {
@@ -112,7 +117,11 @@ export function DinamikSayfaSayfasi() {
   if (tamGenis) {
     return (
       <>
-        <WidgetBolge widgetlar={bolgeWidgetlar} bolge="sayfa_ustu" />
+        <KonumluWidgetBolge
+          widgetlar={bolgeWidgetlar}
+          bolge="sayfa_ustu"
+          konumluSliderlar={sayfaSliderlar}
+        />
         {baslikGoster && (
           <section className="py-8 sm:py-10">
             <div className="container-site">
@@ -136,14 +145,22 @@ export function DinamikSayfaSayfasi() {
             </div>
           </section>
         )}
-        <WidgetBolge widgetlar={bolgeWidgetlar} bolge="sayfa_alti" />
+        <KonumluWidgetBolge
+          widgetlar={bolgeWidgetlar}
+          bolge="sayfa_alti"
+          konumluSliderlar={sayfaSliderlar}
+        />
       </>
     );
   }
 
   return (
     <>
-      <WidgetBolge widgetlar={bolgeWidgetlar} bolge="sayfa_ustu" />
+      <KonumluWidgetBolge
+        widgetlar={bolgeWidgetlar}
+        bolge="sayfa_ustu"
+        konumluSliderlar={sayfaSliderlar}
+      />
       {ortaBolumGoster && (
         <section className="py-12 sm:py-16">
           <div className="container-site">
@@ -163,7 +180,11 @@ export function DinamikSayfaSayfasi() {
           </div>
         </section>
       )}
-      <WidgetBolge widgetlar={bolgeWidgetlar} bolge="sayfa_alti" />
+      <KonumluWidgetBolge
+        widgetlar={bolgeWidgetlar}
+        bolge="sayfa_alti"
+        konumluSliderlar={sayfaSliderlar}
+      />
     </>
   );
 }

@@ -2,6 +2,7 @@ import { HeaderYonetimiFormu } from './site/HeaderYonetimiFormu';
 import { HeroYonetimiFormu } from './site/HeroYonetimiFormu';
 import { FooterYonetimiFormu } from './site/FooterYonetimiFormu';
 import { WidgetYonetimiSayfasi } from '@/pages/admin/WidgetYonetimiSayfasi';
+import { SliderYonetimiSayfasi } from '@/pages/admin/SliderYonetimiSayfasi';
 import { SiteAyarlariSayfasi } from '@/pages/admin/SiteAyarlariSayfasi';
 import { SayfaYonetimiSayfasi } from '@/pages/admin/SayfaYonetimiSayfasi';
 import { MedyaGalerisiSayfasi } from '@/pages/admin/MedyaGalerisiSayfasi';
@@ -46,6 +47,8 @@ function AdminModulGovde({ modulId, onModulAc }: AdminModulIcerikProps) {
       return <FooterYonetimiFormu />;
     case 'widget-yonetimi':
       return <WidgetYonetimiSayfasi />;
+    case 'slider-yonetimi':
+      return <SliderYonetimiSayfasi />;
     case 'site-ayarlari':
       return <SiteAyarlariSayfasi />;
     case 'sayfalar':
