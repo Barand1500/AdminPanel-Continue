@@ -20,7 +20,7 @@
 .ks-gorsel--orijinal { object-fit: none; max-width: 100%; height: auto; }
 .ks-yon--dikey .ks-slider-icerik { min-height: 280px; }
 .ks-yon--yatay .ks-slider-icerik { min-height: 160px; }
-.ks-z--ust { position: relative; z-index: 20; }
+.ks-z--ust { position: relative; z-index: 2; }
 .ks-z--alt { position: relative; z-index: 0; }
 .ks-slayt-metin {
   position: absolute;
@@ -83,30 +83,68 @@
 }
 .ks-nokta--aktif { background: #fff; transform: scale(1.2); }
 
-.ks-yan-wrap {
-  display: grid;
-  gap: 1rem;
+/* Yan yerleşim: widget akışı değişmez, slider boş kenar alanında */
+.ks-yan-sarmal {
+  position: relative;
   width: 100%;
-  align-items: stretch;
+  isolation: isolate;
 }
-.ks-yan-wrap--sol { grid-template-columns: minmax(140px, 28%) 1fr; }
-.ks-yan-wrap--sag { grid-template-columns: 1fr minmax(140px, 28%); }
-.ks-yan-wrap--sag .ks-yan-slider { order: 2; }
-.ks-yan-slider { min-height: 100%; }
-.ks-yan-widgetlar { min-width: 0; display: flex; flex-direction: column; gap: 0; }
-.ks-yon--dikey.ks-yan-wrap .ks-yan-slider .ks-slider-icerik { min-height: 100%; height: 100%; }
+.ks-yan-akis {
+  width: 100%;
+  position: relative;
+  z-index: 2;
+}
+.ks-yan-kolon {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: min(300px, 22vw);
+  max-width: 320px;
+  z-index: 1;
+  pointer-events: auto;
+}
+.ks-yan-sarmal--sol .ks-yan-kolon {
+  right: 100%;
+  margin-right: 0.75rem;
+}
+.ks-yan-sarmal--sag .ks-yan-kolon {
+  left: 100%;
+  margin-left: 0.75rem;
+}
+.ks-yan-sarmal--z-ust .ks-yan-kolon { z-index: 4; }
+.ks-yan-sarmal--z-ust .ks-yan-akis { z-index: 2; }
+.ks-yan-sarmal--z-alt .ks-yan-kolon { z-index: 0; }
+.ks-yan-sarmal--z-alt .ks-yan-akis { z-index: 2; }
+.ks-yon--dikey.ks-yan-sarmal .ks-yan-kolon .ks-slider,
+.ks-yon--dikey.ks-yan-sarmal .ks-yan-kolon .ks-slider-icerik {
+  height: 100%;
+  min-height: 100%;
+}
 
-.ks-ust-alt-wrap { display: flex; flex-direction: column; width: 100%; }
-.ks-bosluk--kucuk { gap: 0.5rem; }
-.ks-bosluk--orta { gap: 1.25rem; }
-.ks-bosluk--buyuk { gap: 2.5rem; }
+/* Üst / alt: widget ayrı blok, sadece araya boşluk */
+.ks-ust-alt-arasi {
+  width: 100%;
+  display: block;
+}
+.ks-ust-alt-arasi--ust.ks-bosluk--kucuk { margin-bottom: 0.5rem; }
+.ks-ust-alt-arasi--ust.ks-bosluk--orta { margin-bottom: 1.25rem; }
+.ks-ust-alt-arasi--ust.ks-bosluk--buyuk { margin-bottom: 2.5rem; }
+.ks-ust-alt-arasi--alt.ks-bosluk--kucuk { margin-top: 0.5rem; }
+.ks-ust-alt-arasi--alt.ks-bosluk--orta { margin-top: 1.25rem; }
+.ks-ust-alt-arasi--alt.ks-bosluk--buyuk { margin-top: 2.5rem; }
 
 .ks-katman { width: 100%; }
 
-@media (max-width: 768px) {
-  .ks-yan-wrap--sol,
-  .ks-yan-wrap--sag { grid-template-columns: 1fr; }
-  .ks-yan-wrap--sag .ks-yan-slider { order: 0; }
+@media (max-width: 1280px) {
+  .ks-yan-kolon {
+    position: static;
+    width: 100%;
+    max-width: none;
+    margin: 0 0 1rem !important;
+  }
+  .ks-yan-sarmal--sag .ks-yan-kolon {
+    margin-bottom: 1rem !important;
+  }
 }
 
 /* Admin — Slider Yönetimi */

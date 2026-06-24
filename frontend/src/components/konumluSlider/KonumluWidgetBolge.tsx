@@ -1,3 +1,4 @@
+import { Fragment } from 'react';
 import type { Widget } from '@/types/site';
 import type { KonumluSliderKayit } from '@/types/konumluSlider';
 import type { WidgetYerlesimBolge } from '@/types/widget';
@@ -10,6 +11,13 @@ interface KonumluWidgetBolgeProps {
   widgetlar: Widget[];
   bolge: WidgetYerlesimBolge;
   konumluSliderlar?: KonumluSliderKayit[];
+}
+
+function ustAltSliderSinifi(
+  konum: 'ust' | 'alt',
+  config: KonumluSliderKayit['configJson']
+) {
+  return `ks-ust-alt-arasi ks-ust-alt-arasi--${konum} ${boslukSinifi(config?.bosluk)}`;
 }
 
 export function KonumluWidgetBolge({
@@ -29,16 +37,19 @@ export function KonumluWidgetBolge({
 
         if (oge.tip === 'yan-grup') {
           const yon = oge.slider.configJson?.yon ?? 'dikey';
-          const tarafSinif = oge.taraf === 'sol' ? 'ks-yan-wrap--sol' : 'ks-yan-wrap--sag';
+          const zUst = oge.slider.configJson?.gorunum?.zIndex === 'ust';
+          const tarafSinif = oge.taraf === 'sol' ? 'ks-yan-sarmal--sol' : 'ks-yan-sarmal--sag';
+          const zSinif = zUst ? 'ks-yan-sarmal--z-ust' : 'ks-yan-sarmal--z-alt';
+
           return (
             <div
               key={`yan-${oge.slider.id}-${idx}`}
-              className={`ks-yan-wrap ${tarafSinif} ks-yon--${yon}`}
+              className={`ks-yan-sarmal ${tarafSinif} ${zSinif} ks-yon--${yon}`}
             >
-              <div className="ks-yan-slider">
+              <aside className="ks-yan-kolon" aria-label={oge.slider.ad}>
                 <KonumluSliderRender slider={oge.slider} />
-              </div>
-              <div className="ks-yan-widgetlar">
+              </aside>
+              <div className="ks-yan-akis">
                 {oge.widgetlar.map((w) => (
                   <WidgetRender key={w.id} widget={w} />
                 ))}
@@ -47,22 +58,26 @@ export function KonumluWidgetBolge({
           );
         }
 
-        const bosluk = oge.slider.configJson?.bosluk;
-        const boslukCls = boslukSinifi(bosluk);
+        const sliderKey = `${oge.konum}-${oge.slider.id}-${oge.widget.id}`;
+
         if (oge.konum === 'ust') {
           return (
-            <div key={`ust-${oge.slider.id}-${oge.widget.id}`} className={`ks-ust-alt-wrap ${boslukCls}`}>
-              <KonumluSliderRender slider={oge.slider} />
+            <Fragment key={sliderKey}>
+              <div className={ustAltSliderSinifi('ust', oge.slider.configJson)}>
+                <KonumluSliderRender slider={oge.slider} />
+              </div>
               <WidgetRender widget={oge.widget} />
-            </div>
+            </Fragment>
           );
         }
 
         return (
-          <div key={`alt-${oge.slider.id}-${oge.widget.id}`} className={`ks-ust-alt-wrap ${boslukCls}`}>
+          <Fragment key={sliderKey}>
             <WidgetRender widget={oge.widget} />
-            <KonumluSliderRender slider={oge.slider} />
-          </div>
+            <div className={ustAltSliderSinifi('alt', oge.slider.configJson)}>
+              <KonumluSliderRender slider={oge.slider} />
+            </div>
+          </Fragment>
         );
       })}
     </>
