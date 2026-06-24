@@ -4,6 +4,7 @@ import type { KonumluSliderKayit } from '@/types/konumluSlider';
 import type { WidgetYerlesimBolge } from '@/types/widget';
 import { WidgetRender } from '@/components/widget/WidgetAlani';
 import { KonumluSliderRender } from '@/components/konumluSlider/KonumluSliderRender';
+import { YanSliderGrup } from '@/components/konumluSlider/YanSliderGrup';
 import { bolgeRenderPlani } from '@/utils/konumluSliderRenderPlani';
 import { boslukSinifi } from '@/utils/konumluSliderYerlesim';
 
@@ -42,19 +43,23 @@ export function KonumluWidgetBolge({
           const zSinif = zUst ? 'ks-yan-sarmal--z-ust' : 'ks-yan-sarmal--z-alt';
 
           return (
-            <div
+            <YanSliderGrup
               key={`yan-${oge.slider.id}-${idx}`}
-              className={`ks-yan-sarmal ${tarafSinif} ${zSinif} ks-yon--${yon}`}
+              tarafSinif={tarafSinif}
+              zSinif={zSinif}
+              yonSinif={`ks-yon--${yon}`}
+              sliderAd={oge.slider.ad}
+              slider={
+                <KonumluSliderRender
+                  slider={oge.slider}
+                  sinif={yon === 'dikey' ? 'ks-slider--yan-dolgu' : ''}
+                />
+              }
             >
-              <aside className="ks-yan-kolon" aria-label={oge.slider.ad}>
-                <KonumluSliderRender slider={oge.slider} />
-              </aside>
-              <div className="ks-yan-akis">
-                {oge.widgetlar.map((w) => (
-                  <WidgetRender key={w.id} widget={w} />
-                ))}
-              </div>
-            </div>
+              {oge.widgetlar.map((w) => (
+                <WidgetRender key={w.id} widget={w} />
+              ))}
+            </YanSliderGrup>
           );
         }
 

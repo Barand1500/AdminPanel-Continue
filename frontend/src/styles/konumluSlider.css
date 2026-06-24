@@ -99,10 +99,11 @@
 .ks-yan-kolon {
   position: absolute;
   top: 0;
-  bottom: 0;
   width: var(--ks-yan-gen);
   z-index: 8;
   pointer-events: auto;
+  display: flex;
+  flex-direction: column;
 }
 .ks-yan-sarmal--sol .ks-yan-kolon {
   left: max(0.5rem, calc(50vw - 40rem - var(--ks-yan-gen) - 1rem));
@@ -117,16 +118,50 @@
 .ks-yan-sarmal--z-alt .ks-yan-kolon { z-index: 6; }
 .ks-yan-sarmal--z-alt .ks-yan-akis { z-index: 2; }
 .ks-yon--dikey.ks-yan-sarmal .ks-yan-kolon .ks-slider {
+  flex: 1 1 auto;
+  width: 100%;
   height: 100%;
-  min-height: 320px;
+  min-height: 100%;
 }
 .ks-yon--dikey.ks-yan-sarmal .ks-yan-kolon .ks-slider-icerik {
   height: 100%;
   min-height: 100%;
 }
-.ks-yan-kolon .ks-gorsel--sigdir {
+
+/* Yan dikey: seçilen widget grubunun tam yüksekliğini kapla */
+.ks-slider--yan-dolgu {
+  flex: 1 1 auto;
+  height: 100%;
+  min-height: 100%;
+}
+.ks-slider--yan-dolgu .ks-slider-icerik {
+  position: absolute;
+  inset: 0;
+  height: 100% !important;
+  min-height: 100% !important;
+}
+.ks-slider--yan-dolgu .ks-slayt {
+  position: absolute;
+  inset: 0;
+}
+.ks-slider--yan-dolgu .ks-slayt--aktif {
+  position: absolute !important;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 1;
+}
+.ks-slider--yan-dolgu .ks-gorsel {
+  width: 100%;
+  height: 100%;
   object-fit: cover;
-  min-height: 200px;
+}
+.ks-slider--yan-dolgu .ks-gorsel--sigdir {
+  object-fit: contain;
+}
+.ks-slider--yan-dolgu .ks-gorsel--orijinal {
+  object-fit: cover;
+  object-position: center top;
 }
 
 .site-public main {
