@@ -2512,7 +2512,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 @media (min-width: 640px) { .ib-kart-grid--2 { grid-template-columns: 1fr 1fr; } }
 .ib-kart { display: flex; gap: 0.75rem; padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; }
 .ib-kart--kompakt { padding: 0.75rem; }
-.ib-kart-ikon { display: flex; height: 2.5rem; width: 2.5rem; shrink: 0; align-items: center; justify-content: center; border-radius: 0.5rem; font-size: 1.125rem; }
+.ib-kart-ikon { display: flex; height: 2.5rem; width: 2.5rem; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 0.5rem; font-size: 1.125rem; }
 .ib-kart-etiket { font-size: 0.75rem; }
 .ib-kart-deger { font-weight: 700; }
 .ib-harita { width: 100%; min-height: 320px; border: none; border-radius: 1rem; }
@@ -2715,7 +2715,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 
 /* G?ncel Konular ? gk */
 .gk-etiket { margin-bottom: 0.25rem; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
-.gk-numara { display: inline-flex; height: 1.75rem; width: 1.75rem; shrink: 0; align-items: center; justify-content: center; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 800; color: #fff; }
+.gk-numara { display: inline-flex; height: 1.75rem; width: 1.75rem; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 0.375rem; font-size: 0.75rem; font-weight: 800; color: #fff; }
 .gk-numara--buyuk { height: 2.5rem; width: 2.5rem; font-size: 1.125rem; border-radius: 0.5rem; }
 .gk-hero { display: block; overflow: hidden; border-radius: 1rem; margin-bottom: 1rem; border: 1px solid #e2e8f0; text-decoration: none; }
 .gk-hero-img { aspect-ratio: 16/9; width: 100%; object-fit: cover; }
@@ -2730,7 +2730,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .gk-gorsel-liste { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.5rem; }
 .gk-gorsel-satir { display: flex; gap: 0.75rem; align-items: center; padding: 0.5rem; border-radius: 0.5rem; text-decoration: none; transition: background .15s; }
 .gk-gorsel-satir:hover { background: #f8fafc; }
-.gk-gorsel-thumb { height: 3.5rem; width: 5rem; shrink: 0; border-radius: 0.375rem; object-fit: cover; }
+.gk-gorsel-thumb { height: 3.5rem; width: 5rem; flex-shrink: 0; border-radius: 0.375rem; object-fit: cover; }
 .gk-gorsel-baslik { font-size: 0.875rem; font-weight: 600; }
 .gk-gorsel-tarih { font-size: 0.75rem; margin-top: 0.125rem; }
 .gk-chip-satir { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
@@ -2778,7 +2778,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .sg-band-gun-saat { margin-top: 0.25rem; font-weight: 700; font-size: 0.875rem; }
 .sg-timeline { margin-top: 1rem; padding-left: 0.5rem; }
 .sg-timeline-oge { display: flex; gap: 1rem; padding-bottom: 1.25rem; position: relative; }
-.sg-timeline-nokta { width: 12px; height: 12px; border-radius: 9999px; border: 2px solid; shrink: 0; margin-top: 0.25rem; }
+.sg-timeline-nokta { width: 12px; height: 12px; border-radius: 9999px; border: 2px solid; flex-shrink: 0; margin-top: 0.25rem; }
 .sg-timeline-gun { font-weight: 800; font-size: 0.875rem; margin-bottom: 0.25rem; }
 .sg-timeline-saatler { display: flex; gap: 1rem; font-size: 0.8rem; color: #64748b; }
 .sg-rozet-panel { padding: 1.25rem; border: 1px solid; background: #fff; }
@@ -4654,6 +4654,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
     line-height: 1.4;
     display: -webkit-box;
     -webkit-line-clamp: 3;
+    line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
@@ -6272,6 +6273,14 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   gap: 0.65rem;
 }
 
+.mlb-ozellikler--masaustu {
+  display: none;
+}
+
+.mlb-ozellikler--mobil {
+  display: flex;
+}
+
 .mlb-ozellik {
   display: flex;
   align-items: flex-start;
@@ -6292,50 +6301,28 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   min-width: 0;
 }
 
-.mlb-ozellik-metin-wrap {
-  display: flex;
-  flex: 1;
-  min-width: 0;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.25rem;
-}
-
-.mlb-ozellik-baslik {
+.mlb-ozellik-metin--mor {
   font-weight: 600;
   line-height: 1.45;
-  width: 100%;
-}
-
-.mlb-ozellik-alt {
-  font-size: 0.8125rem;
-  line-height: 1.5;
-  width: 100%;
 }
 
 @media (min-width: 768px) {
-  .mlb-ozellik-metin-wrap {
-    flex-direction: row;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
+  .mlb-ozellikler--masaustu {
+    display: flex;
   }
 
-  .mlb-ozellik-alt {
-    flex-shrink: 0;
-    max-width: 46%;
-    text-align: right;
-    width: auto;
-  }
-
-  .mlb-ozellik-baslik {
-    width: auto;
+  .mlb-ozellikler--mobil {
+    display: none !important;
   }
 }
 
 @media (max-width: 767px) {
-  .mlb-ozellik-alt {
-    display: none;
+  .mlb-ozellikler--masaustu {
+    display: none !important;
+  }
+
+  .mlb-ozellikler--mobil {
+    display: flex;
   }
 
   .mlb-split,
@@ -6363,6 +6350,10 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   .mlb-baslik-alan {
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  .mlb-ozellikler--mobil {
+    gap: 0.85rem;
   }
 
   .mlb-logo-grid {

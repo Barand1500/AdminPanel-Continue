@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import { useEffect, useState } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetEtiketKarti, WidgetIkonKart } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
@@ -29,117 +30,86 @@ function ikonAltSatirMi(ikon: string): boolean {
   return !k || k === '·' || k === '-' || k === '•' || k === '○' || k === '.';
 }
 
-type OzellikSatir = { id: string; ikon: string; baslik: string; alt?: string };
-
-function ciftSatirModu(ozellikler: WidgetIkonKart[]): boolean {
-  if (ozellikler.length < 2 || ozellikler.length % 2 !== 0) return false;
-  if (ozellikler.some((o) => o.metin.includes('|') || o.metin.includes('\n'))) return false;
-  return ozellikler.every((o, i) => {
-    if (i % 2 === 1) return true;
-    const sonraki = ozellikler[i + 1];
-    if (!sonraki) return false;
-    if (ikonAltSatirMi(sonraki.ikon)) return true;
-    return sonraki.metin.length <= o.metin.length * 1.35;
-  });
+function useMasaustuEkran() {
+  const [masaustu, setMasaustu] = useState(
+    () => typeof window !== 'undefined' && window.matchMedia('(min-width: 768px)').matches,
+  );
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)');
+    const guncelle = () => setMasaustu(mq.matches);
+    guncelle();
+    mq.addEventListener('change', guncelle);
+    return () => mq.removeEventListener('change', guncelle);
+  }, []);
+  return masaustu;
 }
 
-function ozellikleriGrupla(ozellikler: WidgetIkonKart[]): OzellikSatir[] {
-  if (ciftSatirModu(ozellikler)) {
-    const satirlar: OzellikSatir[] = [];
-    for (let i = 0; i < ozellikler.length; i += 2) {
-      const o = ozellikler[i];
-      const sonraki = ozellikler[i + 1];
-      satirlar.push({
-        id: o.id,
-        ikon: o.ikon,
-        baslik: ozellikMetinParcala(o.metin).baslik,
-        alt: sonraki ? ozellikMetinParcala(sonraki.metin).baslik : undefined,
-      });
-    }
-    return satirlar;
-  }
-
-  const satirlar: OzellikSatir[] = [];
-  let i = 0;
-  while (i < ozellikler.length) {
-    const o = ozellikler[i];
-    const parcali = ozellikMetinParcala(o.metin);
-    if (parcali.alt) {
-      satirlar.push({ id: o.id, ikon: o.ikon, baslik: parcali.baslik, alt: parcali.alt });
-      i += 1;
-      continue;
-    }
-    const sonraki = ozellikler[i + 1];
-    if (sonraki && ikonAltSatirMi(sonraki.ikon)) {
-      satirlar.push({ id: o.id, ikon: o.ikon, baslik: o.metin.trim(), alt: sonraki.metin.trim() });
-      i += 2;
-      continue;
-    }
-    if (
-      sonraki &&
-      o.metin.length >= 18 &&
-      sonraki.metin.length > 0 &&
-      sonraki.metin.length <= Math.max(48, o.metin.length * 0.75)
-    ) {
-      satirlar.push({ id: o.id, ikon: o.ikon, baslik: o.metin.trim(), alt: sonraki.metin.trim() });
-      i += 2;
-      continue;
-    }
-    satirlar.push({ id: o.id, ikon: o.ikon, baslik: o.metin.trim() });
-    i += 1;
-  }
-  return satirlar;
-}
-
-function OzellikMetin({
-  baslik,
-  alt,
-  vurgu,
-  metinRengi,
-}: {
-  baslik: string;
-  alt?: string;
-  vurgu: string;
-  metinRengi: string;
-}) {
-  if (!alt) {
-    return <span className="mlb-ozellik-metin">{baslik}</span>;
-  }
+/** Masaüstü: orijinal — her satır tek madde */
+function OzellikListesiMasaustu({ ozellikler, vurgu }: { ozellikler: WidgetIkonKart[]; vurgu: string }) {
+  if (ozellikler.length === 0) return null;
   return (
-    <span className="mlb-ozellik-metin-wrap">
-      <span className="mlb-ozellik-baslik" style={{ color: vurgu }}>
-        {baslik}
-      </span>
-      <span className="mlb-ozellik-alt" style={{ color: metinRengi }}>
-        {alt}
-      </span>
-    </span>
+    <ul className="mlb-ozellikler mlb-ozellikler--masaustu">
+      {ozellikler.map((o) => (
+        <li key={o.id} className="mlb-ozellik">
+          <span className="mlb-ozellik-isaret" style={{ color: vurgu }}>
+            {o.ikon || '✓'}
+          </span>
+          <span className="mlb-ozellik-metin">{o.metin}</span>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/** Mobil: sadece başlık satırları — sağ sütun / açıklama metinleri gösterilmez */
+function ozellikleriMobilMor(ozellikler: WidgetIkonKart[]): Array<{ id: string; ikon: string; baslik: string }> {
+  return ozellikler
+    .filter((o, i) => {
+      const parcali = ozellikMetinParcala(o.metin);
+      if (parcali.alt) return true;
+      if (ikonAltSatirMi(o.ikon)) return false;
+      if (ozellikler.length >= 2 && ozellikler.length % 2 === 0) return i % 2 === 0;
+      return true;
+    })
+    .map((o) => ({
+      id: o.id,
+      ikon: o.ikon || '✓',
+      baslik: ozellikMetinParcala(o.metin).baslik,
+    }));
+}
+
+function OzellikListesiMobil({ ozellikler, vurgu }: { ozellikler: WidgetIkonKart[]; vurgu: string }) {
+  if (ozellikler.length === 0) return null;
+  const morlar = ozellikleriMobilMor(ozellikler);
+  return (
+    <ul className="mlb-ozellikler mlb-ozellikler--mobil">
+      {morlar.map((o) => (
+        <li key={o.id} className="mlb-ozellik">
+          <span className="mlb-ozellik-isaret" style={{ color: vurgu }}>
+            {o.ikon}
+          </span>
+          <span className="mlb-ozellik-metin mlb-ozellik-metin--mor" style={{ color: vurgu }}>
+            {o.baslik}
+          </span>
+        </li>
+      ))}
+    </ul>
   );
 }
 
 function OzellikListesi({
   ozellikler,
   vurgu,
-  metinRengi,
 }: {
   ozellikler: WidgetIkonKart[];
   vurgu: string;
   metinRengi: string;
 }) {
-  if (ozellikler.length === 0) return null;
-  const satirlar = ozellikleriGrupla(ozellikler);
-  return (
-    <ul className="mlb-ozellikler">
-      {satirlar.map((o) => (
-        <li key={o.id} className="mlb-ozellik">
-          <span className="mlb-ozellik-isaret" style={{ color: vurgu }}>
-            {o.ikon || '✓'}
-          </span>
-          <OzellikMetin baslik={o.baslik} alt={o.alt} vurgu={vurgu} metinRengi={metinRengi} />
-        </li>
-      ))}
-    </ul>
-  );
+  const masaustu = useMasaustuEkran();
+  if (masaustu) {
+    return <OzellikListesiMasaustu ozellikler={ozellikler} vurgu={vurgu} />;
+  }
+  return <OzellikListesiMobil ozellikler={ozellikler} vurgu={vurgu} />;
 }
 
 function ModulBaslik({
