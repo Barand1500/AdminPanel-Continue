@@ -51,10 +51,10 @@ export function HeaderSade({ veri, menuAcik, setMenuAcik }: HeaderLayoutProps) {
   return (
     <HeaderGovde veri={veri} className="site-header-varyant-sade">
       <div className="container-site border-b border-[var(--color-border)]/60 py-2">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center">
+        <div className="flex items-center justify-between gap-3 lg:grid lg:grid-cols-[1fr_auto_1fr]">
           <div className="hidden lg:block" />
-          <MarkaAlani veri={veri} className="justify-self-center max-w-[160px]" />
-          <div className="flex justify-end">
+          <MarkaAlani veri={veri} className="max-w-[160px] lg:justify-self-center" />
+          <div className="ml-auto flex shrink-0 justify-end lg:ml-0">
             <SadeMinimalIkonlar veri={veri} />
             <IkonGrubu
               veri={veri}
@@ -116,14 +116,16 @@ export function HeaderMerkezLogo({ veri, ayarlar, menuAcik, setMenuAcik }: Heade
     <>
       <UstBant veri={veri} ayarlar={ayarlar} />
       <HeaderGovde veri={veri} className="site-header-varyant-merkez-logo">
-        <div className="container-site flex min-h-16 items-center justify-between gap-4 py-2">
-          <DesktopMenu menu={veri.menuSol} className="flex-1 justify-end" />
+        <div className="container-site flex min-h-16 items-center justify-between gap-3 py-2">
+          <DesktopMenu menu={veri.menuSol} className="order-2 flex-1 justify-end lg:order-1" />
           <MarkaAlani
             veri={veri}
-            className={`mx-4 justify-center ${headerMarkaKapSinifi(logoBoyutuNormalize(veri.header.logoBoyutu))}`}
+            className={`order-1 shrink-0 lg:order-2 lg:mx-4 lg:justify-center ${headerMarkaKapSinifi(logoBoyutuNormalize(veri.header.logoBoyutu))}`}
           />
-          <DesktopMenu menu={veri.menuSag} className="flex-1" />
-          <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
+          <DesktopMenu menu={veri.menuSag} className="order-3 flex-1 lg:order-3" />
+          <div className="order-4 ml-auto shrink-0 lg:ml-0">
+            <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
+          </div>
         </div>
         <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
       </HeaderGovde>

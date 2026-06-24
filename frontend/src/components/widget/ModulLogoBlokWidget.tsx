@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom';
+import type { CSSProperties } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetEtiketKarti, WidgetIkonKart } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
@@ -14,7 +15,32 @@ function renkler(cfg: WidgetConfig) {
   };
 }
 
-function OzellikListesi({ ozellikler, vurgu }: { ozellikler: WidgetIkonKart[]; vurgu: string }) {
+function ozellikMetinParcala(metin: string): { baslik: string; alt?: string } {
+  const ayirici = metin.includes('|') ? '|' : metin.includes('\n') ? '\n' : null;
+  if (!ayirici) return { baslik: metin };
+  const [baslik, ...rest] = metin.split(ayirici);
+  const alt = rest.join(ayirici).trim();
+  return alt ? { baslik: baslik.trim(), alt } : { baslik: metin.trim() };
+}
+
+function OzellikMetin({ metin, vurgu, metinRengi }: { metin: string; vurgu: string; metinRengi: string }) {
+  const { baslik, alt } = ozellikMetinParcala(metin);
+  if (!alt) {
+    return <span className="mlb-ozellik-metin">{baslik}</span>;
+  }
+  return (
+    <span className="mlb-ozellik-metin-wrap">
+      <span className="mlb-ozellik-baslik" style={{ color: vurgu }}>
+        {baslik}
+      </span>
+      <span className="mlb-ozellik-alt" style={{ color: metinRengi }}>
+        {alt}
+      </span>
+    </span>
+  );
+}
+
+function OzellikListesi({ ozellikler, vurgu, metinRengi }: { ozellikler: WidgetIkonKart[]; vurgu: string; metinRengi: string }) {
   if (ozellikler.length === 0) return null;
   return (
     <ul className="mlb-ozellikler">
@@ -23,7 +49,7 @@ function OzellikListesi({ ozellikler, vurgu }: { ozellikler: WidgetIkonKart[]; v
           <span className="mlb-ozellik-isaret" style={{ color: vurgu }}>
             {o.ikon || '✓'}
           </span>
-          <span>{o.metin}</span>
+          <OzellikMetin metin={o.metin} vurgu={vurgu} metinRengi={metinRengi} />
         </li>
       ))}
     </ul>
@@ -125,7 +151,7 @@ function LogoGrid({
   return (
     <div
       className={`mlb-logo-grid ${sinif}`.trim()}
-      style={{ gridTemplateColumns: `repeat(${Math.min(kolon, 6)}, minmax(0, 1fr))` }}
+      style={{ '--mlb-logo-cols': Math.min(kolon, 6) } as CSSProperties}
     >
       {logolar.map((l) => (
         <LogoKart key={l.id} kart={l} radius={radius} />
@@ -159,7 +185,7 @@ function IcerikBolumu({
         </p>
       )}
       <ModulBaslik widget={widget} renk={renk} ikon={cfg.modulIkon} />
-      <OzellikListesi ozellikler={ozellikler} vurgu={renk.vurgu} />
+      <OzellikListesi ozellikler={ozellikler} vurgu={renk.vurgu} metinRengi={renk.metin} />
       {widget.butonLink && widget.butonMetni && (
         <a href={widget.butonLink} className="mlb-cta" style={{ background: renk.vurgu }}>
           {widget.butonMetni}
@@ -235,7 +261,7 @@ function UstAltGrid({
           </p>
         )}
         <ModulBaslik widget={widget} renk={renk} ikon={cfg.modulIkon} />
-        <OzellikListesi ozellikler={ozellikler} vurgu={renk.vurgu} />
+        <OzellikListesi ozellikler={ozellikler} vurgu={renk.vurgu} metinRengi={renk.metin} />
       </div>
       <LogoGrid logolar={logolar} cfg={cfg} sinif="mlb-logo-grid-genis" kolon={cfg.gorunum?.kolonSayisi ?? 4} />
     </div>
@@ -336,7 +362,7 @@ function BentoModul({
             {widget.aciklama}
           </p>
         )}
-        <OzellikListesi ozellikler={ozellikler} vurgu={renk.vurgu} />
+        <OzellikListesi ozellikler={ozellikler} vurgu={renk.vurgu} metinRengi={renk.metin} />
       </div>
       {logolar.map((l, i) => (
         <LogoKart

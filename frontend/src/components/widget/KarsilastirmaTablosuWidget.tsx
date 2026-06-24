@@ -1,6 +1,7 @@
+import { useEffect, useState } from 'react';
 import type { CSSProperties } from 'react';
 import type { Widget } from '@/types/site';
-import type { WidgetKarsilastirmaPaket } from '@/types/widget';
+import type { WidgetKarsilastirmaPaket, WidgetKarsilastirmaSatiri } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget } from './widgetHelpers';
@@ -82,49 +83,94 @@ function PaketBaslikHucre({ p, renk, koyu }: { p: WidgetKarsilastirmaPaket; renk
   );
 }
 
+function useMobilEkran() {
+  const [mobil, setMobil] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(max-width: 767px)');
+    const guncelle = () => setMobil(mq.matches);
+    guncelle();
+    mq.addEventListener('change', guncelle);
+    return () => mq.removeEventListener('change', guncelle);
+  }, []);
+  return mobil;
+}
+
+function MobilKartGrid({
+  paketler,
+  satirlar,
+  renk,
+  hucreStili,
+  ozellikStili,
+}: {
+  paketler: WidgetKarsilastirmaPaket[];
+  satirlar: WidgetKarsilastirmaSatiri[];
+  renk: ReturnType<typeof tabloRenkler>;
+  hucreStili: CSSProperties;
+  ozellikStili: CSSProperties;
+}) {
+  return (
+    <div className="kt-mobil-grid">
+      {paketler.map((p) => (
+        <article
+          key={p.id}
+          className="kt-mobil-kart"
+          style={{
+            borderRadius: renk.radius,
+            borderColor: p.oneCikan ? renk.vurgu : renk.kenar,
+            backgroundColor: p.oneCikan ? `${renk.vurgu}08` : renk.panel,
+            boxShadow: p.oneCikan ? `0 12px 40px ${renk.vurgu}22` : undefined,
+          }}
+        >
+          <div className="kt-mobil-kart-baslik">
+            <h3 style={{ color: renk.baslik }}>{p.ad}</h3>
+            {p.oneCikan && (
+              <span className="kt-one-cikan-rozet" style={{ backgroundColor: renk.vurgu, color: '#fff' }}>
+                Öne çıkan
+              </span>
+            )}
+          </div>
+          {p.fiyat && <p className="kt-mobil-fiyat" style={{ color: renk.vurgu }}>{p.fiyat}</p>}
+          <ul className="kt-mobil-liste">
+            {satirlar.map((s) => {
+              const pi = paketler.findIndex((x) => x.id === p.id);
+              return (
+                <li key={s.id}>
+                  <span className="kt-mobil-ozellik" style={ozellikStili}>{s.ozellik}</span>
+                  {hucreGoster(s.hucreler[pi] ?? '—', hucreStili, renk.vurgu)}
+                </li>
+              );
+            })}
+          </ul>
+        </article>
+      ))}
+    </div>
+  );
+}
+
 export function KarsilastirmaTablosuWidget({ widget }: { widget: Widget }) {
   const cfg = configOkuFromWidget(widget);
   const paketler = cfg.karsilastirmaPaketler ?? [];
   const satirlar = cfg.karsilastirmaSatirlari ?? [];
   const gt = widgetGorunumTipiAl(widget);
   const renk = tabloRenkler(cfg, widget);
+  const mobilEkran = useMobilEkran();
   if (paketler.length === 0) return null;
 
   const hucreStili: CSSProperties = { color: renk.metin };
   const ozellikStili: CSSProperties = { color: renk.baslik };
+  const kartGorunumu = gt === 'mobil-kart' || mobilEkran;
 
-  if (gt === 'mobil-kart') {
+  if (kartGorunumu) {
     return (
       <WidgetKabuk widget={widget}>
         <TabloBaslikBlok widget={widget} cfg={cfg} renk={renk} />
-        <div className="kt-mobil-grid">
-          {paketler.map((p) => (
-            <article
-              key={p.id}
-              className="kt-mobil-kart"
-              style={{
-                borderRadius: renk.radius,
-                borderColor: p.oneCikan ? renk.vurgu : renk.kenar,
-                backgroundColor: p.oneCikan ? `${renk.vurgu}08` : renk.panel,
-                boxShadow: p.oneCikan ? `0 12px 40px ${renk.vurgu}22` : undefined,
-              }}
-            >
-              <h3 style={{ color: renk.baslik }}>{p.ad}</h3>
-              {p.fiyat && <p className="kt-mobil-fiyat" style={{ color: renk.vurgu }}>{p.fiyat}</p>}
-              <ul className="kt-mobil-liste">
-                {satirlar.map((s) => {
-                  const pi = paketler.findIndex((x) => x.id === p.id);
-                  return (
-                    <li key={s.id}>
-                      <span style={ozellikStili}>{s.ozellik}</span>
-                      {hucreGoster(s.hucreler[pi] ?? '—', hucreStili, renk.vurgu)}
-                    </li>
-                  );
-                })}
-              </ul>
-            </article>
-          ))}
-        </div>
+        <MobilKartGrid
+          paketler={paketler}
+          satirlar={satirlar}
+          renk={renk}
+          hucreStili={hucreStili}
+          ozellikStili={ozellikStili}
+        />
       </WidgetKabuk>
     );
   }
@@ -173,7 +219,7 @@ export function KarsilastirmaTablosuWidget({ widget }: { widget: Widget }) {
         className="kt-tablo-wrap"
         style={{ borderRadius: renk.radius, border: `1px solid ${renk.kenar}`, backgroundColor: renk.panel }}
       >
-        <div className="kt-tablo-scroll">
+        <div className="kt-tablo-scroll" tabIndex={0} role="region" aria-label="Karşılaştırma tablosu — yatay kaydırılabilir">
           <table className="kt-tablo">
             <thead>
               <tr style={{ backgroundColor: koyuHeaderBg, borderBottom: `1px solid ${renk.kenar}` }}>

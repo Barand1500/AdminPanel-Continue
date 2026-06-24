@@ -287,33 +287,44 @@ export function MobilMenuPanel({
   if (!menuAcik) return null;
 
   return (
-    <nav
-      className="border-t px-4 py-3 lg:hidden"
-      style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface-elevated)' }}
-    >
-      {veri.cevrilmisMenu.map((oge, i) => (
-        <div key={`${oge.yol}-${i}`}>
-          <MenuOgeGoster
-            oge={oge}
-            onClick={onMenuKapat}
-            linkClassName="block border-b py-3 text-sm font-medium last:border-0"
-            style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
-            mobil
-          />
-        </div>
-      ))}
-      <div
-        className="mt-2 flex flex-wrap items-center gap-3 border-t pt-3 text-sm font-medium"
-        style={{ borderColor: 'var(--color-border)' }}
+    <>
+      <button
+        type="button"
+        className="site-mobil-menu-backdrop lg:hidden"
+        aria-label="Menüyü kapat"
+        onClick={onMenuKapat}
+      />
+      <nav
+        className="site-mobil-menu-panel border-t lg:hidden"
+        style={{ borderColor: 'var(--color-border)', background: 'var(--color-surface-elevated)' }}
+        aria-label="Mobil menü"
       >
-        <TemaToggle tema={veri.header.ikonlar?.tema} />
-        {kullaniciAlaniGoster(veri.tipEk) && (
-          <Link to="/hesabim" onClick={onMenuKapat} className="text-primary">
-            Hesabım
-          </Link>
-        )}
-      </div>
-    </nav>
+        <div className="site-mobil-menu-links">
+          {veri.cevrilmisMenu.map((oge, i) => (
+            <div key={`${oge.yol}-${i}`}>
+              <MenuOgeGoster
+                oge={oge}
+                onClick={onMenuKapat}
+                linkClassName="block border-b py-2.5 text-sm font-medium last:border-0"
+                style={{ borderColor: 'var(--color-border)', color: 'var(--color-text-muted)' }}
+                mobil
+              />
+            </div>
+          ))}
+        </div>
+        <div className="site-mobil-menu-footer">
+          <CtaLink veri={veri} className="site-mobil-menu-cta" />
+          <div className="site-mobil-menu-alt flex flex-wrap items-center gap-3 text-sm font-medium">
+            <TemaToggle tema={veri.header.ikonlar?.tema} />
+            {kullaniciAlaniGoster(veri.tipEk) && (
+              <Link to="/hesabim" onClick={onMenuKapat} className="text-primary">
+                Hesabım
+              </Link>
+            )}
+          </div>
+        </div>
+      </nav>
+    </>
   );
 }
 

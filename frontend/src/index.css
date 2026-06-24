@@ -542,6 +542,53 @@ body:has(.site-public)::-webkit-scrollbar,
   border-color: var(--color-border);
 }
 
+.site-mobil-menu-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  border: none;
+  background: rgba(15, 23, 42, 0.35);
+  cursor: pointer;
+}
+
+.site-mobil-menu-panel {
+  position: relative;
+  z-index: 41;
+  display: flex;
+  max-height: min(70dvh, calc(100dvh - 4rem));
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.site-mobil-menu-links {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0.5rem 1rem;
+  -webkit-overflow-scrolling: touch;
+}
+
+.site-mobil-menu-footer {
+  display: flex;
+  flex-shrink: 0;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  border-top: 1px solid var(--color-border);
+  padding: 0.875rem 1rem;
+}
+
+.site-mobil-menu-cta {
+  font-size: 0.875rem;
+  font-weight: 600;
+}
+
+@media (max-width: 1023px) {
+  .site-header-varyant-merkez-logo .container-site > .flex {
+    justify-content: space-between;
+  }
+}
+
 .site-header-klasik,
 .site-header-arama-odakli,
 .site-header-kurumsal,
@@ -6229,6 +6276,61 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   flex-shrink: 0;
 }
 
+.mlb-ozellik-metin {
+  flex: 1;
+  min-width: 0;
+}
+
+.mlb-ozellik-metin-wrap {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.mlb-ozellik-baslik {
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.mlb-ozellik-alt {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
+@media (min-width: 640px) {
+  .mlb-ozellik-metin-wrap {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .mlb-ozellik-alt {
+    flex-shrink: 0;
+    max-width: 46%;
+    text-align: right;
+  }
+}
+
+@media (max-width: 639px) {
+  .mlb-cerceve,
+  .mlb-ust-alt,
+  .mlb-gradient {
+    padding: 1.25rem;
+  }
+
+  .mlb-split {
+    gap: 1.25rem;
+  }
+
+  .mlb-baslik-alan {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+}
+
 .mlb-cta {
   display: inline-flex;
   align-self: flex-start;
@@ -6248,6 +6350,19 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .mlb-logo-grid {
   display: grid;
   gap: 0.65rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 480px) {
+  .mlb-logo-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 640px) {
+  .mlb-logo-grid {
+    grid-template-columns: repeat(var(--mlb-logo-cols, 4), minmax(0, 1fr));
+  }
 }
 
 .mlb-logo-kart {
@@ -9461,10 +9576,28 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .kt-baslik { margin: 0; }
 .kt-aciklama { margin: 0.75rem auto 0; max-width: 40rem; font-size: 0.95rem; line-height: 1.65; }
 
-.kt-tablo-wrap { overflow: hidden; }
-.kt-tablo-scroll { overflow-x: auto; }
-.kt-tablo { width: 100%; min-width: 560px; border-collapse: collapse; text-align: left; }
-.kt-ozellik-baslik, .kt-paket-baslik, .kt-ozellik-hucre { padding: 1rem; font-size: 0.875rem; }
+.kt-tablo-wrap { overflow: visible; }
+.kt-tablo-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.kt-tablo { width: 100%; min-width: 520px; border-collapse: collapse; text-align: left; }
+.kt-ozellik-baslik, .kt-paket-baslik, .kt-ozellik-hucre { padding: 0.75rem 0.65rem; font-size: 0.8125rem; }
+@media (min-width: 768px) {
+  .kt-ozellik-baslik, .kt-paket-baslik, .kt-ozellik-hucre { padding: 1rem; font-size: 0.875rem; }
+}
+@media (max-width: 767px) {
+  .kt-ozellik-baslik,
+  .kt-ozellik-hucre {
+    position: sticky;
+    left: 0;
+    z-index: 2;
+    min-width: 7.5rem;
+    background: inherit;
+    box-shadow: 2px 0 6px rgba(15, 23, 42, 0.06);
+  }
+}
 .kt-paket-baslik { text-align: center; vertical-align: bottom; }
 .kt-paket-ad { margin: 0; font-weight: 800; font-size: 0.95rem; }
 .kt-paket-fiyat { margin: 0.35rem 0 0; font-size: 0.85rem; font-weight: 700; }
@@ -9485,11 +9618,27 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 
 .kt-mobil-grid {
   display: grid;
-  gap: 1.25rem;
+  gap: 1rem;
+}
+
+.kt-mobil-kart-baslik {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.kt-mobil-kart-baslik h3 {
+  margin: 0;
+}
+
+.kt-mobil-ozellik {
+  flex: 1;
+  min-width: 0;
 }
 
 @media (min-width: 768px) {
-  .kt-mobil-grid { grid-template-columns: repeat(2, 1fr); }
+  .kt-mobil-grid { grid-template-columns: repeat(2, 1fr); gap: 1.25rem; }
 }
 
 @media (min-width: 1024px) {
@@ -9498,7 +9647,10 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 
 .kt-mobil-kart {
   border: 1px solid;
-  padding: 1.25rem;
+  padding: 1rem;
+}
+@media (min-width: 768px) {
+  .kt-mobil-kart { padding: 1.25rem; }
 }
 .kt-mobil-kart h3 { margin: 0; font-size: 1.1rem; font-weight: 800; }
 .kt-mobil-fiyat { margin: 0.35rem 0 0; font-weight: 700; font-size: 0.95rem; }
@@ -9512,11 +9664,20 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 .kt-mobil-liste li {
   display: flex;
-  justify-content: space-between;
-  gap: 0.75rem;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
   font-size: 0.8125rem;
   padding-bottom: 0.5rem;
   border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+}
+@media (min-width: 480px) {
+  .kt-mobil-liste li {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+  }
 }
 
 .kt-minimal-wrap { overflow-x: auto; }
@@ -10285,7 +10446,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   font-size: 0.65rem;
 }
 
-/* Özel Grid Widget ? parça grid */
+/* ?zel Grid Widget ? par?a grid */
 .blok-olusturucu-grid {
   display: grid;
   width: 100%;
