@@ -6300,21 +6300,9 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   min-width: 0;
 }
 
-.mlb-ozellik-mobil-metin {
-  flex: 1;
-  min-width: 0;
-}
-
-.mlb-ozellik-mobil-metin .mlb-ozellik-baslik {
-  margin: 0;
+.mlb-ozellik-metin--mor {
   font-weight: 600;
   line-height: 1.45;
-}
-
-.mlb-ozellik-mobil-metin .mlb-ozellik-alt {
-  margin: 0.25rem 0 0;
-  font-size: 0.8125rem;
-  line-height: 1.5;
 }
 
 @media (min-width: 768px) {
@@ -6323,11 +6311,19 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   }
 
   .mlb-ozellikler--mobil {
-    display: none;
+    display: none !important;
   }
 }
 
 @media (max-width: 767px) {
+  .mlb-ozellikler--masaustu {
+    display: none !important;
+  }
+
+  .mlb-ozellikler--mobil {
+    display: flex;
+  }
+
   .mlb-split,
   .mlb-split-ters,
   .mlb-marquee-split {
@@ -6361,6 +6357,26 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 
   .mlb-logo-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .mlb-cerceve,
+  .mlb-ust-alt,
+  .mlb-gradient,
+  .mlb-marquee-wrap {
+    overflow-x: hidden;
+    max-width: 100%;
+  }
+
+  html:has(.site-public),
+  body:has(.site-public) {
+    overflow-x: hidden;
+    max-width: 100%;
+    position: relative;
+  }
+
+  .site-public {
+    overflow-x: hidden;
+    max-width: 100%;
   }
 }
 

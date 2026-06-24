@@ -29,8 +29,6 @@ function ikonAltSatirMi(ikon: string): boolean {
   return !k || k === '·' || k === '-' || k === '•' || k === '○' || k === '.';
 }
 
-type OzellikSatir = { id: string; ikon: string; baslik: string; alt?: string };
-
 function ciftSatirModu(ozellikler: WidgetIkonKart[]): boolean {
   if (ozellikler.length < 2 || ozellikler.length % 2 !== 0) return false;
   if (ozellikler.some((o) => o.metin.includes('|') || o.metin.includes('\n'))) return false;
@@ -41,44 +39,6 @@ function ciftSatirModu(ozellikler: WidgetIkonKart[]): boolean {
     if (ikonAltSatirMi(sonraki.ikon)) return true;
     return sonraki.metin.length <= o.metin.length * 1.35;
   });
-}
-
-function ozellikleriGrupla(ozellikler: WidgetIkonKart[]): OzellikSatir[] {
-  if (ciftSatirModu(ozellikler)) {
-    const satirlar: OzellikSatir[] = [];
-    for (let i = 0; i < ozellikler.length; i += 2) {
-      const baslik = ozellikler[i];
-      const altKart = ozellikler[i + 1];
-      satirlar.push({
-        id: baslik.id,
-        ikon: baslik.ikon || '✓',
-        baslik: baslik.metin.trim(),
-        alt: altKart.metin.trim(),
-      });
-    }
-    return satirlar;
-  }
-
-  const satirlar: OzellikSatir[] = [];
-  let i = 0;
-  while (i < ozellikler.length) {
-    const o = ozellikler[i];
-    const parcali = ozellikMetinParcala(o.metin);
-    if (parcali.alt) {
-      satirlar.push({ id: o.id, ikon: o.ikon, baslik: parcali.baslik, alt: parcali.alt });
-      i += 1;
-      continue;
-    }
-    const sonraki = ozellikler[i + 1];
-    if (sonraki && ikonAltSatirMi(sonraki.ikon)) {
-      satirlar.push({ id: o.id, ikon: o.ikon, baslik: o.metin, alt: sonraki.metin });
-      i += 2;
-      continue;
-    }
-    satirlar.push({ id: o.id, ikon: o.ikon, baslik: o.metin });
-    i += 1;
-  }
-  return satirlar;
 }
 
 /** Masaüstü: orijinal — her satır tek madde */
@@ -98,35 +58,69 @@ function OzellikListesiMasaustu({ ozellikler, vurgu }: { ozellikler: WidgetIkonK
   );
 }
 
-/** Mobil: mor başlık + gri açıklama alt alta */
-function OzellikListesiMobil({
-  ozellikler,
-  vurgu,
-  metinRengi,
-}: {
-  ozellikler: WidgetIkonKart[];
-  vurgu: string;
-  metinRengi: string;
-}) {
+/** Mobil: yalnızca mor başlık maddeleri (gri açıklama satırları gösterilmez) */
+function ozellikleriMobilMor(ozellikler: WidgetIkonKart[]): Array<{ id: string; ikon: string; baslik: string }> {
+  if (ciftSatirModu(ozellikler)) {
+    return ozellikler
+      .filter((_, i) => i % 2 === 0)
+      .map((o) => ({
+        id: o.id,
+        ikon: o.ikon || '✓',
+        baslik: ozellikMetinParcala(o.metin).baslik,
+      }));
+  }
+
+  const morlar: Array<{ id: string; ikon: string; baslik: string }> = [];
+  let i = 0;
+  while (i < ozellikler.length) {
+    const o = ozellikler[i];
+    const parcali = ozellikMetinParcala(o.metin);
+    if (parcali.alt) {
+      morlar.push({ id: o.id, ikon: o.ikon || '✓', baslik: parcali.baslik });
+      i += 1;
+      continue;
+    }
+    const sonraki = ozellikler[i + 1];
+    if (sonraki && ikonAltSatirMi(sonraki.ikon)) {
+      morlar.push({ id: o.id, ikon: o.ikon || '✓', baslik: o.metin.trim() });
+      i += 2;
+      continue;
+    }
+    morlar.push({ id: o.id, ikon: o.ikon || '✓', baslik: o.metin.trim() });
+    i += 1;
+  }
+
+  if (
+    morlar.length === ozellikler.length &&
+    ozellikler.length >= 2 &&
+    ozellikler.length % 2 === 0 &&
+    ozellikler.every((o) => (o.ikon || '✓').trim() === '✓')
+  ) {
+    return ozellikler
+      .filter((_, i) => i % 2 === 0)
+      .map((o) => ({
+        id: o.id,
+        ikon: o.ikon || '✓',
+        baslik: ozellikMetinParcala(o.metin).baslik,
+      }));
+  }
+
+  return morlar;
+}
+
+function OzellikListesiMobil({ ozellikler, vurgu }: { ozellikler: WidgetIkonKart[]; vurgu: string }) {
   if (ozellikler.length === 0) return null;
-  const satirlar = ozellikleriGrupla(ozellikler);
+  const morlar = ozellikleriMobilMor(ozellikler);
   return (
     <ul className="mlb-ozellikler mlb-ozellikler--mobil">
-      {satirlar.map((o) => (
-        <li key={o.id} className="mlb-ozellik mlb-ozellik--mobil">
+      {morlar.map((o) => (
+        <li key={o.id} className="mlb-ozellik">
           <span className="mlb-ozellik-isaret" style={{ color: vurgu }}>
-            {o.ikon || '✓'}
+            {o.ikon}
           </span>
-          <div className="mlb-ozellik-mobil-metin">
-            <p className="mlb-ozellik-baslik" style={{ color: vurgu }}>
-              {o.baslik}
-            </p>
-            {o.alt && (
-              <p className="mlb-ozellik-alt" style={{ color: metinRengi }}>
-                {o.alt}
-              </p>
-            )}
-          </div>
+          <span className="mlb-ozellik-metin mlb-ozellik-metin--mor" style={{ color: vurgu }}>
+            {o.baslik}
+          </span>
         </li>
       ))}
     </ul>
@@ -136,7 +130,6 @@ function OzellikListesiMobil({
 function OzellikListesi({
   ozellikler,
   vurgu,
-  metinRengi,
 }: {
   ozellikler: WidgetIkonKart[];
   vurgu: string;
@@ -145,7 +138,7 @@ function OzellikListesi({
   return (
     <>
       <OzellikListesiMasaustu ozellikler={ozellikler} vurgu={vurgu} />
-      <OzellikListesiMobil ozellikler={ozellikler} vurgu={vurgu} metinRengi={metinRengi} />
+      <OzellikListesiMobil ozellikler={ozellikler} vurgu={vurgu} />
     </>
   );
 }
