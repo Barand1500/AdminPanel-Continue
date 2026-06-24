@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import type { CSSProperties } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetEtiketKarti, WidgetIkonKart } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
@@ -76,52 +75,78 @@ function ozellikleriGrupla(ozellikler: WidgetIkonKart[]): OzellikSatir[] {
       i += 2;
       continue;
     }
-    if (
-      sonraki &&
-      o.metin.length >= 18 &&
-      sonraki.metin.length > 0 &&
-      sonraki.metin.length <= Math.max(48, o.metin.length * 0.75)
-    ) {
-      satirlar.push({ id: o.id, ikon: o.ikon, baslik: o.metin, alt: sonraki.metin });
-      i += 2;
-      continue;
-    }
     satirlar.push({ id: o.id, ikon: o.ikon, baslik: o.metin });
     i += 1;
   }
   return satirlar;
 }
 
-function OzellikMetin({ baslik, alt, vurgu, metinRengi }: { baslik: string; alt?: string; vurgu: string; metinRengi: string }) {
-  if (!alt) {
-    return <div className="mlb-ozellik-metin">{baslik}</div>;
-  }
-  return (
-    <div className="mlb-ozellik-metin-wrap">
-      <div className="mlb-ozellik-baslik" style={{ color: vurgu }}>
-        {baslik}
-      </div>
-      <div className="mlb-ozellik-alt" style={{ color: metinRengi }}>
-        {alt}
-      </div>
-    </div>
-  );
-}
-
-function OzellikListesi({ ozellikler, vurgu, metinRengi }: { ozellikler: WidgetIkonKart[]; vurgu: string; metinRengi: string }) {
+/** Masaüstü: orijinal — her satır tek madde */
+function OzellikListesiMasaustu({ ozellikler, vurgu }: { ozellikler: WidgetIkonKart[]; vurgu: string }) {
   if (ozellikler.length === 0) return null;
-  const satirlar = ozellikleriGrupla(ozellikler);
   return (
-    <ul className="mlb-ozellikler">
-      {satirlar.map((o) => (
+    <ul className="mlb-ozellikler mlb-ozellikler--masaustu">
+      {ozellikler.map((o) => (
         <li key={o.id} className="mlb-ozellik">
           <span className="mlb-ozellik-isaret" style={{ color: vurgu }}>
             {o.ikon || '✓'}
           </span>
-          <OzellikMetin baslik={o.baslik} alt={o.alt} vurgu={vurgu} metinRengi={metinRengi} />
+          <span className="mlb-ozellik-metin">{o.metin}</span>
         </li>
       ))}
     </ul>
+  );
+}
+
+/** Mobil: mor başlık + gri açıklama alt alta */
+function OzellikListesiMobil({
+  ozellikler,
+  vurgu,
+  metinRengi,
+}: {
+  ozellikler: WidgetIkonKart[];
+  vurgu: string;
+  metinRengi: string;
+}) {
+  if (ozellikler.length === 0) return null;
+  const satirlar = ozellikleriGrupla(ozellikler);
+  return (
+    <ul className="mlb-ozellikler mlb-ozellikler--mobil">
+      {satirlar.map((o) => (
+        <li key={o.id} className="mlb-ozellik mlb-ozellik--mobil">
+          <span className="mlb-ozellik-isaret" style={{ color: vurgu }}>
+            {o.ikon || '✓'}
+          </span>
+          <div className="mlb-ozellik-mobil-metin">
+            <p className="mlb-ozellik-baslik" style={{ color: vurgu }}>
+              {o.baslik}
+            </p>
+            {o.alt && (
+              <p className="mlb-ozellik-alt" style={{ color: metinRengi }}>
+                {o.alt}
+              </p>
+            )}
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function OzellikListesi({
+  ozellikler,
+  vurgu,
+  metinRengi,
+}: {
+  ozellikler: WidgetIkonKart[];
+  vurgu: string;
+  metinRengi: string;
+}) {
+  return (
+    <>
+      <OzellikListesiMasaustu ozellikler={ozellikler} vurgu={vurgu} />
+      <OzellikListesiMobil ozellikler={ozellikler} vurgu={vurgu} metinRengi={metinRengi} />
+    </>
   );
 }
 
@@ -220,7 +245,7 @@ function LogoGrid({
   return (
     <div
       className={`mlb-logo-grid ${sinif}`.trim()}
-      style={{ '--mlb-logo-cols': Math.min(kolon, 6) } as CSSProperties}
+      style={{ gridTemplateColumns: `repeat(${Math.min(kolon, 6)}, minmax(0, 1fr))` }}
     >
       {logolar.map((l) => (
         <LogoKart key={l.id} kart={l} radius={radius} />
