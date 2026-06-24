@@ -6019,62 +6019,116 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   margin-top: auto;
 }
 
-/* 8 Quote */
-.yk-quote-grid {
-  display: grid;
-  gap: 1.5rem;
+/* 8 Avatar Karusel (quote-stil) */
+.yk-karusel {
+  max-width: 42rem;
+  margin: 0 auto;
 }
 
-@media (min-width: 768px) {
-  .yk-quote-grid {
-    grid-template-columns: repeat(2, 1fr);
-  }
+.yk-karusel-avatar-satir {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
 }
 
-.yk-quote-kart {
+.yk-karusel-avatarlar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+}
+
+.yk-karusel-avatar-tus {
+  border: none;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  border-radius: 9999px;
+  transition: transform 0.25s ease, opacity 0.25s ease;
+}
+
+.yk-karusel-avatar-yan {
+  opacity: 0.55;
+  transform: scale(0.82);
+}
+
+.yk-karusel-avatar-yan:hover {
+  opacity: 0.85;
+  transform: scale(0.9);
+}
+
+.yk-karusel-avatar-aktif {
+  transform: scale(1.12);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  border-radius: 9999px;
+}
+
+.yk-karusel-ok {
+  flex-shrink: 0;
+  width: 2.25rem;
+  height: 2.25rem;
+  border-radius: 9999px;
+  border: 1px solid rgba(15, 23, 42, 0.12);
+  background: #fff;
+  color: #334155;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.yk-karusel-ok:hover {
+  border-color: rgba(15, 23, 42, 0.25);
+  background: #f8fafc;
+}
+
+.yk-karusel-kart {
   position: relative;
-  overflow: hidden;
+  margin-top: 1.25rem;
   border-radius: 1rem;
   border: 1px solid;
   background: #fff;
-  padding: 2rem 1.75rem 1.5rem;
-  box-shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+  padding: 2rem 1.75rem 1.75rem;
+  box-shadow: 0 12px 36px rgba(15, 23, 42, 0.08);
+  text-align: center;
 }
 
-.yk-quote-isaret {
+.yk-karusel-kart-ucgen {
   position: absolute;
-  top: 0.25rem;
-  left: 1rem;
-  font-size: 5rem;
-  font-family: Georgia, serif;
-  line-height: 1;
-  pointer-events: none;
+  top: -0.65rem;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 0.65rem solid transparent;
+  border-right: 0.65rem solid transparent;
+  border-bottom: 0.65rem solid #fff;
+  filter: drop-shadow(0 -1px 0 rgba(15, 23, 42, 0.06));
 }
 
-.yk-quote-yildiz {
-  position: relative;
-  z-index: 1;
+.yk-karusel-yildiz {
+  display: flex;
+  justify-content: center;
   margin-bottom: 0.75rem;
 }
 
-.yk-quote-metin {
-  position: relative;
-  z-index: 1;
-  margin: 0;
+.yk-karusel-imza {
+  margin: 0 0 1rem;
   font-size: 1.05rem;
-  font-weight: 500;
-  line-height: 1.6;
+  line-height: 1.4;
 }
 
-.yk-quote-alt {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  margin-top: 1.25rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(15, 23, 42, 0.08);
+.yk-karusel-metin {
+  margin: 0;
+  font-size: 0.98rem;
+  line-height: 1.75;
+  max-width: 36rem;
+  margin-inline: auto;
 }
 
 /* Modul Logo Blok (MODUL_LOGO_BLOK) */
@@ -6338,6 +6392,360 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   .mlb-bento-icerik {
     grid-column: span 2;
     grid-row: span 1;
+  }
+}
+
+/* Site Hakkinda (SITE_HAKKINDA) */
+.sh-alt-baslik {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.sh-baslik {
+  margin: 0 0 1rem;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  font-weight: 800;
+  line-height: 1.15;
+}
+
+.sh-metin {
+  margin: 0 0 1.25rem;
+  font-size: 1rem;
+  line-height: 1.75;
+}
+
+.sh-icerik {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.sh-ozellik-check-grid {
+  display: grid;
+  gap: 0.75rem 1.5rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 640px) {
+  .sh-ozellik-check-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.sh-ozellik-check {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.92rem;
+}
+
+.sh-ozellik-check-ikon {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 9999px;
+  font-size: 0.7rem;
+  color: #fff;
+}
+
+.sh-ozellik-kutular {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .sh-ozellik-kutular {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.sh-ozellik-kutu {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding: 0.85rem 1rem;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: #f8fafc;
+  font-size: 0.9rem;
+}
+
+.sh-ozellik-kutu-ikon {
+  font-size: 1.1rem;
+}
+
+.sh-ozellik-timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.sh-ozellik-timeline-oge {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.92rem;
+}
+
+.sh-ozellik-timeline-no {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 9999px;
+  border: 2px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.sh-ozellik-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.sh-ozellik-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid;
+  font-size: 0.85rem;
+}
+
+.sh-ozellik-yildiz {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.sh-ozellik-yildiz-oge {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.92rem;
+}
+
+.sh-ozellik-emoji-grid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.sh-ozellik-emoji-kart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.35rem;
+  padding: 0.75rem;
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.sh-ozellik-emoji-buyuk {
+  font-size: 1.5rem;
+}
+
+.sh-ozellik-emoji-metin {
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.sh-gorsel-wrap {
+  position: relative;
+  overflow: hidden;
+  min-height: 16rem;
+}
+
+.sh-gorsel-img,
+.sh-gorsel-bos {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 16rem;
+  object-fit: cover;
+}
+
+.sh-gorsel-bos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #e2e8f0;
+  color: #94a3b8;
+  font-size: 0.9rem;
+}
+
+.sh-gorsel-sol-alt-yuvarlak {
+  border-radius: 0 1.5rem 0 4rem;
+}
+
+.sh-gorsel-sag-alt-yuvarlak {
+  border-radius: 4rem 0 1.5rem 0;
+}
+
+.sh-gorsel-ust-yuvarlak {
+  border-radius: 1.25rem 1.25rem 0 0;
+}
+
+.sh-gorsel-capraz {
+  clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
+  border-radius: 0 1rem 1rem 0;
+}
+
+.sh-gorsel-cam {
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.5);
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.08);
+}
+
+.sh-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  padding: 0.75rem 1.25rem;
+  border-radius: 0.5rem;
+  background: var(--color-primary, #0d9488);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.92rem;
+  text-decoration: none;
+  transition: opacity 0.2s;
+}
+
+.sh-cta:hover {
+  opacity: 0.92;
+}
+
+.sh-cta-play-overlay {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  margin: 0;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.2);
+}
+
+.sh-cta-play {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 9999px;
+  background: rgba(255, 255, 255, 0.25);
+  font-size: 0.65rem;
+}
+
+.sh-cta-serit {
+  margin: 0;
+  width: 100%;
+  justify-content: center;
+  border-radius: 0 0 1rem 1rem;
+}
+
+.sh-cta-bento {
+  margin: 0;
+  width: 100%;
+  justify-content: center;
+}
+
+.sh-split-klasik,
+.sh-split-ters,
+.sh-capraz,
+.sh-gradient-kart {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+
+@media (min-width: 900px) {
+  .sh-split-klasik,
+  .sh-capraz,
+  .sh-gradient-kart {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sh-split-ters {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .sh-split-ters .sh-gorsel-wrap {
+    order: -1;
+  }
+}
+
+.sh-ust-alt {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.sh-ust-alt-alt {
+  display: flex;
+  flex-direction: column;
+}
+
+.sh-ust-alt-cta-serit {
+  margin-top: -0.25rem;
+}
+
+.sh-gradient-kart {
+  border-radius: 1.25rem;
+  padding: 2rem;
+  border: 1px solid rgba(15, 23, 42, 0.06);
+}
+
+.sh-bento {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 768px) {
+  .sh-bento {
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto;
+  }
+
+  .sh-bento-icerik {
+    grid-column: span 2;
+    grid-row: span 2;
+    padding: 1.5rem;
+    border-radius: 1rem;
+    background: #f8fafc;
+    border: 1px solid rgba(15, 23, 42, 0.06);
+  }
+
+  .sh-bento-gorsel {
+    grid-column: span 2;
+    min-height: 12rem;
+  }
+
+  .sh-bento-ozellikler {
+    grid-column: span 3;
+  }
+
+  .sh-bento-cta {
+    grid-column: span 1;
+    display: flex;
+    align-items: stretch;
   }
 }
 
@@ -9212,7 +9620,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   color: rgba(255,255,255,0.75);
 }
 
-/* Split Özellik Vitrin */
+/* Split ?zellik Vitrin */
 .sl-split-vitrin {
   overflow: hidden;
   padding: 1.5rem;
@@ -9403,7 +9811,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 .sl-badge-kart-metin { font-size: 0.8125rem; font-weight: 700; line-height: 1.3; }
 
-/* Sinematik Aç?k */
+/* Sinematik A??k */
 .sl-sinematik-acik { overflow: hidden; box-shadow: 0 8px 32px rgba(15, 23, 42, 0.08); }
 .sl-sinematik-acik-grid {
   display: grid;
@@ -9454,7 +9862,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   border: 1px dashed rgba(255,255,255,0.25);
 }
 
-/* ?? Ücretsiz Deneme (ud-*) ?? */
+/* ?? ?cretsiz Deneme (ud-*) ?? */
 .ud-baslik {
   margin: 0;
   font-size: clamp(1.75rem, 3.5vw, 2.5rem);

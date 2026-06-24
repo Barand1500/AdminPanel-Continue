@@ -1054,6 +1054,7 @@ export function BlokOlusturucuIcerik({ form, onChange }: WidgetPanelProps) {
 export const ICERIK_PANEL_MAP: Record<string, ComponentType<WidgetPanelProps>> = {
   BASLIK_METIN: BaslikMetinIcerik,
   BASLIK_METIN_GORSEL: BaslikMetinGorselIcerik,
+  SITE_HAKKINDA: BaslikMetinGorselIcerik,
   SLIDER: SliderIcerik,
   HERO_BANNER: SliderIcerik,
   HIZMET_KARTLARI: HizmetKartlariIcerik,

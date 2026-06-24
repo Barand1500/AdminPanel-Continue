@@ -116,6 +116,9 @@ export const WIDGET_GORUNUM_ICERIK_ALANLARI: Record<string, WidgetIcerikAlanHari
   BASLIK_METIN_GORSEL: {
     _varsayilan: ['baslik', 'altBaslik', 'aciklama', 'butonMetni', 'butonLink'],
   },
+  SITE_HAKKINDA: {
+    _varsayilan: ['baslik', 'altBaslik', 'aciklama', 'butonMetni', 'butonLink'],
+  },
   MARKA_SERIDI: {
     _varsayilan: ['baslik', 'altBaslik'],
   },

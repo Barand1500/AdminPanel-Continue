@@ -42,6 +42,7 @@ export const YENI_WIDGET_TIPLERI = [
   'YORUM_KARTLARI',
   'FIYATLANDIRMA',
   'MODUL_LOGO_BLOK',
+  'SITE_HAKKINDA',
 ] as const;
 
 export const MODERN_WIDGET_TIPLERI = [
@@ -113,6 +114,7 @@ export const WIDGET_GORUNUM_GORSEL_TIPLERI = new Set([
   'BLOK_OLUSTURUCU',
   'YORUM_KARTLARI',
   'MODUL_LOGO_BLOK',
+  'SITE_HAKKINDA',
 ]);
 
 export const WIDGET_GORUNUM_HABER_TIPLERI = new Set<string>([...HABER_PORTAL_WIDGET_TIPLERI, 'SLIDER', 'BLOG_KARUSEL', 'EKIP_KARUSEL']);
@@ -132,6 +134,7 @@ export const WIDGET_GORUNUM_GRID_TIPLERI = new Set([
   'YORUM_KARTLARI',
   'FIYATLANDIRMA',
   'MODUL_LOGO_BLOK',
+  'SITE_HAKKINDA',
   'BLOK_OLUSTURUCU',
   'KARSILASTIRMA_TABLOSU',
   ...HABER_PORTAL_WIDGET_TIPLERI,
@@ -148,6 +151,7 @@ export const WIDGET_GORUNUM_METIN_TIPLERI = new Set([
   'BLOK_OLUSTURUCU',
   'YORUM_KARTLARI',
   'MODUL_LOGO_BLOK',
+  'SITE_HAKKINDA',
   'UCRETSIZ_DENEME',
   'BULTEN_KAYIT',
 ]);
@@ -495,6 +499,14 @@ export function varsayilanConfig(tip: string): WidgetConfig {
       return { yerlesim, gorunum: { ...gorunum, icerikDuzeni: 'ust' }, ek, metin: '' };
     case 'BASLIK_METIN_GORSEL':
       return { yerlesim, gorunum: { ...gorunum, icerikDuzeni: 'sol' }, ek, metin: '', ikonKartlar: [] };
+    case 'SITE_HAKKINDA':
+      return {
+        yerlesim,
+        gorunum: { ...gorunum, icerikDuzeni: 'sol' },
+        ek,
+        metin: '',
+        ikonKartlar: [],
+      };
     case 'SLIDER':
       return { yerlesim: { bolge: 'slider_alti' }, gorunum: { ...gorunum, sayfalamaStili: 'numara' }, ek, slides: [] };
     case 'HIZMET_KARTLARI':

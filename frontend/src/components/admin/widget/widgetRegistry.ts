@@ -30,6 +30,7 @@ export const WIDGET_TIPLERI = [
   { id: 'SLIDER', etiket: 'Slider', ikon: '🎠', aciklama: 'Kayan banner slaytları', grup: 'Anasayfa', kategori: 'slider' as const },
   { id: 'BASLIK_METIN', etiket: 'Başlık + Metin', ikon: '📝', aciklama: 'Sadece başlık ve metin bloğu', grup: 'İçerik', kategori: 'metin' as const },
   { id: 'BASLIK_METIN_GORSEL', etiket: 'Metin + Görsel', ikon: '📰', aciklama: 'Başlık, metin, görsel ve ikon kartları', grup: 'İçerik', kategori: 'resim_metin' as const },
+  { id: 'SITE_HAKKINDA', etiket: 'Sitemiz Hakkında', ikon: '🏢', aciklama: 'Hakkımızda metin, özellik listesi ve görsel bloğu', grup: 'İçerik', kategori: 'resim_metin' as const },
   { id: 'HIZMET_KARTLARI', etiket: 'Hizmet Kartları', ikon: '💼', aciklama: 'İkon + başlık + açıklama + CTA kartları', grup: 'İçerik', kategori: 'kart' as const },
   { id: 'BLOG_KARUSEL', etiket: 'Blog Karuseli', ikon: '📰', aciklama: 'Yatay blog/haber kartları', grup: 'İçerik', kategori: 'karusel' as const },
   { id: 'LINK_KARTLARI', etiket: 'Link Kartları', ikon: '🔗', aciklama: 'İkonlu hızlı link grid', grup: 'İçerik', kategori: 'kart' as const },

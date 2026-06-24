@@ -96,6 +96,18 @@ function mockConfig(tip: string): WidgetConfig {
           { id: id(), ikon: '🎯', metin: 'Müşteri odaklı' },
         ],
       };
+    case 'SITE_HAKKINDA':
+      return {
+        metin: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sektörde uzun yıllardır güvenilir hizmet sunuyoruz.',
+        ikonKartlar: [
+          { id: id(), ikon: '✓', metin: 'Müşteri Memnuniyeti' },
+          { id: id(), ikon: '✓', metin: 'Sektörün Lideri' },
+          { id: id(), ikon: '✓', metin: '7x24 Whatsapp Desteği' },
+          { id: id(), ikon: '✓', metin: 'Güvenilir Hizmet' },
+          { id: id(), ikon: '✓', metin: 'Güçlü Kadro' },
+          { id: id(), ikon: '✓', metin: 'Öncü Hizmet' },
+        ],
+      };
     case 'BLOG_KARUSEL':
       return {
         blogKartlari: [
@@ -173,8 +185,8 @@ function mockConfig(tip: string): WidgetConfig {
           {
             id: id(),
             metin: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
-            ad: 'Hayrettin Elalmış',
-            firma: 'Seda Makina',
+            ad: 'Serhat Merdiven',
+            firma: 'Merdiven İnşaat',
             yildiz: 5,
             gorselUrl: ONIZLEME_GORSEL,
           },
@@ -672,7 +684,10 @@ export function onizlemeMockVerisiUygula(widget: Widget): Widget {
     ...widget,
     ad: metin(widget.ad, 'Örnek Widget'),
     baslik: metin(widget.baslik, mockBaslik(widget.tip)),
-    altBaslik: metin(widget.altBaslik, 'Güzel Teknoloji'),
+    altBaslik: metin(
+      widget.altBaslik,
+      widget.tip === 'SITE_HAKKINDA' ? 'HAKKIMIZDA' : 'Güzel Teknoloji'
+    ),
     aciklama: metin(
       widget.aciklama,
       widget.tip === 'ILETISIM_FORMU'
@@ -685,10 +700,10 @@ export function onizlemeMockVerisiUygula(widget: Widget): Widget {
     ),
     gorselUrl: widget.gorselUrl?.trim()
       ? widget.gorselUrl
-      : ['BASLIK_METIN_GORSEL', 'VIDEO_BANNER'].includes(widget.tip)
+      : ['BASLIK_METIN_GORSEL', 'SITE_HAKKINDA', 'VIDEO_BANNER'].includes(widget.tip)
         ? ONIZLEME_GORSEL
         : widget.gorselUrl,
-    butonMetni: metin(widget.butonMetni, 'Daha Fazla'),
+    butonMetni: metin(widget.butonMetni, widget.tip === 'SITE_HAKKINDA' ? 'Tanıtım Videomuz' : 'Daha Fazla'),
     butonLink: metin(widget.butonLink, '/iletisim'),
     configJson: birlesik as Record<string, unknown>,
   };
@@ -700,6 +715,7 @@ function mockBaslik(tip: string): string {
     HIZMET_KARTLARI: 'Hizmetlerimiz',
     BASLIK_METIN: 'Hakkımızda',
     BASLIK_METIN_GORSEL: 'Neden Biz?',
+    SITE_HAKKINDA: 'Sitemiz Hakkında',
     BLOG_KARUSEL: 'Son Yazılar',
     LINK_KARTLARI: 'Hızlı Erişim',
     GORSEL_GRID_BLOK: 'Çözümlerimiz',
@@ -707,7 +723,7 @@ function mockBaslik(tip: string): string {
     EKIP_KARUSEL: 'Ekibimiz',
     SAYAC_BLOK: 'Rakamlarla Biz',
     YORUM_KARUSEL: 'Müşteri Yorumları',
-    YORUM_KARTLARI: 'Müşterilerimizin Görüşleri',
+    YORUM_KARTLARI: 'Müşteri Yorumları',
     FIYATLANDIRMA: 'Paketlerimiz',
     MODUL_LOGO_BLOK: '1. Ödeme Sistemleri ve Finans Modülü',
     GALERI: 'Galeri',

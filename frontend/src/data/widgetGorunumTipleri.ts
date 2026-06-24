@@ -199,7 +199,7 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('konusma-balonu', 'Konuşma Balonu', 'Chat tarzı alternatif balonlar', 'okyanus'),
     gt('split-testimonial', 'Split Testimonial', 'Sol büyük yorum, sağ liste', 'lavanta'),
     gt('kart-destesi', 'Kart Destesi', 'Üst üste yığılmış, hover ile yayılan', 'notr'),
-    gt('quote-stil', 'Quote Stil', 'Büyük tırnak tipografisi', 'altin'),
+    gt('quote-stil', 'Avatar Karusel', 'Ortada büyük avatar, altta konuşma balonu kartı', 'altin'),
   ],
   FIYATLANDIRMA: [
     gt('sekmeli-toggle', 'Sekmeli Panel', 'Üst sekme, altta büyük paket detayı', 'mor', 'SaaS'),
@@ -216,6 +216,14 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('gradient-kart', 'Gradient Kart', 'Renkli gradient arka planlı modül kartı', 'mor'),
     gt('logo-marquee', 'Logo Marquee', 'Sol içerik, sağda kayan logo şeridi', 'lavanta'),
     gt('bento-modul', 'Bento Modül', 'Asimetrik bento ızgara düzeni', 'gunes'),
+  ],
+  SITE_HAKKINDA: [
+    gt('split-klasik', 'Split Klasik', 'Sol metin + sağ görsel, sol-alt yuvarlak köşe, check ikonlar', 'notr', 'Kurumsal'),
+    gt('split-ters', 'Ters Split', 'Sol görsel, sağ metin, kutulu ikon kartları', 'okyanus'),
+    gt('ust-alt-genis', 'Üst Alt Geniş', 'Üstte metin, altta tam genişlik görsel + CTA şeridi', 'mint'),
+    gt('capraz-panel', 'Çapraz Panel', 'Diyagonal kesimli görsel + pill ikonlar', 'mor'),
+    gt('gradient-kart', 'Gradient Kart', 'Gradient kart içinde split + yıldız ikonlar', 'lavanta'),
+    gt('bento-hakkimizda', 'Bento Hakkımızda', 'Asimetrik bento grid + emoji özellikler', 'gunes'),
   ],
   ZAMAN_CIZELGESI: [
     gt('dikey-cizgi', 'Dikey Çizgi', 'Dikey timeline', 'notr'),
@@ -653,6 +661,15 @@ const LEGACY_GORUNUM_TIPI: Partial<Record<AktifWidgetTipi, Record<string, string
     'gradient-arkaplan': 'sinematik-hero',
     'mint-cerceve': 'polaroid-kolaj',
     'okyanus-split': 'capraz-split',
+  },
+  SITE_HAKKINDA: {
+    klasik: 'split-klasik',
+    'yan-yana': 'split-ters',
+    'overlay-koyu': 'capraz-panel',
+    'kart-mor': 'gradient-kart',
+    'gradient-arkaplan': 'gradient-kart',
+    'mint-cerceve': 'bento-hakkimizda',
+    'okyanus-split': 'ust-alt-genis',
   },
   POPUP: {
     klasik: 'ortada-modal',

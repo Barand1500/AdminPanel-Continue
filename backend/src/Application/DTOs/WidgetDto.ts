@@ -48,6 +48,7 @@ export const WIDGET_TIPLERI = [
   'HABER_MAGAZIN',
   'MODUL_LOGO_BLOK',
   'UCRETSIZ_DENEME',
+  'SITE_HAKKINDA',
 ] as const;
 
 export type WidgetTip = (typeof WIDGET_TIPLERI)[number];

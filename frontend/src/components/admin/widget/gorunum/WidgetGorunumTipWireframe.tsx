@@ -242,6 +242,83 @@ export function WidgetGorunumTipWireframe({
         </div>
       </div>
     ),
+    'YORUM_KARTLARI:quote-stil': (
+      <div className="space-y-1 p-1 text-center" style={{ background: renk.bg }}>
+        <div className="flex items-center justify-center gap-1">
+          <span className="text-[6px] text-slate-400">‹</span>
+          <div className="h-2 w-2 rounded-full opacity-50" style={{ background: renk.surface }} />
+          <div className="h-3 w-3 rounded-full border" style={{ borderColor: renk.accent, background: renk.surface }} />
+          <div className="h-2 w-2 rounded-full opacity-50" style={{ background: renk.surface }} />
+          <span className="text-[6px] text-slate-400">›</span>
+        </div>
+        <div className="relative mx-2 rounded p-1 shadow-sm" style={{ background: '#fff' }}>
+          <div className="absolute -top-0.5 left-1/2 h-0 w-0 -translate-x-1/2 border-x-[3px] border-b-[3px] border-x-transparent border-b-white" />
+          <div className="mx-auto h-0.5 w-4 rounded" style={{ background: renk.accent, opacity: 0.6 }} />
+          <div className="mt-0.5 h-0.5 w-full rounded" style={{ background: renk.text, opacity: 0.15 }} />
+        </div>
+      </div>
+    ),
+    'SITE_HAKKINDA:split-klasik': (
+      <div className="flex gap-0.5 p-1">
+        <div className="h-5 flex-1 rounded-l p-1" style={{ background: renk.bg }}>
+          <div className="h-0.5 w-2 rounded" style={{ background: renk.accent }} />
+          <div className="mt-0.5 h-0.5 w-3 rounded" style={{ background: renk.text, opacity: 0.2 }} />
+          <div className="mt-1 grid grid-cols-2 gap-0.5">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-0.5 rounded" style={{ background: renk.surface }} />
+            ))}
+          </div>
+        </div>
+        <div className="h-5 w-3 rounded-br-xl rounded-tr" style={{ background: renk.accent, opacity: 0.35 }} />
+      </div>
+    ),
+    'SITE_HAKKINDA:split-ters': (
+      <div className="flex gap-0.5 p-1">
+        <div className="h-5 w-3 rounded-bl-xl rounded-tl" style={{ background: renk.accent, opacity: 0.35 }} />
+        <div className="h-5 flex-1 rounded-r p-1" style={{ background: renk.bg }}>
+          <div className="h-0.5 w-2 rounded" style={{ background: renk.accent }} />
+          <div className="mt-1 grid grid-cols-2 gap-0.5">
+            {[1, 2].map((i) => (
+              <div key={i} className="h-1.5 rounded border" style={{ borderColor: `${renk.accent}44` }} />
+            ))}
+          </div>
+        </div>
+      </div>
+    ),
+    'SITE_HAKKINDA:ust-alt-genis': (
+      <div className="space-y-0.5 p-1" style={{ background: renk.bg }}>
+        <div className="h-2 rounded p-0.5">
+          <div className="h-0.5 w-3 rounded" style={{ background: renk.accent }} />
+        </div>
+        <div className="h-2.5 rounded-t" style={{ background: renk.accent, opacity: 0.3 }} />
+      </div>
+    ),
+    'SITE_HAKKINDA:capraz-panel': (
+      <div className="flex h-5 overflow-hidden rounded">
+        <div className="w-2/5 p-1" style={{ background: renk.bg }}>
+          <div className="h-0.5 w-2 rounded-full" style={{ background: renk.accent, opacity: 0.5 }} />
+        </div>
+        <div className="h-full flex-1 skew-x-[-8deg] origin-bottom-left" style={{ background: renk.surface }} />
+      </div>
+    ),
+    'SITE_HAKKINDA:gradient-kart': (
+      <div className="flex gap-0.5 rounded p-1" style={{ background: `linear-gradient(135deg, ${renk.accent}33, ${renk.bg})` }}>
+        <div className="h-5 flex-1 rounded p-0.5">
+          <div className="h-0.5 w-2 rounded" style={{ background: renk.accent }} />
+        </div>
+        <div className="h-5 w-2.5 rounded" style={{ background: renk.surface }} />
+      </div>
+    ),
+    'SITE_HAKKINDA:bento-hakkimizda': (
+      <div className="grid grid-cols-4 gap-0.5 p-1">
+        <div className="col-span-2 row-span-2 h-5 rounded p-1" style={{ background: renk.bg }}>
+          <div className="h-0.5 w-3 rounded" style={{ background: renk.accent }} />
+        </div>
+        <div className="col-span-2 h-2.5 rounded" style={{ background: renk.surface }} />
+        <div className="h-1.5 rounded" style={{ background: renk.surface }} />
+        <div className="h-1.5 rounded" style={{ background: renk.accent, opacity: 0.4 }} />
+      </div>
+    ),
   };
 
   const icerik =

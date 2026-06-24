@@ -299,29 +299,84 @@ function KartDestesi({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetCon
 }
 
 function QuoteStil({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetConfig; yorumlar: WidgetYorum[] }) {
+  const [aktif, setAktif] = useState(0);
   const renk = gorunumRenk(cfg);
+  const n = yorumlar.length;
+  const secili = yorumlar[aktif] ?? yorumlar[0];
+
+  function onceki() {
+    setAktif((i) => (i - 1 + n) % n);
+  }
+
+  function sonraki() {
+    setAktif((i) => (i + 1) % n);
+  }
+
+  const prevIdx = (aktif - 1 + n) % n;
+  const nextIdx = (aktif + 1) % n;
+  const gosterilecek =
+    n <= 3
+      ? yorumlar.map((y, i) => ({ y, i, konum: i === aktif ? 'aktif' : 'yan' as const }))
+      : [
+          { y: yorumlar[prevIdx], i: prevIdx, konum: 'yan' as const },
+          { y: yorumlar[aktif], i: aktif, konum: 'aktif' as const },
+          { y: yorumlar[nextIdx], i: nextIdx, konum: 'yan' as const },
+        ];
 
   return (
     <>
       <BaslikAlani widget={widget} cfg={cfg} />
-      <div className="yk-quote-grid">
-        {yorumlar.map((y) => (
-          <article key={y.id} className="yk-quote-kart" style={{ borderColor: `${renk.vurgu}22` }}>
-            <span className="yk-quote-isaret" style={{ color: `${renk.vurgu}44` }} aria-hidden>
-              “
-            </span>
-            {renk.yildizAcik && (
-              <div className="yk-quote-yildiz">{yildizGoster(y.yildiz ?? 5, renk.yildiz)}</div>
-            )}
-            <p className="yk-quote-metin" style={{ color: renk.metin }}>
-              {y.metin}
-            </p>
-            <div className="yk-quote-alt">
-              <YazarAvatar y={y} />
-              <YazarBilgi y={y} renk={renk.baslik} />
-            </div>
-          </article>
-        ))}
+      <div className="yk-karusel">
+        <div className="yk-karusel-avatar-satir">
+          {n > 1 && (
+            <button
+              type="button"
+              className="yk-karusel-ok"
+              onClick={onceki}
+              aria-label="Önceki yorum"
+            >
+              ‹
+            </button>
+          )}
+          <div className="yk-karusel-avatarlar">
+            {gosterilecek.map(({ y, i, konum }) => (
+              <button
+                key={y.id}
+                type="button"
+                className={`yk-karusel-avatar-tus yk-karusel-avatar-${konum}`}
+                onClick={() => setAktif(i)}
+                aria-label={`${y.ad} yorumunu göster`}
+                aria-current={konum === 'aktif'}
+              >
+                <YazarAvatar y={y} boyut={konum === 'aktif' ? 'lg' : 'md'} />
+              </button>
+            ))}
+          </div>
+          {n > 1 && (
+            <button
+              type="button"
+              className="yk-karusel-ok"
+              onClick={sonraki}
+              aria-label="Sonraki yorum"
+            >
+              ›
+            </button>
+          )}
+        </div>
+
+        <article className="yk-karusel-kart" style={{ borderColor: `${renk.vurgu}22` }}>
+          <span className="yk-karusel-kart-ucgen" style={{ borderBottomColor: '#fff' }} aria-hidden />
+          {renk.yildizAcik && (
+            <div className="yk-karusel-yildiz">{yildizGoster(secili.yildiz ?? 5, renk.yildiz)}</div>
+          )}
+          <p className="yk-karusel-imza" style={{ color: renk.vurgu }}>
+            <strong>{secili.ad}</strong>
+            {secili.firma ? ` — ${secili.firma}` : ''}
+          </p>
+          <p className="yk-karusel-metin" style={{ color: renk.metin }}>
+            {secili.metin}
+          </p>
+        </article>
       </div>
     </>
   );

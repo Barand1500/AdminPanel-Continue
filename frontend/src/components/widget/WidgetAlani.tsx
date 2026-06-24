@@ -15,6 +15,7 @@ import { YorumKaruselWidget } from './YorumKaruselWidget';
 import { YorumKartlariWidget } from './YorumKartlariWidget';
 import { FiyatlandirmaWidget } from './FiyatlandirmaWidget';
 import { ModulLogoBlokWidget } from './ModulLogoBlokWidget';
+import { SiteHakkindaWidget } from './SiteHakkindaWidget';
 import { GaleriWidget } from './GaleriWidget';
 import { SssWidget } from './SssWidget';
 import { PopupWidget } from './PopupWidget';
@@ -61,6 +62,8 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
         return <BaslikMetinWidget widget={widget} />;
       case 'BASLIK_METIN_GORSEL':
         return <BaslikMetinGorselWidget widget={widget} />;
+      case 'SITE_HAKKINDA':
+        return <SiteHakkindaWidget widget={widget} />;
       case 'BLOG_KARUSEL':
         return <BlogKaruselWidget widget={widget} />;
       case 'LINK_KARTLARI':

@@ -219,6 +219,7 @@ enum WidgetTipi {
   HABER_MAGAZIN
   MODUL_LOGO_BLOK
   UCRETSIZ_DENEME
+  SITE_HAKKINDA
 }
 
 model Medya {
