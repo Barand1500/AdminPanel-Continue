@@ -900,7 +900,7 @@ export function ModulLogoBlokIcerik({ form, onChange }: WidgetPanelProps) {
               />
               <input
                 className={formInputSinifi}
-                placeholder="Özellik metni"
+                placeholder="Özellik metni (Başlık|Açıklama)"
                 value={k.metin}
                 onChange={(e) => {
                   const kopya = [...ozellikler];

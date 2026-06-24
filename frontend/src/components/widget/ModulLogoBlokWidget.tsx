@@ -16,15 +16,56 @@ function renkler(cfg: WidgetConfig) {
 }
 
 function ozellikMetinParcala(metin: string): { baslik: string; alt?: string } {
-  const ayirici = metin.includes('|') ? '|' : metin.includes('\n') ? '\n' : null;
+  const pipe = metin.includes('|');
+  const satir = !pipe && metin.includes('\n');
+  const ayirici = pipe ? '|' : satir ? '\n' : null;
   if (!ayirici) return { baslik: metin };
   const [baslik, ...rest] = metin.split(ayirici);
   const alt = rest.join(ayirici).trim();
   return alt ? { baslik: baslik.trim(), alt } : { baslik: metin.trim() };
 }
 
-function OzellikMetin({ metin, vurgu, metinRengi }: { metin: string; vurgu: string; metinRengi: string }) {
-  const { baslik, alt } = ozellikMetinParcala(metin);
+function ikonAltSatirMi(ikon: string): boolean {
+  const k = ikon.trim();
+  return !k || k === '·' || k === '-' || k === '•' || k === '○' || k === '.';
+}
+
+type OzellikSatir = { id: string; ikon: string; baslik: string; alt?: string };
+
+function ozellikleriGrupla(ozellikler: WidgetIkonKart[]): OzellikSatir[] {
+  const satirlar: OzellikSatir[] = [];
+  let i = 0;
+  while (i < ozellikler.length) {
+    const o = ozellikler[i];
+    const parcali = ozellikMetinParcala(o.metin);
+    if (parcali.alt) {
+      satirlar.push({ id: o.id, ikon: o.ikon, baslik: parcali.baslik, alt: parcali.alt });
+      i += 1;
+      continue;
+    }
+    const sonraki = ozellikler[i + 1];
+    if (sonraki && ikonAltSatirMi(sonraki.ikon)) {
+      satirlar.push({ id: o.id, ikon: o.ikon, baslik: o.metin, alt: sonraki.metin });
+      i += 2;
+      continue;
+    }
+    if (
+      sonraki &&
+      o.metin.length >= 18 &&
+      sonraki.metin.length > 0 &&
+      sonraki.metin.length <= Math.max(48, o.metin.length * 0.75)
+    ) {
+      satirlar.push({ id: o.id, ikon: o.ikon, baslik: o.metin, alt: sonraki.metin });
+      i += 2;
+      continue;
+    }
+    satirlar.push({ id: o.id, ikon: o.ikon, baslik: o.metin });
+    i += 1;
+  }
+  return satirlar;
+}
+
+function OzellikMetin({ baslik, alt, vurgu, metinRengi }: { baslik: string; alt?: string; vurgu: string; metinRengi: string }) {
   if (!alt) {
     return <span className="mlb-ozellik-metin">{baslik}</span>;
   }
@@ -42,14 +83,15 @@ function OzellikMetin({ metin, vurgu, metinRengi }: { metin: string; vurgu: stri
 
 function OzellikListesi({ ozellikler, vurgu, metinRengi }: { ozellikler: WidgetIkonKart[]; vurgu: string; metinRengi: string }) {
   if (ozellikler.length === 0) return null;
+  const satirlar = ozellikleriGrupla(ozellikler);
   return (
     <ul className="mlb-ozellikler">
-      {ozellikler.map((o) => (
+      {satirlar.map((o) => (
         <li key={o.id} className="mlb-ozellik">
           <span className="mlb-ozellik-isaret" style={{ color: vurgu }}>
             {o.ikon || '✓'}
           </span>
-          <OzellikMetin metin={o.metin} vurgu={vurgu} metinRengi={metinRengi} />
+          <OzellikMetin baslik={o.baslik} alt={o.alt} vurgu={vurgu} metinRengi={metinRengi} />
         </li>
       ))}
     </ul>

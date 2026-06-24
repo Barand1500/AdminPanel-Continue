@@ -77,6 +77,7 @@ export function MenuDropdown({ oge, className, linkClassName, style, onClick }: 
   const mobil = className.includes('mobil');
   const tetikSinif = `site-menu-dropdown-tetik ${linkClassName} ${acik ? 'site-menu-dropdown-tetik-acik' : ''}`;
   const panelGorunur = acik && altOgeler.length > 0;
+  const panelGoster = altOgeler.length > 0 && (!mobil || panelGorunur);
 
   const tetikIcerik = (
     <>
@@ -117,7 +118,7 @@ export function MenuDropdown({ oge, className, linkClassName, style, onClick }: 
         </button>
       )}
 
-      {altOgeler.length > 0 && (
+      {panelGoster && (
         <div
           className={`site-menu-dropdown-panel ${yatay ? 'site-menu-dropdown-panel-yatay' : ''} ${panelGorunur ? 'site-menu-dropdown-panel-acik' : ''}`}
           role="menu"
