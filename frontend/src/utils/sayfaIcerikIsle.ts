@@ -140,7 +140,7 @@ export function tamHtmlBelgesiOlustur(icerik: string): string {
 <html lang="tr">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
   <style>html,body{margin:0;padding:0;min-height:100%;}</style>
   ${styleBlok}
 </head>

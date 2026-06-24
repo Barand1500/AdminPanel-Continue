@@ -32,7 +32,34 @@ function ikonAltSatirMi(ikon: string): boolean {
 
 type OzellikSatir = { id: string; ikon: string; baslik: string; alt?: string };
 
+function ciftSatirModu(ozellikler: WidgetIkonKart[]): boolean {
+  if (ozellikler.length < 2 || ozellikler.length % 2 !== 0) return false;
+  if (ozellikler.some((o) => o.metin.includes('|') || o.metin.includes('\n'))) return false;
+  return ozellikler.every((o, i) => {
+    if (i % 2 === 1) return true;
+    const sonraki = ozellikler[i + 1];
+    if (!sonraki) return false;
+    if (ikonAltSatirMi(sonraki.ikon)) return true;
+    return sonraki.metin.length <= o.metin.length * 1.35;
+  });
+}
+
 function ozellikleriGrupla(ozellikler: WidgetIkonKart[]): OzellikSatir[] {
+  if (ciftSatirModu(ozellikler)) {
+    const satirlar: OzellikSatir[] = [];
+    for (let i = 0; i < ozellikler.length; i += 2) {
+      const baslik = ozellikler[i];
+      const altKart = ozellikler[i + 1];
+      satirlar.push({
+        id: baslik.id,
+        ikon: baslik.ikon || '✓',
+        baslik: baslik.metin.trim(),
+        alt: altKart.metin.trim(),
+      });
+    }
+    return satirlar;
+  }
+
   const satirlar: OzellikSatir[] = [];
   let i = 0;
   while (i < ozellikler.length) {
@@ -67,17 +94,17 @@ function ozellikleriGrupla(ozellikler: WidgetIkonKart[]): OzellikSatir[] {
 
 function OzellikMetin({ baslik, alt, vurgu, metinRengi }: { baslik: string; alt?: string; vurgu: string; metinRengi: string }) {
   if (!alt) {
-    return <span className="mlb-ozellik-metin">{baslik}</span>;
+    return <div className="mlb-ozellik-metin">{baslik}</div>;
   }
   return (
-    <span className="mlb-ozellik-metin-wrap">
-      <span className="mlb-ozellik-baslik" style={{ color: vurgu }}>
+    <div className="mlb-ozellik-metin-wrap">
+      <div className="mlb-ozellik-baslik" style={{ color: vurgu }}>
         {baslik}
-      </span>
-      <span className="mlb-ozellik-alt" style={{ color: metinRengi }}>
+      </div>
+      <div className="mlb-ozellik-alt" style={{ color: metinRengi }}>
         {alt}
-      </span>
-    </span>
+      </div>
+    </div>
   );
 }
 
