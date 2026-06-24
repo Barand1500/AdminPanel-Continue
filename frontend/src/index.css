@@ -6272,14 +6272,6 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   gap: 0.65rem;
 }
 
-.mlb-ozellikler--masaustu {
-  display: none;
-}
-
-.mlb-ozellikler--mobil {
-  display: flex;
-}
-
 .mlb-ozellik {
   display: flex;
   align-items: flex-start;
@@ -6300,28 +6292,50 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   min-width: 0;
 }
 
-.mlb-ozellik-metin--mor {
+.mlb-ozellik-metin-wrap {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.mlb-ozellik-baslik {
   font-weight: 600;
   line-height: 1.45;
+  width: 100%;
+}
+
+.mlb-ozellik-alt {
+  font-size: 0.8125rem;
+  line-height: 1.5;
+  width: 100%;
 }
 
 @media (min-width: 768px) {
-  .mlb-ozellikler--masaustu {
-    display: flex;
+  .mlb-ozellik-metin-wrap {
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
   }
 
-  .mlb-ozellikler--mobil {
-    display: none !important;
+  .mlb-ozellik-alt {
+    flex-shrink: 0;
+    max-width: 46%;
+    text-align: right;
+    width: auto;
+  }
+
+  .mlb-ozellik-baslik {
+    width: auto;
   }
 }
 
 @media (max-width: 767px) {
-  .mlb-ozellikler--masaustu {
-    display: none !important;
-  }
-
-  .mlb-ozellikler--mobil {
-    display: flex;
+  .mlb-ozellik-alt {
+    display: none;
   }
 
   .mlb-split,
@@ -6349,10 +6363,6 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   .mlb-baslik-alan {
     flex-direction: column;
     gap: 0.75rem;
-  }
-
-  .mlb-ozellikler--mobil {
-    gap: 0.85rem;
   }
 
   .mlb-logo-grid {
