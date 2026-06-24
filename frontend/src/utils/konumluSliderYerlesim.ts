@@ -6,7 +6,7 @@ import type {
   KonumluSliderKonumTipi,
 } from '@/types/konumluSlider';
 import { idString } from '@/utils/idKarsilastir';
-import { bolgeWidgetlari } from '@/utils/widgetYerlesim';
+import { bolgeWidgetlari, bolgeNormalize } from '@/utils/widgetYerlesim';
 
 export interface YerlesimOnizlemeOgesi {
   id: string;
@@ -100,6 +100,23 @@ export function secimdenHedefWidgetIds(secimler: KonumSecimNoktasi[]): string[] 
     .map(idString);
 }
 
+/** Hedef widget id'lerini bölgedeki gerçek sıraya göre diz */
+export function secimdenHedefWidgetIdsSirali(
+  secimler: KonumSecimNoktasi[],
+  widgetlar: Widget[]
+): string[] {
+  if (secimler.length === 0) return [];
+  const bolge = secimler[0].bolge;
+  if (bolge === 'header' || bolge === 'footer') {
+    return secimdenHedefWidgetIds(secimler);
+  }
+  const liste = bolgeWidgetlari(widgetlar, bolge as import('@/types/widget').WidgetYerlesimBolge);
+  const ids = new Set(secimdenHedefWidgetIds(secimler));
+  return liste
+    .filter((w) => ids.has(idString(w.id)))
+    .map((w) => idString(w.id));
+}
+
 export function konumluSliderlarSayfaFiltre(
   sliderlar: KonumluSliderKayit[],
   sayfaId: string | null
@@ -144,7 +161,7 @@ export function ustAltSliderlar(
   return sliderlar.filter((s) => {
     const cfg = s.configJson;
     if (!cfg || !ustAltKonumMu(cfg.yerlesim.tip)) return false;
-    if (cfg.yerlesim.bolge !== bolge) return false;
+    if (bolgeNormalize(cfg.yerlesim.bolge) !== bolgeNormalize(bolge)) return false;
     return cfg.yerlesim.hedefWidgetIds.some((id) => idString(id) === idString(widgetId));
   });
 }

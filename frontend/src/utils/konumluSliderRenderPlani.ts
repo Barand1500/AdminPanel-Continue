@@ -2,8 +2,12 @@ import type { Widget } from '@/types/site';
 import type { KonumluSliderKayit } from '@/types/konumluSlider';
 import type { WidgetYerlesimBolge } from '@/types/widget';
 import { idString } from '@/utils/idKarsilastir';
-import { bolgeWidgetlari } from '@/utils/widgetYerlesim';
+import { bolgeWidgetlari, bolgeNormalize } from '@/utils/widgetYerlesim';
 import { ustAltSliderlar, yanKonumMu } from '@/utils/konumluSliderYerlesim';
+
+function bolgeEsitMi(kayitli: string | undefined, bolge: WidgetYerlesimBolge) {
+  return bolgeNormalize(kayitli) === bolgeNormalize(bolge);
+}
 
 export type KonumluSliderRenderOge =
   | { tip: 'widget'; widget: Widget }
@@ -26,17 +30,20 @@ function yanGruplariHazirla(
 
   for (const slider of sliderlar) {
     const cfg = slider.configJson;
-    if (!cfg || !yanKonumMu(cfg.yerlesim.tip) || cfg.yerlesim.bolge !== bolge) continue;
+    if (!cfg || !slider.aktif || !yanKonumMu(cfg.yerlesim.tip) || !bolgeEsitMi(cfg.yerlesim.bolge, bolge)) {
+      continue;
+    }
 
     const ids = cfg.yerlesim.hedefWidgetIds
       .map(idString)
       .filter((id) => liste.some((w) => idString(w.id) === id));
     if (ids.length === 0) continue;
 
-    const indeksler = ids
-      .map((id) => liste.findIndex((w) => idString(w.id) === id))
-      .filter((i) => i >= 0)
-      .sort((a, b) => a - b);
+    const indeksler = [...new Set(
+      ids
+        .map((id) => liste.findIndex((w) => idString(w.id) === id))
+        .filter((i) => i >= 0)
+    )].sort((a, b) => a - b);
 
     if (indeksler.length === 0) continue;
 
@@ -49,10 +56,12 @@ function yanGruplariHazirla(
     }
     if (!ardışık) continue;
 
+    const siraliIds = indeksler.map((idx) => idString(liste[idx].id));
+
     gruplar.push({
       slider,
       taraf: cfg.yerlesim.tip === 'widget-sol' ? 'sol' : 'sag',
-      widgetIds: ids,
+      widgetIds: siraliIds,
       baslangicIdx: indeksler[0],
     });
   }

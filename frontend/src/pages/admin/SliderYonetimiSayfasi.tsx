@@ -26,7 +26,7 @@ import {
   widgetSayfaFiltreOgeleri,
 } from '@/utils/widgetYerlesim';
 import {
-  secimdenHedefWidgetIds,
+  secimdenHedefWidgetIdsSirali,
   type KonumSecimNoktasi,
 } from '@/utils/konumluSliderYerlesim';
 import {
@@ -36,11 +36,16 @@ import {
   type KonumluSliderKayit,
 } from '@/types/konumluSlider';
 import type { AdminWidget } from '@/types/admin';
+import type { Widget } from '@/types/site';
 import { idString } from '@/utils/idKarsilastir';
 
 const ANA_SAYFA_ID = '__ana__';
 
-function secimdenConfig(secimler: KonumSecimNoktasi[], onceki: KonumluSliderConfig): KonumluSliderConfig | null {
+function secimdenConfig(
+  secimler: KonumSecimNoktasi[],
+  onceki: KonumluSliderConfig,
+  widgetlar: Widget[]
+): KonumluSliderConfig | null {
   if (secimler.length === 0) return null;
   const ilk = secimler[0];
   return {
@@ -48,7 +53,7 @@ function secimdenConfig(secimler: KonumSecimNoktasi[], onceki: KonumluSliderConf
     yerlesim: {
       tip: ilk.tip,
       bolge: ilk.bolge,
-      hedefWidgetIds: secimdenHedefWidgetIds(secimler),
+      hedefWidgetIds: secimdenHedefWidgetIdsSirali(secimler, widgetlar),
     },
     bosluk: ilk.tip === 'widget-ustu' || ilk.tip === 'widget-alti' ? onceki.bosluk ?? 'orta' : undefined,
   };
@@ -164,7 +169,7 @@ export function SliderYonetimiSayfasi() {
 
   function secimGuncelle(yeni: KonumSecimNoktasi[]) {
     setSecimHata('');
-    const cfg = secimdenConfig(yeni, config);
+    const cfg = secimdenConfig(yeni, config, sayfaWidgetlariListe);
     if (cfg) setConfig(cfg);
     setSecimler(yeni);
   }
