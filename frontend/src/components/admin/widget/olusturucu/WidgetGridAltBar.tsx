@@ -12,6 +12,12 @@ interface WidgetGridAltBarProps {
 
 const PARCA_SECENEKLERI: (1 | 2 | 3 | 4)[] = [1, 2, 3, 4];
 
+function satirSutunOzeti(parcaSayisi: number, duzen: BlokDuzen): string {
+  if (parcaSayisi < 1) return '';
+  if (duzen === 'yan_yana') return `1 satır × ${parcaSayisi} sütun`;
+  return `${parcaSayisi} satır × 1 sütun`;
+}
+
 export function WidgetGridAltBar({
   parcaSayisi,
   duzen,
@@ -24,7 +30,12 @@ export function WidgetGridAltBar({
   return (
     <div className={`ap-olusturucu-alt-bar${kompakt ? ' ap-olusturucu-alt-bar-kompakt' : ''}`}>
       <div className="ap-olusturucu-alt-grup">
-        <span className="ap-olusturucu-alt-etiket">Kaç parça?</span>
+        <span className="ap-olusturucu-alt-etiket">
+          Satır × Sütun
+          {parcaSayisi > 0 && (
+            <span className="ap-olusturucu-alt-ozet"> ({satirSutunOzeti(parcaSayisi, duzen)})</span>
+          )}
+        </span>
         <div className="ap-olusturucu-segment">
           {PARCA_SECENEKLERI.map((n) => (
             <button
@@ -32,6 +43,7 @@ export function WidgetGridAltBar({
               type="button"
               className={`ap-olusturucu-segment-btn${parcaSayisi === n ? ' aktif' : ''}`}
               onClick={() => onParcaSayisi(n)}
+              title={satirSutunOzeti(n, duzen)}
             >
               {n}
             </button>

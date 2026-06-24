@@ -64,12 +64,12 @@ function ButonLink({
 }
 
 function BlokKabuk({ blok, children }: { blok: WidgetBlok; children: ReactNode }) {
-  const wrap = blokOnizlemeWrapperStili(blok);
-  const boyutlu =
-    blok.blokGenislikPx != null ||
-    blok.gorselYukseklikPx != null ||
-    (blok.gorselGenislik != null && blok.gorselGenislik !== 'tam');
-  if (!boyutlu) return <>{children}</>;
+  const wrap: CSSProperties = {
+    ...blokOnizlemeWrapperStili(blok),
+    flex: '1 1 auto',
+    minWidth: 'min(100%, 120px)',
+    maxWidth: '100%',
+  };
   return <div style={wrap}>{children}</div>;
 }
 
@@ -184,9 +184,9 @@ function BlokRender({ blok, cfg }: { blok: WidgetBlok; cfg: WidgetConfig }) {
         </div>
       );
       return dis ? (
-        <a href={href} target="_blank" rel="noreferrer" className="block no-underline">{icerik}</a>
+        <a href={href} target="_blank" rel="noreferrer" className="block max-w-full no-underline">{icerik}</a>
       ) : (
-        <Link to={href} className="block no-underline">{icerik}</Link>
+        <Link to={href} className="block max-w-full no-underline">{icerik}</Link>
       );
     }
     case 'sayac':
@@ -394,10 +394,12 @@ export function BlokOlusturucuWidget({ widget }: { widget: Widget }) {
   const hizalama = g.hizalama ?? 'sol';
   const alignClass = hizalama === 'orta' ? 'text-center' : hizalama === 'sag' ? 'text-right' : 'text-left';
   const yanYana = olusturucu.duzen === 'yan_yana';
-  const gridStyle =
+  const gridClass = [
+    'blok-olusturucu-grid',
     olusturucu.duzen === 'alt_alta'
-      ? { display: 'grid' as const, gridTemplateColumns: '1fr', gap }
-      : { display: 'grid' as const, gridTemplateColumns: `repeat(${olusturucu.parcaSayisi}, minmax(0, 1fr))`, gap };
+      ? 'blok-olusturucu-dikey'
+      : `blok-olusturucu-yatay blok-olusturucu-kolon-${olusturucu.parcaSayisi}`,
+  ].join(' ');
 
   const birlesikKapsulStili = kapsulStiliAl(gt, g, radius, birlesik);
 
@@ -408,7 +410,7 @@ export function BlokOlusturucuWidget({ widget }: { widget: Widget }) {
     const hucreStili = hucreStiliAl(gt, birlesik, g, radius, dikeyAyirici);
 
     return (
-      <div key={hucre.id} className="flex flex-col gap-3" style={hucreStili}>
+      <div key={hucre.id} className="flex flex-row flex-wrap items-start gap-3" style={hucreStili}>
         {icerikBloklar.map((blok) => (
           <BlokRender key={blok.id} blok={blok} cfg={cfg} />
         ))}
@@ -435,10 +437,10 @@ export function BlokOlusturucuWidget({ widget }: { widget: Widget }) {
       )}
       {birlesik ? (
         <div style={birlesikKapsulStili}>
-          <div style={gridStyle}>{hucreler}</div>
+          <div className={gridClass} style={{ gap }}>{hucreler}</div>
         </div>
       ) : (
-        <div style={gridStyle}>{hucreler}</div>
+        <div className={gridClass} style={{ gap }}>{hucreler}</div>
       )}
     </WidgetKabuk>
   );

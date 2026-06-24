@@ -435,7 +435,9 @@ export function WidgetBlokPaleti({
           </button>
         </div>
         <p className="ap-muted text-xs">
-          {hucreSecili ? 'Parçaya tıklayarak hücreye ekleyin.' : 'Önce ortadaki bir hücreyi seçin.'}
+          {hucreSecili
+            ? 'Parçaya tıklayarak hücreye ekleyin. Görsel + metin yan yana için 2 sütun seçin veya aynı parçada ikinci bloğu ekleyin (%50 genişlik).'
+            : 'Önce ortadaki bir hücreyi seçin.'}
         </p>
       </div>
 

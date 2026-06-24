@@ -60,8 +60,10 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
   const [otomatikDoldur, setOtomatikDoldur] = useState(false);
   const kaydetFnRef = useRef<(() => Promise<void>) | null>(null);
   const [siraDuzListe, setSiraDuzListe] = useState<Record<string, boolean>>({});
+  const [yeniTaslakSayac, setYeniTaslakSayac] = useState(0);
 
   const yeniMod = seciliId === null;
+  const editorAnahtar = seciliId ?? `yeni-${yeniTaslakSayac}`;
 
   async function listeYukle() {
     setHata('');
@@ -102,8 +104,9 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
 
   const yeniBaslat = useCallback(() => {
     setSeciliId(null);
+    setYeniTaslakSayac((n) => n + 1);
     setForm(varsayilanWidgetForm(varsayilanYeniTip(varsayilanTip), widgetlar));
-    setBasari('');
+    setBasari('Yeni widget taslağı — Kaydet ile listeye eklenir.');
     setHata('');
     setOnizlemeHazir(true);
   }, [varsayilanTip, widgetlar]);
@@ -142,11 +145,11 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
   const hizliKaydetFooter = useCallback(async () => {
     setHata('');
     try {
-      await kaydet(form, seciliId ?? undefined, { hizli: true });
+      await kaydet(form, yeniMod ? undefined : seciliId ?? undefined, { hizli: true });
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Hızlı kayıt başarısız');
     }
-  }, [form, seciliId, widgetlar]);
+  }, [form, seciliId, yeniMod, widgetlar]);
 
   useModulAksiyonlari(
     {
@@ -256,6 +259,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
               form={form}
               seciliWidget={seciliWidget}
               yeniMod={yeniMod}
+              editorAnahtar={editorAnahtar}
               kaydediliyor={kaydediliyor}
               hata={hata}
               varsayilanTip={varsayilanTip}

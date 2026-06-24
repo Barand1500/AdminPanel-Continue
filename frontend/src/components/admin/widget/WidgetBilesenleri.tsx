@@ -227,6 +227,7 @@ interface WidgetEditorPanelProps {
   form: WidgetFormDegeri;
   seciliWidget: AdminWidget | null;
   yeniMod: boolean;
+  editorAnahtar?: string;
   kaydediliyor: boolean;
   hata: string;
   varsayilanTip?: string;
@@ -243,6 +244,7 @@ export function WidgetEditorPanel({
   form,
   seciliWidget,
   yeniMod,
+  editorAnahtar,
   kaydediliyor,
   hata,
   varsayilanTip: _varsayilanTip,
@@ -258,7 +260,7 @@ export function WidgetEditorPanel({
   const [otomatikDoldur, setOtomatikDoldur] = useState(false);
   const formYedekRef = useRef<WidgetFormDegeri | null>(null);
   const yedekAnahtarRef = useRef<string | null>(null);
-  const widgetAnahtar = seciliWidget?.id ?? 'yeni';
+  const widgetAnahtar = editorAnahtar ?? seciliWidget?.id ?? 'yeni';
   const oncekiAnahtarRef = useRef(widgetAnahtar);
   const oncekiTipRef = useRef(form.tip);
 
@@ -321,13 +323,13 @@ export function WidgetEditorPanel({
   }
 
   async function submit() {
-    await onKaydet(form, seciliWidget?.id);
+    await onKaydet(form, yeniMod ? undefined : seciliWidget?.id);
   }
 
   useEffect(() => {
     onKaydetTetikleyici?.(submit);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form, seciliWidget]);
+  }, [form, seciliWidget, yeniMod]);
 
   const seciliTipMeta = WIDGET_TIPLERI.find((t) => t.id === form.tip);
   const IcerikPanel = ICERIK_PANEL_MAP[form.tip];
@@ -485,6 +487,7 @@ export function WidgetEditorPanel({
 
         {sekme === 'widgetEkleme' && form.tip === 'BLOK_OLUSTURUCU' && (
           <WidgetEklemePanel
+            key={widgetAnahtar}
             form={form}
             onChange={onChange}
             tumWidgetlar={tumWidgetlar}

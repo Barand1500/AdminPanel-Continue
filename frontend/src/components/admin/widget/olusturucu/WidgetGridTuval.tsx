@@ -200,7 +200,7 @@ export function WidgetGridTuval({
       {gridYok ? (
         <div className="ap-olusturucu-bos">
           <p className="ap-muted text-sm">Boş widget</p>
-          <p className="ap-muted mt-1 text-xs">Alttan parça sayısı ve yerleşim seçin.</p>
+          <p className="ap-muted mt-1 text-xs">Alttan satır × sütun ve yerleşim seçin.</p>
         </div>
       ) : birlesik ? (
         <div className="ap-olusturucu-birlesik-kapsul">{gridIcerik}</div>

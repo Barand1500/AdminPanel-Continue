@@ -59,10 +59,11 @@ export const WIDGET_GORUNUM_ICERIK_ALANLARI: Record<string, WidgetIcerikAlanHari
     'marquee-spotlight': ['baslik', 'altBaslik'],
   },
   MODUL_LOGO_BLOK: {
-    _varsayilan: ['baslik', 'aciklama', 'modulIkon', 'butonMetni', 'butonLink', 'dahaFazla'],
+    _varsayilan: ['altBaslik', 'baslik', 'aciklama', 'modulIkon', 'butonMetni', 'butonLink', 'dahaFazla'],
+    'ust-alt-grid': ['altBaslik', 'baslik', 'aciklama', 'modulIkon', 'dahaFazla'],
   },
   HIZMET_KARTLARI: {
-    _varsayilan: ['baslik', 'aciklama'],
+    _varsayilan: ['baslik', 'altBaslik', 'aciklama'],
     'sinematik-hero': ['baslik', 'altBaslik', 'aciklama'],
     'hero-mini-grid': ['baslik', 'aciklama'],
   },

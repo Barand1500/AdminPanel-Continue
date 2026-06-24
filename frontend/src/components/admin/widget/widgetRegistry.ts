@@ -121,6 +121,15 @@ export function widgetTipleriKategoriyeGore(tipFiltre?: string) {
   })).filter((g) => g.tipler.length > 0);
 }
 
+export function benzersizWidgetAd(temel: string, widgetlar: AdminWidget[]): string {
+  const mevcut = new Set(widgetlar.map((w) => w.ad.trim().toLowerCase()));
+  const taban = temel.trim();
+  if (!mevcut.has(taban.toLowerCase())) return taban;
+  let i = 2;
+  while (mevcut.has(`${taban} ${i}`.toLowerCase())) i += 1;
+  return `${taban} ${i}`;
+}
+
 export function varsayilanWidgetForm(
   tip: AktifWidgetTipi | string = 'SLIDER',
   widgetlar: AdminWidget[] = [],
@@ -129,7 +138,7 @@ export function varsayilanWidgetForm(
   const safeTip = tipOlusturulabilirMi(tip) ? tip : 'SLIDER';
   const temizSayfaId = formSayfaId(sayfaId);
   return {
-    ad: safeTip === 'BLOK_OLUSTURUCU' ? 'Özel Grid Widget' : '',
+    ad: safeTip === 'BLOK_OLUSTURUCU' ? benzersizWidgetAd('Özel Grid Widget', widgetlar) : '',
     tip: safeTip,
     sira: sonrakiWidgetSira(widgetlar, temizSayfaId),
     aktif: true,

@@ -153,6 +153,11 @@ function IcerikBolumu({
   const renk = renkler(cfg);
   return (
     <div className="mlb-icerik">
+      {widget.altBaslik && (
+        <p className="mlb-alt-baslik" style={{ color: renk.vurgu }}>
+          {widget.altBaslik}
+        </p>
+      )}
       <ModulBaslik widget={widget} renk={renk} ikon={cfg.modulIkon} />
       <OzellikListesi ozellikler={ozellikler} vurgu={renk.vurgu} />
       {widget.butonLink && widget.butonMetni && (
@@ -311,6 +316,11 @@ function BentoModul({
   return (
     <div className="mlb-bento">
       <div className="mlb-bento-icerik" style={{ borderRadius: `${radius}px` }}>
+        {widget.altBaslik && (
+          <p className="mlb-alt-baslik" style={{ color: renk.vurgu }}>
+            {widget.altBaslik}
+          </p>
+        )}
         {cfg.modulIkon && (
           <div className="mlb-modul-ikon mlb-modul-ikon-buyuk" style={{ background: renk.vurgu }}>
             <span aria-hidden>{cfg.modulIkon}</span>

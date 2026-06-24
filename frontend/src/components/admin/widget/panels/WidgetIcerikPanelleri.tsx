@@ -38,10 +38,20 @@ import {
 } from './WidgetModernPanelleri';
 import type { WidgetPanelProps } from './types';
 
-function MetinAlanlari({ form, onChange, gorsel = false }: WidgetPanelProps & { gorsel?: boolean }) {
+function MetinAlanlari({ form, onChange, gorsel = false, ustEtiket = false }: WidgetPanelProps & { gorsel?: boolean; ustEtiket?: boolean }) {
   const cfg = configOku(form);
   return (
     <AdminFormBolumu baslik="Metin Bloğu" aciklama="Başlık ve içerik metni">
+      {ustEtiket && (
+        <FormAlani etiket="Üst etiket / alt başlık" aciklama="Boş bırakırsanız sitede görünmez.">
+          <input
+            className={formInputSinifi}
+            value={form.altBaslik}
+            placeholder="Örn. HAKKIMIZDA"
+            onChange={(e) => onChange({ ...form, altBaslik: e.target.value })}
+          />
+        </FormAlani>
+      )}
       <FormAlani etiket="Başlık">
         <input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} />
       </FormAlani>
@@ -105,7 +115,7 @@ export function BaslikMetinGorselIcerik(props: WidgetPanelProps) {
   const ikonKartlar = cfg.ikonKartlar ?? [];
   return (
     <>
-      <MetinAlanlari {...props} gorsel />
+      <MetinAlanlari {...props} gorsel ustEtiket />
       <AdminFormBolumu baslik="İkon Kartları" aciklama="Hakkımızda bölümündeki ikon + metin kutuları">
         <ListeSiralayici<WidgetIkonKart>
           ogeler={ikonKartlar}

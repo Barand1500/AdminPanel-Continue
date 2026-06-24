@@ -56,7 +56,18 @@ export function SurecAdimlariIcerik({ form, onChange }: WidgetPanelProps) {
   const adimlar = cfg.surecAdimlari ?? [];
   return (
     <AdminFormBolumu baslik="Süreç Adımları">
+      <FormAlani etiket="Üst etiket / alt başlık" aciklama="Boş bırakırsanız sitede görünmez.">
+        <input
+          className={formInputSinifi}
+          value={form.altBaslik}
+          placeholder="Örn. NASIL ÇALIŞIR"
+          onChange={(e) => onChange({ ...form, altBaslik: e.target.value })}
+        />
+      </FormAlani>
       <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} /></FormAlani>
+      <FormAlani etiket="Açıklama">
+        <textarea className={formInputSinifi} rows={2} value={form.aciklama} onChange={(e) => onChange({ ...form, aciklama: e.target.value })} />
+      </FormAlani>
       <ListeSiralayici<WidgetSurecAdimi>
         ogeler={adimlar}
         onDegistir={(a) => onChange(configGuncelle(form, (c) => ({ ...c, surecAdimlari: a })))}

@@ -6664,6 +6664,14 @@ html:has(.admin-panel[data-tema='acik']) body {
 .ap-olusturucu-grid-yatay.ap-olusturucu-kolon-3 { grid-template-columns: repeat(3, 1fr); }
 .ap-olusturucu-grid-yatay.ap-olusturucu-kolon-4 { grid-template-columns: repeat(4, 1fr); }
 
+@media (max-width: 767px) {
+  .ap-olusturucu-grid-yatay.ap-olusturucu-kolon-2,
+  .ap-olusturucu-grid-yatay.ap-olusturucu-kolon-3,
+  .ap-olusturucu-grid-yatay.ap-olusturucu-kolon-4 {
+    grid-template-columns: 1fr;
+  }
+}
+
 .ap-olusturucu-hucre {
   display: flex;
   flex-direction: column;
@@ -6736,14 +6744,19 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 .ap-olusturucu-blok-liste {
   display: flex;
-  flex-direction: column;
-  gap: 0.375rem;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  align-content: flex-start;
+  gap: 0.5rem;
   flex: 1;
   min-height: 0;
 }
 
 .ap-olusturucu-blok {
   position: relative;
+  flex: 0 1 auto;
+  max-width: 100%;
   padding: 0.5rem 1.75rem 0.5rem 0.5rem;
   border-radius: 0.375rem;
   background: rgba(255, 255, 255, 0.04);
@@ -6814,6 +6827,11 @@ html:has(.admin-panel[data-tema='acik']) body {
   align-items: center;
   gap: 0.625rem;
   flex-wrap: wrap;
+}
+
+.ap-olusturucu-alt-ozet {
+  font-weight: 400;
+  color: var(--ap-muted, #94a3b8);
 }
 
 .ap-olusturucu-alt-etiket {
@@ -6959,7 +6977,9 @@ html:has(.admin-panel[data-tema='acik']) body {
 .ap-blok-boyut-wrap {
   position: relative;
   display: block;
+  flex: 0 1 auto;
   max-width: 100%;
+  min-width: min(100%, 120px);
 }
 
 .ap-blok-boyut-wrap.secili {

@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
-import type { BlokDuzen, BlokTipi, ParcaGorunum } from '@/types/blokOlusturucu';
-import { configGuncelle, configOku } from '@/types/widget';
+import type { BlokDuzen, BlokTipi, ParcaGorunum, WidgetBlok } from '@/types/blokOlusturucu';
 import { olusturucuOku } from '@/types/blokOlusturucu';
-import type { WidgetBlok } from '@/types/blokOlusturucu';
+import { configGuncelle, configOku } from '@/types/widget';
 import { yerlesimEtiketi } from '@/utils/widgetYerlesim';
 import {
   bosOlusturucu,
@@ -13,6 +12,13 @@ import {
 import { WidgetGridTuval } from './WidgetGridTuval';
 import { WidgetGridAltBar } from './WidgetGridAltBar';
 import { WidgetBlokPaleti } from './WidgetBlokPaleti';
+
+const YAN_YANA_BOYUTLU_TIPLER = new Set<BlokTipi>(['gorsel', 'kart', 'video']);
+
+function blokYariGenislik(blok: WidgetBlok): WidgetBlok {
+  if (!YAN_YANA_BOYUTLU_TIPLER.has(blok.tip) || blok.blokGenislikPx != null) return blok;
+  return { ...blok, gorselGenislik: 'yari', blokGenislikPx: undefined };
+}
 
 interface WidgetEklemePanelProps {
   form: WidgetFormDegeri;
@@ -71,9 +77,25 @@ export function WidgetEklemePanel({
 
   function parcaEkle(tip: BlokTipi) {
     if (!aktifHucreId) return;
-    const yeniBlok = varsayilanBlok(tip);
+    const hucre = olusturucu.hucreler.find((h) => h.id === aktifHucreId);
+    if (!hucre) return;
+
+    let yeniBlok = varsayilanBlok(tip);
+    let mevcutBloklar = hucre.bloklar;
+
+    if (mevcutBloklar.length >= 1 && YAN_YANA_BOYUTLU_TIPLER.has(tip)) {
+      yeniBlok = blokYariGenislik(yeniBlok);
+      mevcutBloklar = mevcutBloklar.map((b) =>
+        YAN_YANA_BOYUTLU_TIPLER.has(b.tip) &&
+        b.blokGenislikPx == null &&
+        (b.gorselGenislik == null || b.gorselGenislik === 'tam')
+          ? blokYariGenislik(b)
+          : b
+      );
+    }
+
     const hucreler = olusturucu.hucreler.map((h) =>
-      h.id === aktifHucreId ? { ...h, bloklar: [...h.bloklar, yeniBlok] } : h
+      h.id === aktifHucreId ? { ...h, bloklar: [...mevcutBloklar, yeniBlok] } : h
     );
     olusturucuGuncelle({ ...olusturucu, hucreler });
     setSeciliBlokId(yeniBlok.id);

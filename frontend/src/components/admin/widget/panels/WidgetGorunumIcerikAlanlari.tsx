@@ -55,8 +55,8 @@ export function WidgetGorunumIcerikAlanlari({ form, onChange }: WidgetPanelProps
         </FormAlani>
       )}
       {alanVar('altBaslik') && (
-        <FormAlani etiket={ALAN_ETIKET.altBaslik}>
-          <input className={formInputSinifi} value={form.altBaslik} onChange={(e) => onChange({ ...form, altBaslik: e.target.value })} />
+        <FormAlani etiket={ALAN_ETIKET.altBaslik} aciklama="Boş bırakırsanız sitede görünmez.">
+          <input className={formInputSinifi} value={form.altBaslik} placeholder="Örn. HAKKIMIZDA" onChange={(e) => onChange({ ...form, altBaslik: e.target.value })} />
         </FormAlani>
       )}
       {alanVar('aciklama') && (

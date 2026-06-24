@@ -684,10 +684,7 @@ export function onizlemeMockVerisiUygula(widget: Widget): Widget {
     ...widget,
     ad: metin(widget.ad, 'Örnek Widget'),
     baslik: metin(widget.baslik, mockBaslik(widget.tip)),
-    altBaslik: metin(
-      widget.altBaslik,
-      widget.tip === 'SITE_HAKKINDA' ? 'HAKKIMIZDA' : 'Güzel Teknoloji'
-    ),
+    altBaslik: widget.altBaslik?.trim() ?? '',
     aciklama: metin(
       widget.aciklama,
       widget.tip === 'ILETISIM_FORMU'
