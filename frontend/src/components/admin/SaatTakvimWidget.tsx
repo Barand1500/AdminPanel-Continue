@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useAksiyonCubuguPanelSync } from '@/components/admin/aksiyon-cubugu/AksiyonCubuguPanelContext';
 
 const GUNLER = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'];
 const AYLAR = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
@@ -17,6 +18,8 @@ export function SaatTakvimWidget() {
   const [simdi, setSimdi] = useState(() => new Date());
   const [acik, setAcik] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  useAksiyonCubuguPanelSync(acik, panelRef);
 
   useEffect(() => {
     const id = setInterval(() => setSimdi(new Date()), 30_000);
@@ -44,7 +47,7 @@ export function SaatTakvimWidget() {
         <span className="ap-saat-tarih">{tarih}</span>
       </button>
       {acik && (
-        <div className="ap-takvim-panel">
+        <div ref={panelRef} className="ap-takvim-panel ap-takvim-panel--kenarlik-anim">
           <p className="ap-heading text-center text-sm font-semibold">
             {AYLAR[simdi.getMonth()]} {simdi.getFullYear()}
           </p>

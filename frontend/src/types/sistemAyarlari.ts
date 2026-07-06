@@ -1,6 +1,7 @@
 import type { SagTikPanelAyarlari } from '@/types/sagTikPaneli';
 import { VARSAYILAN_SAG_TIK_PANEL } from '@/types/sagTikPaneli';
 import { sagTikPanelNormalize } from '@/utils/sagTikPanelYardimci';
+import { kenarlikAyariOku } from '@/utils/kenarlikRenkYardimci';
 
 export type Sayfa404MenuTipi = 'ust' | 'footer' | 'her-ikisi' | 'yok';
 
@@ -63,6 +64,8 @@ export interface SistemAyarlariForm {
   robotsEngelle: boolean;
   sagTikPaneli: SagTikPanelAyarlari;
   scriptAyarlari: ScriptAyarlari;
+  kenarlikRenk: string;
+  kenarlikNeon: boolean;
 }
 
 export type SistemSekmeId = 'genel' | 'bakim' | 'sayfa404' | 'dil' | 'guvenlik' | 'script' | 'sagTik' | 'eklentiler';
@@ -121,6 +124,8 @@ export const bosSistemForm: SistemAyarlariForm = {
   robotsEngelle: false,
   sagTikPaneli: { ...VARSAYILAN_SAG_TIK_PANEL, ogeler: [...VARSAYILAN_SAG_TIK_PANEL.ogeler] },
   scriptAyarlari: { ...varsayilanScriptAyarlari },
+  kenarlikRenk: kenarlikAyariOku().renk,
+  kenarlikNeon: kenarlikAyariOku().neon,
 };
 
 export function sistemdenForm(
@@ -146,5 +151,7 @@ export function sistemdenForm(
     robotsEngelle: sistem.robotsEngelle ?? false,
     sagTikPaneli: sagTikPanelNormalize(sistem.sagTikPaneli),
     scriptAyarlari: { ...varsayilanScriptAyarlari, ...sistem.scriptAyarlari },
+    kenarlikRenk: sistem.kenarlikRenk ?? kenarlikAyariOku().renk,
+    kenarlikNeon: sistem.kenarlikNeon ?? kenarlikAyariOku().neon,
   };
 }

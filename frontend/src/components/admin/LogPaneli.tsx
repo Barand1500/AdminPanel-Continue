@@ -1,6 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
 import { adminLogApi, type AdminLogKayit } from '@/features/admin/adminSistemApi';
 import { AltPanel, AltPanelBos, AltPanelOge, AltPanelYukleniyor } from './ortak/AltPanel';
+import {
+  logIslemTuruBul,
+  logKayitOzet,
+  logOzetCumle,
+} from '@/utils/logYardimci';
 
 interface LogPaneliProps {
   acik: boolean;
@@ -48,14 +53,18 @@ export function LogPaneli({ acik, onKapat, onModulAc }: LogPaneliProps) {
     >
       {yukleniyor && <AltPanelYukleniyor />}
       {!yukleniyor && loglar.length === 0 && <AltPanelBos mesaj="Henüz log kaydı yok." />}
-      {loglar.map((log) => (
-        <AltPanelOge
-          key={log.id}
-          baslik={log.islem}
-          alt={`${log.kullaniciAd} · ${log.modulId ?? 'sistem'}`}
-          zaman={log.olusturma}
-        />
-      ))}
+      {loglar.map((log) => {
+        const ozet = logKayitOzet(log);
+        const tur = logIslemTuruBul(ozet);
+        return (
+          <AltPanelOge
+            key={log.id}
+            baslik={logOzetCumle(ozet, tur)}
+            alt={`${log.kullaniciEmail ?? log.kullaniciAd ?? 'sistem'} · ${log.modulId ?? 'sistem'}`}
+            zaman={log.olusturma}
+          />
+        );
+      })}
     </AltPanel>
   );
 }

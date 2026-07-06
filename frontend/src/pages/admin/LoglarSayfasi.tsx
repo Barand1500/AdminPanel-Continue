@@ -1,13 +1,42 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import { adminLogApi, type AdminLogKayit } from '@/features/admin/adminSistemApi';
+import {
+  logAramaEslesir,
+  logGoreliZaman,
+  logIslemEtiket,
+  logIslemIkon,
+  logIslemSinif,
+  logIslemTuruBul,
+  logKullaniciAdi,
+  logKullaniciBasHarf,
+  logKayitOzet,
+  logSaatFormat,
+  logTamTarihFormat,
+  logOzetCumle,
+  loglariGrupla,
+  type LogIslemTuru,
+} from '@/utils/logYardimci';
+
+const ISLEM_FILTRELERI: { id: LogIslemTuru | 'tumu'; ad: string }[] = [
+  { id: 'tumu', ad: 'Tümü' },
+  { id: 'kaydet', ad: 'Kaydet' },
+  { id: 'ekle', ad: 'Yeni Ekle' },
+  { id: 'sil', ad: 'Sil' },
+  { id: 'guncelle', ad: 'Güncelle' },
+  { id: 'diger', ad: 'Diğer' },
+];
 
 export function LoglarSayfasi() {
   const [loglar, setLoglar] = useState<AdminLogKayit[]>([]);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [hata, setHata] = useState('');
   const [temizleniyor, setTemizleniyor] = useState(false);
+  const [arama, setArama] = useState('');
+  const [islemFiltre, setIslemFiltre] = useState<LogIslemTuru | 'tumu'>('tumu');
+  const [kullaniciFiltre, setKullaniciFiltre] = useState('tumu');
 
-  async function yukle() {
+  const yukle = useCallback(async () => {
     setYukleniyor(true);
     setHata('');
     try {
@@ -17,14 +46,14 @@ export function LoglarSayfasi() {
     } finally {
       setYukleniyor(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     void yukle();
-  }, []);
+  }, [yukle]);
 
-  async function temizle() {
-    if (!confirm('Tüm log kayıtları silinecek. Emin misiniz?')) return;
+  const temizle = useCallback(async () => {
+    if (!confirm('Saklama süresini aşan eski log kayıtları temizlenecek. Devam edilsin mi?')) return;
     setTemizleniyor(true);
     try {
       await adminLogApi.temizle();
@@ -34,60 +63,204 @@ export function LoglarSayfasi() {
     } finally {
       setTemizleniyor(false);
     }
-  }
+  }, [yukle]);
+
+  useModulAksiyonlari({ sil: temizle }, { sil: loglar.length > 0 && !temizleniyor });
+
+  const kullanicilar = useMemo(() => {
+    const set = new Map<string, string>();
+    for (const log of loglar) {
+      const anahtar = log.kullaniciEmail ?? log.kullaniciId ?? 'bilinmeyen';
+      set.set(anahtar, logKullaniciAdi(log));
+    }
+    return Array.from(set.entries()).sort((a, b) => a[1].localeCompare(b[1], 'tr'));
+  }, [loglar]);
+
+  const filtrelenmis = useMemo(() => {
+    return loglar.filter((log) => {
+      const ozet = logKayitOzet(log);
+      const tur = logIslemTuruBul(ozet);
+      if (islemFiltre !== 'tumu' && tur !== islemFiltre) return false;
+      if (kullaniciFiltre !== 'tumu') {
+        const anahtar = log.kullaniciEmail ?? log.kullaniciId ?? 'bilinmeyen';
+        if (anahtar !== kullaniciFiltre) return false;
+      }
+      return logAramaEslesir(log, arama, ozet);
+    });
+  }, [loglar, arama, islemFiltre, kullaniciFiltre]);
+
+  const gruplar = useMemo(() => loglariGrupla(filtrelenmis), [filtrelenmis]);
+
+  const istatistik = useMemo(() => {
+    const bugun = new Date();
+    bugun.setHours(0, 0, 0, 0);
+    const bugunku = loglar.filter((l) => new Date(l.olusturma) >= bugun).length;
+    const kullaniciSet = new Set(
+      loglar.map((l) => l.kullaniciEmail ?? l.kullaniciId).filter(Boolean)
+    );
+    return { toplam: loglar.length, bugunku, kullanici: kullaniciSet.size };
+  }, [loglar]);
 
   return (
-    <div>
-      <div className="mb-6 flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-white">Log Takibi</h1>
-          <p className="mt-1 text-sm text-slate-400">Admin panelinde yapılan işlemlerin kaydı</p>
+    <div className="ap-log-sayfa">
+      <div className="ap-log-ust">
+        <div className="flex flex-wrap items-start justify-between gap-4">
+          <div>
+            <h1 className="ap-heading text-xl font-bold">Log Takibi</h1>
+            <p className="ap-muted mt-1 text-sm">
+              Kimin hangi modülde ne yaptığını buradan takip edin.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => void yukle()}
+            disabled={yukleniyor}
+            className="ap-log-yenile-btn"
+          >
+            {yukleniyor ? 'Yenileniyor...' : 'Yenile'}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={() => void temizle()}
-          disabled={temizleniyor || loglar.length === 0}
-          className="rounded border border-red-500/50 px-3 py-1.5 text-sm text-red-300 hover:bg-red-500/10 disabled:opacity-50"
-        >
-          {temizleniyor ? 'Temizleniyor...' : 'Logları Temizle'}
-        </button>
+
+        <div className="ap-log-istatistik-grid">
+          <div className="ap-log-istatistik-kart">
+            <span className="ap-log-istatistik-etiket">Toplam kayıt</span>
+            <strong className="ap-log-istatistik-deger">{istatistik.toplam}</strong>
+          </div>
+          <div className="ap-log-istatistik-kart ap-log-istatistik-kart-mavi">
+            <span className="ap-log-istatistik-etiket">Bugün</span>
+            <strong className="ap-log-istatistik-deger">{istatistik.bugunku}</strong>
+          </div>
+          <div className="ap-log-istatistik-kart ap-log-istatistik-kart-mor">
+            <span className="ap-log-istatistik-etiket">Aktif kullanıcı</span>
+            <strong className="ap-log-istatistik-deger">{istatistik.kullanici}</strong>
+          </div>
+          <div className="ap-log-istatistik-kart ap-log-istatistik-kart-yesil">
+            <span className="ap-log-istatistik-etiket">Gösterilen</span>
+            <strong className="ap-log-istatistik-deger">{filtrelenmis.length}</strong>
+          </div>
+        </div>
+
+        <section className="ap-card ap-log-filtre-kart rounded-xl border p-4">
+          <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
+            <div className="ap-log-arama-wrap">
+              <span className="ap-log-arama-ikon" aria-hidden>
+                ⌕
+              </span>
+              <input
+                type="search"
+                value={arama}
+                onChange={(e) => setArama(e.target.value)}
+                placeholder="Kullanıcı, modül veya işlem ara..."
+                className="ap-log-arama-input"
+              />
+            </div>
+            <select
+              className="ap-log-select"
+              value={islemFiltre}
+              onChange={(e) => setIslemFiltre(e.target.value as LogIslemTuru | 'tumu')}
+            >
+              {ISLEM_FILTRELERI.map((f) => (
+                <option key={f.id} value={f.id}>
+                  İşlem: {f.ad}
+                </option>
+              ))}
+            </select>
+            <select
+              className="ap-log-select"
+              value={kullaniciFiltre}
+              onChange={(e) => setKullaniciFiltre(e.target.value)}
+            >
+              <option value="tumu">Kullanıcı: Tümü</option>
+              {kullanicilar.map(([id, ad]) => (
+                <option key={id} value={id}>
+                  {ad}
+                </option>
+              ))}
+            </select>
+          </div>
+        </section>
       </div>
 
-      {hata && <p className="mb-4 text-sm text-red-400">{hata}</p>}
+      <div className="ap-log-icerik">
+        {hata && (
+          <div className="ap-bildirim ap-bildirim-hata rounded-xl px-4 py-3 text-sm">{hata}</div>
+        )}
 
-      {yukleniyor ? (
-        <p className="text-sm text-slate-400">Yükleniyor...</p>
-      ) : loglar.length === 0 ? (
-        <div className="rounded-lg border border-dashed border-slate-600 py-16 text-center">
-          <p className="text-4xl">📜</p>
-          <p className="mt-2 text-sm text-slate-400">Henüz log kaydı yok.</p>
-        </div>
-      ) : (
-        <div className="overflow-hidden rounded-lg border border-slate-700">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-800 text-xs uppercase text-slate-400">
-              <tr>
-                <th className="px-4 py-3">Tarih</th>
-                <th className="px-4 py-3">Kullanıcı</th>
-                <th className="px-4 py-3">İşlem</th>
-                <th className="px-4 py-3">Modül</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-700 bg-slate-900/50">
-              {loglar.map((log) => (
-                <tr key={log.id}>
-                  <td className="whitespace-nowrap px-4 py-3 text-slate-400">
-                    {new Date(log.olusturma).toLocaleString('tr-TR')}
-                  </td>
-                  <td className="px-4 py-3 text-slate-200">{log.kullaniciEmail}</td>
-                  <td className="px-4 py-3 text-white">{log.islem}</td>
-                  <td className="px-4 py-3 text-slate-400">{log.modulId ?? '—'}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      )}
+        {yukleniyor ? (
+          <div className="ap-log-bos-durum ap-log-bos-durum-tam">
+            <div className="h-8 w-8 animate-spin rounded-full border-2 border-[var(--ap-accent)] border-t-transparent" />
+            <p className="ap-muted mt-3 text-sm">Loglar yükleniyor...</p>
+          </div>
+        ) : filtrelenmis.length === 0 ? (
+          <div className="ap-log-bos-durum ap-log-bos-durum-tam ap-card rounded-xl border">
+            <span className="text-4xl" aria-hidden>
+              📜
+            </span>
+            <p className="ap-heading mt-3 font-medium">
+              {loglar.length === 0 ? 'Henüz log kaydı yok' : 'Filtreye uygun kayıt bulunamadı'}
+            </p>
+            <p className="ap-muted mt-1 text-sm">
+              Panelde kaydet, sil veya modül açma gibi işlemler otomatik buraya düşer.
+            </p>
+          </div>
+        ) : (
+          <div className="ap-log-zaman-cizgisi space-y-6">
+            {gruplar.map(({ grup, kayitlar }) => (
+              <section key={grup}>
+                <h2 className="ap-log-grup-baslik">{grup}</h2>
+                <div className="ap-log-kayit-liste">
+                  {kayitlar.map((log) => (
+                    <LogKayitSatiri key={log.id} log={log} />
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        )}
+
+        {temizleniyor && (
+          <p className="ap-muted text-center text-xs">Eski kayıtlar temizleniyor...</p>
+        )}
+      </div>
     </div>
+  );
+}
+
+function LogKayitSatiri({ log }: { log: AdminLogKayit }) {
+  const ozet = logKayitOzet(log);
+  const tur = logIslemTuruBul(ozet);
+  const kullanici = logKullaniciAdi(log);
+
+  return (
+    <article className="ap-log-kayit">
+      <div className={`ap-log-kayit-ikon ${logIslemSinif(tur)}`} aria-hidden>
+        {logIslemIkon(tur)}
+      </div>
+
+      <div className="ap-log-kayit-govde">
+        <div className="ap-log-kayit-ust">
+          <div className="ap-log-kullanici">
+            <span className="ap-log-avatar">{logKullaniciBasHarf(log)}</span>
+            <div className="min-w-0">
+              <p className="ap-log-kullanici-ad">{kullanici}</p>
+              {log.kullaniciEmail && (
+                <p className="ap-log-kullanici-email">{log.kullaniciEmail}</p>
+              )}
+            </div>
+          </div>
+          <div className="ap-log-zaman" title={logTamTarihFormat(log.olusturma)}>
+            <span className="ap-log-zaman-saat">{logSaatFormat(log.olusturma)}</span>
+            <span className="ap-log-zaman-goreli">{logGoreliZaman(log.olusturma)}</span>
+          </div>
+        </div>
+
+        <p className="ap-log-ozet-cumle">{logOzetCumle(ozet, tur)}</p>
+
+        <div className="ap-log-meta">
+          <span className={`ap-log-etiket ${logIslemSinif(tur)}`}>{logIslemEtiket(tur)}</span>
+          {ozet.modulId && <span className="ap-log-etiket ap-log-etiket-notr">{ozet.modulId}</span>}
+        </div>
+      </div>
+    </article>
   );
 }

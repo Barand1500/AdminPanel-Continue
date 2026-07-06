@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type DragEvent, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, useCallback, type DragEvent, type MouseEvent } from 'react';
 import type { AdminModul, AdminSekme } from '@/types/admin';
 import { modulBul } from '@/data/adminMenuYapisi';
 import {
@@ -6,6 +6,7 @@ import {
   type SekmePanelAyarlari,
 } from '@/utils/sekmePanelAyarlari';
 import { SekmeCubuguArama } from './SekmeCubuguArama';
+import { AnimasyonluKenarlik } from './AnimasyonluKenarlik';
 
 interface UstSekmeCubuguProps {
   sekmeler: AdminSekme[];
@@ -17,6 +18,7 @@ interface UstSekmeCubuguProps {
   sekmeAyarlari?: SekmePanelAyarlari;
   onSekmeAyir?: (sekmeId: string) => void;
   onModulSec?: (modul: AdminModul) => void;
+  baslatMenuAcik?: boolean;
 }
 
 type GrupOgesi =
@@ -65,6 +67,8 @@ function SekmeButonu({
   dropMod,
   hoverOnizleme,
   gorunumModu,
+  baslatMenuAcik,
+  kenarlikAnimKey,
   onSekmeSec,
   onSekmeKapat,
   sekmelerUzunluk,
@@ -84,6 +88,8 @@ function SekmeButonu({
   dropMod: DropMod | null;
   hoverOnizleme: boolean;
   gorunumModu: SekmePanelAyarlari['sekmeGorunumModu'];
+  baslatMenuAcik: boolean;
+  kenarlikAnimKey: number;
   onSekmeSec: (id: string) => void;
   onSekmeKapat: (id: string) => void;
   sekmelerUzunluk: number;
@@ -101,9 +107,18 @@ function SekmeButonu({
   const ikon = modul?.ikon ?? '📄';
   const isimGoster = gorunumModu === 'isim' || gorunumModu === 'ikon-isim';
   const ikonGoster = gorunumModu === 'ikon' || gorunumModu === 'ikon-isim';
+  const tabRef = useRef<HTMLDivElement>(null);
+  const sekmeVurgulu = aktif && !baslatMenuAcik;
+
+  function sekmeSecTikla(e: MouseEvent) {
+    if (e.button !== 0) return;
+    e.stopPropagation();
+    onSekmeSec(sekme.id);
+  }
 
   return (
     <div
+      ref={tabRef}
       draggable
       onDragStart={(e) => onDragStart(e, sekme.id)}
       onDragOver={(e) => onDragOver(e, sekme.id)}
@@ -116,9 +131,11 @@ function SekmeButonu({
       className={`ap-sekme-tab group relative flex max-w-[200px] shrink-0 cursor-grab items-center rounded-t-md border border-b-0 active:cursor-grabbing ${
         gruplu ? 'rounded-none first:rounded-tl-md last:rounded-tr-md' : ''
       } ${
-        aktif
-          ? 'border-[var(--ap-border)] bg-[var(--ap-tab-active)] text-[var(--ap-heading)] shadow-sm'
-          : 'border-transparent bg-[var(--ap-tab-idle)] text-[var(--ap-text-muted)] hover:bg-[var(--ap-hover)]'
+        sekmeVurgulu
+          ? 'ap-sekme-tab--kenarlik-aktif border-[var(--ap-border)] bg-[var(--ap-tab-active)] text-[var(--ap-heading)] shadow-sm'
+          : aktif
+            ? 'border-[var(--ap-border)] bg-[var(--ap-tab-active)] text-[var(--ap-heading)] shadow-sm'
+            : 'border-transparent bg-[var(--ap-tab-idle)] text-[var(--ap-text-muted)] hover:bg-[var(--ap-hover)]'
       } ${tasinan ? 'opacity-50' : ''} ${
         hedef && dropMod === 'grup' ? 'ap-sekme-drop-grup' : ''
       } ${hedef && dropMod === 'once' ? 'ap-sekme-drop-once' : ''} ${
@@ -126,11 +143,18 @@ function SekmeButonu({
       }`}
       style={{ minHeight: 'var(--ap-tab-height, 2rem)', fontSize: 'var(--ap-tab-font-size, 0.75rem)' }}
     >
+      {sekmeVurgulu && (
+        <AnimasyonluKenarlik
+          animasyonAnahtar={`${sekme.id}-${kenarlikAnimKey}`}
+          kapsayiciRef={tabRef}
+          ustYaricap={6}
+        />
+      )}
       <button
         type="button"
         draggable={false}
-        onClick={() => onSekmeSec(sekme.id)}
-        className="flex min-h-[inherit] min-w-0 flex-1 items-center gap-1 truncate px-3 py-1.5"
+        className="ap-sekme-tab-sec flex min-h-[inherit] min-w-0 flex-1 cursor-pointer items-center gap-1 truncate px-3 py-1.5"
+        onMouseDown={sekmeSecTikla}
       >
         {sekme.kaydedilmedi && (
           <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" title="Kaydedilmemiş değişiklik" />
@@ -147,10 +171,12 @@ function SekmeButonu({
             e.stopPropagation();
             onSekmeKapat(sekme.id);
           }}
-          className="mr-1 shrink-0 rounded px-1 text-sm leading-none opacity-60 transition hover:bg-[var(--ap-hover)] hover:opacity-100 group-hover:opacity-100"
+          className="ap-sekme-tab-kapat mr-1 shrink-0 rounded px-1 text-sm leading-none opacity-60 transition hover:bg-[var(--ap-hover)] hover:opacity-100 group-hover:opacity-100"
           aria-label="Sekmeyi kapat"
         >
-          ×
+          <svg viewBox="0 0 24 24" className="h-3.5 w-3.5" fill="none" stroke="currentColor" strokeWidth="2" aria-hidden>
+            <path strokeLinecap="round" d="M18 6L6 18M6 6l12 12" />
+          </svg>
         </button>
       )}
     </div>
@@ -167,14 +193,17 @@ export function UstSekmeCubugu({
   sekmeAyarlari: disAyarlari,
   onSekmeAyir,
   onModulSec,
+  baslatMenuAcik = false,
 }: UstSekmeCubuguProps) {
   const [ayarlar, setAyarlar] = useState<SekmePanelAyarlari>(() => disAyarlari ?? sekmeAyarlariOku());
   const [surukleniyor, setSurukleniyor] = useState<string | null>(null);
   const [dropHedef, setDropHedef] = useState<string | null>(null);
   const [dropMod, setDropMod] = useState<DropMod | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
+  const scrollTrackRef = useRef<HTMLDivElement>(null);
   const [solOk, setSolOk] = useState(false);
   const [sagOk, setSagOk] = useState(false);
+  const [kenarlikAnimKey, setKenarlikAnimKey] = useState(0);
   const surukleBaslangic = useRef<{ x: number; y: number; id: string } | null>(null);
 
   useEffect(() => {
@@ -217,8 +246,30 @@ export function UstSekmeCubugu({
     };
   }, [ogeler]);
 
+  useEffect(() => {
+    const alan = scrollTrackRef.current;
+    if (!alan) return;
+
+    const tekerlekKaydir = (e: WheelEvent) => {
+      const el = scrollRef.current;
+      if (!el || el.scrollWidth <= el.clientWidth + 1) return;
+
+      const delta = Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX;
+      if (delta === 0) return;
+
+      e.preventDefault();
+      el.scrollBy({ left: delta, behavior: 'auto' });
+    };
+
+    alan.addEventListener('wheel', tekerlekKaydir, { passive: false });
+    return () => alan.removeEventListener('wheel', tekerlekKaydir);
+  }, [ogeler]);
+
   function kaydir(yon: 'sol' | 'sag') {
-    scrollRef.current?.scrollBy({ left: yon === 'sol' ? -180 : 180, behavior: 'smooth' });
+    const el = scrollRef.current;
+    if (!el) return;
+    const miktar = Math.max(200, Math.round(el.clientWidth * 0.65));
+    el.scrollBy({ left: yon === 'sol' ? -miktar : miktar, behavior: 'smooth' });
   }
 
   function onDragStart(e: DragEvent, id: string) {
@@ -276,13 +327,23 @@ export function UstSekmeCubugu({
     setDropMod(null);
   }
 
+  const sekmeSecAnim = useCallback(
+    (id: string) => {
+      onSekmeSec(id);
+      setKenarlikAnimKey((n) => n + 1);
+    },
+    [onSekmeSec]
+  );
+
   const ortakSekmeProps = {
     surukleniyor,
     dropHedef,
     dropMod,
     hoverOnizleme: ayarlar.hoverOnizleme,
     gorunumModu: ayarlar.sekmeGorunumModu,
-    onSekmeSec,
+    baslatMenuAcik,
+    kenarlikAnimKey,
+    onSekmeSec: sekmeSecAnim,
     onSekmeKapat,
     sekmelerUzunluk: sekmeler.length,
     onDragStart,
@@ -296,14 +357,22 @@ export function UstSekmeCubugu({
 
   return (
     <div className="ap-sekme-scroll-wrap" style={tabCss} data-ap-kesif="sekme-cubugu">
-      <div className="ap-sekme-scroll-track">
-        {solOk && (
-          <button type="button" className="ap-sekme-scroll-btn ap-sekme-scroll-sol" onClick={() => kaydir('sol')} aria-label="Sola">
-            ‹
-          </button>
-        )}
+      <div ref={scrollTrackRef} className="ap-sekme-scroll-rail">
+        <button
+          type="button"
+          className="ap-sekme-scroll-btn ap-sekme-scroll-btn--sabit ap-sekme-scroll-sol"
+          onClick={() => kaydir('sol')}
+          disabled={!solOk}
+          aria-label="Sola kaydır"
+        >
+          <svg viewBox="0 0 24 24" className="ap-sekme-scroll-btn-ikon" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
+          </svg>
+        </button>
 
-        <div ref={scrollRef} className="ap-sekme-scroll">
+        <div className="ap-sekme-scroll-ayrac" aria-hidden />
+
+        <div ref={scrollRef} className="ap-sekme-scroll ap-sekme-scroll--ortada">
           {ogeler.map((oge) => {
             if (oge.tip === 'tek') {
               return (
@@ -335,11 +404,19 @@ export function UstSekmeCubugu({
           })}
         </div>
 
-        {sagOk && (
-          <button type="button" className="ap-sekme-scroll-btn ap-sekme-scroll-sag" onClick={() => kaydir('sag')} aria-label="Sağa">
-            ›
-          </button>
-        )}
+        <div className="ap-sekme-scroll-ayrac" aria-hidden />
+
+        <button
+          type="button"
+          className="ap-sekme-scroll-btn ap-sekme-scroll-btn--sabit ap-sekme-scroll-sag"
+          onClick={() => kaydir('sag')}
+          disabled={!sagOk}
+          aria-label="Sağa kaydır"
+        >
+          <svg viewBox="0 0 24 24" className="ap-sekme-scroll-btn-ikon" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
+          </svg>
+        </button>
       </div>
 
       {ayarlar.sekmeAramaAktif && onModulSec && (

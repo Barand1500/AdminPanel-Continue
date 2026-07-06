@@ -4,6 +4,7 @@ import { GorselAlan } from '@/components/form/GorselAlan';
 import { BakimEkrani } from '@/components/ortak/BakimEkrani';
 import { AdminPanelKarti } from '@/components/admin/ortak/AdminBilesenleri';
 import { DurumAnahtari } from './SistemSekmeCubugu';
+import { KenarlikRenkSecici } from './KenarlikRenkSecici';
 import type { SistemAyarlariForm } from '@/types/sistemAyarlari';
 import { PANEL_DILLERI } from '@/types/sistemAyarlari';
 import { panelJsonIceAktar, PANEL_VARSAYILAN_DILLER } from '@/i18n/panelSozluk';
@@ -246,6 +247,22 @@ export function SistemGenelSekme({
           className={formInputSinifi}
           value={form.logSaklamaGun}
           onChange={(e) => onChange({ ...form, logSaklamaGun: Number(e.target.value) || 90 })}
+        />
+      </FormAlani>
+      <FormAlani
+        etiket="Border rengi seçiniz"
+        aciklama="Sekme, menü ve aksiyon çubuğu kenarlık vurgu rengi (tasarım aynı kalır, yalnızca renk değişir)"
+      >
+        <KenarlikRenkSecici
+          kenarlikRenk={form.kenarlikRenk}
+          kenarlikNeon={form.kenarlikNeon}
+          onChange={(ayar) =>
+            onChange({
+              ...form,
+              kenarlikRenk: ayar.renk,
+              kenarlikNeon: ayar.neon,
+            })
+          }
         />
       </FormAlani>
     </div>

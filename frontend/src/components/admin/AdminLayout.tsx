@@ -22,6 +22,11 @@ import { AdminSagTikMenu } from '@/components/admin/sagTik/AdminSagTikMenu';
 import { PanelDilKabuk } from '@/components/admin/PanelDilKabuk';
 import { sekmeAyarlariOku, splitSekmeleriHesapla } from '@/utils/sekmePanelAyarlari';
 import { kisayolAyarlariOku, klavyeOlayiEslesir } from '@/utils/kisayolAyarlari';
+import {
+  kenarlikAyariOku,
+  kenarlikRenkCssDegiskeni,
+  type KenarlikRenkAyari,
+} from '@/utils/kenarlikRenkYardimci';
 import type { AdminModul, AdminSekme } from '@/types/admin';
 import '@/styles/adminTema.css';
 
@@ -52,6 +57,8 @@ function AdminPanelGovde() {
   const navigate = useNavigate();
   const aksiyonlar = useAksiyonCubugu(focusModulId);
   const [sekmeAyarlari, setSekmeAyarlari] = useState(sekmeAyarlariOku);
+  const [kenarlikAyar, setKenarlikAyar] = useState<KenarlikRenkAyari>(() => kenarlikAyariOku());
+  const [baslatMenuAcik, setBaslatMenuAcik] = useState(false);
   const [ayriPencereler, setAyriPencereler] = useState<AyriPencere[]>([]);
   const [rehberAcik, setRehberAcik] = useState(false);
   /** Kapatılan sekmenin modülü — URL gecikince useEffect'in sekmeyi yeniden açmasını engeller */
@@ -62,6 +69,17 @@ function AdminPanelGovde() {
     window.addEventListener('ap-sekme-ayarlari-guncellendi', handler);
     return () => window.removeEventListener('ap-sekme-ayarlari-guncellendi', handler);
   }, []);
+
+  useEffect(() => {
+    const handler = () => setKenarlikAyar(kenarlikAyariOku());
+    window.addEventListener('ap-kenarlik-renk-guncellendi', handler);
+    return () => window.removeEventListener('ap-kenarlik-renk-guncellendi', handler);
+  }, []);
+
+  const panelStil = useMemo(
+    () => kenarlikRenkCssDegiskeni(kenarlikAyar, tema),
+    [kenarlikAyar, tema]
+  );
 
   const aktifSekme = sekmeler.find((s) => s.id === aktifSekmeId);
   const splitSekmeler = useMemo(
@@ -262,7 +280,11 @@ function AdminPanelGovde() {
 
   return (
     <SistemKesifProvider onModulAc={modulSecHandler}>
-    <div className="admin-panel flex h-screen min-h-0 w-full flex-col overflow-hidden" data-tema={tema}>
+    <div
+      className={`admin-panel flex h-screen min-h-0 w-full flex-col overflow-hidden${kenarlikAyar.neon ? ' admin-panel--kenarlik-neon' : ''}`}
+      data-tema={tema}
+      style={panelStil}
+    >
       <AdminHeader
         sekmeler={sekmeler}
         aktifSekmeId={aktifSekmeId}
@@ -272,6 +294,8 @@ function AdminPanelGovde() {
         onSekmeBirlestir={sekmeBirlestir}
         onModulSec={modulAcHandler}
         onSekmeAyir={sekmeAyarlari.surukleAyirPencere ? sekmeAyir : undefined}
+        baslatMenuAcik={baslatMenuAcik}
+        onBaslatMenuAcikDegistir={setBaslatMenuAcik}
       />
 
       <SiteAyarlariKirliIzleyici
