@@ -193,22 +193,45 @@ export const HEADER_TIP_DEMO: Record<HeaderTipi, HeaderTipDemoPaket> = {
     ]),
     kategoriler: [],
   },
-  split: {
-    markaMetni: 'NORDHOME',
-    slogan: 'Eviniz için her şey',
-    telefon: '444 4 555',
-    email: 'info@nordhome-ornek.com',
-    anaRenk: '#0058a3',
-    ikincilRenk: '#ffdb00',
-    aramaPlaceholder: 'Ürün veya oda ara...',
-    ornekNotu: 'IKEA tarzı split düzen örneği — sahte marka',
-    menu: menu([{ baslik: 'Fikirler' }, { baslik: 'Planlayıcı' }, { baslik: 'Hizmetler' }]),
-    kategoriler: [
-      kat('oturma', 'Oturma Odası'),
-      kat('mutfak', 'Mutfak'),
-      kat('yatak', 'Yatak Odası'),
-      kat('banyo', 'Banyo'),
+  'imza-kurumsal': {
+    markaMetni: 'imzakurumsal',
+    slogan: '',
+    telefon: '0 555 111 22 33',
+    email: 'mail@siteniz.com',
+    anaRenk: '#1e4d8c',
+    ikincilRenk: '#c5d4e8',
+    aramaPlaceholder: 'Ara...',
+    ornekNotu: 'İki katmanlı kurumsal header — üst iletişim + ikonlu menü / katalog',
+    menu: [
+      { baslik: 'Anasayfa', yol: '/', ikon: '🏠' },
+      {
+        baslik: 'Kurumsal',
+        yol: '/kurumsal',
+        ikon: '👤',
+        altOgeler: [
+          { baslik: 'Hakkımızda', yol: '/hakkimizda' },
+          { baslik: 'Ekibimiz', yol: '/ekip' },
+        ],
+      },
+      {
+        baslik: 'Ürünler',
+        yol: '/urunler',
+        ikon: '📦',
+        altOgeler: [
+          { baslik: 'Katalog', yol: '/katalog' },
+          { baslik: 'Yeni Ürünler', yol: '/yeni' },
+        ],
+      },
+      { baslik: 'Blog', yol: '/blog', ikon: '🌐' },
+      { baslik: 'İletişim', yol: '/iletisim', ikon: '✉️' },
+      {
+        baslik: 'Tema',
+        yol: '/tema',
+        ikon: '🖥️',
+        altOgeler: [{ baslik: 'Varyantlar', yol: '/tema' }],
+      },
     ],
+    kategoriler: [],
   },
 };
 

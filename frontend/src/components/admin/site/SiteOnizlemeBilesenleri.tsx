@@ -89,8 +89,49 @@ export function SiteHeaderOnizleme({
           ...(tip === 'modern' && !mergedHeader.tipEk?.ctaMetni
             ? { ctaMetni: 'İletişim', ctaLink: '/iletisim' }
             : {}),
+          ...(tip === 'imza-kurumsal'
+            ? {
+                ctaMetni: mergedHeader.tipEk?.ctaMetni || 'Katalog',
+                ctaLink: mergedHeader.tipEk?.ctaLink || '/katalog',
+                aramaModu: 'ikon' as const,
+                kullaniciGoster: false,
+              }
+            : {}),
         },
+        ...(tip === 'imza-kurumsal'
+          ? {
+              ustBant: {
+                telefonGoster: true,
+                emailGoster: true,
+                kurlarGoster: false,
+                sosyalGoster: true,
+              },
+              dilDestegi: {
+                aktif: true,
+                gorunum: 'bayrak' as const,
+                varsayilanDil: 'tr',
+                diller: [
+                  { kod: 'tr', ad: 'Türkçe', bayrak: '🇹🇷', aktif: true, sira: 0 },
+                  { kod: 'en', ad: 'English', bayrak: '🇬🇧', aktif: true, sira: 1 },
+                  { kod: 'de', ad: 'Deutsch', bayrak: '🇩🇪', aktif: true, sira: 2 },
+                ],
+              },
+            }
+          : {}),
       },
+      ...(tip === 'imza-kurumsal'
+        ? {
+            sosyalMedyaJson: {
+              facebook: 'https://facebook.com',
+              twitter: 'https://twitter.com',
+              instagram: 'https://instagram.com',
+              linkedin: 'https://linkedin.com',
+              youtube: 'https://youtube.com',
+              pinterest: 'https://pinterest.com',
+              whatsapp: 'https://wa.me/905551112233',
+            },
+          }
+        : {}),
     };
   }, [ayarlar, headerJson, iletisim, demoMod, demo, tip]);
 

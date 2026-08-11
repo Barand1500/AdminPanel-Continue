@@ -58,7 +58,7 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
   return (
     <AdminPanelKarti baslik="Ek Ayarlar" altBaslik={`${tanim.ad} tipine özel alanlar`}>
       <div className="space-y-4">
-        {(tip === 'sade' || tip === 'kompakt' || tip === 'arama-odakli' || tip === 'split') && (
+        {(tip === 'sade' || tip === 'kompakt' || tip === 'arama-odakli' || tip === 'imza-kurumsal') && (
           <>
             <ToggleSatir
               etiket="Arama kutusu göster"
@@ -100,31 +100,31 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
           </FormAlani>
         )}
 
-        {tip === 'modern' && (
+        {(tip === 'modern' || tip === 'imza-kurumsal') && (
           <>
-            <FormAlani etiket="CTA buton metni">
+            <FormAlani etiket={tip === 'imza-kurumsal' ? 'Katalog buton metni' : 'CTA buton metni'}>
               <input
                 className={formInputSinifi}
                 value={tipEk.ctaMetni ?? ''}
                 onChange={(e) => guncelle({ ctaMetni: e.target.value })}
               />
             </FormAlani>
-            <FormAlani etiket="CTA link">
+            <FormAlani etiket={tip === 'imza-kurumsal' ? 'Katalog link' : 'CTA link'}>
               <input
                 className={formInputSinifi}
                 value={tipEk.ctaLink ?? ''}
                 onChange={(e) => guncelle({ ctaLink: e.target.value })}
-                placeholder="/iletisim"
+                placeholder={tip === 'imza-kurumsal' ? '/katalog' : '/iletisim'}
               />
             </FormAlani>
           </>
         )}
 
-        {(tip === 'merkez-logo' || tip === 'split') && (
+        {tip === 'merkez-logo' && (
           <>
             <GorselAlan
               etiket="İkinci logo"
-              aciklama="Split veya merkez logo düzeninde ikincil marka"
+              aciklama="Merkez logo düzeninde ikincil marka"
               deger={tipEk.ikinciLogoUrl ?? ''}
               onChange={(v) => guncelle({ ikinciLogoUrl: v || null })}
               onizlemeSinifi="h-10 max-w-[120px] rounded object-contain border border-[var(--ap-border)] p-1"
@@ -201,7 +201,11 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
           </>
         )}
 
-        {tip !== 'sade' && tip !== 'kompakt' && tip !== 'arama-odakli' && tip !== 'split' && (
+        {tip !== 'sade' &&
+          tip !== 'kompakt' &&
+          tip !== 'arama-odakli' &&
+          tip !== 'imza-kurumsal' &&
+          tip !== 'modern' && (
           <ToggleSatir
             etiket="Kullanıcı alanı göster"
             aciklama="Header sağındaki hesap / giriş ikonu"

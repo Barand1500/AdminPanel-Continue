@@ -10,7 +10,7 @@ export const HEADER_TIPLERI = [
   'kurumsal',
   'mega-menu',
   'seffaf-hero',
-  'split',
+  'imza-kurumsal',
 ] as const;
 
 export type HeaderTipi = (typeof HEADER_TIPLERI)[number];
@@ -35,10 +35,19 @@ export const HEADER_TIP_TANIMLARI: HeaderTipTanimi[] = [
   { id: 'kurumsal', ad: 'Kurumsal', aciklama: 'Güçlü üst bant + destek metni', ilham: 'Microsoft', ustBant: true, kategoriArama: true, ekAyarlari: true },
   { id: 'mega-menu', ad: 'Mega Menü', aciklama: 'Geniş kategori paneli', ilham: 'Teknosa', ustBant: true, kategoriArama: true, ekAyarlari: true },
   { id: 'seffaf-hero', ad: 'Hero Overlay', aciklama: 'Karanlık hero alanı + şeffaf header üstte', ilham: 'Tesla', ustBant: false, kategoriArama: false, ekAyarlari: true },
-  { id: 'split', ad: 'Split', aciklama: 'Sol logo+kategori, sağ arama', ilham: 'IKEA', ustBant: true, kategoriArama: true, ekAyarlari: true },
+  {
+    id: 'imza-kurumsal',
+    ad: 'İmza Kurumsal',
+    aciklama: 'Üst iletişim bandı + ikonlu menü, katalog ve arama',
+    ilham: 'Kurumsal CMS',
+    ustBant: true,
+    kategoriArama: false,
+    ekAyarlari: true,
+  },
 ];
 
 export function headerTipiNormalize(tip?: string | null): HeaderTipi {
+  if (tip === 'split') return 'imza-kurumsal';
   if (tip && HEADER_TIPLERI.includes(tip as HeaderTipi)) return tip as HeaderTipi;
   return 'klasik';
 }
@@ -69,6 +78,15 @@ export function varsayilanTipEk(tip: HeaderTipi): HeaderTipEkAyarlari {
     case 'kompakt': return { ...ortak, kompaktYukseklik: 40, aramaModu: 'ikon' };
     case 'modern': return { ...ortak, ctaMetni: 'İletişim', ctaLink: '/iletisim', aramaGoster: false };
     case 'seffaf-hero': return { ...ortak, seffafBaslangic: true, aramaModu: 'ikon', ctaMetni: 'Sipariş Ver', ctaLink: '/siparis' };
+    case 'imza-kurumsal':
+      return {
+        ...ortak,
+        aramaModu: 'ikon',
+        aramaGoster: true,
+        kullaniciGoster: false,
+        ctaMetni: 'Katalog',
+        ctaLink: '/katalog',
+      };
     default: return ortak;
   }
 }

@@ -19,7 +19,8 @@ import {
   SadeMinimalIkonlar,
 } from './HeaderOrtakParcalar';
 import { HeaderIkon } from '../HeaderIkon';
-import { KategoriMenu } from '../KategoriMenu';
+import { HeaderDilSecici } from '../HeaderDilSecici';
+import { SosyalMedyaIkonSatirlari } from '../SosyalMedyaIkon';
 
 interface HeaderLayoutProps {
   veri: HeaderVeri;
@@ -259,33 +260,85 @@ export function HeaderSeffafHero({ veri, menuAcik, setMenuAcik }: HeaderLayoutPr
   );
 }
 
-export function HeaderSplit({ veri, ayarlar, menuAcik, setMenuAcik }: HeaderLayoutProps) {
+function KatalogPdfIkon({ className = 'h-4 w-4' }: { className?: string }) {
   return (
-    <>
-      <UstBant veri={veri} ayarlar={ayarlar} />
-      <HeaderGovde veri={veri} className="site-header-varyant-split">
-        <div className="container-site flex h-16 items-center justify-between gap-4">
-          <div className="flex min-w-0 items-center gap-3">
-            <MarkaAlani veri={veri} className="max-w-[220px]" />
-            {veri.kategoriMenuGoster && (
-              <KategoriMenu
-                baslikMetni={veri.kategoriBaslikMetni}
-                acilisModu={veri.header.kategori?.acilisModu}
-                kategoriler={veri.cevrilmisKategoriler}
-                mega={veri.varsayilanMenuStil.mega}
-                kolonSayisi={veri.varsayilanMenuStil.kolonSayisi}
-              />
+    <svg className={className} viewBox="0 0 24 24" fill="none" aria-hidden>
+      <path
+        d="M7 3h7l5 5v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
+      <path d="M14 3v5h5" stroke="currentColor" strokeWidth="1.6" />
+      <path d="M8.5 14h7M8.5 17h5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+export function HeaderImzaKurumsal({ veri, ayarlar, menuAcik, setMenuAcik }: HeaderLayoutProps) {
+  const telefon = ayarlar?.telefon?.trim();
+  const email = ayarlar?.email?.trim();
+  const ust = veri.header.ustBant;
+  const ctaMetin = veri.tipEk.ctaMetni?.trim() || 'Katalog';
+  const ctaLink = veri.tipEk.ctaLink?.trim() || '/katalog';
+
+  return (
+    <div className="site-header-imza-shell sticky top-0 z-40">
+      <div className="site-header-imza-ust">
+        <div className="container-site flex flex-wrap items-center justify-between gap-2 py-2 text-xs">
+          <div className="flex flex-wrap items-center gap-4">
+            {ust?.telefonGoster !== false && telefon && (
+              <a href={`tel:${telefon.replace(/\s/g, '')}`} className="site-header-imza-iletisim">
+                <span aria-hidden>📞</span>
+                <span>{telefon}</span>
+              </a>
+            )}
+            {ust?.emailGoster !== false && email && (
+              <a href={`mailto:${email}`} className="site-header-imza-iletisim">
+                <span aria-hidden>✉️</span>
+                <span>{email}</span>
+              </a>
             )}
           </div>
-          <div className="hidden min-w-[300px] flex-1 lg:block">
-            <AramaAlani veri={veri} />
+          <div className="flex flex-wrap items-center gap-3">
+            {ust?.sosyalGoster !== false && ayarlar?.sosyalMedyaJson && (
+              <SosyalMedyaIkonSatirlari
+                sosyal={ayarlar.sosyalMedyaJson}
+                className="site-header-imza-sosyal"
+                ikonSinifi="h-3.5 w-3.5"
+              />
+            )}
+            {veri.header.dilDestegi?.aktif && (
+              <HeaderDilSecici ayar={veri.header.dilDestegi} className="site-header-imza-dil" satir />
+            )}
           </div>
-          <DesktopMenu menu={veri.cevrilmisMenu} />
-          <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
+        </div>
+      </div>
+
+      <header className={`site-header site-header-imza-kurumsal site-header-varyant-imza-kurumsal ${veri.tipSinifi} border-0 shadow-none`}>
+        <div className="container-site flex min-h-[4.5rem] items-center justify-between gap-4 py-2">
+          <MarkaAlani veri={veri} className="site-header-imza-marka max-w-[220px] shrink-0" />
+          <DesktopMenu
+            menu={veri.cevrilmisMenu}
+            className="site-header-imza-nav flex-1 justify-end gap-1 xl:gap-2"
+            linkClassName="site-header-imza-link site-menu-nav-link"
+          />
+          <div className="flex shrink-0 items-center gap-2">
+            <Link to={ctaLink} className="site-header-imza-katalog hidden sm:inline-flex">
+              <KatalogPdfIkon />
+              <span>{ctaMetin}</span>
+            </Link>
+            <AramaAlani veri={veri} className="site-header-imza-arama" />
+            <IkonGrubu
+              veri={veri}
+              menuAcik={menuAcik}
+              onMenuToggle={() => setMenuAcik((v) => !v)}
+              sadeceHamburger
+            />
+          </div>
         </div>
         <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
-      </HeaderGovde>
-    </>
+      </header>
+    </div>
   );
 }
 
@@ -307,8 +360,8 @@ export function HeaderLayoutSec(props: HeaderLayoutProps) {
       return <HeaderMegaMenu {...props} />;
     case 'seffaf-hero':
       return <HeaderSeffafHero {...props} />;
-    case 'split':
-      return <HeaderSplit {...props} />;
+    case 'imza-kurumsal':
+      return <HeaderImzaKurumsal {...props} />;
     case 'klasik':
     default:
       return <HeaderKlasik {...props} />;

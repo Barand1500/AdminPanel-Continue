@@ -105,14 +105,29 @@ export function HeaderTipWireframe({ tip }: { tip: HeaderTipi }) {
         </div>
       </div>
     ),
-    split: (
-      <div className="space-y-1 p-2">
-        <div className="flex gap-1">
-          <div className={`h-3 w-5 ${bar}`} />
-          <div className="flex-1" />
-          <div className={`h-2 w-10 ${line}`} />
+    'imza-kurumsal': (
+      <div className="overflow-hidden rounded bg-[#1a3a6b]">
+        <div className="flex items-center justify-between bg-[#0f2748] px-1.5 py-1">
+          <div className="flex gap-1">
+            <div className="h-1 w-6 rounded bg-white/50" />
+            <div className="h-1 w-7 rounded bg-white/35" />
+          </div>
+          <div className="flex gap-0.5">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-1.5 w-1.5 rounded-full bg-white/70" />
+            ))}
+          </div>
         </div>
-        <div className={`h-1 w-full ${line}`} />
+        <div className="flex items-center gap-1 px-1.5 py-1.5">
+          <div className={`h-2.5 w-6 ${bar}`} />
+          <div className="ml-auto flex gap-0.5">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-1 w-3 rounded bg-white/45" />
+            ))}
+          </div>
+          <div className="h-2 w-5 rounded bg-white/80" />
+          <div className="h-2 w-2 rounded bg-white/70" />
+        </div>
       </div>
     ),
   };

@@ -30,6 +30,8 @@ Thumbs.db
 
 # Prisma
 backend/prisma/migrations/**/migration_lock.toml
+*.db
+*.db-journal
 
 # Uploads (local dev)
 backend/uploads/*

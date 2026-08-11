@@ -6,9 +6,11 @@ import { useSiteDil } from '@/contexts/SiteDilContext';
 interface HeaderDilSeciciProps {
   ayar: DilDestegiAyarlari;
   className?: string;
+  /** Tüm dilleri yan yana bayrak olarak göster (kurumsal üst bant) */
+  satir?: boolean;
 }
 
-export function HeaderDilSecici({ ayar, className = '' }: HeaderDilSeciciProps) {
+export function HeaderDilSecici({ ayar, className = '', satir = false }: HeaderDilSeciciProps) {
   const diller = aktifDiller(ayar);
   const { dilKodu, dilAyarla } = useSiteDil();
   const [acik, setAcik] = useState(false);
@@ -33,6 +35,28 @@ export function HeaderDilSecici({ ayar, className = '' }: HeaderDilSeciciProps) 
     localStorage.setItem(SITE_DIL_STORAGE, kod);
     setAcik(false);
     window.dispatchEvent(new CustomEvent('site-dil-degisti', { detail: kod }));
+  }
+
+  if (satir && bayrakli) {
+    return (
+      <div className={`header-dil-satir ${className}`.trim()} role="listbox" aria-label="Dil seçimi">
+        {diller.map((d) => (
+          <button
+            key={d.kod}
+            type="button"
+            role="option"
+            aria-selected={d.kod === gecerliKod}
+            title={d.ad}
+            className={`header-dil-satir-oge${d.kod === gecerliKod ? ' header-dil-satir-oge-aktif' : ''}`}
+            onClick={() => dilSec(d.kod)}
+          >
+            <span className="header-dil-bayrak" aria-hidden>
+              {d.bayrak}
+            </span>
+          </button>
+        ))}
+      </div>
+    );
   }
 
   return (
