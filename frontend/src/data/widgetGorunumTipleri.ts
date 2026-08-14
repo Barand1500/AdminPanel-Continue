@@ -57,6 +57,14 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('sinematik-acik', 'Sinematik Açık', 'Açık tema sinematik split slayt', 'mint'),
     gt('gradient-split', 'Gradient Split', 'Gradient zemin bölünmüş hero', 'mor'),
   ],
+  KURUMSAL_HERO: [
+    gt('vetahsilat-klasik', 'Vetahsilat Klasik', 'Tam genişlik mavi overlay, dikey nokta navigasyon', 'okyanus', 'Vetahsilat'),
+    gt('vetahsilat-koyu', 'Koyu Gradient', 'Koyu gradient overlay hero', 'gece'),
+    gt('vetahsilat-acik', 'Açık Overlay', 'Açık mavi ton overlay', 'okyanus'),
+    gt('vetahsilat-mor', 'Mor Kurumsal', 'Mor kurumsal ton', 'mor'),
+    gt('vetahsilat-yesil', 'Yeşil Kurumsal', 'Yeşil kurumsal ton', 'yesil'),
+    gt('vetahsilat-lavanta', 'Lavanta', 'Lavanta ton hero', 'lavanta'),
+  ],
   HIZMET_KARTLARI: [
     gt('masonry-duvar', 'Masonry Duvar', 'Farklı yükseklikte Pinterest tarzı duvar', 'notr'),
     gt('hover-flip', 'Hover Flip', 'Ön yüz ikon, arka yüz detay + CTA', 'mor', 'Stripe'),
@@ -486,6 +494,11 @@ const LEGACY_GORUNUM_TIPI: Partial<Record<AktifWidgetTipi, Record<string, string
     minimal: 'badge-modern',
     'gradient-hero': 'gradient-split',
     'kenar-cerceve': 'orbit-merkez',
+  },
+  KURUMSAL_HERO: {
+    klasik: 'vetahsilat-klasik',
+    sinematik: 'vetahsilat-koyu',
+    'gradient-hero': 'vetahsilat-acik',
   },
   GALERI: {
     'klasik-grid': 'hover-zoom-etiket',

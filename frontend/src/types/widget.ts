@@ -18,6 +18,8 @@ import type {
 import { HABER_PORTAL_WIDGET_TIPLERI } from '@/types/haberWidget';
 import { onizlemeMockVerisiUygula, widgetFormMockUygula } from '@/utils/widgetOnizlemeMock';
 import { varsayilanWidgetGorunumTipi } from '@/data/widgetGorunumTipleri';
+import type { KurumsalHeroConfig } from '@/types/kurumsalHero';
+import { varsayilanKurumsalHeroConfig } from '@/types/kurumsalHero';
 export { widgetFormMockUygula };
 export { HABER_PORTAL_WIDGET_TIPLERI };
 
@@ -43,6 +45,7 @@ export const YENI_WIDGET_TIPLERI = [
   'FIYATLANDIRMA',
   'MODUL_LOGO_BLOK',
   'SITE_HAKKINDA',
+  'KURUMSAL_HERO',
 ] as const;
 
 export const MODERN_WIDGET_TIPLERI = [
@@ -453,6 +456,7 @@ export interface WidgetConfig {
   kriptoLimit?: number;
   kriptoSemboller?: string[];
   olusturucu?: BlokOlusturucuConfig;
+  kurumsalHero?: KurumsalHeroConfig;
 }
 
 export function uid() {
@@ -671,6 +675,13 @@ export function varsayilanConfig(tip: string): WidgetConfig {
         gorunum: { ...gorunum, kolonSayisi: 2, padding: 'normal', borderRadius: 12 },
         ek,
         olusturucu: { parcaSayisi: 0, duzen: 'yan_yana', parcaGorunum: 'birlesik', hucreler: [] },
+      };
+    case 'KURUMSAL_HERO':
+      return {
+        yerlesim: { bolge: 'header_alti' },
+        gorunum: { ...gorunum, bolumGenisligi: 'tam_ekran' },
+        ek,
+        kurumsalHero: varsayilanKurumsalHeroConfig(),
       };
     default:
       return { yerlesim, gorunum, ek };

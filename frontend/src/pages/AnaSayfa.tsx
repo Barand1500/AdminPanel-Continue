@@ -10,6 +10,7 @@ import { PopupWidgetlar } from '@/components/widget/WidgetBolge';
 import { KonumluWidgetBolge } from '@/components/konumluSlider/KonumluWidgetBolge';
 import { anaSayfaWidgetlari } from '@/utils/widgetYerlesim';
 import { konumluSliderlarSayfaFiltre } from '@/utils/konumluSliderYerlesim';
+import { kurumsalHeroWidgetVarMi } from '@/utils/kurumsalHeroYardimci';
 
 function AnaSayfaHizmetBlog({
   widgetlar,
@@ -45,6 +46,8 @@ export function AnaSayfa() {
       <BlogBolumu bloglar={blogOnizleme} />
     ) : null;
 
+  const kurumsalHeroAktif = kurumsalHeroWidgetVarMi(anaWidgetlar);
+
   return (
     <>
       <KonumluWidgetBolge
@@ -53,8 +56,8 @@ export function AnaSayfa() {
         konumluSliderlar={sayfaSliderlar}
       />
 
-      <HeroSlider heroJson={site.ayarlar?.heroJson} />
-      <GuvenSerit heroJson={site.ayarlar?.heroJson} />
+      {!kurumsalHeroAktif && <HeroSlider heroJson={site.ayarlar?.heroJson} />}
+      {!kurumsalHeroAktif && <GuvenSerit heroJson={site.ayarlar?.heroJson} />}
 
       <KonumluWidgetBolge
         widgetlar={anaWidgetlar}

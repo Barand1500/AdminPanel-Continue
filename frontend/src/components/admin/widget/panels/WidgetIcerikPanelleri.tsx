@@ -37,6 +37,7 @@ import {
   ZamanCizelgesiIcerik,
 } from './WidgetModernPanelleri';
 import type { WidgetPanelProps } from './types';
+import { KurumsalHeroIcerik } from './KurumsalHeroIcerik';
 
 function MetinAlanlari({ form, onChange, gorsel = false, ustEtiket = false }: WidgetPanelProps & { gorsel?: boolean; ustEtiket?: boolean }) {
   const cfg = configOku(form);
@@ -1067,6 +1068,7 @@ export const ICERIK_PANEL_MAP: Record<string, ComponentType<WidgetPanelProps>> =
   SITE_HAKKINDA: BaslikMetinGorselIcerik,
   SLIDER: SliderIcerik,
   HERO_BANNER: SliderIcerik,
+  KURUMSAL_HERO: KurumsalHeroIcerik,
   HIZMET_KARTLARI: HizmetKartlariIcerik,
   GALERI: GaleriIcerik,
   SSS: SssIcerik,

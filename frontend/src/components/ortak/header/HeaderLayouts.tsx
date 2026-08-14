@@ -218,6 +218,84 @@ export function HeaderMegaMenu({ veri, ayarlar, menuAcik, setMenuAcik }: HeaderL
   );
 }
 
+export function HeaderOverlayKurumsal({
+  veri,
+  ayarlar,
+  menuAcik,
+  setMenuAcik,
+  ustBantGoster = true,
+}: HeaderLayoutProps & { ustBantGoster?: boolean }) {
+  const telefon = ayarlar?.telefon?.trim();
+  const email = ayarlar?.email?.trim();
+  const ust = veri.header.ustBant;
+  const ctaMetin = veri.tipEk.ctaMetni?.trim() || 'DEMO';
+  const ctaLink = veri.tipEk.ctaLink?.trim() || '/iletisim';
+
+  return (
+    <div className="site-header-overlay-shell absolute inset-x-0 top-0 z-50">
+      {ustBantGoster && (
+        <div className="site-header-overlay-ust">
+          <div className="container-site flex flex-wrap items-center justify-between gap-2 py-2 text-xs">
+            <div className="flex flex-wrap items-center gap-4">
+              {ust?.telefonGoster !== false && telefon && (
+                <a href={`tel:${telefon.replace(/\s/g, '')}`} className="site-header-overlay-iletisim">
+                  <span aria-hidden>📞</span>
+                  <span>{telefon}</span>
+                </a>
+              )}
+              {ust?.emailGoster !== false && email && (
+                <a href={`mailto:${email}`} className="site-header-overlay-iletisim">
+                  <span aria-hidden>✉️</span>
+                  <span>{email}</span>
+                </a>
+              )}
+            </div>
+            <div className="flex flex-wrap items-center gap-3">
+              {ust?.sosyalGoster !== false && ayarlar?.sosyalMedyaJson && (
+                <SosyalMedyaIkonSatirlari
+                  sosyal={ayarlar.sosyalMedyaJson}
+                  className="site-header-overlay-sosyal"
+                  ikonSinifi="h-3.5 w-3.5"
+                />
+              )}
+              {veri.header.dilDestegi?.aktif && (
+                <HeaderDilSecici ayar={veri.header.dilDestegi} className="site-header-overlay-dil" satir />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <header
+        className={`site-header site-header-overlay-nav site-header-varyant-overlay ${veri.tipSinifi} border-0 bg-transparent shadow-none`}
+      >
+        <div className="container-site flex min-h-[4rem] items-center justify-between gap-4 py-2 sm:min-h-[4.5rem]">
+          <MarkaAlani veri={veri} className="site-header-overlay-marka max-w-[220px] shrink-0" />
+          <DesktopMenu
+            menu={veri.cevrilmisMenu}
+            className="site-header-overlay-nav-menu hidden flex-1 justify-center gap-1 lg:flex xl:gap-2"
+            linkClassName="site-header-overlay-link site-menu-nav-link"
+          />
+          <div className="flex shrink-0 items-center gap-2">
+            <Link to={ctaLink} className="site-header-overlay-cta hidden sm:inline-flex">
+              <span aria-hidden>🖥️</span>
+              <span>{ctaMetin}</span>
+            </Link>
+            <AramaAlani veri={veri} className="site-header-overlay-arama" />
+            <IkonGrubu
+              veri={veri}
+              menuAcik={menuAcik}
+              onMenuToggle={() => setMenuAcik((v) => !v)}
+              sadeceHamburger
+            />
+          </div>
+        </div>
+        <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
+      </header>
+    </div>
+  );
+}
+
 export function HeaderSeffafHero({ veri, menuAcik, setMenuAcik }: HeaderLayoutProps) {
   return (
     <div className="site-header-hero-shell">

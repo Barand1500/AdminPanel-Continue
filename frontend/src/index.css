@@ -1565,6 +1565,303 @@ html[data-site-tema='koyu'] .guven-serit {
   background: #ffffff;
 }
 
+/* ─── Kurumsal Hero (vetahsilat tarzı) ───────────────────────────────────── */
+
+.site-header-overlay-mode {
+  position: relative;
+}
+
+.site-header-overlay-shell {
+  pointer-events: none;
+}
+
+.site-header-overlay-shell > * {
+  pointer-events: auto;
+}
+
+.site-header-overlay-ust {
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+  background: rgb(15 23 42 / 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.site-header-overlay-iletisim {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: rgb(255 255 255 / 0.88);
+  transition: color 0.2s ease;
+}
+
+.site-header-overlay-iletisim:hover {
+  color: #ffffff;
+}
+
+.site-header-overlay-sosyal a {
+  color: rgb(255 255 255 / 0.85);
+}
+
+.site-header-overlay-nav {
+  background: linear-gradient(180deg, rgb(15 23 42 / 0.45) 0%, rgb(15 23 42 / 0.15) 100%);
+  backdrop-filter: blur(4px);
+}
+
+.site-header-overlay-marka .site-marka-metin {
+  color: #ffffff;
+}
+
+.site-header-overlay-link {
+  color: rgb(255 255 255 / 0.9) !important;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 0.35rem 0.65rem;
+  border-radius: 0.25rem;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.site-header-overlay-link:hover {
+  color: #ffffff !important;
+  background: rgb(255 255 255 / 0.08);
+}
+
+.site-header-overlay-cta {
+  align-items: center;
+  gap: 0.4rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgb(255 255 255 / 0.85);
+  background: rgb(255 255 255 / 0.95);
+  padding: 0.45rem 0.85rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #1e40af;
+  transition: background-color 0.2s ease;
+}
+
+.site-header-overlay-cta:hover {
+  background: #ffffff;
+}
+
+.site-header-overlay-arama button,
+.site-header-overlay-arama a {
+  color: #ffffff !important;
+  border-color: rgb(255 255 255 / 0.35) !important;
+}
+
+.kurumsal-hero {
+  position: relative;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  overflow: hidden;
+  background: #0f172a;
+}
+
+.kurumsal-hero--overlay {
+  margin-top: 0;
+}
+
+.kurumsal-hero-sahne {
+  position: relative;
+  min-height: inherit;
+  height: 100%;
+}
+
+.kurumsal-hero-arkaplan {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.kurumsal-hero-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.kurumsal-hero-icerik {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  min-height: inherit;
+  align-items: center;
+  padding: 6.5rem 0 4rem;
+}
+
+.kurumsal-hero-icerik-grid {
+  display: grid;
+  width: 100%;
+  align-items: center;
+  gap: 2rem;
+}
+
+@media (min-width: 1024px) {
+  .kurumsal-hero-icerik-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+.kurumsal-hero-metin {
+  max-width: 38rem;
+  color: #ffffff;
+}
+
+.kurumsal-hero-baslik {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.kurumsal-hero-aciklama {
+  margin-top: 1rem;
+  max-width: 34rem;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  color: rgb(255 255 255 / 0.88);
+}
+
+.kurumsal-hero-butonlar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.75rem;
+}
+
+.kurumsal-hero-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.35rem;
+  padding: 0.7rem 1.35rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.kurumsal-hero-btn--birincil {
+  background: #38bdf8;
+  color: #ffffff;
+}
+
+.kurumsal-hero-btn--birincil:hover {
+  opacity: 0.92;
+}
+
+.kurumsal-hero-btn--ikincil {
+  border: 1px solid rgb(255 255 255 / 0.35);
+  background: rgb(255 255 255 / 0.12);
+  color: #ffffff;
+  backdrop-filter: blur(4px);
+}
+
+.kurumsal-hero-btn--ikincil:hover {
+  background: rgb(255 255 255 / 0.2);
+}
+
+.kurumsal-hero-on-gorsel {
+  display: none;
+  justify-content: flex-end;
+}
+
+@media (min-width: 1024px) {
+  .kurumsal-hero-on-gorsel {
+    display: flex;
+  }
+
+  .kurumsal-hero-on-gorsel img {
+    max-height: min(72vh, 520px);
+    width: auto;
+    object-fit: contain;
+  }
+}
+
+.kurumsal-hero-noktalar {
+  position: absolute;
+  right: 1.25rem;
+  top: 50%;
+  z-index: 5;
+  display: flex;
+  transform: translateY(-50%);
+  flex-direction: column;
+  gap: 0.55rem;
+}
+
+@media (min-width: 768px) {
+  .kurumsal-hero-noktalar {
+    right: 2rem;
+  }
+}
+
+.kurumsal-hero-nokta {
+  height: 0.65rem;
+  width: 0.65rem;
+  border-radius: 9999px;
+  border: 2px solid rgb(255 255 255 / 0.85);
+  background: transparent;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.kurumsal-hero-nokta--aktif {
+  background: #ffffff;
+  transform: scale(1.08);
+}
+
+.kurumsal-hero-oklar {
+  position: absolute;
+  right: 1.25rem;
+  bottom: 1.25rem;
+  z-index: 5;
+  display: flex;
+  overflow: hidden;
+  border-radius: 0.25rem;
+  background: rgb(15 23 42 / 0.55);
+  backdrop-filter: blur(4px);
+}
+
+@media (min-width: 768px) {
+  .kurumsal-hero-oklar {
+    right: 2rem;
+    bottom: 2rem;
+  }
+}
+
+.kurumsal-hero-ok {
+  display: flex;
+  height: 2.5rem;
+  width: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: #ffffff;
+  font-size: 1.25rem;
+  line-height: 1;
+  transition: background-color 0.2s ease;
+}
+
+.kurumsal-hero-ok:hover {
+  background: rgb(255 255 255 / 0.12);
+}
+
+.kurumsal-hero-ok + .kurumsal-hero-ok {
+  border-left: 1px solid rgb(255 255 255 / 0.15);
+}
+
+.kurumsal-hero--bos {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #1e3a8a, #0f172a);
+}
+
+.kurumsal-hero-bos-icerik {
+  padding: 2rem;
+  text-align: center;
+}
+
 .guven-serit {
   width: 100%;
   border-top: 1px solid color-mix(in srgb, var(--color-primary) 12%, var(--color-border));

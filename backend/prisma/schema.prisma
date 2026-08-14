@@ -240,6 +240,7 @@ enum WidgetTipi {
   MODUL_LOGO_BLOK
   UCRETSIZ_DENEME
   SITE_HAKKINDA
+  KURUMSAL_HERO
 }
 
 model Medya {

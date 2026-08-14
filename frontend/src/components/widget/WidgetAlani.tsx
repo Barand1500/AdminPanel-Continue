@@ -44,6 +44,7 @@ import {
 import { BlokOlusturucuWidget } from './BlokOlusturucuWidget';
 import { HaritaWidget } from './HaritaWidget';
 import { KategoriWidget } from './KategoriWidget';
+import { KurumsalHeroWidget } from './KurumsalHeroWidget';
 
 interface WidgetRenderProps {
   widget: Widget;
@@ -142,6 +143,8 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
         return <HaritaWidget widget={widget} />;
       case 'KATEGORI':
         return <KategoriWidget widget={widget} />;
+      case 'KURUMSAL_HERO':
+        return <KurumsalHeroWidget widget={widget} onizleme={onizleme} />;
       default:
         return null;
     }

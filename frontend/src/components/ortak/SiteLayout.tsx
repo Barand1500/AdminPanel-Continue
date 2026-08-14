@@ -24,6 +24,7 @@ import { EklentiYukleyici } from '@/components/ortak/eklentiler/EklentiYukleyici
 import { useAktifEklentiler } from '@/hooks/useAktifEklentiler';
 import { KonumluSliderKatman } from '@/components/konumluSlider/KonumluSliderKatman';
 import { useAktifSayfaId } from '@/hooks/useAktifSayfaId';
+import { KurumsalHeroOverlayProvider, useKurumsalHeroOverlay } from '@/contexts/KurumsalHeroOverlayContext';
 
 function SiteLayoutIcerik() {
   const { veri, yukleniyor } = useSiteVerisi();
@@ -42,6 +43,7 @@ function SiteLayoutIcerik() {
   const aktifEklentiler = useAktifEklentiler(veri);
   const aktifSayfaId = useAktifSayfaId(veri.sayfalar);
   const konumluSliderlar = veri.konumluSliderlar ?? [];
+  const overlay = useKurumsalHeroOverlay();
 
   useSiteTemaUygula(site.ayarlar, site.ad);
 
@@ -71,12 +73,14 @@ function SiteLayoutIcerik() {
     <SiteDilProvider ayarlar={site.ayarlar} sayfalar={veri.sayfalar} navKategoriler={veri.navKategoriler}>
       <SiteScriptEnjektor scriptAyarlari={sistem.scriptAyarlari} />
       <SeoYonlendirmeKontrol yonlendirmeler={veri.seoYonlendirmeler} />
-      <div className="site-public flex min-h-screen flex-col">
-        <KonumluSliderKatman
-          konumluSliderlar={konumluSliderlar}
-          sayfaId={aktifSayfaId}
-          tip="header-ustu"
-        />
+      <div className={`site-public flex min-h-screen flex-col${overlay.active ? ' site-header-overlay-mode' : ''}`}>
+        {!overlay.active && (
+          <KonumluSliderKatman
+            konumluSliderlar={konumluSliderlar}
+            sayfaId={aktifSayfaId}
+            tip="header-ustu"
+          />
+        )}
         {headerGoster && (
           <>
             <SiteHeader
@@ -85,16 +89,18 @@ function SiteLayoutIcerik() {
               menuOgeleri={menuOgeleri}
               kategoriler={menuKategoriler}
             />
-            <KonumluSliderKatman
-              konumluSliderlar={konumluSliderlar}
-              sayfaId={aktifSayfaId}
-              tip="header-alti"
-            />
+            {!overlay.active && (
+              <KonumluSliderKatman
+                konumluSliderlar={konumluSliderlar}
+                sayfaId={aktifSayfaId}
+                tip="header-alti"
+              />
+            )}
           </>
         )}
-        <SiteFormBolge formlar={veri.formlar ?? []} konum="hero-alti" />
+        {!overlay.active && <SiteFormBolge formlar={veri.formlar ?? []} konum="hero-alti" />}
         <main className="flex-1">
-          <SiteFormBolge formlar={veri.formlar ?? []} konum="icerik-basi" />
+          {!overlay.active && <SiteFormBolge formlar={veri.formlar ?? []} konum="icerik-basi" />}
           <Outlet context={veri} />
           <SiteFormBolge formlar={veri.formlar ?? []} konum="icerik-sonu" />
         </main>
@@ -123,7 +129,9 @@ export function SiteLayout() {
     <SiteTemaProvider>
       <SiteAuthProvider>
         <SayfaModalProvider>
-          <SiteLayoutIcerik />
+          <KurumsalHeroOverlayProvider>
+            <SiteLayoutIcerik />
+          </KurumsalHeroOverlayProvider>
         </SayfaModalProvider>
       </SiteAuthProvider>
     </SiteTemaProvider>

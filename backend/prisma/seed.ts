@@ -3,6 +3,64 @@ import bcrypt from 'bcryptjs';
 
 const prisma = new PrismaClient();
 
+const KURUMSAL_HERO_DEMO_CONFIG = {
+  yerlesim: { bolge: 'header_alti' },
+  gorunum: { bolumGenisligi: 'tam_ekran' },
+  kurumsalHero: {
+    gecisSuresiSn: 6,
+    ustBantGoster: true,
+    headerOverlay: true,
+    gorunum: { yukseklik: '85vh', overlayRenk: '#1e40af', overlayOpaklik: 0.72 },
+    slaytlar: [
+      {
+        id: 'kh-1',
+        sira: 0,
+        aktif: true,
+        arkaPlanUrl: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600',
+        baslik: 'Safir İmza Kurumsal Wordpress Teması',
+        aciklama:
+          'Dahili cache, sınırsız renk seçeneği, modern ve mobil uyumlu tasarım, tek tıkla demo içerik ve özel Gutenberg blokları ile harika bir kurumsal tema.',
+        birincilButon: { metin: 'Şimdi Satın Al', link: '/iletisim', renk: '#38bdf8', yaziRenk: '#ffffff' },
+        ikinciButon: { metin: 'İletişime Geç', link: '/iletisim' },
+      },
+      {
+        id: 'kh-2',
+        sira: 1,
+        aktif: true,
+        arkaPlanUrl: 'https://images.unsplash.com/photo-1486325212027-8081e485255e?w=1600',
+        onGorselUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800',
+        baslik: 'Her Sektöre Özel Modern ve Kaliteli Hizmet Anlayışı',
+        aciklama:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        birincilButon: { metin: 'Şimdi Satın Al', link: '/iletisim', renk: '#38bdf8', yaziRenk: '#ffffff' },
+        ikinciButon: { metin: 'İletişime Geç', link: '/iletisim' },
+      },
+      {
+        id: 'kh-3',
+        sira: 2,
+        aktif: true,
+        arkaPlanUrl: 'https://images.unsplash.com/photo-1514565131-fce0801e5785?w=1600',
+        baslik: '%100 Müşteri Memnuniyeti ile Ayrıcalıklı Olmanın Keyfini Yaşayın',
+        aciklama:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        birincilButon: { metin: 'Şimdi Satın Al', link: '/iletisim', renk: '#38bdf8', yaziRenk: '#ffffff' },
+        ikinciButon: { metin: 'İletişime Geç', link: '/iletisim' },
+      },
+      {
+        id: 'kh-4',
+        sira: 3,
+        aktif: true,
+        arkaPlanUrl: 'https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=1600',
+        baslik: 'Pazarlamada Her Zaman En İyisi ile Çalışmanın Ayrıcalığını Yaşayın',
+        aciklama:
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
+        birincilButon: { metin: 'Şimdi Satın Al', link: '/iletisim', renk: '#38bdf8', yaziRenk: '#ffffff' },
+        ikinciButon: { metin: 'İletişime Geç', link: '/iletisim' },
+      },
+    ],
+  },
+};
+
 const HERO_VARSAYILAN = {
   gecisSuresiSn: 6,
   sliderDuzenlemeModu: 'ayni-sekme',
@@ -328,6 +386,13 @@ async function main() {
   if (mevcutWidgetSayisi === 0) {
     const demoWidgetlar = [
       {
+        ad: 'Kurumsal Hero Slider',
+        tip: WidgetTipi.KURUMSAL_HERO,
+        sira: 1,
+        baslik: 'Kurumsal Hero',
+        configJson: KURUMSAL_HERO_DEMO_CONFIG,
+      },
+      {
         ad: 'Hakkımızda Bloğu',
         tip: WidgetTipi.BASLIK_METIN_GORSEL,
         sira: 10,
@@ -481,6 +546,24 @@ async function main() {
       });
     }
     console.log(`${demoWidgetlar.length} demo widget olusturuldu.`);
+  }
+
+  const kurumsalHeroVar = await prisma.widget.findFirst({
+    where: { siteId: site.id, tip: WidgetTipi.KURUMSAL_HERO },
+  });
+  if (!kurumsalHeroVar) {
+    await prisma.widget.create({
+      data: {
+        siteId: site.id,
+        ad: 'Kurumsal Hero Slider',
+        tip: WidgetTipi.KURUMSAL_HERO,
+        sira: 1,
+        aktif: true,
+        baslik: 'Kurumsal Hero',
+        configJson: KURUMSAL_HERO_DEMO_CONFIG,
+      },
+    });
+    console.log('Kurumsal Hero demo widget olusturuldu.');
   }
 
   console.log('Seed tamamlandı.');
