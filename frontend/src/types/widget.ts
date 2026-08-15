@@ -575,9 +575,9 @@ export function varsayilanConfig(tip: string): WidgetConfig {
         gridKartlar: [],
       };
     case 'HARITA':
-      return { yerlesim: { bolge: 'footer_ustu' }, gorunum, ek, haritaZoom: 14 };
+      return { yerlesim: { bolge: 'icerik_alani' }, gorunum, ek, haritaZoom: 14 };
     case 'ILETISIM_FORMU':
-      return { yerlesim: { bolge: 'footer_ustu' }, gorunum, ek };
+      return { yerlesim: { bolge: 'icerik_alani' }, gorunum, ek };
     case 'POPUP':
       return { yerlesim: { bolge: 'footer_ustu' }, gorunum, ek, popupGecikme: 3, popupTetikleyici: 'sayfa_yukle' };
     case 'KATEGORI':
@@ -654,7 +654,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     case 'KOSE_YAZARLARI':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4, gorselKonumu: 'sol', sayfalamaStili: 'ok' }, ek, koseYazarlari: [], tumunuGorMetin: 'Tüm Yazarlar', tumunuGorLink: '/yazarlar' };
     case 'ILETISIM_BLOK':
-      return { yerlesim: { bolge: 'footer_ustu' }, gorunum: { ...gorunum, icerikDuzeni: 'sag' }, ek, iletisimKartlari: [], haritaZoom: 14 };
+      return { yerlesim: { bolge: 'icerik_alani' }, gorunum: { ...gorunum, icerikDuzeni: 'sag' }, ek, iletisimKartlari: [], haritaZoom: 14 };
     case 'KATEGORI_HABER_LISTESI':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 2, gorselKonumu: 'sol', kartStili: 'yatay' }, ek, haberKartlari: [], tumunuGorMetin: '+ Tümünü Görüntüle', tumunuGorLink: '#' };
     case 'KATEGORI_HABER_OVERLAY':
