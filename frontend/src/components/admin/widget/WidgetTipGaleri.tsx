@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type MouseEvent } from 'react';
 import { AdminAramaKutusu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { WidgetGaleriOnizleme } from './WidgetGaleriOnizleme';
 import {
@@ -45,6 +45,16 @@ interface WidgetTipGaleriProps {
   onSec: (tip: string) => void;
 }
 
+function InfoIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M12 11.2V16.5" />
+      <circle cx="12" cy="8" r="0.9" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
 function tipSirala(tipler: WidgetTipMeta[]) {
   return [...tipler].sort((a, b) => {
     const ia = ONERILEN_SIRALAMA.indexOf(a.id);
@@ -59,6 +69,7 @@ function tipSirala(tipler: WidgetTipMeta[]) {
 export function WidgetTipGaleri({ tipFiltre, onSec }: WidgetTipGaleriProps) {
   const [arama, setArama] = useState('');
   const [kategori, setKategori] = useState('tumu');
+  const [infoTip, setInfoTip] = useState<string | null>(null);
 
   const kategorili = useMemo(() => widgetTipleriKategoriyeGore(tipFiltre), [tipFiltre]);
 
@@ -81,7 +92,7 @@ export function WidgetTipGaleri({ tipFiltre, onSec }: WidgetTipGaleriProps) {
           t.id.toLowerCase().includes(q)
       );
     }
-    return tipSirala(liste);
+    return tipSirala(liste).filter((t) => t.id !== 'BLOK_OLUSTURUCU');
   }, [arama, kategori, kategorili, tipFiltre]);
 
   const gorunenKategoriler = tipFiltre
@@ -114,6 +125,15 @@ export function WidgetTipGaleri({ tipFiltre, onSec }: WidgetTipGaleriProps) {
           ))}
         </div>
 
+        {(!tipFiltre || tipFiltre === 'BLOK_OLUSTURUCU') && (
+          <p className="ap-widget-galeri-ozel">
+            Aradığınızı burada bulamadınız mı? Kendiniz oluşturun:{' '}
+            <button type="button" className="ap-widget-galeri-ozel-ad" onClick={() => onSec('BLOK_OLUSTURUCU')}>
+              Özel Grid Widget
+            </button>
+          </p>
+        )}
+
         {tipler.length === 0 ? (
           <p className="ap-muted py-10 text-center text-sm">Bu aramada eşleşen widget yok.</p>
         ) : (
@@ -121,23 +141,31 @@ export function WidgetTipGaleri({ tipFiltre, onSec }: WidgetTipGaleriProps) {
             {tipler.map((tip) => (
               <div
                 key={tip.id}
-                role="button"
-                tabIndex={0}
-                className="ap-widget-galeri-kart"
+                className={`ap-widget-galeri-kart${infoTip === tip.id ? ' ap-widget-galeri-kart--info' : ''}`}
                 onClick={() => onSec(tip.id)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter' || e.key === ' ') {
-                    e.preventDefault();
-                    onSec(tip.id);
-                  }
-                }}
               >
                 <WidgetGaleriOnizleme tip={tip.id} etiket={tip.etiket} />
-                <span className="ap-widget-galeri-ad">
-                  <span aria-hidden>{tip.ikon}</span>
-                  {tip.etiket}
+                <span className="ap-widget-galeri-ad-satir">
+                  <span className="ap-widget-galeri-ad">
+                    <span aria-hidden>{tip.ikon}</span>
+                    {tip.etiket}
+                  </span>
+                  <button
+                    type="button"
+                    className={`ap-widget-galeri-info${infoTip === tip.id ? ' ap-widget-galeri-info--acik' : ''}`}
+                    aria-label={`${tip.etiket} nedir?`}
+                    aria-expanded={infoTip === tip.id}
+                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
+                      e.stopPropagation();
+                      setInfoTip((onceki) => (onceki === tip.id ? null : tip.id));
+                    }}
+                  >
+                    <InfoIkon />
+                    <span className="ap-widget-galeri-info-kutu" role="tooltip">
+                      {tip.aciklama}
+                    </span>
+                  </button>
                 </span>
-                <span className="ap-widget-galeri-aciklama">{tip.aciklama}</span>
                 <span className="ap-widget-galeri-sec">Bu tipi seç</span>
               </div>
             ))}
