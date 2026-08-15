@@ -20,7 +20,10 @@ export function veritabaniHataMesaji(err: unknown): string | null {
   }
 
   if (mesaj.includes('DATABASE_URL') || mesaj.includes("Can't reach database")) {
-    return 'Veritabani baglantisi kurulamadi. MySQL servisinin acik oldugunu ve backend/.env icindeki DATABASE_URL degerini kontrol edin.';
+    return (
+      'Veritabani baglantisi kurulamadi. Localde MySQL gerekmez: backend/.env icinde DATABASE_URL="file:./dev.db" olmali, sonra npm run db:setup. ' +
+      'Sunucuda ise MySQL adresi DATABASE_URL icinde tanimli olmali.'
+    );
   }
 
   return null;

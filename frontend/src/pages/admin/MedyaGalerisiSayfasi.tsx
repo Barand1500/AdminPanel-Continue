@@ -1,5 +1,6 @@
-import { useCallback, useEffect, useState } from 'react';
-import { MedyaGrid, MedyaYukleyici } from '@/components/admin/medya/MedyaBilesenleri';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { MedyaGrid, MedyaOnizlemeModal, MedyaYukleyici } from '@/components/admin/medya/MedyaBilesenleri';
+import { AdminModulKabuk, YukleniyorDurumu } from '@/components/admin/ortak/AdminBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import {
   adminMedyaOlustur,
@@ -15,28 +16,37 @@ export function MedyaGalerisiSayfasi() {
   const [medyalar, setMedyalar] = useState<AdminMedya[]>([]);
   const [urlForm, setUrlForm] = useState({ ad: '', url: '' });
   const [seciliIds, setSeciliIds] = useState<string[]>([]);
+  const [arama, setArama] = useState('');
+  const [onizlenen, setOnizlenen] = useState<AdminMedya | null>(null);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [islemYapiliyor, setIslemYapiliyor] = useState(false);
   const [yuklemeIlerleme, setYuklemeIlerleme] = useState<{ tamamlanan: number; toplam: number } | null>(null);
+  const dosyaInputRef = useRef<HTMLInputElement>(null);
 
-  async function yukle() {
+  const yukle = useCallback(async () => {
     setYukleniyor(true);
     try {
       setMedyalar(await adminMedyalariGetir());
     } catch (err) {
-      adminIslemBildirimi(err instanceof Error ? err.message : 'Medyalar alinamadi', 'hata');
+      adminIslemBildirimi(err instanceof Error ? err.message : 'Medyalar alınamadı', 'hata');
     } finally {
       setYukleniyor(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     void yukle();
-  }, []);
+  }, [yukle]);
+
+  const filtreli = useMemo(() => {
+    const q = arama.toLowerCase().trim();
+    if (!q) return medyalar;
+    return medyalar.filter((m) => m.ad.toLowerCase().includes(q));
+  }, [medyalar, arama]);
 
   const urlEkle = useCallback(async () => {
     if (!urlForm.ad.trim() || !urlForm.url.trim()) {
-      adminIslemBildirimi('Medya adı ve URL zorunludur', 'hata');
+      adminIslemBildirimi('Medya adı ve adres gerekli', 'hata');
       return;
     }
     setIslemYapiliyor(true);
@@ -44,6 +54,7 @@ export function MedyaGalerisiSayfasi() {
       await adminMedyaOlustur(urlForm.ad, urlForm.url);
       setUrlForm({ ad: '', url: '' });
       await yukle();
+      adminIslemBildirimi('Görsel eklendi', 'basari');
     } catch (err) {
       adminIslemBildirimi(err instanceof Error ? err.message : 'Medya eklenemedi', 'hata');
     } finally {
@@ -55,8 +66,8 @@ export function MedyaGalerisiSayfasi() {
     if (seciliIds.length === 0) return;
     const mesaj =
       seciliIds.length === 1
-        ? 'Bu medyayı silmek istediğinize emin misiniz?'
-        : `${seciliIds.length} medyayı silmek istediğinize emin misiniz?`;
+        ? 'Bu görsel silinsin mi?'
+        : `${seciliIds.length} görsel silinsin mi?`;
     if (!confirm(mesaj)) return;
     setIslemYapiliyor(true);
     try {
@@ -75,16 +86,21 @@ export function MedyaGalerisiSayfasi() {
   }, [seciliIds, yukle]);
 
   useModulAksiyonlari(
-    { kaydet: urlEkle, sil },
+    {
+      kaydet: urlEkle,
+      ekle: () => dosyaInputRef.current?.click(),
+      sil,
+    },
     {
       kaydet: !islemYapiliyor && Boolean(urlForm.ad.trim() && urlForm.url.trim()),
+      ekle: !islemYapiliyor,
       sil: seciliIds.length > 0 && !islemYapiliyor,
     }
   );
 
   async function dosyalariYukle(dosyalar: File[]) {
     if (dosyalar.length === 0) {
-      adminIslemBildirimi('Yüklenecek geçerli görsel dosyası bulunamadı', 'hata');
+      adminIslemBildirimi('Yüklenecek geçerli görsel bulunamadı', 'hata');
       return;
     }
     setIslemYapiliyor(true);
@@ -95,7 +111,7 @@ export function MedyaGalerisiSayfasi() {
       });
       await yukle();
       if (sonuc.basarili.length > 0) {
-        adminIslemBildirimi(`${sonuc.basarili.length} görsel başarıyla yüklendi.`, 'basari');
+        adminIslemBildirimi(`${sonuc.basarili.length} görsel yüklendi`, 'basari');
       }
       if (sonuc.hatalar.length > 0) {
         const detay = sonuc.hatalar.map((h) => `${h.dosyaAdi}: ${h.mesaj}`).join(' · ');
@@ -113,40 +129,40 @@ export function MedyaGalerisiSayfasi() {
   }
 
   return (
-    <div>
-      <h1 className="text-xl font-bold text-white">Medya Galerisi</h1>
-      <p className="mt-1 text-sm text-slate-400">
-        Görselleri toplu sürükleyip bırakın veya seçin. URL ile tek tek de ekleyebilirsiniz. Silmek için medya seçip alt bardan Sil kullanın.
-      </p>
-      {islemYapiliyor && !yuklemeIlerleme && <p className="mt-4 text-sm text-slate-400">İşlem yapılıyor...</p>}
-
-      <div className="mt-6">
+    <AdminModulKabuk onizleGoster={false} baslik="Medya Galerisi" aciklama="Görselleri yükleyin, seçin, kopyalayın.">
+      <div className="ap-medya">
         <MedyaYukleyici
           urlForm={urlForm}
           yukleniyor={islemYapiliyor}
           yuklemeIlerleme={yuklemeIlerleme}
+          kompakt={medyalar.length > 0}
+          dosyaInputRef={dosyaInputRef}
           onUrlFormChange={setUrlForm}
-          onDosyalarSec={dosyalariYukle}
+          onUrlEkle={() => void urlEkle()}
+          onDosyalarSec={(d) => void dosyalariYukle(d)}
         />
-      </div>
 
-      <div className="mt-8">
         {yukleniyor ? (
-          <p className="text-sm text-slate-400">Yükleniyor...</p>
+          <YukleniyorDurumu mesaj="Galeri yükleniyor..." />
         ) : (
           <MedyaGrid
-            medyalar={medyalar}
+            medyalar={filtreli}
             seciliIds={seciliIds}
+            arama={arama}
+            onArama={setArama}
             onSecToggle={(id) =>
               setSeciliIds((onceki) =>
                 onceki.includes(id) ? onceki.filter((x) => x !== id) : [...onceki, id]
               )
             }
-            onHepsiniSec={() => setSeciliIds(medyalar.map((m) => m.id))}
+            onHepsiniSec={() => setSeciliIds(filtreli.map((m) => m.id))}
             onSecimiTemizle={() => setSeciliIds([])}
+            onOnizle={setOnizlenen}
           />
         )}
       </div>
-    </div>
+
+      <MedyaOnizlemeModal medya={onizlenen} onKapat={() => setOnizlenen(null)} />
+    </AdminModulKabuk>
   );
 }

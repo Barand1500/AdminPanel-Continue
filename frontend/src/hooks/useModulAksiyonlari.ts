@@ -26,6 +26,7 @@ export function useModulAksiyonlari(
     handlers.ekle,
     handlers.altEkle,
     handlers.sil,
+    handlers.duzenle,
     handlers.onizle,
     handlers.yayinla,
   ]);
@@ -42,6 +43,7 @@ export function useModulAksiyonlari(
     durumlar?.ekle,
     durumlar?.altEkle,
     durumlar?.sil,
+    durumlar?.duzenle,
     durumlar?.onizle,
     durumlar?.yayinla,
   ]);

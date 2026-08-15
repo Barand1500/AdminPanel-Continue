@@ -91,13 +91,6 @@ export function KonumluSliderOnizleme({
 
   return (
     <div className="ks-onizleme">
-      <div className="ks-onizleme-baslik">
-        <h3 className="text-sm font-semibold text-[var(--ap-text)]">Yerleşim önizlemesi</h3>
-        <p className="text-xs text-[var(--ap-muted)]">
-          Hedef bölgeyi tıklayın. Yan yerleşimde bitişik widgetları seçebilirsiniz; üst/alt için tek widget.
-        </p>
-      </div>
-
       {hata && <p className="ks-onizleme-hata">{hata}</p>}
 
       <div className="ks-onizleme-tuval">

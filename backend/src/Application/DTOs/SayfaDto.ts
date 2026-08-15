@@ -12,7 +12,7 @@ export const sayfaOlusturSchema = z.object({
   ikon: z.string().max(32).nullable().optional(),
   seoTitle: z.string().nullable().optional(),
   seoDesc: z.string().nullable().optional(),
-  yayinda: z.boolean().default(false),
+  yayinda: z.boolean().default(true),
   menudeGoster: z.boolean().default(true),
   sira: z.number().int().default(0),
   acilisModu: sayfaAcilisModuSchema.default('normal'),

@@ -1,16 +1,17 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   AdminModulKabuk,
-  AdminPanelKarti,
   BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
-import { KonumluSliderOnizleme } from '@/components/admin/konumluSlider/KonumluSliderOnizleme';
+import { AdminPilSekme } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
-  KonumluSliderAyarlarPaneli,
-  konumSecimOzeti,
-  sliderListeOzeti,
-} from '@/components/admin/konumluSlider/KonumluSliderAyarlarPaneli';
+  ANA_SAYFA_ID,
+  SliderEditorPanel,
+  SliderListesiPanel,
+} from '@/components/admin/konumluSlider/SliderBilesenleri';
+import { SliderOnizlemeModal } from '@/components/admin/konumluSlider/SliderOnizlemeModal';
+import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import {
   konumluSliderGuncelle,
   konumluSliderlariGetir,
@@ -20,17 +21,12 @@ import {
 import { adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
 import { widgetlariGetir } from '@/features/admin/widgetApi';
 import { siteVerisiGuncellendiYayinla } from '@/utils/siteVerisiOlaylari';
-import {
-  anaSayfaWidgetlari,
-  sayfaWidgetlari,
-  widgetSayfaFiltreOgeleri,
-} from '@/utils/widgetYerlesim';
+import { anaSayfaWidgetlari, sayfaWidgetlari } from '@/utils/widgetYerlesim';
 import {
   secimdenHedefWidgetIdsSirali,
   type KonumSecimNoktasi,
 } from '@/utils/konumluSliderYerlesim';
 import {
-  KONUMLU_SLIDER_KONUM_ETIKET,
   varsayilanKonumluSliderConfig,
   type KonumluSliderConfig,
   type KonumluSliderKayit,
@@ -39,7 +35,32 @@ import type { AdminWidget } from '@/types/admin';
 import type { Widget } from '@/types/site';
 import { idString } from '@/utils/idKarsilastir';
 
-const ANA_SAYFA_ID = '__ana__';
+type Gorunum = 'liste' | 'editor';
+
+function ListeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+    </svg>
+  );
+}
+
+function YeniIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function DuzenlemeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+    </svg>
+  );
+}
 
 function secimdenConfig(
   secimler: KonumSecimNoktasi[],
@@ -76,7 +97,7 @@ export function SliderYonetimiSayfasi() {
   const [sayfalar, setSayfalar] = useState<AdminSayfa[]>([]);
   const [sayfaId, setSayfaId] = useState(ANA_SAYFA_ID);
   const [seciliSliderId, setSeciliSliderId] = useState<string | null>(null);
-  const [ad, setAd] = useState('Yeni Slider');
+  const [ad, setAd] = useState('');
   const [aktif, setAktif] = useState(true);
   const [config, setConfig] = useState<KonumluSliderConfig>(varsayilanKonumluSliderConfig());
   const [secimler, setSecimler] = useState<KonumSecimNoktasi[]>([]);
@@ -85,6 +106,8 @@ export function SliderYonetimiSayfasi() {
   const [hata, setHata] = useState('');
   const [basari, setBasari] = useState('');
   const [secimHata, setSecimHata] = useState('');
+  const [gorunum, setGorunum] = useState<Gorunum>('liste');
+  const [onizlemeAcik, setOnizlemeAcik] = useState(false);
 
   const anaSayfaMi = sayfaId === ANA_SAYFA_ID;
 
@@ -94,15 +117,8 @@ export function SliderYonetimiSayfasi() {
     return m;
   }, [sayfalar]);
 
-  const sayfaFiltreOgeleri = useMemo(
-    () => widgetSayfaFiltreOgeleri(widgetlar, sayfaAdlari),
-    [widgetlar, sayfaAdlari]
-  );
-
   const sayfaWidgetlariListe = useMemo(() => {
-    const ham = anaSayfaMi
-      ? anaSayfaWidgetlari(widgetlar)
-      : sayfaWidgetlari(widgetlar, sayfaId);
+    const ham = anaSayfaMi ? anaSayfaWidgetlari(widgetlar) : sayfaWidgetlari(widgetlar, sayfaId);
     return ham.filter((w) => w.aktif);
   }, [widgetlar, sayfaId, anaSayfaMi]);
 
@@ -139,9 +155,9 @@ export function SliderYonetimiSayfasi() {
     void listeYukle();
   }, []);
 
-  const yeniBaslat = useCallback(() => {
+  const formuSifirla = useCallback(() => {
     setSeciliSliderId(null);
-    setAd('Yeni Slider');
+    setAd('');
     setAktif(true);
     setConfig(varsayilanKonumluSliderConfig());
     setSecimler([]);
@@ -150,10 +166,10 @@ export function SliderYonetimiSayfasi() {
     setHata('');
   }, []);
 
-  useEffect(() => {
-    if (seciliSliderId) return;
-    setSecimler([]);
-  }, [sayfaId, seciliSliderId]);
+  const yeniBaslat = useCallback(() => {
+    formuSifirla();
+    setGorunum('editor');
+  }, [formuSifirla]);
 
   function sliderSec(slider: KonumluSliderKayit) {
     setSeciliSliderId(slider.id);
@@ -161,10 +177,26 @@ export function SliderYonetimiSayfasi() {
     setAktif(slider.aktif);
     const cfg = slider.configJson ?? varsayilanKonumluSliderConfig();
     setConfig(cfg);
+    setSayfaId(slider.sayfaId ? idString(slider.sayfaId) : ANA_SAYFA_ID);
     setSecimler(sliderdanSecim(slider));
     setBasari('');
     setHata('');
     setSecimHata('');
+  }
+
+  const duzenlemeyeGit = useCallback(() => {
+    if (!seciliSliderId) return;
+    setGorunum('editor');
+  }, [seciliSliderId]);
+
+  function sayfaDegistir(yeniId: string) {
+    setSayfaId(yeniId);
+    setSecimler([]);
+    setSecimHata('');
+    setConfig((onceki) => ({
+      ...onceki,
+      yerlesim: { ...onceki.yerlesim, hedefWidgetIds: [] },
+    }));
   }
 
   function secimGuncelle(yeni: KonumSecimNoktasi[]) {
@@ -174,19 +206,19 @@ export function SliderYonetimiSayfasi() {
     setSecimler(yeni);
   }
 
-  async function kaydet() {
+  const kaydet = useCallback(async () => {
     setHata('');
     setBasari('');
+    if (!ad.trim()) {
+      setHata('Slider adı gerekli.');
+      return;
+    }
     if (secimler.length === 0) {
-      setHata('Önizlemeden bir yerleşim noktası seçin.');
+      setHata('Konum sekmesinden sliderın duracağı yeri seçin.');
       return;
     }
     if (!config.slaytlar.some((s) => s.aktif && s.gorselUrl)) {
-      setHata('En az bir aktif slayt görseli gerekli.');
-      return;
-    }
-    if (!ad.trim()) {
-      setHata('Slider adı gerekli.');
+      setHata('Slaytlar sekmesine en az bir aktif görsel ekleyin.');
       return;
     }
 
@@ -218,162 +250,116 @@ export function SliderYonetimiSayfasi() {
     } finally {
       setKaydediliyor(false);
     }
-  }
+  }, [ad, secimler, config, anaSayfaMi, sayfaId, aktif, seciliSliderId, sliderlar, sayfaSliderlari.length]);
 
-  async function sil(id: string) {
-    if (!window.confirm('Bu slider silinsin mi?')) return;
+  const sil = useCallback(async () => {
+    if (!seciliSliderId || !window.confirm('Bu slider silinsin mi?')) return;
     setKaydediliyor(true);
+    setHata('');
     try {
-      await konumluSliderSil(id);
-      setSliderlar((liste) => liste.filter((s) => s.id !== id));
-      if (seciliSliderId === id) yeniBaslat();
+      await konumluSliderSil(seciliSliderId);
+      setSliderlar((liste) => liste.filter((s) => s.id !== seciliSliderId));
       setBasari('Slider silindi.');
+      formuSifirla();
+      setGorunum('liste');
       siteVerisiGuncellendiYayinla();
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Silme başarısız');
     } finally {
       setKaydediliyor(false);
     }
+  }, [seciliSliderId, formuSifirla]);
+
+  const onizle = useCallback(() => setOnizlemeAcik(true), []);
+
+  useModulAksiyonlari(
+    {
+      kaydet,
+      ekle: yeniBaslat,
+      sil,
+      duzenle: duzenlemeyeGit,
+      onizle,
+    },
+    {
+      kaydet: gorunum === 'editor' && !kaydediliyor && Boolean(ad.trim()),
+      ekle: true,
+      sil: !!seciliSliderId && !kaydediliyor,
+      duzenle: !!seciliSliderId && gorunum === 'liste' && !kaydediliyor,
+      onizle: gorunum === 'editor' || !!seciliSliderId,
+    }
+  );
+
+  function gorunumDegistir(id: Gorunum) {
+    if (id === gorunum) return;
+    if (id === 'liste') {
+      setGorunum('liste');
+      return;
+    }
+    yeniBaslat();
   }
 
   if (yukleniyor) {
     return (
-      <AdminModulKabuk
-        baslik="Slider Yönetimi"
-        aciklama="Sayfa üzerinde konumlandırılmış sliderlar oluşturun ve yönetin."
-      >
-        <YukleniyorDurumu />
+      <AdminModulKabuk onizleGoster={false}>
+        <YukleniyorDurumu mesaj="Sliderlar yükleniyor..." />
       </AdminModulKabuk>
     );
   }
 
   return (
     <AdminModulKabuk
-      baslik="Slider Yönetimi"
-      aciklama="Önizlemede hedef bölgeyi seçin; yan yerleşimde bitişik widgetları birlikte işaretleyebilirsiniz."
-      ustAksiyon={
-        <button type="button" className="ks-admin-btn ks-admin-btn--ghost" onClick={yeniBaslat}>
-          + Yeni slider
-        </button>
+      onizleGoster={false}
+      ustIcerik={
+        <AdminPilSekme
+          sekmeler={[
+            { id: 'liste', etiket: 'Slider Listesi', ikon: <ListeIkon /> },
+            {
+              id: 'editor',
+              etiket: gorunum === 'editor' && seciliSliderId ? 'Düzenleme' : 'Yeni Slider',
+              ikon: gorunum === 'editor' && seciliSliderId ? <DuzenlemeIkon /> : <YeniIkon />,
+            },
+          ]}
+          aktif={gorunum}
+          onDegistir={gorunumDegistir}
+        />
       }
     >
-      {hata && <div className="mb-4"><BildirimKutusu tur="hata" mesaj={hata} /></div>}
-      {basari && <div className="mb-4"><BildirimKutusu tur="basari" mesaj={basari} /></div>}
+      {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
+      {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
 
-      <div className="ks-yonetim-grid">
-        <aside className="ks-yonetim-sol">
-          <AdminPanelKarti baslik="Sayfa" altBaslik="Slider hangi sayfada görünsün?">
-            <select
-              className="ks-admin-select"
-              value={sayfaId}
-              onChange={(e) => {
-                setSayfaId(e.target.value);
-                if (!seciliSliderId) yeniBaslat();
-              }}
-            >
-              {sayfaFiltreOgeleri.map((o) => (
-                <option key={o.id} value={o.id}>
-                  {o.etiket}
-                </option>
-              ))}
-            </select>
-          </AdminPanelKarti>
+      {gorunum === 'liste' ? (
+        <SliderListesiPanel
+          sliderlar={sliderlar}
+          sayfaAdlari={sayfaAdlari}
+          seciliId={seciliSliderId}
+          onSec={sliderSec}
+        />
+      ) : (
+        <SliderEditorPanel
+          key={seciliSliderId ?? 'yeni'}
+          ad={ad}
+          aktif={aktif}
+          sayfaId={sayfaId}
+          config={config}
+          secimler={secimler}
+          sayfalar={sayfalar}
+          widgetlar={sayfaWidgetlariListe}
+          anaSayfaMi={anaSayfaMi}
+          secimHata={secimHata}
+          onAd={setAd}
+          onAktif={setAktif}
+          onSayfaId={sayfaDegistir}
+          onConfig={setConfig}
+          onSecimler={secimGuncelle}
+        />
+      )}
 
-          <AdminPanelKarti
-            baslik="Mevcut sliderlar"
-            altBaslik={`${sayfaSliderlari.length} kayıt`}
-            ustAksiyon={
-              <button type="button" className="ks-admin-btn ks-admin-btn--mini" onClick={yeniBaslat}>
-                Yeni
-              </button>
-            }
-          >
-            <div className="ks-slider-liste">
-              {sayfaSliderlari.length === 0 && (
-                <p className="text-sm text-[var(--ap-muted)]">Bu sayfada slider yok.</p>
-              )}
-              {sayfaSliderlari.map((s) => (
-                <button
-                  key={s.id}
-                  type="button"
-                  className={`ks-slider-liste-oge ${seciliSliderId === s.id ? 'ks-slider-liste-oge--aktif' : ''}`}
-                  onClick={() => sliderSec(s)}
-                >
-                  <span className="ks-slider-liste-ad">{s.ad}</span>
-                  <span className="ks-slider-liste-alt">{sliderListeOzeti(s)}</span>
-                  {!s.aktif && <span className="ks-slider-liste-pasif">Pasif</span>}
-                </button>
-              ))}
-            </div>
-          </AdminPanelKarti>
-        </aside>
-
-        <section className="ks-yonetim-orta">
-          <AdminPanelKarti baslik="Konum seçimi" altBaslik="Tıklayarak hedef belirleyin">
-            <KonumluSliderOnizleme
-              widgetlar={sayfaWidgetlariListe}
-              anaSayfaMi={anaSayfaMi}
-              secimler={secimler}
-              onSecimDegisti={secimGuncelle}
-              hata={secimHata}
-            />
-          </AdminPanelKarti>
-        </section>
-
-        <aside className="ks-yonetim-sag">
-          <AdminPanelKarti baslik="Slider ayarları">
-            <div className="space-y-4">
-              <label className="ks-admin-alan">
-                <span>Ad</span>
-                <input
-                  className="ks-admin-input"
-                  value={ad}
-                  onChange={(e) => setAd(e.target.value)}
-                  placeholder="Örn: Karşılaştırma yanı banner"
-                />
-              </label>
-
-              <label className="ks-admin-switch">
-                <input type="checkbox" checked={aktif} onChange={(e) => setAktif(e.target.checked)} />
-                <span>Yayında</span>
-              </label>
-
-              {secimler.length > 0 && (
-                <div className="ks-admin-secim-kutu">
-                  <span className="text-xs text-[var(--ap-muted)]">Seçilen konum</span>
-                  <p className="text-sm font-medium">{konumSecimOzeti(config)}</p>
-                  <p className="text-xs text-[var(--ap-muted)]">
-                    {KONUMLU_SLIDER_KONUM_ETIKET[config.yerlesim.tip]}
-                  </p>
-                </div>
-              )}
-
-              <KonumluSliderAyarlarPaneli config={config} onChange={setConfig} />
-
-              <div className="flex flex-wrap gap-2 pt-2">
-                <button
-                  type="button"
-                  className="ks-admin-btn ks-admin-btn--birincil"
-                  disabled={kaydediliyor}
-                  onClick={() => void kaydet()}
-                >
-                  {kaydediliyor ? 'Kaydediliyor…' : seciliSliderId ? 'Güncelle' : 'Oluştur'}
-                </button>
-                {seciliSliderId && (
-                  <button
-                    type="button"
-                    className="ks-admin-btn ks-admin-btn--tehlike"
-                    disabled={kaydediliyor}
-                    onClick={() => void sil(seciliSliderId)}
-                  >
-                    Sil
-                  </button>
-                )}
-              </div>
-            </div>
-          </AdminPanelKarti>
-        </aside>
-      </div>
+      <SliderOnizlemeModal
+        acik={onizlemeAcik}
+        ad={ad}
+        config={config}
+        onKapat={() => setOnizlemeAcik(false)}
+      />
     </AdminModulKabuk>
   );
 }

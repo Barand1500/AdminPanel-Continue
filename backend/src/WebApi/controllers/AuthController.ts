@@ -1,5 +1,6 @@
 import type { NextFunction, Request, Response } from 'express';
 import { AuthService, type JwtPayload } from '../../Services/AuthService.js';
+import { veritabaniHataMesaji } from '../utils/veritabaniHataMesaji.js';
 
 const authService = new AuthService();
 
@@ -33,10 +34,9 @@ export class AuthController {
       const sonuc = await authService.giris(req.body);
       return res.json(sonuc);
     } catch (err) {
-      if (err instanceof Error && err.message.includes('DATABASE_URL')) {
-        return res.status(503).json({
-          mesaj: 'Veritabani baglantisi kurulamadi. MySQL servisinin acik oldugunu ve backend/.env icindeki DATABASE_URL degerini kontrol edin.',
-        });
+      const dbMesaj = veritabaniHataMesaji(err);
+      if (dbMesaj) {
+        return res.status(503).json({ mesaj: dbMesaj });
       }
       if (err instanceof Error && err.message.includes('Prisma')) {
         console.error('[Auth]', err.message);

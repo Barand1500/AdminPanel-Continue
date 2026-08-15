@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import { formInputSinifi } from '@/components/form/FormAlani';
 
 export function AdminIstatistikKarti({
@@ -52,6 +52,37 @@ export function AdminSekmeler<T extends string>({
           {s.etiket}
         </button>
       ))}
+    </div>
+  );
+}
+
+export function AdminPilSekme<T extends string>({
+  sekmeler,
+  aktif,
+  onDegistir,
+}: {
+  sekmeler: { id: T; etiket: string; ikon?: ReactNode }[];
+  aktif: T;
+  onDegistir: (id: T) => void;
+}) {
+  return (
+    <div className="ap-pil-sekme" role="tablist">
+      {sekmeler.map((s) => {
+        const secili = aktif === s.id;
+        return (
+          <button
+            key={s.id}
+            type="button"
+            role="tab"
+            aria-selected={secili}
+            onClick={() => onDegistir(s.id)}
+            className={`ap-pil-sekme-oge ${secili ? 'ap-pil-sekme-oge-aktif' : ''}`}
+          >
+            {s.ikon && <span className="ap-pil-sekme-ikon">{s.ikon}</span>}
+            {s.etiket}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -113,18 +144,42 @@ export function AdminFormBolumu({
   baslik,
   aciklama,
   children,
+  akordeon = false,
+  varsayilanAcik = true,
 }: {
   baslik: string;
   aciklama?: string;
   children: ReactNode;
+  akordeon?: boolean;
+  varsayilanAcik?: boolean;
 }) {
+  const [acik, setAcik] = useState(varsayilanAcik);
+  const govdeAcik = !akordeon || acik;
+
   return (
-    <section className="ap-form-bolum">
-      <div className="ap-form-bolum-baslik">
-        <h3 className="ap-heading text-sm font-semibold">{baslik}</h3>
-        {aciklama && <p className="ap-muted text-xs">{aciklama}</p>}
-      </div>
-      <div className="ap-form-bolum-icerik">{children}</div>
+    <section className={`ap-form-bolum${akordeon ? ' ap-form-bolum--akordeon' : ''}`}>
+      {akordeon ? (
+        <button
+          type="button"
+          className="ap-form-bolum-baslik ap-form-bolum-akordeon-tus"
+          aria-expanded={acik}
+          onClick={() => setAcik((v) => !v)}
+        >
+          <span>
+            <span className="ap-heading block text-sm font-semibold">{baslik}</span>
+            {aciklama && <p className="ap-muted text-xs">{aciklama}</p>}
+          </span>
+          <span className="ap-form-bolum-akordeon-ok" aria-hidden>
+            {acik ? '▾' : '▸'}
+          </span>
+        </button>
+      ) : (
+        <div className="ap-form-bolum-baslik">
+          <h3 className="ap-heading text-sm font-semibold">{baslik}</h3>
+          {aciklama && <p className="ap-muted text-xs">{aciklama}</p>}
+        </div>
+      )}
+      {govdeAcik && <div className="ap-form-bolum-icerik">{children}</div>}
     </section>
   );
 }

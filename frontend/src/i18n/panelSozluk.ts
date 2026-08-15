@@ -39,6 +39,8 @@ export const PANEL_SOZLUK_TR: Record<string, string> = {
   'aksiyon.sil': 'Sil',
   'aksiyon.ekle': 'Yeni Ekle',
   'aksiyon.guncelle': 'Güncelle',
+  'aksiyon.duzenle': 'Düzenle',
+  'aksiyon.altEkle': 'Yeni Alt Ekle',
   'aksiyon.onizle': 'Önizle',
   'aksiyon.yayinla': 'Yayınla',
 
@@ -111,6 +113,8 @@ export const PANEL_SOZLUK_EN: Record<string, string> = {
   'aksiyon.sil': 'Delete',
   'aksiyon.ekle': 'Add New',
   'aksiyon.guncelle': 'Update',
+  'aksiyon.duzenle': 'Edit',
+  'aksiyon.altEkle': 'Add Subpage',
   'aksiyon.onizle': 'Preview',
   'aksiyon.yayinla': 'Publish',
 

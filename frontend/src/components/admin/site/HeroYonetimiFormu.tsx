@@ -1,17 +1,22 @@
-import { useMemo, useState, useEffect } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
-import { useSiteYonetimiAksiyonlari } from '@/hooks/useSiteYonetimiAksiyonlari';
 import { GorselAlan } from '@/components/form/GorselAlan';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
-import { LinkYoluAlani } from '@/components/form/LinkYoluAlani';
 import { medyaTamUrl } from '@/features/admin/medyaApi';
 import {
-  AdminPanelKarti,
+  AdminModulKabuk,
   BildirimKutusu,
   HataDurumu,
-  ModulBaslik,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
+import {
+  AdminAnahtarDugme,
+  AdminBosDurum,
+  AdminDurumEtiketi,
+  AdminFormBolumu,
+  AdminPilSekme,
+} from '@/components/admin/ortak/AdminFormBilesenleri';
+import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import {
   HERO_BUTON_AKSIYONLARI,
   HERO_BUTON_KONUMLARI,
@@ -33,8 +38,73 @@ import {
   type HeroSlide,
 } from '@/types/hero';
 
+type Gorunum = 'liste' | 'editor' | 'kartlar';
+
+function ListeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+    </svg>
+  );
+}
+
+function YeniIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function DuzenlemeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+    </svg>
+  );
+}
+
+function KartIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 10h18" />
+    </svg>
+  );
+}
+
 function gecerliHex(deger: string, varsayilan: string) {
   return /^#[0-9A-Fa-f]{6}$/.test(deger) ? deger : varsayilan;
+}
+
+function stilAdi(id: HeroSlide['stil']) {
+  return HERO_STILLER.find((s) => s.id === id)?.ad ?? id;
+}
+
+function PilGrup<T extends string>({
+  secenekler,
+  secili,
+  onSec,
+}: {
+  secenekler: { id: T; ad: string }[];
+  secili: T;
+  onSec: (id: T) => void;
+}) {
+  return (
+    <div className="ap-hero-piller">
+      {secenekler.map((s) => (
+        <button
+          key={s.id}
+          type="button"
+          onClick={() => onSec(s.id)}
+          className={`ap-hero-pil${secili === s.id ? ' ap-hero-pil--aktif' : ''}`}
+        >
+          {s.ad}
+        </button>
+      ))}
+    </div>
+  );
 }
 
 function KompaktRenkSatir({
@@ -50,533 +120,423 @@ function KompaktRenkSatir({
 }) {
   const picker = gecerliHex(deger, varsayilan);
   return (
-    <div className="flex items-center gap-2">
-      <span className="w-[5.5rem] shrink-0 text-xs font-medium text-[var(--ap-text-muted)]">{etiket}</span>
-      <input
-        type="color"
-        value={picker}
-        onChange={(e) => onChange(e.target.value)}
-        className="h-9 w-10 shrink-0 cursor-pointer rounded border border-[var(--ap-border)] bg-transparent p-0.5"
-        title={etiket}
-      />
+    <label className="ap-hero-renk">
+      <span>{etiket}</span>
+      <input type="color" value={picker} onChange={(e) => onChange(e.target.value)} title={etiket} />
       <input
         type="text"
         value={deger}
         onChange={(e) => onChange(e.target.value)}
-        className={`${formInputSinifi} min-w-0 flex-1 py-1.5 text-xs`}
+        className={`${formInputSinifi} ap-hero-renk-hex`}
         placeholder={varsayilan}
       />
-    </div>
+    </label>
   );
 }
 
-function HeroOnizleme({ hero, seciliSlide }: { hero: HeroAyarlari; seciliSlide: HeroSlide | null }) {
+function HeroOnizlemeIcerik({ hero, seciliSlide }: { hero: HeroAyarlari; seciliSlide: HeroSlide | null }) {
   const onizlenecek =
-    seciliSlide?.gorselUrl
-      ? seciliSlide
-      : hero.sliderlar.find((s) => s.aktif && s.gorselUrl) ?? null;
-
+    seciliSlide?.gorselUrl ? seciliSlide : hero.sliderlar.find((s) => s.aktif && s.gorselUrl) ?? null;
   const gorselSrc = onizlenecek?.gorselUrl ? medyaTamUrl(onizlenecek.gorselUrl) : '';
-
   const kartSayisi = hero.kartlarAktif ? hero.kartlar.length : 0;
-  const kartKolon =
-    kartSayisi <= 1
-      ? 'grid-cols-1 justify-items-center'
-      : kartSayisi === 2
-        ? 'grid-cols-2 justify-items-center'
-        : kartSayisi === 3
-          ? 'grid-cols-3 justify-items-center'
-          : 'grid-cols-2 sm:grid-cols-4 justify-items-center';
-
   const tamEkranOnizleme = onizlenecek?.stil === 'tam-ekran';
 
   return (
-    <div className="xl:sticky xl:top-4">
-      <AdminPanelKarti baslik="Önizleme" altBaslik="Seçili slider ve kartlar">
-        <div className="overflow-hidden rounded-xl border border-[var(--ap-border)] bg-[var(--ap-input-bg)]">
-          {onizlenecek && gorselSrc ? (
-            <div className={`relative w-full bg-slate-900 ${tamEkranOnizleme ? 'aspect-[9/16] sm:aspect-[16/10]' : 'aspect-[16/9]'}`}>
-              <img
-                src={gorselSrc}
-                alt=""
-                className={heroGorselSinifi(onizlenecek.gorselKirpma, onizlenecek.gorselOdak)}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).style.display = 'none';
+    <div className="ap-hero-oniz">
+      {onizlenecek && gorselSrc ? (
+        <div className={`ap-hero-oniz-sahne${tamEkranOnizleme ? ' ap-hero-oniz-sahne--dikey' : ''}`}>
+          <img
+            src={gorselSrc}
+            alt=""
+            className={heroGorselSinifi(onizlenecek.gorselKirpma, onizlenecek.gorselOdak)}
+          />
+          <div className={`ap-hero-oniz-perde${tamEkranOnizleme ? ' ap-hero-oniz-perde--tam' : ''}`} />
+          <div className={`ap-hero-oniz-metin${tamEkranOnizleme ? ' ap-hero-oniz-metin--tam' : ''}`}>
+            {onizlenecek.altBaslik && <p className="ap-hero-oniz-alt">{onizlenecek.altBaslik}</p>}
+            {onizlenecek.baslik && <p className="ap-hero-oniz-baslik">{onizlenecek.baslik}</p>}
+            {onizlenecek.baslikVurgu && <p className="ap-hero-oniz-vurgu">{onizlenecek.baslikVurgu}</p>}
+            {onizlenecek.aciklama && <p className="ap-hero-oniz-aciklama">{onizlenecek.aciklama}</p>}
+            {onizlenecek.butonAktif && onizlenecek.butonMetni && (
+              <span
+                className="ap-hero-oniz-btn"
+                style={{
+                  backgroundColor: gecerliHex(
+                    onizlenecek.butonRenk,
+                    tamEkranOnizleme ? HERO_TAM_EKRAN_BUTON_RENK : HERO_VARSAYILAN_BUTON_RENK
+                  ),
+                  color: gecerliHex(
+                    onizlenecek.butonYaziRenk,
+                    tamEkranOnizleme ? HERO_TAM_EKRAN_BUTON_YAZI : HERO_VARSAYILAN_BUTON_YAZI
+                  ),
                 }}
-              />
-              <div className={`absolute inset-0 ${tamEkranOnizleme ? 'bg-black/50' : 'bg-gradient-to-t from-black/60 via-black/20 to-transparent'}`} />
-              <div
-                className={`absolute inset-0 flex p-3 ${
-                  tamEkranOnizleme ? 'items-center justify-start' : 'flex-col justify-end'
-                }`}
               >
-                {tamEkranOnizleme ? (
-                  <div className="max-w-[85%]">
-                    {onizlenecek.altBaslik && (
-                      <p className="text-[9px] font-semibold uppercase tracking-wide text-white/70">{onizlenecek.altBaslik}</p>
-                    )}
-                    {onizlenecek.baslik && (
-                      <p className="mt-1 whitespace-pre-line text-sm font-bold leading-tight text-white">{onizlenecek.baslik}</p>
-                    )}
-                    {onizlenecek.baslikVurgu && (
-                      <p className="text-sm font-bold text-orange-400">{onizlenecek.baslikVurgu}</p>
-                    )}
-                    {onizlenecek.aciklama && (
-                      <p className="mt-1 line-clamp-2 text-[10px] text-white/80">{onizlenecek.aciklama}</p>
-                    )}
-                    {onizlenecek.butonAktif && onizlenecek.butonMetni && (
-                      <span
-                        className="mt-2 inline-flex w-fit rounded-full px-2.5 py-1 text-[10px] font-semibold shadow"
-                        style={{
-                          backgroundColor: gecerliHex(onizlenecek.butonRenk, HERO_TAM_EKRAN_BUTON_RENK),
-                          color: gecerliHex(onizlenecek.butonYaziRenk, HERO_TAM_EKRAN_BUTON_YAZI),
-                        }}
-                      >
-                        {onizlenecek.butonMetni} →
-                      </span>
-                    )}
-                  </div>
-                ) : (
-                  <>
-                    {onizlenecek.altBaslik && (
-                      <p className="text-[10px] font-semibold uppercase tracking-wide text-violet-200">{onizlenecek.altBaslik}</p>
-                    )}
-                    {onizlenecek.baslik && (
-                      <p className="line-clamp-2 text-sm font-bold text-white">{onizlenecek.baslik}</p>
-                    )}
-                    {onizlenecek.butonAktif && onizlenecek.butonMetni && (
-                      <span
-                        className="mt-2 inline-flex w-fit rounded px-2.5 py-1 text-[10px] font-semibold shadow"
-                        style={{
-                          backgroundColor: gecerliHex(onizlenecek.butonRenk, HERO_VARSAYILAN_BUTON_RENK),
-                          color: gecerliHex(onizlenecek.butonYaziRenk, HERO_VARSAYILAN_BUTON_YAZI),
-                        }}
-                      >
-                        {onizlenecek.butonMetni}
-                      </span>
-                    )}
-                  </>
-                )}
-              </div>
-              {!onizlenecek.aktif && (
-                <span className="absolute right-2 top-2 rounded bg-amber-500/90 px-2 py-0.5 text-[10px] font-medium text-white">
-                  Kapalı
-                </span>
-              )}
-            </div>
-          ) : (
-            <div className="flex aspect-[16/9] flex-col items-center justify-center bg-gradient-to-br from-violet-500/10 to-slate-800/30 p-4 text-center">
-              <span className="text-3xl opacity-50">🏠</span>
-              <p className="ap-muted mt-2 text-xs">Görsel yükleyin</p>
-            </div>
-          )}
-
-          {hero.kartlarAktif && hero.kartlar.length > 0 && (
-            <div className={`grid gap-2 border-t border-[var(--ap-border)] p-2.5 ${kartKolon}`}>
-              {hero.kartlar.map((k) => (
-                <div key={k.id} className="flex min-w-0 items-center gap-1.5 rounded-md bg-[var(--ap-surface)] p-1.5">
-                  <span className="shrink-0 text-base leading-none">{k.ikon}</span>
-                  <div className="min-w-0">
-                    <p className="truncate text-[10px] font-semibold text-[var(--ap-text)]">{k.baslik}</p>
-                    <p className="truncate text-[9px] text-[var(--ap-text-muted)]">{k.aciklama}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {hero.sliderlar.filter((s) => s.aktif && s.gorselUrl).length > 1 && (
-            <p className="border-t border-[var(--ap-border)] px-3 py-2 text-center text-[10px] text-[var(--ap-text-muted)]">
-              Geçiş: {hero.gecisSuresiSn} sn
-            </p>
-          )}
+                {onizlenecek.butonMetni}
+              </span>
+            )}
+          </div>
+          {!onizlenecek.aktif && <span className="ap-hero-oniz-rozet">Kapalı</span>}
         </div>
-      </AdminPanelKarti>
+      ) : (
+        <div className="ap-hero-oniz-bos">Görsel yükleyin</div>
+      )}
+
+      {hero.kartlarAktif && hero.kartlar.length > 0 && (
+        <div className={`ap-hero-oniz-kartlar ap-hero-oniz-kartlar--${Math.min(kartSayisi, 4)}`}>
+          {hero.kartlar.map((k) => (
+            <div key={k.id} className="ap-hero-oniz-kart">
+              <span>{k.ikon}</span>
+              <div>
+                <p>{k.baslik}</p>
+                <small>{k.aciklama}</small>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
-function SecimKartlari<T extends string>({
-  secenekler,
-  secili,
-  onSec,
+
+function HeroOnizlemeModal({
+  acik,
+  hero,
+  seciliSlide,
+  onKapat,
 }: {
-  secenekler: { id: T; ad: string; aciklama?: string }[];
-  secili: T;
-  onSec: (id: T) => void;
+  acik: boolean;
+  hero: HeroAyarlari;
+  seciliSlide: HeroSlide | null;
+  onKapat: () => void;
 }) {
+  useEffect(() => {
+    if (!acik) return;
+    function tus(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onKapat();
+      }
+    }
+    document.addEventListener('keydown', tus);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', tus);
+      document.body.style.overflow = '';
+    };
+  }, [acik, onKapat]);
+
+  if (!acik) return null;
+
   return (
-    <div className="grid gap-2 sm:grid-cols-3">
-      {secenekler.map((s) => (
-        <button
-          key={s.id}
-          type="button"
-          onClick={() => onSec(s.id)}
-          className={`ap-hero-secim-kart ${secili === s.id ? 'ap-hero-secim-kart-aktif' : ''}`}
-        >
-          <span className="font-semibold">{s.ad}</span>
-          {s.aciklama && <span className="ap-muted mt-0.5 block text-xs">{s.aciklama}</span>}
-        </button>
-      ))}
+    <div className="ap-admin-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="hero-onizleme-baslik">
+      <button type="button" className="ap-admin-modal-backdrop" aria-label="Kapat" onClick={onKapat} />
+      <div className="ap-admin-modal ap-admin-modal-genis ap-hero-oniz-modal">
+        <header className="ap-admin-modal-header">
+          <div>
+            <h2 id="hero-onizleme-baslik" className="ap-admin-modal-baslik">
+              Hero önizleme
+            </h2>
+            <p className="ap-admin-modal-alt">Ana sayfa banner görünümü</p>
+          </div>
+          <button type="button" className="ap-admin-modal-kapat" onClick={onKapat}>
+            ✕ ESC
+          </button>
+        </header>
+        <div className="ap-hero-oniz-govde">
+          <HeroOnizlemeIcerik hero={hero} seciliSlide={seciliSlide} />
+        </div>
+      </div>
     </div>
   );
 }
 
 function SlideDuzenlemeForm({
   slide,
+  siraNo,
   slideGuncelle,
-  slideSil,
 }: {
   slide: HeroSlide;
+  siraNo: number;
   slideGuncelle: (id: string, parca: Partial<HeroSlide>) => void;
-  slideSil: (id: string) => void;
 }) {
   const tamEkran = slide.stil === 'tam-ekran';
 
   return (
-    <div className="space-y-4">
-      <GorselAlan
-        etiket="Arka Plan Görseli"
-        deger={slide.gorselUrl}
-        onChange={(v) => slideGuncelle(slide.id, { gorselUrl: v })}
-        onizlemeSinifi={`h-24 w-full max-w-md rounded-lg border border-[var(--ap-border)] ${heroGorselObjectSinifi(slide.gorselKirpma, slide.gorselOdak)}`}
-      />
-
-      <FormAlani etiket="Görsel yerleşimi" aciklama="Görselin slider alanına nasıl oturacağını seçin">
-        <div className="grid gap-2 sm:grid-cols-2">
-          {HERO_GORSEL_KIRPMA.map((secenek) => (
-            <button
-              key={secenek.id}
-              type="button"
-              onClick={() => slideGuncelle(slide.id, { gorselKirpma: secenek.id })}
-              className={`rounded-lg border p-3 text-left text-sm transition ${
-                (slide.gorselKirpma ?? 'kapla') === secenek.id
-                  ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)]/10'
-                  : 'border-[var(--ap-border)] hover:border-[var(--ap-accent)]/40'
-              }`}
-            >
-              <span className="font-semibold">{secenek.ad}</span>
-              <span className="ap-muted mt-0.5 block text-xs">{secenek.aciklama}</span>
-            </button>
-          ))}
+    <div className="ap-editor-panel ap-hero-editor">
+      <div className="ap-hero-editor-ust">
+        <div>
+          <h2 className="ap-heading text-sm font-semibold">Slider {siraNo}</h2>
+          <p className="ap-muted text-xs">{stilAdi(slide.stil)}</p>
         </div>
-      </FormAlani>
-
-      {(slide.gorselKirpma ?? 'kapla') !== 'doldur' && (
-        <FormAlani etiket="Görsel odağı" aciklama="Kırpma olursa hangi bölge öne çıksın">
-          <div className="flex flex-wrap gap-2">
-            {HERO_GORSEL_ODAK.map((secenek) => (
-              <button
-                key={secenek.id}
-                type="button"
-                onClick={() => slideGuncelle(slide.id, { gorselOdak: secenek.id })}
-                className={`rounded-lg border px-3 py-2 text-sm transition ${
-                  (slide.gorselOdak ?? 'merkez') === secenek.id
-                    ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)]/10 font-semibold'
-                    : 'border-[var(--ap-border)] hover:border-[var(--ap-accent)]/40'
-                }`}
-              >
-                {secenek.ad}
-              </button>
-            ))}
-          </div>
-        </FormAlani>
-      )}
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <FormAlani etiket={tamEkran ? 'Başlık satırları' : 'Başlık'} aciklama={tamEkran ? 'Her satır için Enter kullanın' : undefined}>
-          {tamEkran ? (
-            <textarea
-              className={formInputSinifi}
-              rows={3}
-              value={slide.baslik}
-              onChange={(e) => slideGuncelle(slide.id, { baslik: e.target.value })}
-              placeholder={'Tüm Süreçleri\nTek Ekrandan'}
-            />
-          ) : (
-            <input
-              className={formInputSinifi}
-              value={slide.baslik}
-              onChange={(e) => slideGuncelle(slide.id, { baslik: e.target.value })}
-              placeholder="Ana başlık"
-            />
-          )}
-        </FormAlani>
-        <FormAlani etiket={tamEkran ? 'Turuncu vurgu' : 'Alt Başlık'} aciklama={tamEkran ? 'Son satır turuncu renkte gösterilir' : undefined}>
-          {tamEkran ? (
-            <input
-              className={formInputSinifi}
-              value={slide.baslikVurgu ?? ''}
-              onChange={(e) => slideGuncelle(slide.id, { baslikVurgu: e.target.value })}
-              placeholder="Yönetin."
-            />
-          ) : (
-            <input
-              className={formInputSinifi}
-              value={slide.altBaslik}
-              onChange={(e) => slideGuncelle(slide.id, { altBaslik: e.target.value })}
-              placeholder="Üst etiket"
-            />
-          )}
-        </FormAlani>
+        <div className={`ap-hero-aktif-anahtar${slide.aktif ? ' ap-hero-aktif-anahtar--acik' : ''}`}>
+          <AdminAnahtarDugme
+            etiket="Aktif"
+            acik={slide.aktif}
+            onDegistir={(aktif) => slideGuncelle(slide.id, { aktif })}
+          />
+        </div>
       </div>
 
-      {tamEkran && (
-        <FormAlani etiket="Üst etiket (opsiyonel)">
-          <input
-            className={formInputSinifi}
-            value={slide.altBaslik}
-            onChange={(e) => slideGuncelle(slide.id, { altBaslik: e.target.value })}
-            placeholder="Kısa üst metin"
-          />
-        </FormAlani>
-      )}
-
-      <FormAlani etiket="Açıklama">
-        <textarea
-          className={formInputSinifi}
-          rows={2}
-          value={slide.aciklama}
-          onChange={(e) => slideGuncelle(slide.id, { aciklama: e.target.value })}
-        />
-      </FormAlani>
-
-      <FormAlani etiket="Slider Stili">
-        <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-4">
-          {HERO_STILLER.map((st) => (
-            <button
-              key={st.id}
-              type="button"
-              onClick={() => {
-                const parca: Partial<HeroSlide> = { stil: st.id };
-                if (st.id === 'tam-ekran' && slide.stil !== 'tam-ekran') {
-                  parca.butonRenk = HERO_TAM_EKRAN_BUTON_RENK;
-                  parca.butonYaziRenk = HERO_TAM_EKRAN_BUTON_YAZI;
-                  parca.saatGoster = true;
-                }
-                slideGuncelle(slide.id, parca);
-              }}
-              className={`rounded-lg border p-3 text-left text-sm transition ${
-                slide.stil === st.id
-                  ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)]/10'
-                  : 'border-[var(--ap-border)] hover:border-[var(--ap-accent)]/40'
-              }`}
-            >
-              <span className="font-semibold">{st.ad}</span>
-              <span className="ap-muted mt-0.5 block text-xs">{st.aciklama}</span>
-            </button>
-          ))}
-        </div>
-      </FormAlani>
-
-      {tamEkran && (
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={slide.saatGoster !== false}
-            onChange={(e) => slideGuncelle(slide.id, { saatGoster: e.target.checked })}
-          />
-          Sol altta saat ve tarih göster
-        </label>
-      )}
-
-      <label className="flex items-center gap-2 text-sm">
-        <input
-          type="checkbox"
-          checked={slide.butonAktif}
-          onChange={(e) => slideGuncelle(slide.id, { butonAktif: e.target.checked })}
-        />
-        {tamEkran ? 'Birincil buton göster' : 'Buton göster'}
-      </label>
-
-      {slide.butonAktif && (
-        <div className="space-y-4 rounded-lg border border-dashed border-[var(--ap-border)] p-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <FormAlani etiket="Buton Metni">
-              <input
-                className={formInputSinifi}
-                value={slide.butonMetni}
-                onChange={(e) => slideGuncelle(slide.id, { butonMetni: e.target.value })}
-                placeholder={tamEkran ? 'Özellikleri Keşfet' : 'Hemen İncele'}
+      <div className="ap-hero-editor-govde">
+        <AdminFormBolumu baslik="Görsel ve stil">
+          <div className="ap-hero-gorsel-stil">
+            <div className="ap-hero-arka-plan">
+              <GorselAlan
+                etiket="Arka plan"
+                deger={slide.gorselUrl}
+                onChange={(v) => slideGuncelle(slide.id, { gorselUrl: v })}
+                onizlemeSinifi={`ap-hero-gorsel-onizleme ${heroGorselObjectSinifi(slide.gorselKirpma, slide.gorselOdak)}`}
               />
-            </FormAlani>
-            <FormAlani etiket="Buton Linki">
-              <input
-                className={formInputSinifi}
-                value={slide.butonLink}
-                onChange={(e) => slideGuncelle(slide.id, { butonLink: e.target.value })}
-                placeholder="/hizmetler veya https://..."
-              />
-            </FormAlani>
-          </div>
-          {!tamEkran && (
-            <div className="grid gap-4 lg:grid-cols-2 lg:items-stretch">
-              <FormAlani etiket="Buton Konumu" aciklama="9 noktadan birini seçin">
-                <div className="inline-grid grid-cols-3 gap-1.5 rounded-lg border border-[var(--ap-border)] p-2">
-                  {HERO_BUTON_KONUMLARI.map((k) => (
-                    <button
-                      key={k.id}
-                      type="button"
-                      title={k.id}
-                      onClick={() => slideGuncelle(slide.id, { butonKonum: k.id })}
-                      className={`flex h-9 w-9 items-center justify-center rounded text-sm ${
-                        slide.butonKonum === k.id
-                          ? 'bg-[var(--ap-accent)] text-white'
-                          : 'bg-[var(--ap-surface)] hover:bg-[var(--ap-hover)]'
-                      }`}
-                    >
-                      {k.etiket}
-                    </button>
-                  ))}
-                </div>
-              </FormAlani>
-
-              <FormAlani etiket="Butona tıklayınca" aciklama="Ziyaretçi butona tıkladığında ne olsun?">
-                <SecimKartlari
-                  secenekler={HERO_BUTON_AKSIYONLARI}
-                  secili={slide.butonAksiyon ?? 'ayni-sekme'}
-                  onSec={(id) => slideGuncelle(slide.id, { butonAksiyon: id as HeroButonAksiyon })}
+            </div>
+            <div className="ap-hero-stil-gruplar">
+              <FormAlani etiket="Stil">
+                <PilGrup
+                  secenekler={HERO_STILLER.map((s) => ({ id: s.id, ad: s.ad }))}
+                  secili={slide.stil}
+                  onSec={(id) => {
+                    const parca: Partial<HeroSlide> = { stil: id };
+                    if (id === 'tam-ekran' && slide.stil !== 'tam-ekran') {
+                      parca.butonRenk = HERO_TAM_EKRAN_BUTON_RENK;
+                      parca.butonYaziRenk = HERO_TAM_EKRAN_BUTON_YAZI;
+                      parca.saatGoster = true;
+                    }
+                    slideGuncelle(slide.id, parca);
+                  }}
                 />
               </FormAlani>
+              <FormAlani etiket="Sığdırma">
+                <PilGrup
+                  secenekler={HERO_GORSEL_KIRPMA.map((s) => ({ id: s.id, ad: s.ad }))}
+                  secili={slide.gorselKirpma ?? 'kapla'}
+                  onSec={(id) => slideGuncelle(slide.id, { gorselKirpma: id })}
+                />
+              </FormAlani>
+              {(slide.gorselKirpma ?? 'kapla') !== 'doldur' && (
+                <FormAlani etiket="Odak">
+                  <PilGrup
+                    secenekler={HERO_GORSEL_ODAK}
+                    secili={slide.gorselOdak ?? 'merkez'}
+                    onSec={(id) => slideGuncelle(slide.id, { gorselOdak: id })}
+                  />
+                </FormAlani>
+              )}
             </div>
-          )}
+          </div>
+        </AdminFormBolumu>
 
+        <AdminFormBolumu baslik="Metin">
+          <div className="ap-hero-form-grid">
+            <FormAlani etiket={tamEkran ? 'Başlık satırları' : 'Başlık'}>
+              {tamEkran ? (
+                <textarea
+                  className={formInputSinifi}
+                  rows={3}
+                  value={slide.baslik}
+                  onChange={(e) => slideGuncelle(slide.id, { baslik: e.target.value })}
+                  placeholder={'Tüm Süreçleri\nTek Ekrandan'}
+                />
+              ) : (
+                <input
+                  className={formInputSinifi}
+                  value={slide.baslik}
+                  onChange={(e) => slideGuncelle(slide.id, { baslik: e.target.value })}
+                  placeholder="Ana başlık"
+                />
+              )}
+            </FormAlani>
+            <FormAlani etiket={tamEkran ? 'Turuncu vurgu' : 'Alt başlık'}>
+              <input
+                className={formInputSinifi}
+                value={tamEkran ? slide.baslikVurgu ?? '' : slide.altBaslik}
+                onChange={(e) =>
+                  slideGuncelle(
+                    slide.id,
+                    tamEkran ? { baslikVurgu: e.target.value } : { altBaslik: e.target.value }
+                  )
+                }
+                placeholder={tamEkran ? 'Yönetin.' : 'Üst etiket'}
+              />
+            </FormAlani>
+          </div>
           {tamEkran && (
-            <FormAlani etiket="Butona tıklayınca" aciklama="Ziyaretçi butona tıkladığında ne olsun?">
-              <SecimKartlari
-                secenekler={HERO_BUTON_AKSIYONLARI}
-                secili={slide.butonAksiyon ?? 'ayni-sekme'}
-                onSec={(id) => slideGuncelle(slide.id, { butonAksiyon: id as HeroButonAksiyon })}
+            <FormAlani etiket="Üst etiket">
+              <input
+                className={formInputSinifi}
+                value={slide.altBaslik}
+                onChange={(e) => slideGuncelle(slide.id, { altBaslik: e.target.value })}
+                placeholder="Kısa üst metin"
               />
             </FormAlani>
           )}
-
-          <div className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface)] p-3">
-            <p className="mb-3 text-xs font-semibold text-[var(--ap-text)]">Buton Renkleri</p>
-            <div className="space-y-3">
-              <KompaktRenkSatir
-                etiket="Arka plan"
-                deger={slide.butonRenk}
-                varsayilan={tamEkran ? HERO_TAM_EKRAN_BUTON_RENK : HERO_VARSAYILAN_BUTON_RENK}
-                onChange={(v) => slideGuncelle(slide.id, { butonRenk: v })}
-              />
-              <KompaktRenkSatir
-                etiket="Yazı"
-                deger={slide.butonYaziRenk}
-                varsayilan={tamEkran ? HERO_TAM_EKRAN_BUTON_YAZI : HERO_VARSAYILAN_BUTON_YAZI}
-                onChange={(v) => slideGuncelle(slide.id, { butonYaziRenk: v })}
-              />
-            </div>
-          </div>
-        </div>
-      )}
-
-      {tamEkran && (
-        <>
-          <label className="flex items-center gap-2 text-sm">
-            <input
-              type="checkbox"
-              checked={slide.ikinciButonAktif ?? false}
-              onChange={(e) => slideGuncelle(slide.id, { ikinciButonAktif: e.target.checked })}
+          <FormAlani etiket="Açıklama">
+            <textarea
+              className={formInputSinifi}
+              rows={2}
+              value={slide.aciklama}
+              onChange={(e) => slideGuncelle(slide.id, { aciklama: e.target.value })}
+              placeholder="Kısa açıklama"
             />
-            İkincil metin linki göster
-          </label>
+          </FormAlani>
+          {tamEkran && (
+            <AdminAnahtarDugme
+              etiket="Sol altta saat"
+              acik={slide.saatGoster !== false}
+              onDegistir={(saatGoster) => slideGuncelle(slide.id, { saatGoster })}
+            />
+          )}
+        </AdminFormBolumu>
 
-          {slide.ikinciButonAktif && (
-            <div className="space-y-4 rounded-lg border border-dashed border-[var(--ap-border)] p-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <FormAlani etiket="Link metni">
+        <AdminFormBolumu baslik="Buton">
+          <AdminAnahtarDugme
+            etiket={tamEkran ? 'Birincil buton' : 'Buton göster'}
+            acik={slide.butonAktif}
+            onDegistir={(butonAktif) => slideGuncelle(slide.id, { butonAktif })}
+          />
+          {slide.butonAktif && (
+            <>
+              <div className="ap-hero-form-grid">
+                <FormAlani etiket="Metin">
                   <input
                     className={formInputSinifi}
-                    value={slide.ikinciButonMetni ?? ''}
-                    onChange={(e) => slideGuncelle(slide.id, { ikinciButonMetni: e.target.value })}
-                    placeholder="İletişime Geç"
+                    value={slide.butonMetni}
+                    onChange={(e) => slideGuncelle(slide.id, { butonMetni: e.target.value })}
+                    placeholder={tamEkran ? 'Özellikleri Keşfet' : 'Hemen İncele'}
                   />
                 </FormAlani>
-                <FormAlani etiket="Link adresi">
+                <FormAlani etiket="Link">
                   <input
                     className={formInputSinifi}
-                    value={slide.ikinciButonLink ?? ''}
-                    onChange={(e) => slideGuncelle(slide.id, { ikinciButonLink: e.target.value })}
-                    placeholder="/iletisim"
+                    value={slide.butonLink}
+                    onChange={(e) => slideGuncelle(slide.id, { butonLink: e.target.value })}
+                    placeholder="/hizmetler"
                   />
                 </FormAlani>
               </div>
-              <FormAlani etiket="Linke tıklayınca">
-                <SecimKartlari
-                  secenekler={HERO_BUTON_AKSIYONLARI}
-                  secili={slide.ikinciButonAksiyon ?? 'ayni-sekme'}
-                  onSec={(id) => slideGuncelle(slide.id, { ikinciButonAksiyon: id as HeroButonAksiyon })}
+              <div className="ap-hero-form-grid">
+                {!tamEkran && (
+                  <FormAlani etiket="Konum">
+                    <div className="ap-hero-konum">
+                      {HERO_BUTON_KONUMLARI.map((k) => (
+                        <button
+                          key={k.id}
+                          type="button"
+                          title={k.id}
+                          onClick={() => slideGuncelle(slide.id, { butonKonum: k.id })}
+                          className={`ap-hero-konum-oge${slide.butonKonum === k.id ? ' ap-hero-konum-oge--aktif' : ''}`}
+                        >
+                          {k.etiket}
+                        </button>
+                      ))}
+                    </div>
+                  </FormAlani>
+                )}
+                <FormAlani etiket="Tıklayınca">
+                  <PilGrup
+                    secenekler={HERO_BUTON_AKSIYONLARI.map((s) => ({ id: s.id, ad: s.ad }))}
+                    secili={slide.butonAksiyon ?? 'ayni-sekme'}
+                    onSec={(id) => slideGuncelle(slide.id, { butonAksiyon: id as HeroButonAksiyon })}
+                  />
+                </FormAlani>
+              </div>
+              <div className="ap-hero-form-grid">
+                <KompaktRenkSatir
+                  etiket="Arka plan"
+                  deger={slide.butonRenk}
+                  varsayilan={tamEkran ? HERO_TAM_EKRAN_BUTON_RENK : HERO_VARSAYILAN_BUTON_RENK}
+                  onChange={(v) => slideGuncelle(slide.id, { butonRenk: v })}
                 />
-              </FormAlani>
-            </div>
+                <KompaktRenkSatir
+                  etiket="Yazı"
+                  deger={slide.butonYaziRenk}
+                  varsayilan={tamEkran ? HERO_TAM_EKRAN_BUTON_YAZI : HERO_VARSAYILAN_BUTON_YAZI}
+                  onChange={(v) => slideGuncelle(slide.id, { butonYaziRenk: v })}
+                />
+              </div>
+            </>
           )}
-        </>
-      )}
 
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[var(--ap-border)] pt-4">
-        <label className="flex items-center gap-2 text-sm">
-          <input
-            type="checkbox"
-            checked={slide.aktif}
-            onChange={(e) => slideGuncelle(slide.id, { aktif: e.target.checked })}
-          />
-          Bu slider yayında
-        </label>
-        <button
-          type="button"
-          onClick={() => slideSil(slide.id)}
-          className="text-sm text-red-400 hover:text-red-300"
-        >
-          Sliderı Sil
-        </button>
+          {tamEkran && (
+            <>
+              <AdminAnahtarDugme
+                etiket="İkincil link"
+                acik={slide.ikinciButonAktif ?? false}
+                onDegistir={(ikinciButonAktif) => slideGuncelle(slide.id, { ikinciButonAktif })}
+              />
+              {slide.ikinciButonAktif && (
+                <div className="ap-hero-form-grid">
+                  <FormAlani etiket="Link metni">
+                    <input
+                      className={formInputSinifi}
+                      value={slide.ikinciButonMetni ?? ''}
+                      onChange={(e) => slideGuncelle(slide.id, { ikinciButonMetni: e.target.value })}
+                      placeholder="İletişime Geç"
+                    />
+                  </FormAlani>
+                  <FormAlani etiket="Adres">
+                    <input
+                      className={formInputSinifi}
+                      value={slide.ikinciButonLink ?? ''}
+                      onChange={(e) => slideGuncelle(slide.id, { ikinciButonLink: e.target.value })}
+                      placeholder="/iletisim"
+                    />
+                  </FormAlani>
+                </div>
+              )}
+            </>
+          )}
+        </AdminFormBolumu>
       </div>
     </div>
   );
 }
 
 export function HeroYonetimiFormu() {
-  const { ayarlar, yukleniyor, hata, kaydediliyor, alanGuncelle } = useSiteAyarlariYonetimi();
-  useSiteYonetimiAksiyonlari();
-
+  const { ayarlar, yukleniyor, hata, kaydediliyor, kaydet, alanGuncelle } = useSiteAyarlariYonetimi();
   const hero = useMemo(() => heroAyarlariBirlestir(ayarlar?.heroJson), [ayarlar?.heroJson]);
+  const [gorunum, setGorunum] = useState<Gorunum>('liste');
   const [seciliSlideId, setSeciliSlideId] = useState<string | null>(null);
   const [gecisMetin, setGecisMetin] = useState('6');
+  const [onizlemeAcik, setOnizlemeAcik] = useState(false);
 
   useEffect(() => {
     setGecisMetin(String(hero.gecisSuresiSn));
   }, [hero.gecisSuresiSn]);
 
-  useEffect(() => {
-    if (!seciliSlideId && hero.sliderlar.length > 0) {
-      setSeciliSlideId(hero.sliderlar[0].id);
-    }
-  }, [hero.sliderlar, seciliSlideId]);
+  const seciliSlide = hero.sliderlar.find((s) => s.id === seciliSlideId) ?? null;
 
-  const seciliSlide = hero.sliderlar.find((s) => s.id === seciliSlideId) ?? hero.sliderlar[0] ?? null;
+  const heroGuncelle = useCallback(
+    (guncel: HeroAyarlari) => alanGuncelle('heroJson', guncel),
+    [alanGuncelle]
+  );
 
-  const heroGuncelle = (guncel: HeroAyarlari) => {
-    alanGuncelle('heroJson', guncel);
-  };
+  const slideGuncelle = useCallback(
+    (id: string, parca: Partial<HeroSlide>) => {
+      heroGuncelle({
+        ...hero,
+        sliderlar: hero.sliderlar.map((s) => (s.id === id ? { ...s, ...parca } : s)),
+      });
+    },
+    [hero, heroGuncelle]
+  );
 
-  const slideGuncelle = (id: string, parca: Partial<HeroSlide>) => {
-    heroGuncelle({
-      ...hero,
-      sliderlar: hero.sliderlar.map((s) => (s.id === id ? { ...s, ...parca } : s)),
-    });
-  };
-
-  const slideEkle = () => {
+  const slideEkle = useCallback(() => {
     const yeni = bosHeroSlide(hero.sliderlar.length);
     heroGuncelle({ ...hero, sliderlar: [...hero.sliderlar, yeni] });
     setSeciliSlideId(yeni.id);
-  };
+    setGorunum('editor');
+  }, [hero, heroGuncelle]);
 
-  const slideSil = (id: string) => {
-    if (!confirm('Bu slider silinsin mi?')) return;
-    const kalan = hero.sliderlar.filter((s) => s.id !== id);
+  const slideSil = useCallback(() => {
+    if (!seciliSlideId || !confirm('Bu slider silinsin mi?')) return;
+    const kalan = hero.sliderlar.filter((s) => s.id !== seciliSlideId);
     heroGuncelle({ ...hero, sliderlar: kalan.map((s, i) => ({ ...s, sira: i })) });
     setSeciliSlideId(kalan[0]?.id ?? null);
-  };
+    setGorunum('liste');
+  }, [hero, heroGuncelle, seciliSlideId]);
+
+  const duzenlemeyeGit = useCallback(() => {
+    if (!seciliSlideId) return;
+    setGorunum('editor');
+  }, [seciliSlideId]);
 
   const kartGuncelle = (id: string, parca: Partial<HeroKart>) => {
     heroGuncelle({
@@ -586,15 +546,20 @@ export function HeroYonetimiFormu() {
   };
 
   const kartEkle = () => {
-    const yeni: HeroKart = {
-      id: `k-${Date.now()}`,
-      ikon: '⭐',
-      baslik: 'Yeni Özellik',
-      aciklama: 'Kısa açıklama',
-      link: '',
-      sira: hero.kartlar.length,
-    };
-    heroGuncelle({ ...hero, kartlar: [...hero.kartlar, yeni] });
+    heroGuncelle({
+      ...hero,
+      kartlar: [
+        ...hero.kartlar,
+        {
+          id: `k-${Date.now()}`,
+          ikon: '⭐',
+          baslik: 'Yeni Özellik',
+          aciklama: 'Kısa açıklama',
+          link: '',
+          sira: hero.kartlar.length,
+        },
+      ],
+    });
   };
 
   const kartSil = (id: string) => {
@@ -605,156 +570,222 @@ export function HeroYonetimiFormu() {
     });
   };
 
-  if (yukleniyor) return <YukleniyorDurumu mesaj="Hero ayarları yükleniyor..." />;
+  useModulAksiyonlari(
+    {
+      kaydet,
+      ekle: slideEkle,
+      sil: slideSil,
+      duzenle: duzenlemeyeGit,
+      onizle: () => setOnizlemeAcik(true),
+    },
+    {
+      kaydet: !kaydediliyor,
+      ekle: gorunum !== 'kartlar',
+      sil: gorunum !== 'kartlar' && !!seciliSlideId && !kaydediliyor,
+      duzenle: gorunum === 'liste' && !!seciliSlideId && !kaydediliyor,
+      onizle: true,
+    }
+  );
+
+  function gorunumDegistir(id: Gorunum) {
+    if (id === gorunum) return;
+    if (id === 'liste' || id === 'kartlar') {
+      setGorunum(id);
+      return;
+    }
+    slideEkle();
+  }
+
+  function gecisYaz(raw: string) {
+    setGecisMetin(raw);
+    const n = Number(raw);
+    if (raw !== '' && !Number.isNaN(n) && n >= 2 && n <= 60) {
+      heroGuncelle({ ...hero, gecisSuresiSn: n });
+    }
+  }
+
+  function gecisBlur() {
+    const n = Number(gecisMetin);
+    if (gecisMetin === '' || Number.isNaN(n) || n < 2) {
+      setGecisMetin(String(HERO_VARSAYILAN_GECIS_SN));
+      heroGuncelle({ ...hero, gecisSuresiSn: HERO_VARSAYILAN_GECIS_SN });
+      return;
+    }
+    const v = Math.min(60, Math.max(2, n));
+    setGecisMetin(String(v));
+    heroGuncelle({ ...hero, gecisSuresiSn: v });
+  }
+
+  const editorEtiket = gorunum === 'editor' && seciliSlide ? 'Düzenleme' : 'Yeni Slider';
+
+  if (yukleniyor) {
+    return (
+      <AdminModulKabuk onizleGoster={false}>
+        <YukleniyorDurumu mesaj="Hero ayarları yükleniyor..." />
+      </AdminModulKabuk>
+    );
+  }
   if (!ayarlar) return <HataDurumu mesaj={hata ?? 'Ayarlar yüklenemedi'} />;
 
   return (
-    <div className="ap-hero-yonetimi space-y-6">
-      <ModulBaslik
-        baslik="Hero Yönetimi"
-        aciklama="Ana sayfa slider ve güven kartlarını düzenleyin."
-      />
-
+    <AdminModulKabuk
+      onizleGoster={false}
+      ustIcerik={
+        <AdminPilSekme
+          sekmeler={[
+            { id: 'liste', etiket: 'Slider Listesi', ikon: <ListeIkon /> },
+            {
+              id: 'editor',
+              etiket: editorEtiket,
+              ikon: gorunum === 'editor' && seciliSlide ? <DuzenlemeIkon /> : <YeniIkon />,
+            },
+            { id: 'kartlar', etiket: 'Güven Kartları', ikon: <KartIkon /> },
+          ]}
+          aktif={gorunum}
+          onDegistir={gorunumDegistir}
+        />
+      }
+    >
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
-      <div className="grid gap-6 xl:grid-cols-3">
-        <div className="space-y-6 xl:col-span-2">
-          <AdminPanelKarti baslik="Sliderlar" altBaslik="Görseller sırayla ana sayfada döner">
-            <div className="ap-hero-ust-ayar grid gap-4 sm:grid-cols-2">
-              <FormAlani etiket="Geçiş Süresi" aciklama="İki slide arası bekleme">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="number"
-                    min={2}
-                    max={60}
-                    className={formInputSinifi}
-                    value={gecisMetin}
-                    onChange={(e) => {
-                      const raw = e.target.value;
-                      setGecisMetin(raw);
-                      const n = Number(raw);
-                      if (raw !== '' && !Number.isNaN(n) && n >= 2 && n <= 60) {
-                        heroGuncelle({ ...hero, gecisSuresiSn: n });
-                      }
-                    }}
-                    onBlur={() => {
-                      const n = Number(gecisMetin);
-                      if (gecisMetin === '' || Number.isNaN(n) || n < 2) {
-                        setGecisMetin(String(HERO_VARSAYILAN_GECIS_SN));
-                        heroGuncelle({ ...hero, gecisSuresiSn: HERO_VARSAYILAN_GECIS_SN });
-                        return;
-                      }
-                      const v = Math.min(60, Math.max(2, n));
-                      setGecisMetin(String(v));
-                      heroGuncelle({ ...hero, gecisSuresiSn: v });
-                    }}
-                  />
-                  <span className="ap-muted shrink-0 text-sm">saniye</span>
-                </div>
-              </FormAlani>
+      {gorunum === 'liste' && (
+        <aside className="ap-sidebar-panel ap-sayfa-liste-panel ap-sayfa-liste-panel--tam">
+          <div className="ap-sidebar-baslik">
+            <div>
+              <h2 className="ap-heading text-sm font-semibold">Hero sliderlar</h2>
+              <p className="ap-muted text-xs">{hero.sliderlar.length} kayıt</p>
             </div>
-
-            <div className="mt-5 flex flex-wrap gap-2 border-b border-[var(--ap-border)] pb-4">
-              {hero.sliderlar.map((s, i) => (
+            <label className="ap-hero-gecis">
+              <span>Geçiş</span>
+              <input
+                type="number"
+                min={2}
+                max={60}
+                className={formInputSinifi}
+                value={gecisMetin}
+                onChange={(e) => gecisYaz(e.target.value)}
+                onBlur={gecisBlur}
+              />
+              <span>sn</span>
+            </label>
+          </div>
+          <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
+            {hero.sliderlar.length === 0 ? (
+              <AdminBosDurum
+                ikon="🏠"
+                baslik="Henüz slider yok"
+                aciklama="Üstten Yeni Slider ile başlayın"
+              />
+            ) : (
+              hero.sliderlar.map((s, i) => (
                 <button
                   key={s.id}
                   type="button"
+                  className={`ap-liste-oge ap-hero-liste-oge${seciliSlideId === s.id ? ' ap-liste-oge-secili' : ''}`}
                   onClick={() => setSeciliSlideId(s.id)}
-                  className={`ap-hero-slide-sekme ${seciliSlide?.id === s.id ? 'ap-hero-slide-sekme-aktif' : ''}`}
                 >
-                  Slider {i + 1}
-                  {!s.aktif && <span className="ml-1 opacity-60">(kapalı)</span>}
+                  {s.gorselUrl ? (
+                    <img src={medyaTamUrl(s.gorselUrl)} alt="" className="ap-hero-liste-kapak" />
+                  ) : (
+                    <span className="ap-hero-liste-kapak ap-hero-liste-kapak--bos" aria-hidden>
+                      🏠
+                    </span>
+                  )}
+                  <span className="min-w-0 flex-1">
+                    <span className="ap-liste-oge-baslik">{s.baslik.trim() || `Slider ${i + 1}`}</span>
+                    <span className="ap-liste-oge-alt">{stilAdi(s.stil)}</span>
+                    <span className="ap-liste-oge-etiketler mt-1.5">
+                      {s.aktif ? (
+                        <AdminDurumEtiketi tur="yayinda">Aktif</AdminDurumEtiketi>
+                      ) : (
+                        <AdminDurumEtiketi tur="pasif">Kapalı</AdminDurumEtiketi>
+                      )}
+                    </span>
+                  </span>
                 </button>
+              ))
+            )}
+          </div>
+        </aside>
+      )}
+
+      {gorunum === 'editor' && seciliSlide && (
+        <SlideDuzenlemeForm
+          slide={seciliSlide}
+          siraNo={hero.sliderlar.findIndex((s) => s.id === seciliSlide.id) + 1}
+          slideGuncelle={slideGuncelle}
+        />
+      )}
+
+      {gorunum === 'kartlar' && (
+        <div className="ap-editor-panel ap-hero-kartlar">
+          <div className="ap-hero-editor-ust">
+            <div>
+              <h2 className="ap-heading text-sm font-semibold">Güven kartları</h2>
+              <p className="ap-muted text-xs">Slider altındaki ikonlu kutular</p>
+            </div>
+            <div className={`ap-hero-aktif-anahtar${hero.kartlarAktif ? ' ap-hero-aktif-anahtar--acik' : ''}`}>
+              <AdminAnahtarDugme
+                etiket="Göster"
+                acik={hero.kartlarAktif}
+                onDegistir={(kartlarAktif) => heroGuncelle({ ...hero, kartlarAktif })}
+              />
+            </div>
+          </div>
+          {hero.kartlarAktif && (
+            <div className="ap-hero-kart-liste">
+              {hero.kartlar.map((kart) => (
+                <div key={kart.id} className="ap-hero-kart-satir">
+                  <input
+                    className={`${formInputSinifi} ap-hero-kart-ikon`}
+                    value={kart.ikon}
+                    onChange={(e) => kartGuncelle(kart.id, { ikon: e.target.value })}
+                    title="İkon"
+                    maxLength={4}
+                  />
+                  <input
+                    className={formInputSinifi}
+                    value={kart.baslik}
+                    onChange={(e) => kartGuncelle(kart.id, { baslik: e.target.value })}
+                    placeholder="Başlık"
+                  />
+                  <input
+                    className={formInputSinifi}
+                    value={kart.aciklama}
+                    onChange={(e) => kartGuncelle(kart.id, { aciklama: e.target.value })}
+                    placeholder="Açıklama"
+                  />
+                  <input
+                    className={formInputSinifi}
+                    value={kart.link ?? ''}
+                    onChange={(e) => kartGuncelle(kart.id, { link: e.target.value })}
+                    placeholder="Link"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => kartSil(kart.id)}
+                    disabled={hero.kartlar.length <= 1}
+                    className="ap-hero-kart-sil"
+                  >
+                    Sil
+                  </button>
+                </div>
               ))}
-              <button type="button" onClick={slideEkle} className="ap-link-btn rounded-lg px-3 py-1.5 text-sm">
-                + Yeni Slider
+              <button type="button" onClick={kartEkle} className="ap-hero-kart-ekle">
+                + Kart ekle
               </button>
             </div>
-
-            {seciliSlide ? (
-              <div className="ap-hero-duzenleme-kart mt-4 rounded-xl border border-[var(--ap-border)] bg-[var(--ap-input-bg)] p-4 sm:p-5">
-                <p className="ap-heading mb-4 text-sm font-semibold">Slider Düzenleme</p>
-                <SlideDuzenlemeForm slide={seciliSlide} slideGuncelle={slideGuncelle} slideSil={slideSil} />
-              </div>
-            ) : (
-              <p className="ap-muted mt-4 text-sm">Henüz slider yok. &quot;+ Yeni Slider&quot; ile ekleyin.</p>
-            )}
-          </AdminPanelKarti>
-
-          {/* Güven kartları */}
-          <AdminPanelKarti baslik="Güven Kartları" altBaslik="Slider altındaki ikonlu kutular">
-            <label className="ap-toggle-kart ap-toggle-yesil mb-4 flex cursor-pointer items-center justify-between">
-              <div>
-                <span className="ap-heading block text-sm font-semibold">Kartları Göster</span>
-                <span className="ap-muted text-xs">Kapalıyken sitede görünmez</span>
-              </div>
-              <button
-                type="button"
-                role="switch"
-                aria-checked={hero.kartlarAktif}
-                onClick={() => heroGuncelle({ ...hero, kartlarAktif: !hero.kartlarAktif })}
-                className={`ap-toggle ${hero.kartlarAktif ? 'ap-toggle-on' : ''}`}
-              >
-                <span className="ap-toggle-thumb" />
-              </button>
-            </label>
-
-            {hero.kartlarAktif && (
-              <div className="space-y-3">
-                {hero.kartlar.map((kart) => (
-                  <div
-                    key={kart.id}
-                    className="space-y-3 rounded-lg border border-[var(--ap-border)] p-3"
-                  >
-                    <div className="grid gap-3 sm:grid-cols-[3rem_1fr_1fr_auto]">
-                      <input
-                        className={`${formInputSinifi} text-center text-xl`}
-                        value={kart.ikon}
-                        onChange={(e) => kartGuncelle(kart.id, { ikon: e.target.value })}
-                        title="Emoji / ikon"
-                        maxLength={4}
-                      />
-                      <input
-                        className={formInputSinifi}
-                        value={kart.baslik}
-                        onChange={(e) => kartGuncelle(kart.id, { baslik: e.target.value })}
-                        placeholder="Başlık"
-                      />
-                      <input
-                        className={formInputSinifi}
-                        value={kart.aciklama}
-                        onChange={(e) => kartGuncelle(kart.id, { aciklama: e.target.value })}
-                        placeholder="Açıklama"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => kartSil(kart.id)}
-                        disabled={hero.kartlar.length <= 1}
-                        className="text-sm text-red-400 disabled:opacity-30"
-                      >
-                        Sil
-                      </button>
-                    </div>
-                    <FormAlani etiket="Link (opsiyonel)">
-                      <LinkYoluAlani
-                        deger={kart.link ?? ''}
-                        onChange={(link) => kartGuncelle(kart.id, { link })}
-                        placeholder="/hizmetler veya https://..."
-                      />
-                    </FormAlani>
-                  </div>
-                ))}
-                <button type="button" onClick={kartEkle} className="ap-link-btn text-sm">
-                  + Kart Ekle
-                </button>
-              </div>
-            )}
-          </AdminPanelKarti>
+          )}
         </div>
+      )}
 
-        <HeroOnizleme hero={hero} seciliSlide={seciliSlide} />
-      </div>
-    </div>
+      <HeroOnizlemeModal
+        acik={onizlemeAcik}
+        hero={hero}
+        seciliSlide={seciliSlide}
+        onKapat={() => setOnizlemeAcik(false)}
+      />
+    </AdminModulKabuk>
   );
 }

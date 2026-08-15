@@ -1,17 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   SeoGenelPanel,
-  SeoMetaTablo,
-  SeoSekmeCubugu,
+  SeoKayitEditorPanel,
+  SeoUrlListesiPanel,
   type SeoSekmeId,
 } from '@/components/admin/seo/SeoBilesenleri';
 import { SeoLinkEkleModal } from '@/components/admin/seo/SeoLinkEkleModal';
+import { SeoOnizlemeModal } from '@/components/admin/seo/SeoOnizlemeModal';
 import {
   AdminModulKabuk,
-  AdminPanelKarti,
   BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
+import { AdminPilSekme } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import {
   kategoriUrlOlustur,
@@ -26,6 +27,32 @@ import {
   type SeoOzet,
   type SeoYonlendirme,
 } from '@/features/admin/seoApi';
+
+function GenelIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3 12h18M12 3a14 14 0 010 18M12 3a14 14 0 000 18" />
+    </svg>
+  );
+}
+
+function ListeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+    </svg>
+  );
+}
+
+function DuzenlemeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+    </svg>
+  );
+}
 
 function sekmeHedefTip(sekme: SeoSekmeId): SeoKayit['tip'] | null {
   if (sekme === 'kategori') return 'kategori';
@@ -61,8 +88,11 @@ function ozettenKayitlar(ozet: SeoOzet, sekme: SeoSekmeId): SeoKayit[] {
   }
 }
 
+type Gorunum = 'liste' | 'editor';
+
 export function SeoYonetimiSayfasi() {
   const [sekme, setSekme] = useState<SeoSekmeId>('genel');
+  const [gorunum, setGorunum] = useState<Gorunum>('liste');
   const [ozet, setOzet] = useState<SeoOzet | null>(null);
   const [kayitlar, setKayitlar] = useState<SeoKayit[]>([]);
   const [yonlendirmeler, setYonlendirmeler] = useState<SeoYonlendirme[]>([]);
@@ -76,11 +106,14 @@ export function SeoYonetimiSayfasi() {
     seoAnahtar: '',
     ogGorselUrl: '',
   });
+  const [seciliKayitId, setSeciliKayitId] = useState<string | null>(null);
+  const [seciliYonlendirmeId, setSeciliYonlendirmeId] = useState<string | null>(null);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [hata, setHata] = useState('');
   const [basari, setBasari] = useState('');
   const [linkModalHedef, setLinkModalHedef] = useState<SeoKayit | null>(null);
+  const [onizlemeAcik, setOnizlemeAcik] = useState(false);
 
   const yukle = useCallback(async () => {
     setYukleniyor(true);
@@ -110,9 +143,7 @@ export function SeoYonetimiSayfasi() {
     setKayitlar(liste);
 
     const hedefTip = sekmeHedefTip(sekme);
-    const yonl = yonlendirmeleriNormalize(ozet.yonlendirmeler).filter(
-      (y) => y.hedefTip === hedefTip
-    );
+    const yonl = yonlendirmeleriNormalize(ozet.yonlendirmeler).filter((y) => y.hedefTip === hedefTip);
     setYonlendirmeler(yonl);
 
     const harita: Record<string, { seoTitle: string; seoDesc: string }> = {};
@@ -168,18 +199,9 @@ export function SeoYonetimiSayfasi() {
   }, [yonlendirmeler, orijinalYonl]);
 
   const tabloKirli = kirliIdler.size > 0 || kirliYonlendirmeIdler.size > 0;
-
-  const sekmeSayilari = useMemo(
-    () =>
-      ozet
-        ? {
-            genel: 1,
-            kategori: ozet.kategoriler.length,
-            'sabit-sayfa': ozet.sayfalar.length,
-          }
-        : undefined,
-    [ozet]
-  );
+  const seciliKayit = kayitlar.find((k) => k.id === seciliKayitId) ?? null;
+  const urlSekmesi = sekme !== 'genel';
+  const editorAcik = urlSekmesi && gorunum === 'editor' && !!seciliKayit;
 
   const genelKaydet = useCallback(async () => {
     setKaydediliyor(true);
@@ -231,6 +253,7 @@ export function SeoYonetimiSayfasi() {
       });
       setOzet(guncel);
       setBasari('SEO ve 301 yönlendirmeleri kaydedildi.');
+      setSeciliYonlendirmeId(null);
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Kayıt başarısız');
       throw err;
@@ -239,22 +262,74 @@ export function SeoYonetimiSayfasi() {
     }
   }, [tabloKirli, kayitlar, kirliIdler, yonlendirmeler, kirliYonlendirmeIdler]);
 
+  const kaydet = useCallback(async () => {
+    if (sekme === 'genel') await genelKaydet();
+    else await topluKaydet();
+  }, [sekme, genelKaydet, topluKaydet]);
+
+  const duzenlemeyeGit = useCallback(() => {
+    if (!seciliKayitId) return;
+    setGorunum('editor');
+    setSeciliYonlendirmeId(null);
+    setBasari('');
+    setHata('');
+  }, [seciliKayitId]);
+
+  const ekle = useCallback(() => {
+    if (!seciliKayit) return;
+    setLinkModalHedef(seciliKayit);
+  }, [seciliKayit]);
+
+  const sil = useCallback(() => {
+    if (!seciliYonlendirmeId) return;
+    setYonlendirmeler((prev) =>
+      prev.map((y) => (y.id === seciliYonlendirmeId ? { ...y, silindi: true } : y))
+    );
+    setSeciliYonlendirmeId(null);
+  }, [seciliYonlendirmeId]);
+
+  const onizle = useCallback(() => setOnizlemeAcik(true), []);
+
   useModulAksiyonlari(
-    { kaydet: sekme === 'genel' ? genelKaydet : topluKaydet },
     {
-      kaydet:
-        !kaydediliyor && (sekme === 'genel' || tabloKirli),
+      kaydet,
+      ekle,
+      sil,
+      duzenle: duzenlemeyeGit,
+      onizle,
+    },
+    {
+      kaydet: !kaydediliyor && (sekme === 'genel' || tabloKirli),
+      ekle: editorAcik && !kaydediliyor,
+      sil: editorAcik && !!seciliYonlendirmeId && !kaydediliyor,
+      duzenle: urlSekmesi && gorunum === 'liste' && !!seciliKayitId && !kaydediliyor,
+      onizle: sekme === 'genel' || !!seciliKayit,
     }
   );
 
   function sekmeDegistir(yeni: SeoSekmeId) {
+    if (yeni === sekme) {
+      if (gorunum === 'editor') setGorunum('liste');
+      return;
+    }
     setSekme(yeni);
+    setGorunum('liste');
+    setSeciliKayitId(null);
+    setSeciliYonlendirmeId(null);
     setBasari('');
     setHata('');
   }
 
-  function kayitDegistir(id: string, alan: 'seoTitle' | 'seoDesc', deger: string) {
-    setKayitlar((prev) => prev.map((k) => (k.id === id ? { ...k, [alan]: deger } : k)));
+  function kayitSec(kayit: SeoKayit) {
+    setSeciliKayitId(kayit.id);
+    setSeciliYonlendirmeId(null);
+    setBasari('');
+    setHata('');
+  }
+
+  function kayitDegistir(alan: 'seoTitle' | 'seoDesc', deger: string) {
+    if (!seciliKayitId) return;
+    setKayitlar((prev) => prev.map((k) => (k.id === seciliKayitId ? { ...k, [alan]: deger } : k)));
   }
 
   function yonlendirmeDegistir(id: string, alan: 'seoTitle' | 'seoDesc', deger: string) {
@@ -262,9 +337,8 @@ export function SeoYonetimiSayfasi() {
   }
 
   function yonlendirmeSil(id: string) {
-    setYonlendirmeler((prev) =>
-      prev.map((y) => (y.id === id ? { ...y, silindi: true } : y))
-    );
+    setYonlendirmeler((prev) => prev.map((y) => (y.id === id ? { ...y, silindi: true } : y)));
+    if (seciliYonlendirmeId === id) setSeciliYonlendirmeId(null);
   }
 
   function linkEkle(deger: { kaynakUrl: string; seoTitle: string; seoDesc: string }) {
@@ -292,9 +366,17 @@ export function SeoYonetimiSayfasi() {
     setHata('');
   }
 
+  const onizlemeKayit = sekme === 'genel' ? null : seciliKayit;
+  const onizlemeBaslik = onizlemeKayit?.seoTitle ?? genelForm.seoBaslik;
+  const onizlemeAciklama = onizlemeKayit?.seoDesc ?? genelForm.seoAciklama;
+  const onizlemeUrl = onizlemeKayit?.url ?? 'siteniz.com';
+
+  const kategoriEtiket = sekme === 'kategori' && gorunum === 'editor' ? 'Düzenleme' : 'Kategori';
+  const sayfaEtiket = sekme === 'sabit-sayfa' && gorunum === 'editor' ? 'Düzenleme' : 'Sabit Sayfa';
+
   if (yukleniyor) {
     return (
-      <AdminModulKabuk baslik="SEO Ayarları" onizleGoster={false}>
+      <AdminModulKabuk onizleGoster={false}>
         <YukleniyorDurumu mesaj="SEO verileri yükleniyor..." />
       </AdminModulKabuk>
     );
@@ -302,45 +384,70 @@ export function SeoYonetimiSayfasi() {
 
   return (
     <AdminModulKabuk
-      baslik="SEO Ayarları"
-      aciklama="Title, description ve 301 yönlendirmelerini yönetin. Yeşil + ile 301 ekleyin; kaydetmek için alttaki Kaydet veya üst aksiyon çubuğunu kullanın."
-      onizleGoster
+      onizleGoster={false}
+      ustIcerik={
+        <AdminPilSekme
+          sekmeler={[
+            { id: 'genel', etiket: 'Genel', ikon: <GenelIkon /> },
+            {
+              id: 'kategori',
+              etiket: kategoriEtiket,
+              ikon: sekme === 'kategori' && gorunum === 'editor' ? <DuzenlemeIkon /> : <ListeIkon />,
+            },
+            {
+              id: 'sabit-sayfa',
+              etiket: sayfaEtiket,
+              ikon: sekme === 'sabit-sayfa' && gorunum === 'editor' ? <DuzenlemeIkon /> : <ListeIkon />,
+            },
+          ]}
+          aktif={sekme}
+          onDegistir={sekmeDegistir}
+        />
+      }
     >
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
-      <SeoSekmeCubugu aktif={sekme} onDegistir={sekmeDegistir} sayilar={sekmeSayilari} />
+      {sekme === 'genel' && <SeoGenelPanel form={genelForm} onChange={setGenelForm} />}
 
-      <div className="mt-5">
-        {sekme === 'genel' && <SeoGenelPanel form={genelForm} onChange={setGenelForm} />}
-        {sekme !== 'genel' && (
-          <AdminPanelKarti
-            baslik={sekme === 'kategori' ? 'Kategori SEO' : 'Sabit Sayfa SEO'}
-            altBaslik="301 yönlendirmeleri ana URL altında listelenir"
-          >
-            <SeoMetaTablo
-              kayitlar={kayitlar}
-              yonlendirmeler={yonlendirmeler}
-              kirliIdler={kirliIdler}
-              kirliYonlendirmeIdler={kirliYonlendirmeIdler}
-              kaydediliyor={kaydediliyor}
-              onDegistir={kayitDegistir}
-              onYonlendirmeDegistir={yonlendirmeDegistir}
-              onYonlendirmeSil={yonlendirmeSil}
-              onLinkEkleTikla={setLinkModalHedef}
-              onTopluKaydet={() => void topluKaydet()}
-              kaydetAktif={tabloKirli}
-            />
-          </AdminPanelKarti>
-        )}
-      </div>
+      {urlSekmesi && gorunum === 'liste' && (
+        <SeoUrlListesiPanel
+          kayitlar={kayitlar}
+          yonlendirmeler={yonlendirmeler}
+          kirliIdler={kirliIdler}
+          kirliYonlendirmeIdler={kirliYonlendirmeIdler}
+          seciliId={seciliKayitId}
+          baslik={sekme === 'kategori' ? 'Kategori SEO' : 'Sayfa SEO'}
+          onSec={kayitSec}
+        />
+      )}
+
+      {editorAcik && seciliKayit && (
+        <SeoKayitEditorPanel
+          kayit={seciliKayit}
+          yonlendirmeler={yonlendirmeler}
+          seciliYonlendirmeId={seciliYonlendirmeId}
+          onDegistir={kayitDegistir}
+          onYonlendirmeDegistir={yonlendirmeDegistir}
+          onYonlendirmeSec={setSeciliYonlendirmeId}
+          onYonlendirmeSil={yonlendirmeSil}
+        />
+      )}
 
       <SeoLinkEkleModal
         acik={!!linkModalHedef}
         hedefUrl={linkModalHedef?.url ?? '/'}
         onKapat={() => setLinkModalHedef(null)}
         onEkle={linkEkle}
+      />
+
+      <SeoOnizlemeModal
+        acik={onizlemeAcik}
+        baslik={onizlemeBaslik ?? ''}
+        aciklama={onizlemeAciklama ?? ''}
+        url={onizlemeUrl}
+        onKapat={() => setOnizlemeAcik(false)}
       />
     </AdminModulKabuk>
   );

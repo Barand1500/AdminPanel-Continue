@@ -1,19 +1,16 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import {
+  bosKategoriForm,
+  KategoriEditorPanel,
+  KategoriListesiPanel,
+  kategoridenForm,
+} from '@/components/admin/kategori/KategoriBilesenleri';
 import {
   AdminModulKabuk,
   BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
-import {
-  AdminAnahtarDugme,
-  AdminAramaKutusu,
-  AdminBosDurum,
-  AdminDurumEtiketi,
-  AdminFormBolumu,
-} from '@/components/admin/ortak/AdminFormBilesenleri';
-import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
-import { GorselAlan } from '@/components/form/GorselAlan';
-import { KategoriMenuOnizleme } from '@/components/admin/kategori/KategoriMenuOnizleme';
+import { AdminPilSekme } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import {
   navKategoriGuncelle,
@@ -22,111 +19,47 @@ import {
   navKategorileriGetir,
 } from '@/features/admin/navKategoriApi';
 import type { NavKategoriFormDegeri, NavKategoriKayit } from '@/types/navKategori';
-import { navKategoriAgaciOlustur, navKategoriDerinlik, navKategoriUstSecenekleri } from '@/utils/navKategoriAgaci';
-import { kategoriAcilisModuNormalize } from '@/types/header';
+import { navKategoriDerinlik } from '@/utils/navKategoriAgaci';
 import { headerAyarlariBirlestir } from '@/types/header';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 
-const bosForm: NavKategoriFormDegeri = {
-  baslik: '',
-  slug: '',
-  yol: '',
-  gorselUrl: '',
-  ikon: '',
-  aktif: true,
-  sira: 0,
-  ustKategoriId: null,
-};
+type Gorunum = 'liste' | 'editor';
 
-function kategoridenForm(k: NavKategoriKayit): NavKategoriFormDegeri {
-  return {
-    baslik: k.baslik,
-    slug: k.slug,
-    yol: k.yol ?? '',
-    gorselUrl: k.gorselUrl ?? '',
-    ikon: k.ikon ?? '',
-    aktif: k.aktif,
-    sira: k.sira,
-    ustKategoriId: k.ustKategoriId,
-  };
-}
-
-function KategoriAgacSatiri({
-  kategori,
-  seciliId,
-  girinti,
-  onSec,
-}: {
-  kategori: NavKategoriKayit;
-  seciliId: string | null;
-  girinti: number;
-  onSec: (k: NavKategoriKayit) => void;
-}) {
+function ListeIkon() {
   return (
-    <button
-      type="button"
-      onClick={() => onSec(kategori)}
-      className={`ap-liste-oge mb-1 w-full text-left ${seciliId === kategori.id ? 'ap-liste-oge-secili' : ''}`}
-      style={girinti > 0 ? { marginLeft: `${girinti * 14}px` } : undefined}
-    >
-      <p className="ap-liste-oge-baslik">{kategori.baslik}</p>
-      <p className="ap-liste-oge-alt">/{kategori.slug}</p>
-      <div className="ap-liste-oge-etiketler">
-        {kategori.aktif ? (
-          <AdminDurumEtiketi tur="yayinda">Aktif</AdminDurumEtiketi>
-        ) : (
-          <AdminDurumEtiketi tur="taslak">Pasif</AdminDurumEtiketi>
-        )}
-        {girinti > 0 && <AdminDurumEtiketi tur="bilgi">Alt</AdminDurumEtiketi>}
-      </div>
-    </button>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+    </svg>
   );
 }
 
-function KategoriAgacListesi({
-  kayitlar,
-  ustId,
-  seciliId,
-  girinti,
-  onSec,
-}: {
-  kayitlar: NavKategoriKayit[];
-  ustId: string | null;
-  seciliId: string | null;
-  girinti: number;
-  onSec: (k: NavKategoriKayit) => void;
-}) {
-  const cocuklar = kayitlar
-    .filter((k) => (ustId ? k.ustKategoriId === ustId : !k.ustKategoriId))
-    .sort((a, b) => a.sira - b.sira || a.baslik.localeCompare(b.baslik, 'tr'));
-
+function YeniIkon() {
   return (
-    <>
-      {cocuklar.map((k) => (
-        <div key={k.id}>
-          <KategoriAgacSatiri kategori={k} seciliId={seciliId} girinti={girinti} onSec={onSec} />
-          <KategoriAgacListesi
-            kayitlar={kayitlar}
-            ustId={k.id}
-            seciliId={seciliId}
-            girinti={girinti + 1}
-            onSec={onSec}
-          />
-        </div>
-      ))}
-    </>
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function DuzenlemeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+    </svg>
   );
 }
 
 export function KategoriYonetimiSayfasi() {
-  const { headerAyarlari, headerGuncelle, kaydet: siteAyarlariKaydet, kaydediliyor: siteKaydediliyor } = useSiteAyarlariYonetimi();
+  const { headerAyarlari, headerGuncelle, kaydet: siteAyarlariKaydet, kaydediliyor: siteKaydediliyor } =
+    useSiteAyarlariYonetimi();
   const header = headerAyarlariBirlestir(headerAyarlari ? { headerAyarlariJson: headerAyarlari } : null);
   const kategoriMenuAcik = header.kategori?.menuGoster !== false;
 
   const [kategoriler, setKategoriler] = useState<NavKategoriKayit[]>([]);
-  const [form, setForm] = useState<NavKategoriFormDegeri>(bosForm);
+  const [form, setForm] = useState<NavKategoriFormDegeri>(bosKategoriForm);
   const [seciliId, setSeciliId] = useState<string | null>(null);
-  const [arama, setArama] = useState('');
+  const [gorunum, setGorunum] = useState<Gorunum>('liste');
   const [yukleniyor, setYukleniyor] = useState(true);
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [hata, setHata] = useState('');
@@ -152,22 +85,17 @@ export function KategoriYonetimiSayfasi() {
     void yukle();
   }, [yukle]);
 
-  const filtreli = useMemo(() => {
-    const q = arama.trim().toLowerCase();
-    if (!q) return kategoriler;
-    return kategoriler.filter(
-      (k) => k.baslik.toLowerCase().includes(q) || k.slug.toLowerCase().includes(q)
-    );
-  }, [kategoriler, arama]);
-
-  const onizlemeAgaci = useMemo(() => navKategoriAgaciOlustur(kategoriler, true), [kategoriler]);
-
-  const yeniBaslat = useCallback(() => {
+  const formuSifirla = useCallback(() => {
     setSeciliId(null);
-    setForm(bosForm);
+    setForm(bosKategoriForm);
     setHata('');
     setBasari('');
   }, []);
+
+  const yeniBaslat = useCallback(() => {
+    formuSifirla();
+    setGorunum('editor');
+  }, [formuSifirla]);
 
   const altEkle = useCallback(
     (ust: NavKategoriKayit) => {
@@ -177,9 +105,10 @@ export function KategoriYonetimiSayfasi() {
       }
       setSeciliId(null);
       const altSayi = kategoriler.filter((k) => k.ustKategoriId === ust.id).length;
-      setForm({ ...bosForm, ustKategoriId: ust.id, sira: altSayi });
+      setForm({ ...bosKategoriForm, ustKategoriId: ust.id, sira: altSayi });
       setHata('');
       setBasari('');
+      setGorunum('editor');
     },
     [kategoriler]
   );
@@ -206,6 +135,7 @@ export function KategoriYonetimiSayfasi() {
       setKategoriler(await navKategorileriGetir());
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Kayıt başarısız');
+      throw err;
     } finally {
       setKaydediliyor(false);
     }
@@ -217,14 +147,21 @@ export function KategoriYonetimiSayfasi() {
     try {
       await navKategoriSil(seciliId);
       setBasari('Kategori silindi.');
-      yeniBaslat();
+      formuSifirla();
+      setGorunum('liste');
       await yukle();
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Silme başarısız');
+      throw err;
     } finally {
       setKaydediliyor(false);
     }
-  }, [seciliId, yeniBaslat, yukle]);
+  }, [seciliId, formuSifirla, yukle]);
+
+  const duzenlemeyeGit = useCallback(() => {
+    if (!seciliId) return;
+    setGorunum('editor');
+  }, [seciliId]);
 
   useModulAksiyonlari(
     {
@@ -235,12 +172,14 @@ export function KategoriYonetimiSayfasi() {
         if (secili) altEkle(secili);
       },
       sil,
+      duzenle: duzenlemeyeGit,
     },
     {
-      kaydet: !kaydediliyor,
+      kaydet: gorunum === 'editor' && !kaydediliyor && Boolean(form.baslik.trim()),
       ekle: true,
-      altEkle: !!seciliId && !kaydediliyor,
+      altEkle: !!seciliId && gorunum === 'liste' && !kaydediliyor,
       sil: !!seciliId && !kaydediliyor,
+      duzenle: !!seciliId && gorunum === 'liste' && !kaydediliyor,
     }
   );
 
@@ -251,7 +190,14 @@ export function KategoriYonetimiSayfasi() {
     setBasari('');
   }
 
-  const ustSecenekleri = navKategoriUstSecenekleri(kategoriler, seciliId ?? undefined);
+  function gorunumDegistir(id: Gorunum) {
+    if (id === gorunum) return;
+    if (id === 'liste') {
+      setGorunum('liste');
+      return;
+    }
+    yeniBaslat();
+  }
 
   const kategoriMenuToggle = useCallback(
     async (acik: boolean) => {
@@ -274,153 +220,60 @@ export function KategoriYonetimiSayfasi() {
     [headerAyarlari, headerGuncelle, siteAyarlariKaydet]
   );
 
-  if (yukleniyor) return <YukleniyorDurumu mesaj="Kategoriler yükleniyor..." />;
+  const editorEtiket =
+    gorunum === 'editor' && seciliId
+      ? 'Düzenleme'
+      : gorunum === 'editor' && form.ustKategoriId
+        ? 'Yeni Alt'
+        : 'Yeni Kategori';
+
+  if (yukleniyor) {
+    return (
+      <AdminModulKabuk onizleGoster={false}>
+        <YukleniyorDurumu mesaj="Kategoriler yükleniyor..." />
+      </AdminModulKabuk>
+    );
+  }
 
   return (
     <AdminModulKabuk
-      baslik="Kategori Yönetimi"
-      aciklama="Header’daki Tüm Kategoriler menüsünü buradan yönetin. En fazla 3 seviye (ana → alt → alt-alt)."
+      onizleGoster={false}
+      ustIcerik={
+        <AdminPilSekme
+          sekmeler={[
+            { id: 'liste', etiket: 'Kategori Listesi', ikon: <ListeIkon /> },
+            {
+              id: 'editor',
+              etiket: editorEtiket,
+              ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniIkon />,
+            },
+          ]}
+          aktif={gorunum}
+          onDegistir={gorunumDegistir}
+        />
+      }
     >
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
 
-      <div className="ap-split-layout ap-kategori-yonetim-layout">
-        <aside className="ap-sidebar-panel">
-          <div className="ap-sidebar-baslik">
-            <div>
-              <h2 className="ap-heading text-sm font-semibold">Kategori Listesi</h2>
-              <p className="ap-muted text-xs">{kategoriler.length} kategori</p>
-            </div>
-          </div>
-          <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Kategori ara..." />
-          <div className="ap-scroll ap-sidebar-icerik">
-            {filtreli.length === 0 ? (
-              <AdminBosDurum ikon="📂" baslik="Henüz kategori yok" aciklama="Alttaki Yeni Ekle ile başlayın" />
-            ) : (
-              <KategoriAgacListesi
-                kayitlar={filtreli}
-                ustId={null}
-                seciliId={seciliId}
-                girinti={0}
-                onSec={kategoriSec}
-              />
-            )}
-          </div>
-        </aside>
-
-        <div className="ap-editor-panel ap-kategori-editor">
-          <AdminFormBolumu
-            baslik="Tüm Kategoriler Menüsü"
-            aciklama="Kapalıyken header'da kategori butonu görünmez. Açıkken yalnızca aktif kategoriler listelenir."
-          >
-            <AdminAnahtarDugme
-              etiket="Tüm Kategoriler menüsünü göster"
-              acik={kategoriMenuAcik}
-              onDegistir={(v) => void kategoriMenuToggle(v)}
-            />
-            {siteKaydediliyor && <p className="ap-muted text-xs">Menü ayarı kaydediliyor…</p>}
-          </AdminFormBolumu>
-
-          <AdminFormBolumu
-            baslik={seciliId ? 'Kategori Düzenle' : form.ustKategoriId ? 'Yeni Alt Kategori' : 'Yeni Kategori'}
-            aciklama="Kaydet ile veritabanına yazılır. Pasif kategoriler sitede görünmez."
-          >
-            <div className="ap-kategori-form-grid">
-              <FormAlani etiket="Kategori Adı">
-                <input
-                  className={formInputSinifi}
-                  value={form.baslik}
-                  onChange={(e) => setForm({ ...form, baslik: e.target.value })}
-                  placeholder="Örn: Bilgisayar"
-                />
-              </FormAlani>
-              <FormAlani etiket="Slug" aciklama="Boş bırakılırsa otomatik oluşur">
-                <input
-                  className={formInputSinifi}
-                  value={form.slug}
-                  onChange={(e) => setForm({ ...form, slug: e.target.value })}
-                  placeholder="bilgisayar"
-                />
-              </FormAlani>
-              <FormAlani etiket="Link (yol)" aciklama="Boşsa /kategori-slug yolu kullanılır">
-                <input
-                  className={formInputSinifi}
-                  value={form.yol}
-                  onChange={(e) => setForm({ ...form, yol: e.target.value })}
-                  placeholder="/hizmetler"
-                />
-              </FormAlani>
-              <FormAlani etiket="Üst kategori">
-                <select
-                  className={formSelectSinifi}
-                  value={form.ustKategoriId ?? ''}
-                  onChange={(e) =>
-                    setForm({ ...form, ustKategoriId: e.target.value || null })
-                  }
-                >
-                  <option value="">— Ana kategori (üst yok) —</option>
-                  {ustSecenekleri.map((u) => (
-                    <option key={u.id} value={u.id}>
-                      {u.baslik}
-                    </option>
-                  ))}
-                </select>
-              </FormAlani>
-              <FormAlani etiket="Sıra">
-                <input
-                  type="number"
-                  min={0}
-                  className={formInputSinifi}
-                  value={form.sira}
-                  onChange={(e) => setForm({ ...form, sira: Number(e.target.value) || 0 })}
-                />
-              </FormAlani>
-              <FormAlani etiket="İkon (emoji)" aciklama="Opsiyonel">
-                <input
-                  className={formInputSinifi}
-                  value={form.ikon}
-                  onChange={(e) => setForm({ ...form, ikon: e.target.value })}
-                  placeholder="💻"
-                />
-              </FormAlani>
-            </div>
-            <div className="ap-kategori-form-tam">
-              <GorselAlan
-                etiket="Kategori Görseli"
-                deger={form.gorselUrl}
-                onChange={(v) => setForm({ ...form, gorselUrl: v })}
-              />
-            </div>
-            <AdminAnahtarDugme
-              etiket="Aktif (sitede göster)"
-              acik={form.aktif}
-              onDegistir={(aktif: boolean) => setForm({ ...form, aktif })}
-            />
-          </AdminFormBolumu>
-
-          <AdminFormBolumu
-            baslik="Menü Önizleme"
-            aciklama={
-              !kategoriMenuAcik
-                ? 'Menü kapalı — sitede Tüm Kategoriler butonu görünmez.'
-                : `Header’daki “${header.kategori?.baslikMetni ?? 'Tüm Kategoriler'}” menüsü böyle görünür. Açılış modu Header Yönetimi’nden değişir.`
-            }
-          >
-            {!kategoriMenuAcik ? (
-              <div className="ap-kategori-onizleme-bos rounded-xl border border-dashed border-[var(--ap-border)] p-6 text-center">
-                <p className="ap-muted text-sm">Kategori menüsü kapalı.</p>
-              </div>
-            ) : (
-              <KategoriMenuOnizleme
-                kategoriler={onizlemeAgaci}
-                baslikMetni={header.kategori?.baslikMetni}
-                acilisModu={kategoriAcilisModuNormalize(header.kategori?.acilisModu)}
-              />
-            )}
-          </AdminFormBolumu>
-        </div>
-      </div>
+      {gorunum === 'liste' ? (
+        <KategoriListesiPanel
+          kategoriler={kategoriler}
+          seciliId={seciliId}
+          menuAcik={kategoriMenuAcik}
+          menuKaydediliyor={siteKaydediliyor}
+          onSec={kategoriSec}
+          onMenuToggle={(v) => void kategoriMenuToggle(v)}
+        />
+      ) : (
+        <KategoriEditorPanel
+          form={form}
+          seciliId={seciliId}
+          kategoriler={kategoriler}
+          onChange={setForm}
+        />
+      )}
     </AdminModulKabuk>
   );
 }
