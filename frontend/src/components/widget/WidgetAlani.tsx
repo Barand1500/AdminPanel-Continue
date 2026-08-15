@@ -1,4 +1,5 @@
 import type { Widget } from '@/types/site';
+import { kurumsalHeroProxyMi, kurumsalHeroWidgetNormalize } from '@/utils/kurumsalHeroProxy';
 import { SliderWidget } from './SliderWidget';
 import { HizmetKartlariWidget } from './HizmetKartlariWidget';
 import { ReferanslarWidget } from './ReferanslarWidget';
@@ -53,6 +54,10 @@ interface WidgetRenderProps {
 
 export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
   if (!widget.aktif && !onizleme) return null;
+
+  if (kurumsalHeroProxyMi(widget)) {
+    return <KurumsalHeroWidget widget={kurumsalHeroWidgetNormalize(widget)} onizleme={onizleme} />;
+  }
 
   const inner = (() => {
     switch (widget.tip) {

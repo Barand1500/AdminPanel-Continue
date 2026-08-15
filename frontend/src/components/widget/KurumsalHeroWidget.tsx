@@ -6,7 +6,6 @@ import {
   kurumsalHeroConfigOku,
   type KurumsalHeroSlayt,
 } from '@/types/kurumsalHero';
-import { useKurumsalHeroOverlay } from '@/contexts/KurumsalHeroOverlayContext';
 
 interface KurumsalHeroWidgetProps {
   widget: Widget;
@@ -73,19 +72,12 @@ export function KurumsalHeroWidget({ widget, onizleme }: KurumsalHeroWidgetProps
   const kh = kurumsalHeroConfigOku(cfg);
   const slaytlar = kh.slaytlar.filter((s) => s.aktif && s.arkaPlanUrl?.trim());
   const [aktif, setAktif] = useState(0);
-  const overlay = useKurumsalHeroOverlay();
   const sureMs = Math.max(2000, (kh.gecisSuresiSn ?? 6) * 1000);
   const yukseklik = kh.gorunum.yukseklik ?? '85vh';
 
   useEffect(() => {
     setAktif(0);
   }, [slaytlar.length, widget.id]);
-
-  useEffect(() => {
-    if (onizleme || !kh.headerOverlay) return;
-    overlay.activate({ yukseklik, ustBantGoster: kh.ustBantGoster });
-    return () => overlay.deactivate();
-  }, [onizleme, kh.headerOverlay, kh.ustBantGoster, yukseklik, overlay.activate, overlay.deactivate]);
 
   useEffect(() => {
     if (slaytlar.length <= 1) return;

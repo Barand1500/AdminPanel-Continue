@@ -1,4 +1,4 @@
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { Outlet, useMatches } from 'react-router-dom';
 import { SayfaModalProvider } from '@/contexts/SayfaModalContext';
 import { SiteDilProvider } from '@/contexts/SiteDilContext';
@@ -25,6 +25,10 @@ import { useAktifEklentiler } from '@/hooks/useAktifEklentiler';
 import { KonumluSliderKatman } from '@/components/konumluSlider/KonumluSliderKatman';
 import { useAktifSayfaId } from '@/hooks/useAktifSayfaId';
 import { KurumsalHeroOverlayProvider, useKurumsalHeroOverlay } from '@/contexts/KurumsalHeroOverlayContext';
+import {
+  kurumsalHeroOverlayAyarlariBul,
+  kurumsalHeroSayfaWidgetBul,
+} from '@/utils/kurumsalHeroYardimci';
 
 function SiteLayoutIcerik() {
   const { veri, yukleniyor } = useSiteVerisi();
@@ -44,6 +48,20 @@ function SiteLayoutIcerik() {
   const aktifSayfaId = useAktifSayfaId(veri.sayfalar);
   const konumluSliderlar = veri.konumluSliderlar ?? [];
   const overlay = useKurumsalHeroOverlay();
+
+  const kurumsalHeroSayfa = useMemo(
+    () => kurumsalHeroSayfaWidgetBul(veri.widgetlar, aktifSayfaId),
+    [veri.widgetlar, aktifSayfaId]
+  );
+
+  useEffect(() => {
+    const ayar = kurumsalHeroOverlayAyarlariBul(kurumsalHeroSayfa);
+    if (!ayar) {
+      overlay.deactivate();
+      return;
+    }
+    overlay.activate(ayar);
+  }, [kurumsalHeroSayfa, overlay.activate, overlay.deactivate]);
 
   useSiteTemaUygula(site.ayarlar, site.ad);
 
