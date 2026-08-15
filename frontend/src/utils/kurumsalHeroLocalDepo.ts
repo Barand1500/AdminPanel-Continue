@@ -150,20 +150,18 @@ export function kurumsalHeroFormdanYerelWidget(
   });
 }
 
-/** API widget listesine yerel Kurumsal Hero kayitlarini birlestirir. */
+/** API widget listesine yerel Kurumsal Hero kayitlarini birlestirir (yedek). */
 export function kurumsalHeroYerelWidgetlariBirlestir(widgetlar: AdminWidget[]): AdminWidget[] {
-  if (!kurumsalHeroYerelMod()) return widgetlar;
   const apiKhHaric = widgetlar.filter((w) => w.tip !== 'KURUMSAL_HERO');
-  return [...apiKhHaric, ...kurumsalHeroYerelWidgetlariGetir()].sort(
-    (a, b) => a.sira - b.sira || a.ad.localeCompare(b.ad, 'tr')
-  );
+  const yerel = kurumsalHeroYerelWidgetlariGetir();
+  if (yerel.length === 0) return widgetlar;
+  return [...apiKhHaric, ...yerel].sort((a, b) => a.sira - b.sira || a.ad.localeCompare(b.ad, 'tr'));
 }
 
-/** Site verisine yerel Kurumsal Hero widgetlarini ekler. */
+/** Site verisine yerel Kurumsal Hero widgetlarini ekler (yedek). */
 export function kurumsalHeroYerelSiteWidgetlariBirlestir(widgetlar: Widget[]): Widget[] {
-  if (!kurumsalHeroYerelMod()) return widgetlar;
   const apiKhHaric = widgetlar.filter((w) => w.tip !== 'KURUMSAL_HERO');
-  return [...apiKhHaric, ...kurumsalHeroYerelSiteWidgetlariGetir()].sort(
-    (a, b) => a.sira - b.sira || a.ad.localeCompare(b.ad, 'tr')
-  );
+  const yerel = kurumsalHeroYerelSiteWidgetlariGetir();
+  if (yerel.length === 0) return widgetlar;
+  return [...apiKhHaric, ...yerel].sort((a, b) => a.sira - b.sira || a.ad.localeCompare(b.ad, 'tr'));
 }

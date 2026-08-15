@@ -3,6 +3,7 @@ import { konumluSliderConfigOku } from '@/types/konumluSlider';
 import { bosSiteVerisi } from '@/data/bosSiteVerisi';
 import { jsonYanitOku } from '@/utils/jsonFetch';
 import { kurumsalHeroYerelSiteWidgetlariBirlestir } from '@/utils/kurumsalHeroLocalDepo';
+import { kurumsalHeroWidgetlariNormalize } from '@/utils/kurumsalHeroProxy';
 
 const API_URL = import.meta.env.VITE_API_URL ?? '/api';
 const SITE_SLUG = import.meta.env.VITE_SITE_SLUG ?? 'demo';
@@ -20,7 +21,9 @@ export async function siteVerisiGetir(signal?: AbortSignal): Promise<SitePublicD
       ...veri,
       site: { ...bosSiteVerisi.site, ...veri.site },
       sayfalar: veri.sayfalar ?? [],
-      widgetlar: kurumsalHeroYerelSiteWidgetlariBirlestir(veri.widgetlar ?? []),
+      widgetlar: kurumsalHeroYerelSiteWidgetlariBirlestir(
+        kurumsalHeroWidgetlariNormalize(veri.widgetlar ?? []),
+      ),
       bloglar: veri.bloglar ?? [],
       navKategoriler: (veri.navKategoriler ?? []).map((k) => ({
         ...k,

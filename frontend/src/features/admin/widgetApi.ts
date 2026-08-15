@@ -14,11 +14,17 @@ import {
   kurumsalHeroYerelIdMi,
   kurumsalHeroYerelKayitId,
   kurumsalHeroYerelKayitVarMi,
-  kurumsalHeroYerelMod,
   kurumsalHeroYerelOlustur,
   kurumsalHeroYerelSil,
   kurumsalHeroYerelWidgetlariBirlestir,
 } from '@/utils/kurumsalHeroLocalDepo';
+import {
+  KURUMSAL_HERO_PROXY_TIP,
+  kurumsalHeroApiPayloadDonustur,
+  kurumsalHeroApiPayloadGerekli,
+  kurumsalHeroWidgetNormalize,
+  kurumsalHeroWidgetlariNormalize,
+} from '@/utils/kurumsalHeroProxy';
 
 function widgetAdUret(form: WidgetFormDegeri) {
   const ad = form.ad.trim();
@@ -91,6 +97,11 @@ function payloadHazirla(form: WidgetFormDegeri, guncelleme = false) {
   };
 }
 
+function apiPayloadHazirla(form: WidgetFormDegeri, guncelleme = false) {
+  const payload = payloadHazirla(form, guncelleme);
+  return kurumsalHeroApiPayloadGerekli(payload) ? kurumsalHeroApiPayloadDonustur(payload) : payload;
+}
+
 function authHeaders() {
   const token = tokenAl();
   if (!token) {
@@ -102,75 +113,83 @@ function authHeaders() {
   };
 }
 
+function adminWidgetApiNormalize(widget: AdminWidget): AdminWidget {
+  return kurumsalHeroWidgetNormalize(adminWidgetNormalize(widget));
+}
+
 export async function widgetlariGetir(tip?: string): Promise<AdminWidget[]> {
-  const query = tip ? `?tip=${encodeURIComponent(tip)}` : '';
+  const apiTip = tip === 'KURUMSAL_HERO' ? KURUMSAL_HERO_PROXY_TIP : tip;
+  const query = apiTip ? `?tip=${encodeURIComponent(apiTip)}` : '';
   const yanit = await fetch(`${API_URL}/admin/widgetlar${query}`, {
     headers: authHeaders(),
   });
   const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widgetlar?: AdminWidget[] }>(yanit);
   if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widgetlar alinamadi'));
-  const apiWidgetlar = (veri.widgetlar as AdminWidget[]).map(adminWidgetNormalize);
+  const apiWidgetlar = kurumsalHeroWidgetlariNormalize(
+    (veri.widgetlar as AdminWidget[]).map(adminWidgetNormalize),
+  );
   const birlesik = kurumsalHeroYerelWidgetlariBirlestir(apiWidgetlar);
   if (!tip) return birlesik;
   return birlesik.filter((w) => w.tip === tip);
 }
 
+async function kurumsalHeroYerelKaydet(
+  form: WidgetFormDegeri,
+  payload: Record<string, unknown>,
+  id?: string,
+): Promise<AdminWidget> {
+  const yerelId = id ? kurumsalHeroYerelKayitId(id) : undefined;
+  const taslak = kurumsalHeroFormdanYerelWidget(form, payload, yerelId);
+  if (id && kurumsalHeroYerelKayitVarMi(id)) {
+    return kurumsalHeroYerelGuncelle(yerelId!, taslak);
+  }
+  return kurumsalHeroYerelOlustur(taslak);
+}
+
 export async function widgetOlustur(form: WidgetFormDegeri): Promise<AdminWidget> {
   const payload = payloadHazirla(form);
-  if (kurumsalHeroYerelMod() && form.tip === 'KURUMSAL_HERO') {
-    const taslak = kurumsalHeroFormdanYerelWidget(form, payload);
-    return kurumsalHeroYerelOlustur(taslak);
-  }
+  const apiPayload = apiPayloadHazirla(form);
 
   const yanit = await fetch(`${API_URL}/admin/widgetlar`, {
     method: 'POST',
     headers: authHeaders(),
-    body: JSON.stringify(payload),
+    body: JSON.stringify(apiPayload),
   });
   const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widget?: AdminWidget }>(yanit);
   if (!yanit.ok) {
-    if (kurumsalHeroYerelMod() && form.tip === 'KURUMSAL_HERO') {
-      const taslak = kurumsalHeroFormdanYerelWidget(form, payload);
-      return kurumsalHeroYerelOlustur(taslak);
+    if (form.tip === 'KURUMSAL_HERO') {
+      return kurumsalHeroYerelKaydet(form, payload);
     }
     throw new Error(apiHataMesaji(veri, 'Widget olusturulamadi'));
   }
-  return adminWidgetNormalize(veri.widget as AdminWidget);
+  return adminWidgetApiNormalize(veri.widget as AdminWidget);
 }
 
 export async function widgetGuncelle(id: string, form: WidgetFormDegeri): Promise<AdminWidget> {
   const payload = payloadHazirla(form, true);
-  if (kurumsalHeroYerelMod() && (kurumsalHeroYerelIdMi(id) || form.tip === 'KURUMSAL_HERO')) {
-    const yerelId = kurumsalHeroYerelKayitId(id);
-    const taslak = kurumsalHeroFormdanYerelWidget(form, payload, yerelId);
-    if (kurumsalHeroYerelKayitVarMi(id)) {
-      return kurumsalHeroYerelGuncelle(yerelId, taslak);
-    }
-    return kurumsalHeroYerelOlustur(taslak);
+  const apiPayload = apiPayloadHazirla(form, true);
+
+  if (kurumsalHeroYerelIdMi(id)) {
+    return kurumsalHeroYerelGuncelle(id, kurumsalHeroFormdanYerelWidget(form, payload, id));
   }
 
   const yanit = await fetch(`${API_URL}/admin/widgetlar/${id}`, {
     method: 'PUT',
     headers: authHeaders(),
-    body: JSON.stringify(payload),
+    body: JSON.stringify(apiPayload),
   });
   const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widget?: AdminWidget }>(yanit);
   if (!yanit.ok) {
-    if (kurumsalHeroYerelMod() && form.tip === 'KURUMSAL_HERO') {
-      const yerelId = kurumsalHeroYerelKayitId(id);
-      const taslak = kurumsalHeroFormdanYerelWidget(form, payload, yerelId);
-      if (kurumsalHeroYerelKayitVarMi(id)) {
-        return kurumsalHeroYerelGuncelle(yerelId, taslak);
-      }
-      return kurumsalHeroYerelOlustur(taslak);
+    if (form.tip === 'KURUMSAL_HERO') {
+      return kurumsalHeroYerelKaydet(form, payload, id);
     }
     throw new Error(apiHataMesaji(veri, 'Widget guncellenemedi'));
   }
-  return adminWidgetNormalize(veri.widget as AdminWidget);
+  return adminWidgetApiNormalize(veri.widget as AdminWidget);
 }
 
 export async function widgetSil(id: string): Promise<void> {
-  if (kurumsalHeroYerelMod() && (kurumsalHeroYerelIdMi(id) || kurumsalHeroYerelKayitVarMi(id))) {
+  if (kurumsalHeroYerelIdMi(id) || kurumsalHeroYerelKayitVarMi(id)) {
     kurumsalHeroYerelSil(kurumsalHeroYerelKayitId(id));
     return;
   }
