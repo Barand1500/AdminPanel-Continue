@@ -52,12 +52,11 @@ const modulAksiyonlari: Record<string, AksiyonButonu[]> = {
     A('onizle', 'Önizle', true),
   ],
   'widget-yonetimi': [
-    A('kaydet', 'Kaydet', true),
-    A('hizliKaydet', 'Hızlı Kaydet', true),
-    A('ekle', 'Yeni Ekle', true, true),
+    A('kaydet', 'Kaydet', true, true),
+    A('ekle', 'Yeni Ekle', true),
     A('sil', 'Sil', true),
+    A('duzenle', 'Düzenle', true),
     A('onizle', 'Önizle', true),
-    A('yayinla', 'Yayınla', true),
   ],
   seo: [
     A('kaydet', 'Kaydet', true, true),

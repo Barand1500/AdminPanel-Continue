@@ -1,16 +1,18 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   varsayilanWidgetForm,
   WidgetEditorPanel,
   WidgetListesiPanel,
   widgettenForma,
 } from '@/components/admin/widget/WidgetBilesenleri';
+import { WidgetTipGaleri } from '@/components/admin/widget/WidgetTipGaleri';
 import { WidgetOnizlemeModal } from '@/components/admin/widget/WidgetOnizlemeModal';
 import {
   AdminModulKabuk,
   BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
+import { AdminPilSekme } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import { widgetGuncelle, widgetOlustur, widgetSil, widgetlariGetir } from '@/features/admin/widgetApi';
 import { adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
@@ -18,28 +20,43 @@ import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 import { sonrakiWidgetSira, siraCakismasiBul } from '@/utils/widgetSiraYardimci';
 import { siteVerisiGuncellendiYayinla } from '@/utils/siteVerisiOlaylari';
 import { widgetFormNormalize } from '@/utils/widgetFormYardimci';
-import { configOku } from '@/types/widget';
-import { olusturucuOku } from '@/types/blokOlusturucu';
-import { olusturucuDoluMu } from '@/components/admin/widget/olusturucu/blokOlusturucuYardimci';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
 
 const YENI_WIDGET_TIPI = 'BLOK_OLUSTURUCU';
+
+type Gorunum = 'liste' | 'editor';
 
 function varsayilanYeniTip(filtre?: string) {
   return filtre ?? YENI_WIDGET_TIPI;
 }
 
 function kaydetHazirMi(form: WidgetFormDegeri) {
-  return Boolean(
-    form.tip &&
-    (form.ad.trim() || form.baslik.trim() || tipEtiketi(form.tip))
+  return Boolean(form.tip && (form.ad.trim() || form.baslik.trim() || tipEtiketi(form.tip)));
+}
+
+function ListeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+    </svg>
   );
 }
 
-function hizliKaydetHazirMi(form: WidgetFormDegeri) {
-  if (form.tip !== 'BLOK_OLUSTURUCU') return false;
-  const cfg = configOku(form);
-  return kaydetHazirMi(form) && olusturucuDoluMu(olusturucuOku(cfg));
+function YeniIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function DuzenlemeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+    </svg>
+  );
 }
 
 interface WidgetYonetimiSayfasiProps {
@@ -55,17 +72,16 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
   const [hata, setHata] = useState('');
   const [basari, setBasari] = useState('');
   const [seciliId, setSeciliId] = useState<string | null>(null);
+  const [gorunum, setGorunum] = useState<Gorunum>('liste');
   const [onizlemeAcik, setOnizlemeAcik] = useState(false);
-  const [onizlemeHazir, setOnizlemeHazir] = useState(false);
   const [otomatikDoldur, setOtomatikDoldur] = useState(false);
-  const kaydetFnRef = useRef<(() => Promise<void>) | null>(null);
-  const [siraDuzListe, setSiraDuzListe] = useState<Record<string, boolean>>({});
   const [yeniTaslakSayac, setYeniTaslakSayac] = useState(0);
+  const [tipOnaylandi, setTipOnaylandi] = useState(Boolean(varsayilanTip));
 
   const yeniMod = seciliId === null;
   const editorAnahtar = seciliId ?? `yeni-${yeniTaslakSayac}`;
 
-  async function listeYukle() {
+  const yukle = useCallback(async () => {
     setHata('');
     setYukleniyor(true);
     try {
@@ -80,49 +96,68 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
     } finally {
       setYukleniyor(false);
     }
-  }
+  }, [varsayilanTip]);
 
   useEffect(() => {
-    void listeYukle();
-  }, [varsayilanTip]);
+    void yukle();
+  }, [yukle]);
 
   useEffect(() => {
     if (seciliId != null) return;
     setForm((onceki) => {
       const sonraki = sonrakiWidgetSira(widgetlar, onceki.sayfaId);
       const cakisma = siraCakismasiBul(widgetlar, onceki.sira, onceki.sayfaId);
-      const varsayilanCakisma =
-        sonraki > 1 && onceki.sira === 1;
+      const varsayilanCakisma = sonraki > 1 && onceki.sira === 1;
       if (!cakisma && !varsayilanCakisma) return onceki;
       return onceki.sira === sonraki ? onceki : { ...onceki, sira: sonraki };
     });
   }, [widgetlar, seciliId, form.sayfaId]);
 
-  useEffect(() => {
-    setOnizlemeHazir(Boolean(form.tip && (seciliId || yeniMod)));
-  }, [form.tip, seciliId, yeniMod]);
-
-  const yeniBaslat = useCallback(() => {
+  const formuSifirla = useCallback(() => {
     setSeciliId(null);
     setYeniTaslakSayac((n) => n + 1);
     setForm(varsayilanWidgetForm(varsayilanYeniTip(varsayilanTip), widgetlar));
-    setBasari('Yeni widget taslağı — Kaydet ile listeye eklenir.');
+    setTipOnaylandi(Boolean(varsayilanTip));
+    setBasari('');
     setHata('');
-    setOnizlemeHazir(true);
   }, [varsayilanTip, widgetlar]);
 
-  const onKaydetTetikleyici = useCallback((fn: () => Promise<void>) => {
-    kaydetFnRef.current = fn;
-  }, []);
+  const yeniBaslat = useCallback(() => {
+    formuSifirla();
+    setGorunum('editor');
+  }, [formuSifirla]);
 
-  const kaydetFooter = useCallback(async () => {
+  const kaydet = useCallback(async () => {
+    const deger = widgetFormNormalize(form);
+    const ad = deger.ad.trim() || deger.baslik.trim() || tipEtiketi(deger.tip);
+    if (!ad) {
+      setHata('Widget adı veya içerik başlığı gerekli');
+      return;
+    }
+    const kayitDegeri = deger.ad.trim() ? deger : { ...deger, ad };
+    setKaydediliyor(true);
     setHata('');
+    setBasari('');
     try {
-      await kaydetFnRef.current?.();
+      if (seciliId) {
+        const guncel = await widgetGuncelle(seciliId, kayitDegeri);
+        setWidgetlar((onceki) => onceki.map((w) => (w.id === guncel.id ? guncel : w)));
+        setForm(widgettenForma(guncel));
+        setBasari('Widget güncellendi.');
+      } else {
+        const yeni = await widgetOlustur(kayitDegeri);
+        setWidgetlar((onceki) => [yeni, ...onceki]);
+        setSeciliId(yeni.id);
+        setForm(widgettenForma(yeni));
+        setBasari(yeni.aktif ? 'Yeni widget oluşturuldu (aktif).' : 'Yeni widget oluşturuldu (pasif).');
+      }
+      siteVerisiGuncellendiYayinla();
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Kayıt başarısız');
+    } finally {
+      setKaydediliyor(false);
     }
-  }, []);
+  }, [form, seciliId]);
 
   const silHandler = useCallback(async () => {
     if (!seciliId || !confirm('Bu widgetı silmek istediğinize emin misiniz?')) return;
@@ -135,36 +170,33 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
       setSeciliId(null);
       setForm(varsayilanWidgetForm(varsayilanYeniTip(varsayilanTip), kalan));
       setBasari('Widget silindi.');
+      setGorunum('liste');
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Silme başarısız');
     } finally {
       setKaydediliyor(false);
     }
-  }, [seciliId, varsayilanTip]);
+  }, [seciliId, varsayilanTip, widgetlar]);
 
-  const hizliKaydetFooter = useCallback(async () => {
-    setHata('');
-    try {
-      await kaydet(form, yeniMod ? undefined : seciliId ?? undefined, { hizli: true });
-    } catch (err) {
-      setHata(err instanceof Error ? err.message : 'Hızlı kayıt başarısız');
-    }
-  }, [form, seciliId, yeniMod, widgetlar]);
+  const duzenlemeyeGit = useCallback(() => {
+    if (!seciliId) return;
+    setGorunum('editor');
+  }, [seciliId]);
 
   useModulAksiyonlari(
     {
-      kaydet: kaydetFooter,
-      hizliKaydet: hizliKaydetFooter,
+      kaydet,
       ekle: yeniBaslat,
       sil: silHandler,
+      duzenle: duzenlemeyeGit,
       onizle: () => setOnizlemeAcik(true),
     },
     {
-      kaydet: !kaydediliyor && kaydetHazirMi(form),
-      hizliKaydet: !kaydediliyor && hizliKaydetHazirMi(form),
+      kaydet: gorunum === 'editor' && tipOnaylandi && !kaydediliyor && kaydetHazirMi(form),
       ekle: true,
       sil: !!seciliId && !kaydediliyor,
-      onizle: onizlemeHazir && !kaydediliyor,
+      duzenle: !!seciliId && gorunum !== 'editor' && !kaydediliyor,
+      onizle: gorunum === 'editor' && tipOnaylandi && Boolean(form.tip) && !kaydediliyor,
     }
   );
 
@@ -173,106 +205,101 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
     [widgetlar, seciliId]
   );
 
-  async function kaydet(deger: WidgetFormDegeri, widgetId?: string, opts?: { hizli?: boolean }) {
-    deger = widgetFormNormalize(deger);
-    const ad = deger.ad.trim() || deger.baslik.trim() || tipEtiketi(deger.tip);
-    if (!ad) {
-      setHata('Widget adı veya içerik başlığı gerekli');
-      throw new Error('Widget adı veya içerik başlığı gerekli');
-    }
-    let kayitDegeri = deger.ad.trim() ? deger : { ...deger, ad };
-    if (deger.tip === 'BLOK_OLUSTURUCU' && opts?.hizli) {
-      kayitDegeri = { ...kayitDegeri, aktif: true };
-    }
-    setKaydediliyor(true);
-    setHata('');
-    try {
-      if (widgetId) {
-        const guncel = await widgetGuncelle(widgetId, kayitDegeri);
-        setWidgetlar((onceki) => onceki.map((w) => (w.id === guncel.id ? guncel : w)));
-        setForm(widgettenForma(guncel));
-        setBasari(opts?.hizli ? 'Widget siteye eklendi.' : 'Widget güncellendi.');
-      } else {
-        const yeni = await widgetOlustur(kayitDegeri);
-        setWidgetlar((onceki) => [yeni, ...onceki]);
-        setSeciliId(yeni.id);
-        setForm(widgettenForma(yeni));
-        setBasari(
-          opts?.hizli
-            ? 'Widget siteye eklendi.'
-            : yeni.aktif
-              ? 'Yeni widget oluşturuldu (aktif).'
-              : 'Yeni widget oluşturuldu (pasif).'
-        );
-      }
-      siteVerisiGuncellendiYayinla();
-    } finally {
-      setKaydediliyor(false);
-    }
-  }
-
   function widgetSec(widget: AdminWidget) {
     setSeciliId(widget.id);
     setForm(widgettenForma(widget));
+    setTipOnaylandi(true);
     setBasari('');
     setHata('');
-    setOnizlemeHazir(true);
+    setGorunum('editor');
   }
 
-  function sayfaSiraToggle(sayfaFiltreId: string) {
-    setSiraDuzListe((onceki) => ({
-      ...onceki,
-      [sayfaFiltreId]: !onceki[sayfaFiltreId],
-    }));
+  function galeridenTipSec(tip: string) {
+    const taslak = varsayilanWidgetForm(tip, widgetlar, form.sayfaId);
+    setForm({
+      ...taslak,
+      ad: taslak.ad.trim() || tipEtiketi(tip),
+      sira: form.sira,
+      sayfaId: form.sayfaId,
+    });
+    setTipOnaylandi(true);
+    setBasari('');
+    setHata('');
   }
 
-  const baslik = varsayilanTip === 'SLIDER'
-    ? 'Slider Yönetimi'
-    : varsayilanTip === 'HIZMET_KARTLARI'
-      ? 'Hizmet Widgetları'
-      : 'Widget Yönetimi';
+  function tipiDegistir() {
+    setTipOnaylandi(false);
+  }
 
-  const aciklama = varsayilanTip
-    ? `${baslik} — anasayfa bileşenlerini düzenleyin`
-    : 'Anasayfa ve tüm sayfalardaki widget bileşenlerini yönetin';
+  function gorunumDegistir(id: Gorunum) {
+    if (id === gorunum) return;
+    if (id === 'liste') {
+      setGorunum('liste');
+      return;
+    }
+    if (seciliId) {
+      setGorunum('editor');
+      return;
+    }
+    yeniBaslat();
+  }
+
+  const editorEtiket = gorunum === 'editor' && seciliId ? 'Düzenleme' : 'Yeni Widget';
+
+  if (yukleniyor) {
+    return (
+      <AdminModulKabuk onizleGoster={false}>
+        <YukleniyorDurumu mesaj="Widgetlar yükleniyor..." />
+      </AdminModulKabuk>
+    );
+  }
 
   return (
-    <AdminModulKabuk baslik={baslik} aciklama={aciklama}>
+    <AdminModulKabuk
+      onizleGoster={false}
+      ustIcerik={
+        <AdminPilSekme
+          sekmeler={[
+            { id: 'liste', etiket: 'Widget Listesi', ikon: <ListeIkon /> },
+            {
+              id: 'editor',
+              etiket: editorEtiket,
+              ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniIkon />,
+            },
+          ]}
+          aktif={gorunum}
+          onDegistir={gorunumDegistir}
+        />
+      }
+    >
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
+      {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
 
-      {yukleniyor ? (
-        <YukleniyorDurumu mesaj="Widgetlar yükleniyor..." />
-      ) : (
-        <>
-          <div className="ap-split-layout">
-            <WidgetListesiPanel
-              widgetlar={widgetlar}
-              seciliId={seciliId}
-              tipFiltre={varsayilanTip}
-              sayfalar={sayfalar}
-              siraDuzListe={siraDuzListe}
-              onSayfaSiraToggle={sayfaSiraToggle}
-              onSec={widgetSec}
-            />
-            <WidgetEditorPanel
-              form={form}
-              seciliWidget={seciliWidget}
-              yeniMod={yeniMod}
-              editorAnahtar={editorAnahtar}
-              kaydediliyor={kaydediliyor}
-              hata={hata}
-              varsayilanTip={varsayilanTip}
-              tumWidgetlar={widgetlar}
-              sayfalar={sayfalar}
-              onChange={(yeni) => setForm(widgetFormNormalize(yeni))}
-              onKaydet={kaydet}
-              onKaydetTetikleyici={onKaydetTetikleyici}
-              onTipSecildi={() => setOnizlemeHazir(true)}
-              onOtomatikDoldurChange={setOtomatikDoldur}
-            />
-          </div>
-        </>
+      {gorunum === 'liste' && (
+        <WidgetListesiPanel
+          widgetlar={widgetlar}
+          seciliId={seciliId}
+          tipFiltre={varsayilanTip}
+          sayfalar={sayfalar}
+          onSec={widgetSec}
+        />
+      )}
+      {gorunum === 'editor' && yeniMod && !tipOnaylandi && (
+        <WidgetTipGaleri tipFiltre={varsayilanTip} onSec={galeridenTipSec} />
+      )}
+      {gorunum === 'editor' && tipOnaylandi && (
+        <WidgetEditorPanel
+          form={form}
+          seciliWidget={seciliWidget}
+          yeniMod={yeniMod}
+          editorAnahtar={editorAnahtar}
+          tumWidgetlar={widgetlar}
+          sayfalar={sayfalar}
+          onChange={(yeni) => setForm(widgetFormNormalize(yeni))}
+          onOtomatikDoldurChange={setOtomatikDoldur}
+          onTipDegistirIste={yeniMod ? tipiDegistir : undefined}
+        />
       )}
 
       <WidgetOnizlemeModal

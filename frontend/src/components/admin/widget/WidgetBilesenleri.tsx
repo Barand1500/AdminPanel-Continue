@@ -1,23 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
 import { widgetFormMockUygula } from '@/types/widget';
-import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
+import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
 import {
   AdminAnahtarDugme,
   AdminAramaKutusu,
   AdminBosDurum,
   AdminDurumEtiketi,
-  AdminFormBolumu,
-  AdminSekmeler,
 } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { EkAyarlarPanel } from './EkAyarlarPanel';
 import { WidgetYerlesimPanel } from './WidgetYerlesimPanel';
 import { OrtakGorunumPanel } from './gorunum/OrtakGorunumPanel';
+import { WidgetEklemePanel } from './olusturucu/WidgetEklemePanel';
 import { ICERIK_PANEL_MAP } from './panels/WidgetIcerikPanelleri';
 import {
   GIZLI_WIDGET_TIPLERI,
   WIDGET_TIPLERI,
-  tipDegistir,
   tipEtiketi,
   tipIkon,
   tipKategoriEtiketi,
@@ -26,7 +24,6 @@ import {
   widgetTipleriKategoriyeGore,
   WIDGET_TIP_KATEGORILERI,
 } from './widgetRegistry';
-import { WidgetTipSecici } from './WidgetTipSecici';
 import { yerlesimEtiketi, yerlesimOku, widgetSayfaFiltreOgeleri } from '@/utils/widgetYerlesim';
 import { sayfaFiltreWidgetlari, siraCakismasiBul } from '@/utils/widgetSiraYardimci';
 import type { AdminSayfa } from '@/features/admin/sayfaApi';
@@ -51,8 +48,6 @@ interface WidgetListesiPanelProps {
   seciliId: string | null;
   tipFiltre?: string;
   sayfalar?: AdminSayfa[];
-  siraDuzListe?: Record<string, boolean>;
-  onSayfaSiraToggle?: (sayfaFiltreId: string) => void;
   onSec: (widget: AdminWidget) => void;
 }
 
@@ -61,11 +56,10 @@ export function WidgetListesiPanel({
   seciliId,
   tipFiltre,
   sayfalar = [],
-  siraDuzListe = {},
-  onSayfaSiraToggle,
   onSec,
 }: WidgetListesiPanelProps) {
   const [arama, setArama] = useState('');
+  const [durumFiltre, setDurumFiltre] = useState<'tumu' | 'aktif' | 'pasif'>('tumu');
   const [sayfaFiltre, setSayfaFiltre] = useState<string | null>(null);
 
   const sayfaAdlari = useMemo(() => {
@@ -87,6 +81,8 @@ export function WidgetListesiPanel({
         : ([...widgetlar] as AdminWidget[])
             .filter((w) => !tipFiltre || w.tip === tipFiltre)
             .sort((a, b) => Number(a.sira) - Number(b.sira) || a.ad.localeCompare(b.ad, 'tr'));
+    if (durumFiltre === 'aktif') liste = liste.filter((w) => w.aktif);
+    if (durumFiltre === 'pasif') liste = liste.filter((w) => !w.aktif);
     if (q) {
       liste = liste.filter(
         (w) =>
@@ -94,15 +90,6 @@ export function WidgetListesiPanel({
           w.tip.toLowerCase().includes(q) ||
           tipEtiketi(w.tip).toLowerCase().includes(q)
       );
-    }
-
-    if (sayfaFiltre != null && siraDuzListe[sayfaFiltre]) {
-      return {
-        mod: 'duz' as const,
-        liste: [...liste].sort(
-          (a, b) => Number(a.sira) - Number(b.sira) || a.ad.localeCompare(b.ad, 'tr')
-        ),
-      };
     }
 
     const gruplar = new Map<string, AdminWidget[]>();
@@ -115,12 +102,8 @@ export function WidgetListesiPanel({
     for (const arr of gruplar.values()) {
       arr.sort((a, b) => Number(a.sira) - Number(b.sira) || a.ad.localeCompare(b.ad, 'tr'));
     }
-    return { mod: 'gruplu' as const, gruplar: [...gruplar.entries()] };
-  }, [widgetlar, arama, tipFiltre, sayfaFiltre, siraDuzListe]);
-
-  const sayfaWidgetSayisi =
-    sayfaFiltre != null ? sayfaFiltreWidgetlari(widgetlar, sayfaFiltre, tipFiltre).length : 0;
-  const siraTusAktif = sayfaFiltre != null && sayfaWidgetSayisi >= 1;
+    return { gruplar: [...gruplar.entries()] };
+  }, [widgetlar, arama, durumFiltre, tipFiltre, sayfaFiltre]);
 
   function widgetSatiri(w: AdminWidget) {
     return (
@@ -128,27 +111,27 @@ export function WidgetListesiPanel({
         key={w.id}
         type="button"
         onClick={() => onSec(w)}
-        className={`ap-liste-oge mb-1 ${seciliId === w.id ? 'ap-liste-oge-secili' : ''}`}
+        className={`ap-liste-oge ap-form-liste-oge${seciliId === w.id ? ' ap-liste-oge-secili' : ''}`}
       >
-        <div className="flex items-start gap-2">
-          <span className="text-base">{tipIkon(w.tip)}</span>
-          <div className="min-w-0 flex-1">
-            <p className="ap-liste-oge-baslik truncate">{w.ad}</p>
-            <p className="ap-liste-oge-alt">
-              {sayfaEtiketi(w.sayfaId)} · {tipEtiketi(w.tip)} · {yerlesimEtiketi(yerlesimOku(w))} · Sıra {w.sira}
-            </p>
-            <div className="ap-liste-oge-etiketler">
-              {w.aktif ? (
-                <AdminDurumEtiketi tur="aktif">Aktif</AdminDurumEtiketi>
-              ) : (
-                <AdminDurumEtiketi tur="pasif">Pasif</AdminDurumEtiketi>
-              )}
-              {GIZLI_WIDGET_TIPLERI.has(w.tip) && (
-                <AdminDurumEtiketi tur="pasif">Eski tip</AdminDurumEtiketi>
-              )}
-            </div>
-          </div>
-        </div>
+        <span className="ap-form-liste-ikon" aria-hidden>
+          {tipIkon(w.tip)}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="ap-liste-oge-baslik">{w.ad}</span>
+          <span className="ap-liste-oge-alt">
+            {sayfaEtiketi(w.sayfaId)} · {tipEtiketi(w.tip)} · {yerlesimEtiketi(yerlesimOku(w))} · Sıra {w.sira}
+          </span>
+          <span className="ap-liste-oge-etiketler mt-1.5">
+            {w.aktif ? (
+              <AdminDurumEtiketi tur="aktif">Aktif</AdminDurumEtiketi>
+            ) : (
+              <AdminDurumEtiketi tur="pasif">Pasif</AdminDurumEtiketi>
+            )}
+            {GIZLI_WIDGET_TIPLERI.has(w.tip) && (
+              <AdminDurumEtiketi tur="pasif">Eski tip</AdminDurumEtiketi>
+            )}
+          </span>
+        </span>
       </button>
     );
   }
@@ -158,54 +141,65 @@ export function WidgetListesiPanel({
     return sayfaAdlari.get(idString(sayfaId)) ?? 'Sayfa';
   }
 
+  const aktifSayisi = widgetlar.filter((w) => w.aktif).length;
+
   return (
-    <aside className="ap-sidebar-panel ap-widget-sidebar">
-      <div className="ap-sidebar-baslik ap-sidebar-baslik-dikey">
-        <div className="flex items-center gap-2">
+    <aside className="ap-sidebar-panel ap-sayfa-liste-panel ap-sayfa-liste-panel--tam">
+      <div className="ap-sidebar-baslik">
+        <div>
           <h2 className="ap-heading text-sm font-semibold">Widgetlar</h2>
-          {sayfaFiltre && onSayfaSiraToggle && (
-            <button
-              type="button"
-              className={`ap-widget-sira-tus${siraDuzListe[sayfaFiltre] ? ' ap-widget-sira-tus--aktif' : ''}`}
-              disabled={!siraTusAktif}
-              title={
-                siraDuzListe[sayfaFiltre]
-                  ? 'Kategori görünümüne dön'
-                  : 'Kategorileri gizle, sıra numarasına göre listele (1, 2, 3…)'
-              }
-              onClick={() => onSayfaSiraToggle(sayfaFiltre)}
-            >
-              {siraDuzListe[sayfaFiltre] ? 'Geri al' : 'Sırala'}
-            </button>
-          )}
+          <p className="ap-muted text-xs">
+            {widgetlar.length} kayıt · {aktifSayisi} aktif
+          </p>
         </div>
-        <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Widget ara..." />
-        {sayfaRozetleri.length > 0 && (
-          <div className="ap-widget-sayfa-filtreler" role="tablist" aria-label="Sayfaya göre filtre">
-            {sayfaRozetleri.map((rozet) => (
-              <button
-                key={rozet.id}
-                type="button"
-                role="tab"
-                aria-selected={sayfaFiltre === rozet.id}
-                onClick={() => setSayfaFiltre((onceki) => (onceki === rozet.id ? null : rozet.id))}
-                className={`ap-widget-sayfa-filtre ${sayfaFiltre === rozet.id ? 'ap-widget-sayfa-filtre-aktif' : ''}`}
-              >
-                {rozet.etiket}
-              </button>
-            ))}
-          </div>
-        )}
+        <div className="ap-form-filtre-piller">
+          {([
+            { id: 'tumu', etiket: 'Tümü' },
+            { id: 'aktif', etiket: 'Aktif' },
+            { id: 'pasif', etiket: 'Pasif' },
+          ] as const).map((f) => (
+            <button
+              key={f.id}
+              type="button"
+              className={`ap-form-filtre-pil${durumFiltre === f.id ? ' ap-form-filtre-pil--aktif' : ''}`}
+              onClick={() => setDurumFiltre(f.id)}
+            >
+              {f.etiket}
+            </button>
+          ))}
+        </div>
       </div>
-      <div className="ap-scroll ap-sidebar-icerik ap-widget-sidebar-icerik">
-        {listeGorunumu.mod === 'duz' ? (
-          listeGorunumu.liste.length === 0 ? (
-            <AdminBosDurum ikon="🧩" baslik="Widget yok" aciklama="Alt bardan Yeni Ekle ile widget oluşturun" />
-          ) : (
-            <div className="mb-3">{listeGorunumu.liste.map(widgetSatiri)}</div>
-          )
+      <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Widget adı veya tip ara..." />
+      {sayfaRozetleri.length > 0 && (
+        <div className="ap-widget-liste-filtreler" role="tablist" aria-label="Sayfaya göre filtre">
+          <button
+            type="button"
+            role="tab"
+            aria-selected={sayfaFiltre == null}
+            className={`ap-form-filtre-pil${sayfaFiltre == null ? ' ap-form-filtre-pil--aktif' : ''}`}
+            onClick={() => setSayfaFiltre(null)}
+          >
+            Tüm sayfalar
+          </button>
+          {sayfaRozetleri.map((rozet) => (
+            <button
+              key={rozet.id}
+              type="button"
+              role="tab"
+              aria-selected={sayfaFiltre === rozet.id}
+              className={`ap-form-filtre-pil${sayfaFiltre === rozet.id ? ' ap-form-filtre-pil--aktif' : ''}`}
+              onClick={() => setSayfaFiltre(rozet.id)}
+            >
+              {rozet.etiket}
+            </button>
+          ))}
+        </div>
+      )}
+      <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
+        {widgetlar.length === 0 ? (
+          <AdminBosDurum ikon="🧩" baslik="Henüz widget yok" aciklama="Üstten Yeni Widget ile başlayın" />
         ) : listeGorunumu.gruplar.length === 0 ? (
-          <AdminBosDurum ikon="🧩" baslik="Widget yok" aciklama="Alt bardan Yeni Ekle ile widget oluşturun" />
+          <AdminBosDurum ikon="🔎" baslik="Sonuç yok" aciklama="Filtreyi veya aramayı temizleyip tekrar deneyin" />
         ) : (
           listeGorunumu.gruplar.map(([grup, liste]) => (
             <div key={grup} className="mb-3">
@@ -219,8 +213,6 @@ export function WidgetListesiPanel({
   );
 }
 
-import { WidgetEklemePanel } from './olusturucu/WidgetEklemePanel';
-
 type EditorSekme = 'genel' | 'icerik' | 'gorunum' | 'gelismis' | 'widgetEkleme';
 
 interface WidgetEditorPanelProps {
@@ -228,16 +220,11 @@ interface WidgetEditorPanelProps {
   seciliWidget: AdminWidget | null;
   yeniMod: boolean;
   editorAnahtar?: string;
-  kaydediliyor: boolean;
-  hata: string;
-  varsayilanTip?: string;
   tumWidgetlar?: AdminWidget[];
   sayfalar?: AdminSayfa[];
   onChange: (form: WidgetFormDegeri) => void;
-  onKaydetTetikleyici?: (fn: () => Promise<void>) => void;
-  onKaydet: (deger: WidgetFormDegeri, widgetId?: string) => Promise<void>;
-  onTipSecildi?: (tip: string) => void;
   onOtomatikDoldurChange?: (acik: boolean) => void;
+  onTipDegistirIste?: () => void;
 }
 
 export function WidgetEditorPanel({
@@ -245,19 +232,14 @@ export function WidgetEditorPanel({
   seciliWidget,
   yeniMod,
   editorAnahtar,
-  kaydediliyor,
-  hata,
-  varsayilanTip: _varsayilanTip,
   tumWidgetlar = [],
   sayfalar = [],
   onChange,
-  onKaydetTetikleyici,
-  onKaydet,
-  onTipSecildi,
   onOtomatikDoldurChange,
+  onTipDegistirIste,
 }: WidgetEditorPanelProps) {
-  const [sekme, setSekme] = useState<EditorSekme>('genel');
-  const [otomatikDoldur, setOtomatikDoldur] = useState(false);
+  const [sekme, setSekme] = useState<EditorSekme>('icerik');
+  const [otomatikDoldur, setOtomatikDoldur] = useState(yeniMod);
   const formYedekRef = useRef<WidgetFormDegeri | null>(null);
   const yedekAnahtarRef = useRef<string | null>(null);
   const widgetAnahtar = editorAnahtar ?? seciliWidget?.id ?? 'yeni';
@@ -269,10 +251,14 @@ export function WidgetEditorPanel({
   }, [otomatikDoldur, onOtomatikDoldurChange]);
 
   useEffect(() => {
-    if (yeniMod && form.tip === 'BLOK_OLUSTURUCU') {
-      setSekme('widgetEkleme');
+    setSekme(form.tip === 'BLOK_OLUSTURUCU' ? 'widgetEkleme' : 'icerik');
+  }, [widgetAnahtar, form.tip]);
+
+  useEffect(() => {
+    if (sekme === 'widgetEkleme' && form.tip !== 'BLOK_OLUSTURUCU') {
+      setSekme('genel');
     }
-  }, [yeniMod, form.tip, widgetAnahtar]);
+  }, [form.tip, sekme]);
 
   useEffect(() => {
     if (oncekiAnahtarRef.current === widgetAnahtar) return;
@@ -322,15 +308,6 @@ export function WidgetEditorPanel({
     yedekAnahtarRef.current = null;
   }
 
-  async function submit() {
-    await onKaydet(form, yeniMod ? undefined : seciliWidget?.id);
-  }
-
-  useEffect(() => {
-    onKaydetTetikleyici?.(submit);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [form, seciliWidget, yeniMod]);
-
   const seciliTipMeta = WIDGET_TIPLERI.find((t) => t.id === form.tip);
   const IcerikPanel = ICERIK_PANEL_MAP[form.tip];
   const sayfaEtiketi = useMemo(() => {
@@ -342,115 +319,77 @@ export function WidgetEditorPanel({
     [tumWidgetlar, form.sira, form.sayfaId, seciliWidget?.id]
   );
 
-  return (
-    <div className="ap-editor-panel ap-widget-editor">
-      <div className="ap-editor-ust">
-        <div className="ap-editor-baslik">
-          <div className="flex items-center gap-3">
-            <span className="text-2xl">{tipIkon(form.tip)}</span>
-            <div>
-              <h2 className="ap-heading text-base font-semibold">
-                {yeniMod ? 'Yeni Widget' : form.ad || 'Widget Düzenle'}
-              </h2>
-              <p className="ap-muted text-xs">{seciliTipMeta?.aciklama ?? tipEtiketi(form.tip)}</p>
-            </div>
-          </div>
-          {form.aktif ? (
-            <AdminDurumEtiketi tur="aktif">Aktif</AdminDurumEtiketi>
-          ) : (
-            <AdminDurumEtiketi tur="pasif">Pasif</AdminDurumEtiketi>
-          )}
-        </div>
+  const icSekmeler: { id: EditorSekme; etiket: string }[] = [
+    { id: 'genel', etiket: 'Yerleşim' },
+    { id: 'icerik', etiket: 'İçerik' },
+    { id: 'gorunum', etiket: 'Görünüm' },
+    { id: 'gelismis', etiket: 'Ek Ayarlar' },
+    ...(form.tip === 'BLOK_OLUSTURUCU' ? [{ id: 'widgetEkleme' as const, etiket: 'Widget Ekleme' }] : []),
+  ];
 
-        <AdminSekmeler
-          aktif={sekme}
-          onDegistir={setSekme}
-          sekmeler={[
-            { id: 'genel', etiket: 'Genel', ikon: '⚙️' },
-            { id: 'icerik', etiket: 'İçerik', ikon: '📝' },
-            { id: 'gorunum', etiket: 'Görünüm', ikon: '🎨' },
-            { id: 'gelismis', etiket: 'Ek Ayarlar', ikon: '🔧' },
-            ...(form.tip === 'BLOK_OLUSTURUCU'
-              ? [{ id: 'widgetEkleme' as const, etiket: 'Widget Ekleme', ikon: '➕' }]
-              : []),
-          ]}
-        />
+  return (
+    <div className="ap-editor-panel ap-form-editor ap-widget-editor">
+      <div className="ap-form-editor-ust">
+        <div>
+          <h2 className="ap-heading text-sm font-semibold">{yeniMod ? 'Yeni widget' : 'Widget düzenle'}</h2>
+          <p className="ap-widget-editor-tip">
+            <span>{seciliTipMeta?.etiket ?? tipEtiketi(form.tip)}</span>
+            {onTipDegistirIste && (
+              <button type="button" className="ap-widget-tip-degistir" onClick={onTipDegistirIste}>
+                Tipi değiştir
+              </button>
+            )}
+          </p>
+        </div>
+        <div className={`ap-form-yayin-anahtar${form.aktif ? ' ap-form-yayin-anahtar--acik' : ''}`}>
+          <AdminAnahtarDugme etiket="Aktif" acik={form.aktif} onDegistir={(aktif) => onChange({ ...form, aktif })} />
+        </div>
       </div>
 
-      <div className={`ap-editor-icerik${sekme === 'widgetEkleme' ? ' ap-editor-icerik-ekleme' : ''}`}>
-        {sekme === 'genel' && (
-          <>
-            {yeniMod && (
-              <AdminFormBolumu baslik="Widget Tipi" aciklama="Üstten kategori seçin; yalnızca o gruptaki bileşenler listelenir.">
-                <WidgetTipSecici
-                  seciliTip={form.tip}
-                  onSec={(tip) => {
-                    onChange(tipDegistir(form, tip, tumWidgetlar));
-                    onTipSecildi?.(tip);
-                  }}
-                />
-              </AdminFormBolumu>
-            )}
+      <div className="ap-form-editor-govde">
+        <div className="ap-widget-kimlik-satir">
+          <FormAlani etiket="Widget adı">
+            <input
+              className={formInputSinifi}
+              value={form.ad}
+              onChange={(e) => onChange({ ...form, ad: e.target.value })}
+              placeholder={form.baslik.trim() || tipEtiketi(form.tip) || 'Anasayfa Metin Bloğu'}
+            />
+          </FormAlani>
+          <FormAlani etiket={`Sıra — ${sayfaEtiketi}`}>
+            <input
+              type="number"
+              min={1}
+              className={formInputSinifi}
+              value={form.sira}
+              onChange={(e) => onChange({ ...form, sira: Number(e.target.value) })}
+              placeholder="1"
+            />
+          </FormAlani>
+        </div>
+        {siraCakisma && (
+          <div className="ap-sira-uyari" role="alert">
+            <strong>Sıra çakışması:</strong> {sayfaEtiketi} sayfasında sıra {form.sira} zaten &quot;{siraCakisma.ad}&quot; ({tipEtiketi(siraCakisma.tip)}) widgetında kullanılıyor.
+          </div>
+        )}
 
-            <AdminFormBolumu baslik="Kimlik" aciklama="Admin panelinde görünecek ad. Boş bırakırsanız içerik başlığından otomatik üretilir.">
-              <FormAlani etiket="Widget Adı">
-                <input
-                  className={formInputSinifi}
-                  value={form.ad}
-                  onChange={(e) => onChange({ ...form, ad: e.target.value })}
-                  placeholder={form.baslik.trim() || tipEtiketi(form.tip) || 'Örnek: Anasayfa Metin Bloğu'}
-                />
-              </FormAlani>
-              {!yeniMod && (
-                <FormAlani etiket="Tip">
-                  {tipOlusturulabilirMi(form.tip) ? (
-                    <select
-                      className={formSelectSinifi}
-                      value={form.tip}
-                      onChange={(e) => {
-                        onChange(tipDegistir(form, e.target.value, tumWidgetlar));
-                        onTipSecildi?.(e.target.value);
-                      }}
-                    >
-                      {widgetTipleriKategoriyeGore().map(({ kategori, tipler }) => (
-                        <optgroup key={kategori.id} label={kategori.etiket}>
-                          {tipler.map((t) => (
-                            <option key={t.id} value={t.id}>{t.etiket}</option>
-                          ))}
-                        </optgroup>
-                      ))}
-                    </select>
-                  ) : (
-                    <p className="text-sm text-amber-400">{tipEtiketi(form.tip)} (eski tip — yalnızca düzenlenebilir)</p>
-                  )}
-                  {tipOlusturulabilirMi(form.tip) && (
-                    <p className="ap-muted mt-1 text-xs">Kategori: {tipKategoriEtiketi(form.tip)}</p>
-                  )}
-                </FormAlani>
-              )}
-              <FormAlani
-                etiket={`Sıra — ${sayfaEtiketi}`}
-                aciklama={`${sayfaEtiketi} sayfasındaki görüntüleme sırası. Her sayfanın kendi 1, 2, 3… dizisi vardır.`}
-              >
-                <input
-                  type="number"
-                  min={1}
-                  className={`${formInputSinifi} max-w-[120px]`}
-                  value={form.sira}
-                  onChange={(e) => onChange({ ...form, sira: Number(e.target.value) })}
-                />
-              </FormAlani>
-              {siraCakisma && (
-                <div className="ap-sira-uyari" role="alert">
-                  <strong>⚠️ Sıra çakışması:</strong> <strong>{sayfaEtiketi}</strong> sayfasında sıra{' '}
-                  <strong>{form.sira}</strong> zaten{' '}
-                  <strong>&quot;{siraCakisma.ad}&quot;</strong> ({tipEtiketi(siraCakisma.tip)}) widgetında kullanılıyor.
-                  Lütfen birinin sırasını değiştirin, aksi halde görüntüleme sırası belirsiz olur.
-                </div>
-              )}
-              <AdminAnahtarDugme etiket="Aktif" acik={form.aktif} onDegistir={(v) => onChange({ ...form, aktif: v })} />
-            </AdminFormBolumu>
+        <div className="ap-form-ic-piller" role="tablist">
+          {icSekmeler.map((s) => (
+            <button
+              key={s.id}
+              type="button"
+              role="tab"
+              aria-selected={sekme === s.id}
+              className={`ap-form-ic-pil${sekme === s.id ? ' ap-form-ic-pil--aktif' : ''}`}
+              onClick={() => setSekme(s.id)}
+            >
+              {s.etiket}
+            </button>
+          ))}
+        </div>
 
+        <div className={`ap-form-ic-govde${sekme === 'widgetEkleme' ? ' ap-editor-icerik-ekleme' : ''}`}>
+          {sekme === 'genel' && (
             <WidgetYerlesimPanel
               form={form}
               onChange={onChange}
@@ -458,45 +397,37 @@ export function WidgetEditorPanel({
               mevcutWidgetId={seciliWidget?.id}
               sayfalar={sayfalar}
             />
-          </>
-        )}
+          )}
 
-        {sekme === 'icerik' && (
-          <>
-            <AdminFormBolumu
-              baslik="Otomatik doldur"
-              aciklama="Boş alanları örnek metin, görsel ve liste verileriyle doldurur. Kapattığınızda açmadan önceki haline döner. Kaydetmeden önce içeriği düzenleyebilirsiniz."
-            >
-              <AdminAnahtarDugme
-                etiket="Örnek içerikle doldur"
-                acik={otomatikDoldur}
-                onDegistir={otomatikDoldurDegistir}
-              />
-            </AdminFormBolumu>
-            {IcerikPanel ? (
-              <IcerikPanel form={form} onChange={onChange} />
-            ) : (
-              <AdminBosDurum ikon="📝" baslik="İçerik paneli yok" aciklama="Bu widget tipi için özel içerik editörü tanımlı değil." />
-            )}
-          </>
-        )}
+          {sekme === 'icerik' && (
+            <>
+              <div className="ap-widget-icerik-ust">
+                <AdminAnahtarDugme
+                  etiket="Örnek içerik"
+                  acik={otomatikDoldur}
+                  onDegistir={otomatikDoldurDegistir}
+                />
+              </div>
+              {IcerikPanel ? (
+                <IcerikPanel form={form} onChange={onChange} />
+              ) : (
+                <AdminBosDurum ikon="📝" baslik="İçerik paneli yok" aciklama="Bu widget tipi için özel içerik editörü tanımlı değil." />
+              )}
+            </>
+          )}
 
-        {sekme === 'gorunum' && <OrtakGorunumPanel form={form} onChange={onChange} />}
-
-        {sekme === 'gelismis' && <EkAyarlarPanel form={form} onChange={onChange} />}
-
-        {sekme === 'widgetEkleme' && form.tip === 'BLOK_OLUSTURUCU' && (
-          <WidgetEklemePanel
-            key={widgetAnahtar}
-            form={form}
-            onChange={onChange}
-            tumWidgetlar={tumWidgetlar}
-            onGenelSekmesi={() => setSekme('genel')}
-          />
-        )}
-
-        {hata && <p className="text-sm text-red-400">{hata}</p>}
-        {kaydediliyor && <p className="ap-muted text-sm">Kaydediliyor...</p>}
+          {sekme === 'gorunum' && <OrtakGorunumPanel form={form} onChange={onChange} />}
+          {sekme === 'gelismis' && <EkAyarlarPanel form={form} onChange={onChange} />}
+          {sekme === 'widgetEkleme' && form.tip === 'BLOK_OLUSTURUCU' && (
+            <WidgetEklemePanel
+              key={widgetAnahtar}
+              form={form}
+              onChange={onChange}
+              tumWidgetlar={tumWidgetlar}
+              onGenelSekmesi={() => setSekme('genel')}
+            />
+          )}
+        </div>
       </div>
     </div>
   );

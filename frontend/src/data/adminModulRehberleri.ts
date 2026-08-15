@@ -110,31 +110,31 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
 
   'widget-yonetimi': {
     baslik: 'Widget Rehberi',
-    altBaslik: 'Ana sayfa bloklarını yönetin',
+    altBaslik: 'Sayfa bloklarını yönetin',
     bolumBaslik: 'Widget Yönetimi',
     kartlar: [
       {
         ikon: '🧩',
         baslik: 'Widget Nedir?',
-        aciklama: 'Slider, hizmet kartları ve özel bloklar ana sayfada sırayla gösterilir. Her widget tipi farklı alanlar içerir.',
+        aciklama: 'Slider, hizmet kartları ve özel bloklar sayfada sırayla gösterilir. Her widget tipi farklı alanlar içerir.',
         renk: 'mor',
       },
       {
-        ikon: '➕',
-        baslik: 'Yeni Widget',
-        aciklama: 'Tip seçin, İçerik ve Görünüm sekmelerinden düzenleyin. Footer Önizle ile canlı önizleme açılır.',
+        ikon: '📋',
+        baslik: 'Liste ve düzenleme',
+        aciklama: 'Widget Listesi’nden bir kayda tıklayınca düzenleme açılır. Yeni Widget önce tipi görsel kartlardan seçtirir; sonra içeriği doldurursunuz.',
         renk: 'turuncu',
       },
       {
         ikon: '👁️',
         baslik: 'Önizleme',
-        aciklama: 'Genel sekmesinde tip kartına veya listeden widget seçince Önizle aktif olur.',
+        aciklama: 'Alt bardaki Önizle, widgetı modalda gösterir. Siteyi Önizle bu sayfada yoktur.',
         renk: 'yesil',
       },
       {
         ikon: '🔢',
-        baslik: 'Sıralama',
-        aciklama: 'Sıra numarası küçük olan widget önce görünür. Aktif/pasif anahtarı ile gizleyebilirsiniz.',
+        baslik: 'Sıralama ve durum',
+        aciklama: 'Sıra numarası küçük olan önce görünür. Üstteki yeşil Aktif anahtarı ile sitede gösterir veya gizlersiniz.',
         renk: 'mavi',
       },
       {

@@ -1,5 +1,7 @@
+import { useEffect } from 'react';
 import { WidgetRender } from '@/components/widget/WidgetAlani';
 import { formToWidgetOnizleme } from '@/types/widget';
+import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 import type { WidgetFormDegeri } from '@/types/admin';
 
 interface WidgetOnizlemeModalProps {
@@ -10,24 +12,44 @@ interface WidgetOnizlemeModalProps {
 }
 
 export function WidgetOnizlemeModal({ acik, form, otomatikDoldur = false, onKapat }: WidgetOnizlemeModalProps) {
+  useEffect(() => {
+    if (!acik) return;
+    function tus(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onKapat();
+      }
+    }
+    document.addEventListener('keydown', tus);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', tus);
+      document.body.style.overflow = '';
+    };
+  }, [acik, onKapat]);
+
   if (!acik) return null;
 
   const widget = formToWidgetOnizleme(form, 'onizleme', otomatikDoldur);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <button type="button" className="absolute inset-0 bg-black/70" aria-label="Kapat" onClick={onKapat} />
-      <div className="relative flex max-h-[90vh] w-full max-w-5xl flex-col overflow-hidden rounded-xl border border-slate-700 bg-slate-900 shadow-2xl">
-        <div className="flex items-center justify-between border-b border-slate-700 px-4 py-3">
+    <div className="ap-admin-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="widget-onizleme-baslik">
+      <button type="button" className="ap-admin-modal-backdrop" aria-label="Kapat" onClick={onKapat} />
+      <div className="ap-admin-modal ap-admin-modal-genis ap-widget-oniz-modal">
+        <header className="ap-admin-modal-header">
           <div>
-            <h2 className="text-base font-semibold text-white">Widget Önizleme</h2>
-            <p className="text-xs text-slate-400">{form.ad || 'Taslak'} · {form.tip.replaceAll('_', ' ')}</p>
+            <h2 id="widget-onizleme-baslik" className="ap-admin-modal-baslik">
+              Widget önizleme
+            </h2>
+            <p className="ap-admin-modal-alt">
+              {form.ad.trim() || 'Taslak'} · {tipEtiketi(form.tip)}
+            </p>
           </div>
-          <button type="button" onClick={onKapat} className="rounded-lg px-3 py-1.5 text-sm text-slate-300 hover:bg-slate-800">
-            Kapat
+          <button type="button" className="ap-admin-modal-kapat" onClick={onKapat}>
+            ✕ ESC
           </button>
-        </div>
-        <div className="ap-scroll overflow-y-auto bg-slate-100">
+        </header>
+        <div className="ap-scroll ap-widget-oniz-govde">
           <WidgetRender widget={widget} onizleme />
         </div>
       </div>

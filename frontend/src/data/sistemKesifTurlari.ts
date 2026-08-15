@@ -189,11 +189,11 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         okYonu: 'alt' as const,
         baslik: 'Widget Yönetimi',
         aciklama:
-          'Anasayfa ve diğer sayfalardaki bileşenler (slider, hizmet kartları, haber blokları vb.) widget olarak eklenir. Sol listeden widget seçip sağdan tip ve içeriğini düzenlersiniz.',
+          'Sayfalardaki bileşenleri buradan yönetin. Yeni Widget’ta önce görsel kartlardan tipi seçin; listeden tıklayınca düzenleme açılır. Aktif anahtarı sitede gösterir. Önizle kartı modalda açar.',
         ipuclari: [
-          'Her widget bir tipe sahiptir (Slider, Hero, SSS…)',
-          'Widget\'ı hangi sayfada göstereceğinizi seçebilirsiniz',
-          'Önizleme ile sonucu kontrol edin',
+          'Listeden tıklayınca düzenleme açılır',
+          'Aktif anahtarı widgetı sitede gösterir',
+          'Önizle ile sonucu modalda kontrol edin',
         ],
       },
       {
