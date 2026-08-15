@@ -75,35 +75,20 @@ const dashboardAdimlari = [
     hedef: 'dash-kpi',
     modulId: 'dashboard',
     okYonu: 'alt' as const,
-    baslik: 'Özet Kartları — Sitenizin Durumu',
+    baslik: 'Sayılar — Sitenizin Durumu',
     aciklama:
-      'Yayında kaç sayfa var, kaç form gönderildi, kaç medya yüklendi gibi bilgileri tek bakışta görürsünüz. Analitik modda form gönderim grafiği ve içerik dağılımı da gösterilir.',
-    ipuclari: [
-      'Analitik görünümde Bugün / Bu Hafta / Bu Ay seçebilirsiniz',
-      'Sade görünüm daha az grafik, daha çok özet sunar',
-    ],
+      'Yayındaki sayfa, blog, form, widget ve medya kartları burada durur. Bir karta tıklayınca ilgili modül açılır.',
+    ipuclari: ['Bekleyen sayısı, okunmamış form yanıtlarını gösterir'],
   },
   {
     id: 'dash-hizli',
     hedef: 'dash-hizli-erisim',
     modulId: 'dashboard',
     okYonu: 'ust' as const,
-    baslik: 'Hızlı Erişim — Sık Kullandıklarınız',
+    baslik: 'Modüller — Sık Kullandıklarınız',
     aciklama:
-      'En çok girdiğiniz modüllere tek tıkla ulaşın. Dişli simgesine basarak hangi modüllerin görüneceğini kendiniz seçebilirsiniz.',
-    ipuclari: [
-      'Profil ayarlarından da hızlı erişim listesi düzenlenir',
-      'Kartlara tıklayınca ilgili modül yeni sekmede açılır',
-    ],
-  },
-  {
-    id: 'dash-gorunum',
-    hedef: 'dash-gorunum',
-    modulId: 'dashboard',
-    okYonu: 'alt' as const,
-    baslik: 'Görünüm Seçimi',
-    aciklama:
-      'Dashboard\'u "Analitik" (grafikli, detaylı) veya "Sade" (sade özet) olarak görebilirsiniz. Tercihiniz otomatik hatırlanır.',
+      'En çok girdiğiniz sayfalara tek tıkla geçin. Düzenle ile listede hangilerinin duracağını siz seçersiniz.',
+    ipuclari: ['Profil ayarlarından da bu liste düzenlenir'],
   },
   {
     id: 'site-onizle',
@@ -152,7 +137,7 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
   {
     id: 'dashboard',
     baslik: 'Dashboard',
-    aciklama: 'Ana sayfa, özetler ve hızlı erişim.',
+    aciklama: 'Ana sayfa: sayılar, son hareket ve modüller.',
     ikon: '📊',
     adimlar: [
       {
@@ -218,9 +203,9 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         okYonu: 'alt' as const,
         baslik: 'Blog / Haberler',
         aciklama:
-          'Haber ve blog yazılarını buradan ekleyin. Başlık, özet, kapak görseli ve zengin metin editörü ile içerik oluşturun. Yayına almadan önce taslak olarak saklayabilirsiniz.',
+          'Haber ve blog yazılarını buradan yönetin. Listeden seçip Düzenle; Yeni Yazı ile ekleyin. Yayında anahtarı yazıyı sitede gösterir. Görünüm sekmesinde menü ve ana sayfa bandını ayarlayın. Önizle kartı modalda açar.',
         ipuclari: [
-          'Slug: yazının URL\'deki adresi (ör. /blog/yeni-yazi)',
+          'Slug boş bırakılırsa başlıktan otomatik oluşur',
           'SEO başlık ve açıklama her yazı için ayrı ayarlanabilir',
         ],
       },
@@ -231,9 +216,9 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         okYonu: 'alt' as const,
         baslik: 'Form Yönetimi',
         aciklama:
-          'İletişim, teklif alma veya başvuru formları tasarlayın. Alanları (metin, e-posta, telefon vb.) sürükleyerek ekleyin. Gelen mesajlar bu modülde listelenir.',
+          'İletişim ve başvuru formlarını buradan yönetin. Listeden seçip Düzenle; Yeni Form ile ekleyin. Alanlar, yerleşim ve bildirim editörde. Gönderimler ayrı sekmede. Önizle formu modalda test eder.',
         ipuclari: [
-          'Formu sitede nerede göstereceğinizi "Yerleşim" sekmesinden seçin',
+          'Yayında anahtarı formu sitede gösterir',
           'Bildirim e-postası ile yeni gönderimde haberdar olun',
         ],
       },
@@ -275,7 +260,7 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         okYonu: 'alt' as const,
         baslik: 'Hero — Ana Banner',
         aciklama:
-          'Anasayfanın büyük giriş alanı. Arka plan görseli, başlık, alt metin ve buton metnini buradan değiştirirsiniz.',
+          'Anasayfanın büyük giriş alanı. Listeden slider seçip Düzenle; Yeni Ekle ile slayt ekleyin. Güven Kartları ayrı sekmede. Önizle bannerı modalda gösterir.',
       },
       {
         id: 'footer',
@@ -294,7 +279,7 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         okYonu: 'alt' as const,
         baslik: 'Kategori Yönetimi',
         aciklama:
-          'Menü ve haber kategorilerini ağaç yapısında oluşturun. Üst kategori altına alt kategoriler ekleyebilirsiniz.',
+          'Header’daki Tüm Kategoriler menüsünü ağaç olarak yönetin. Listeden seçip Düzenle; Yeni Alt Ekle ile 3 seviyeye kadar alt kategori ekleyin.',
       },
     ],
   },
@@ -319,10 +304,10 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         okYonu: 'alt' as const,
         baslik: 'SEO Ayarları Modülü',
         aciklama:
-          'Genel SEO sekmesinde site geneli ayarlar; Kategori ve Sabit Sayfa sekmelerinde her URL için title/description girilir. Yeşil + ile 301 yönlendirme eklenir (eski adres → yeni adres).',
+          'Genel sekmesinde site geneli ayarlar vardır. Kategori ve Sabit Sayfa listesinden bir URL seçip Düzenle ile title/description girilir. Önizle Google sonucunu modalda gösterir.',
         ipuclari: [
-          '301 yönlendirme: taşınan sayfalar için eski linki yönlendirin',
-          'Değişiklikler alt Kaydet veya üst çubuktan kaydedilir',
+          '301 yönlendirme: düzenleme ekranında Yeni Ekle ile eski adresi yönlendirin',
+          'Değişiklikler aksiyon çubuğundaki Kaydet ile kaydedilir',
         ],
       },
       {

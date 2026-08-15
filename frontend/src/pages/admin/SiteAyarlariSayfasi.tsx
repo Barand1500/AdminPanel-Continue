@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import { useSiteYonetimiAksiyonlari } from '@/hooks/useSiteYonetimiAksiyonlari';
@@ -17,7 +17,7 @@ import {
   HataDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
 import { GunduzSablonSecici, GeceSablonSecici } from '@/components/admin/site/TemaSablonSecici';
-import { TemaOnizlemePaneli } from '@/components/admin/site/TemaOnizlemePaneli';
+import { TemaOnizlemeModal } from '@/components/admin/site/TemaOnizlemeModal';
 import { whatsappFormatla, whatsappKayitDegeri, telefonFormatla } from '@/utils/telefonFormat';
 import {
   GUNDUZ_SABLONLARI,
@@ -30,7 +30,9 @@ import {
 export function SiteAyarlariSayfasi() {
   const { site, siteAd, ayarlar, yukleniyor, hata, kaydediliyor, alanGuncelle, siteAdGuncelle } =
     useSiteAyarlariYonetimi();
-  useSiteYonetimiAksiyonlari();
+  const [onizlemeAcik, setOnizlemeAcik] = useState(false);
+  const onizle = useCallback(() => setOnizlemeAcik(true), []);
+  useSiteYonetimiAksiyonlari(onizle);
 
   const whatsappGoster = ayarlar?.whatsapp ? whatsappFormatla(ayarlar.whatsapp) : '';
 
@@ -151,45 +153,51 @@ export function SiteAyarlariSayfasi() {
         <AdminPanelKarti baslik="Tipografi" altBaslik="Site genelinde kullanılacak yazı tipi">
           <FontSecici deger={ayarlar.font ?? 'Inter'} onChange={(v) => alanGuncelle('font', v)} />
         </AdminPanelKarti>
+      </div>
 
+      <div className="mt-6">
         <AdminPanelKarti baslik="İletişim Bilgileri" altBaslik="Footer, header üst bant ve iletişim sayfasında kullanılır">
-          <div className="space-y-4">
-            <TelefonInput
-              deger={ayarlar.telefon ? telefonFormatla(ayarlar.telefon) : ''}
-              onChange={(v) => alanGuncelle('telefon', v || null)}
-            />
-            <EmailInput deger={ayarlar.email ?? ''} onChange={(v) => alanGuncelle('email', v || null)} />
-            <WhatsAppInput deger={whatsappGoster} onChange={whatsappGuncelle} />
-            <FormAlani etiket="Adres">
-              <textarea
-                className={formInputSinifi}
-                rows={3}
-                placeholder="Mahalle, sokak, ilce, il..."
-                value={ayarlar.adres ?? ''}
-                onChange={(e) => alanGuncelle('adres', e.target.value || null)}
+          <div className="ap-site-ayarlari-iletisim">
+            <div className="ap-site-ayarlari-iletisim-satir ap-site-ayarlari-iletisim-satir--uc">
+              <TelefonInput
+                deger={ayarlar.telefon ? telefonFormatla(ayarlar.telefon) : ''}
+                onChange={(v) => alanGuncelle('telefon', v || null)}
+                aciklama=""
               />
-            </FormAlani>
-            <FormAlani etiket="Telif Yazisi" aciklama="Footer alt satir metni">
-              <input
-                className={formInputSinifi}
-                placeholder={`© ${new Date().getFullYear()} ${siteAd}. Tüm hakları saklıdır.`}
-                value={ayarlar.telifYazisi ?? ''}
-                onChange={(e) => alanGuncelle('telifYazisi', e.target.value || null)}
-              />
-            </FormAlani>
+              <EmailInput deger={ayarlar.email ?? ''} onChange={(v) => alanGuncelle('email', v || null)} aciklama="" />
+              <WhatsAppInput deger={whatsappGoster} onChange={whatsappGuncelle} aciklama="" />
+            </div>
+            <div className="ap-site-ayarlari-iletisim-satir ap-site-ayarlari-iletisim-satir--iki">
+              <FormAlani etiket="Adres">
+                <input
+                  className={formInputSinifi}
+                  placeholder="Mahalle, sokak, ilce, il..."
+                  value={ayarlar.adres ?? ''}
+                  onChange={(e) => alanGuncelle('adres', e.target.value || null)}
+                />
+              </FormAlani>
+              <FormAlani etiket="Telif Yazisi">
+                <input
+                  className={formInputSinifi}
+                  placeholder={`© ${new Date().getFullYear()} ${siteAd}. Tüm hakları saklıdır.`}
+                  value={ayarlar.telifYazisi ?? ''}
+                  onChange={(e) => alanGuncelle('telifYazisi', e.target.value || null)}
+                />
+              </FormAlani>
+            </div>
           </div>
         </AdminPanelKarti>
-
-        <AdminPanelKarti baslik="Önizleme" altBaslik="Gündüz ve gece modu canlı önizleme">
-          <TemaOnizlemePaneli
-            siteAd={siteAd || site?.ad || 'Site'}
-            anaRenk={ayarlar.anaRenk ?? '#7c3aed'}
-            ikincilRenk={ayarlar.ikincilRenk ?? '#a78bfa'}
-            geceSablon={temaAyarlari.geceSablon}
-            font={ayarlar.font}
-          />
-        </AdminPanelKarti>
       </div>
+
+      <TemaOnizlemeModal
+        acik={onizlemeAcik}
+        siteAd={siteAd || site?.ad || 'Site'}
+        anaRenk={ayarlar.anaRenk ?? '#7c3aed'}
+        ikincilRenk={ayarlar.ikincilRenk ?? '#a78bfa'}
+        geceSablon={temaAyarlari.geceSablon}
+        font={ayarlar.font}
+        onKapat={() => setOnizlemeAcik(false)}
+      />
     </div>
   );
 }

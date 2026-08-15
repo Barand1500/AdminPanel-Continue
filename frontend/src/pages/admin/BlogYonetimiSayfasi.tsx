@@ -1,6 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { BlogDuzenleFormu, BlogListesi } from '@/components/admin/blog/BlogBilesenleri';
-import { BlogGorunumPanel } from '@/components/admin/blog/BlogGorunumPanel';
+import {
+  BlogEditorPanel,
+  BlogGorunumPaneli,
+  BlogListesiPanel,
+  BlogOnizlemeModal,
+  blogdanForm,
+  bosBlogForm,
+} from '@/components/admin/blog/BlogBilesenleri';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import { useKaydedilmemisBildirim } from '@/contexts/AdminUyariBildirimContext';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
@@ -9,46 +15,51 @@ import {
   BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
-import { AdminIstatistikKarti } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminPilSekme } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
   adminBlogGuncelle,
   adminBlogOlustur,
   adminBlogSil,
   adminBloglariGetir,
   type AdminBlog,
-  type BlogFormDegeri,
 } from '@/features/admin/blogApi';
 import { blogAyarlariBirlestir, type BlogAyarlari } from '@/types/blog';
 import { siteVerisiGuncellendiYayinla } from '@/utils/siteVerisiOlaylari';
 
-const bosForm: BlogFormDegeri = {
-  baslik: '',
-  slug: '',
-  ozet: '',
-  icerik: '',
-  kapakGorsel: '',
-  yazar: '',
-  kategori: '',
-  yayinda: false,
-  oneCikan: false,
-  seoTitle: '',
-  seoDesc: '',
-};
+type Gorunum = 'liste' | 'editor' | 'gorunum';
 
-function blogdanForm(b: AdminBlog): BlogFormDegeri {
-  return {
-    baslik: b.baslik,
-    slug: b.slug,
-    ozet: b.ozet ?? '',
-    icerik: b.icerik,
-    kapakGorsel: b.kapakGorsel ?? '',
-    yazar: b.yazar ?? '',
-    kategori: b.kategori ?? '',
-    yayinda: b.yayinda,
-    oneCikan: b.oneCikan,
-    seoTitle: b.seoTitle ?? '',
-    seoDesc: b.seoDesc ?? '',
-  };
+function ListeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+    </svg>
+  );
+}
+
+function YeniIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 5v14M5 12h14" />
+    </svg>
+  );
+}
+
+function DuzenlemeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+    </svg>
+  );
+}
+
+function GorunumIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <rect x="3" y="4" width="18" height="16" rx="2" />
+      <path d="M3 9h18M8 4v5" />
+    </svg>
+  );
 }
 
 export function BlogYonetimiSayfasi() {
@@ -56,12 +67,14 @@ export function BlogYonetimiSayfasi() {
   const blogAyarlari = useMemo(() => blogAyarlariBirlestir(ayarlar), [ayarlar]);
 
   const [bloglar, setBloglar] = useState<AdminBlog[]>([]);
-  const [form, setForm] = useState<BlogFormDegeri>(bosForm);
+  const [form, setForm] = useState(bosBlogForm);
   const [seciliId, setSeciliId] = useState<string | null>(null);
+  const [gorunum, setGorunum] = useState<Gorunum>('liste');
   const [yukleniyor, setYukleniyor] = useState(true);
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [hata, setHata] = useState('');
   const [basari, setBasari] = useState('');
+  const [onizlemeAcik, setOnizlemeAcik] = useState(false);
 
   useKaydedilmemisBildirim(
     kirli && !kaydediliyor,
@@ -70,17 +83,7 @@ export function BlogYonetimiSayfasi() {
     'blog-gorunum'
   );
 
-  const istatistik = useMemo(
-    () => ({
-      toplam: bloglar.length,
-      yayinda: bloglar.filter((b) => b.yayinda).length,
-      taslak: bloglar.filter((b) => !b.yayinda).length,
-      oneCikan: bloglar.filter((b) => b.oneCikan).length,
-    }),
-    [bloglar]
-  );
-
-  async function yukle() {
+  const yukle = useCallback(async () => {
     setYukleniyor(true);
     try {
       setBloglar(await adminBloglariGetir());
@@ -89,78 +92,73 @@ export function BlogYonetimiSayfasi() {
     } finally {
       setYukleniyor(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
     void yukle();
-  }, []);
+  }, [yukle]);
 
-  const yeniBaslat = useCallback(() => {
+  const formuSifirla = useCallback(() => {
     setSeciliId(null);
-    setForm(bosForm);
+    setForm(bosBlogForm);
     setBasari('');
     setHata('');
   }, []);
+
+  const yeniBaslat = useCallback(() => {
+    formuSifirla();
+    setGorunum('editor');
+  }, [formuSifirla]);
 
   const blogAyarlariGuncelle = (guncel: BlogAyarlari) => {
     alanGuncelle('blogAyarlariJson', guncel);
   };
 
-  const siteAyarlariKaydet = useCallback(async () => {
-    if (!kirli) return;
-    await siteKaydet();
-    siteVerisiGuncellendiYayinla();
-  }, [kirli, siteKaydet]);
-
   const kaydet = useCallback(async () => {
-    if (!kirli && !form.baslik.trim()) {
-      setHata('Kaydedilecek içerik yok');
+    if (gorunum === 'gorunum') {
+      if (!kirli) return;
+      setKaydediliyor(true);
+      setHata('');
+      setBasari('');
+      try {
+        await siteKaydet();
+        siteVerisiGuncellendiYayinla();
+        setBasari('Görünüm ayarları kaydedildi.');
+      } catch (err) {
+        setHata(err instanceof Error ? err.message : 'Kayıt başarısız');
+      } finally {
+        setKaydediliyor(false);
+      }
       return;
     }
+
+    if (!form.baslik.trim()) {
+      setHata('Başlık zorunludur');
+      return;
+    }
+
     setKaydediliyor(true);
     setHata('');
     setBasari('');
     try {
-      let mesaj = '';
-      if (form.baslik.trim()) {
-        if (seciliId) await adminBlogGuncelle(seciliId, form);
-        else await adminBlogOlustur(form);
-        mesaj = seciliId ? 'Yazı güncellendi.' : 'Yeni yazı oluşturuldu.';
-        yeniBaslat();
-        await yukle();
+      if (seciliId) {
+        const g = await adminBlogGuncelle(seciliId, form);
+        setForm(blogdanForm(g));
+        setBasari('Yazı güncellendi.');
+      } else {
+        const o = await adminBlogOlustur(form);
+        setForm(blogdanForm(o));
+        setSeciliId(o.id);
+        setBasari('Yazı oluşturuldu.');
       }
-      if (kirli) {
-        await siteAyarlariKaydet();
-        mesaj = mesaj ? `${mesaj} Görünüm ayarları kaydedildi.` : 'Görünüm ayarları kaydedildi.';
-      }
-      setBasari(mesaj || 'Kaydedildi.');
+      setBloglar(await adminBloglariGetir());
       siteVerisiGuncellendiYayinla();
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Kayıt başarısız');
     } finally {
       setKaydediliyor(false);
     }
-  }, [form, seciliId, yeniBaslat, kirli, siteAyarlariKaydet]);
-
-  const yayinla = useCallback(async () => {
-    const guncel = { ...form, yayinda: true };
-    setKaydediliyor(true);
-    setHata('');
-    setBasari('');
-    try {
-      if (seciliId) await adminBlogGuncelle(seciliId, guncel);
-      else await adminBlogOlustur(guncel);
-      if (kirli) await siteAyarlariKaydet();
-      setBasari('Yazı yayınlandı.');
-      yeniBaslat();
-      await yukle();
-      siteVerisiGuncellendiYayinla();
-    } catch (err) {
-      setHata(err instanceof Error ? err.message : 'Yayınlama başarısız');
-    } finally {
-      setKaydediliyor(false);
-    }
-  }, [form, seciliId, yeniBaslat, kirli, siteAyarlariKaydet]);
+  }, [form, seciliId, gorunum, kirli, siteKaydet]);
 
   const sil = useCallback(async () => {
     if (!seciliId || !confirm('Bu yazıyı silmek istediğinize emin misiniz?')) return;
@@ -168,7 +166,8 @@ export function BlogYonetimiSayfasi() {
     try {
       await adminBlogSil(seciliId);
       setBasari('Yazı silindi.');
-      yeniBaslat();
+      formuSifirla();
+      setGorunum('liste');
       await yukle();
       siteVerisiGuncellendiYayinla();
     } catch (err) {
@@ -176,71 +175,98 @@ export function BlogYonetimiSayfasi() {
     } finally {
       setKaydediliyor(false);
     }
-  }, [seciliId, yeniBaslat]);
+  }, [seciliId, formuSifirla, yukle]);
 
-  const onizle = useCallback(() => {
-    const slug = form.slug.trim();
-    if (form.yayinda && slug) {
-      window.open(`/blog/${slug}`, '_blank');
-    } else {
-      window.open('/blog', '_blank');
-    }
-  }, [form.slug, form.yayinda]);
+  const duzenlemeyeGit = useCallback(() => {
+    if (!seciliId) return;
+    setGorunum('editor');
+  }, [seciliId]);
 
   useModulAksiyonlari(
     {
       kaydet,
       ekle: yeniBaslat,
       sil,
-      yayinla,
-      onizle,
+      duzenle: duzenlemeyeGit,
+      onizle: () => setOnizlemeAcik(true),
     },
     {
-      kaydet: !kaydediliyor && (kirli || !!form.baslik.trim()),
-      ekle: true,
-      sil: !!seciliId && !kaydediliyor,
-      yayinla: !kaydediliyor && !!form.baslik.trim(),
+      kaydet:
+        !kaydediliyor &&
+        (gorunum === 'gorunum' ? kirli : gorunum === 'editor' && Boolean(form.baslik.trim())),
+      ekle: gorunum !== 'gorunum',
+      sil: gorunum !== 'gorunum' && !!seciliId && !kaydediliyor,
+      duzenle: gorunum === 'liste' && !!seciliId && !kaydediliyor,
       onizle: true,
     }
   );
 
+  function yaziSec(b: AdminBlog) {
+    setSeciliId(b.id);
+    setForm(blogdanForm(b));
+    setHata('');
+    setBasari('');
+  }
+
+  function gorunumDegistir(id: Gorunum) {
+    if (id === gorunum) return;
+    if (id === 'liste' || id === 'gorunum') {
+      setGorunum(id);
+      return;
+    }
+    yeniBaslat();
+  }
+
+  const editorEtiket = gorunum === 'editor' && seciliId ? 'Düzenleme' : 'Yeni Yazı';
+  const seciliBlog = bloglar.find((b) => b.id === seciliId) ?? null;
+
+  if (yukleniyor) {
+    return (
+      <AdminModulKabuk onizleGoster={false}>
+        <YukleniyorDurumu mesaj="Blog yazıları yükleniyor..." />
+      </AdminModulKabuk>
+    );
+  }
+
   return (
     <AdminModulKabuk
-      baslik="Blog / Haberler"
-      aciklama="Haber ve blog yazılarını oluşturun, görünüm yerlerini seçin ve yayınlayın."
+      onizleGoster={false}
+      ustIcerik={
+        <AdminPilSekme
+          sekmeler={[
+            { id: 'liste', etiket: 'Yazı Listesi', ikon: <ListeIkon /> },
+            {
+              id: 'editor',
+              etiket: editorEtiket,
+              ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniIkon />,
+            },
+            { id: 'gorunum', etiket: 'Görünüm', ikon: <GorunumIkon /> },
+          ]}
+          aktif={gorunum}
+          onDegistir={gorunumDegistir}
+        />
+      }
     >
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
 
-      {yukleniyor ? (
-        <YukleniyorDurumu mesaj="Blog yazıları yükleniyor..." />
-      ) : (
-        <div className="ap-blog-yonetim">
-          <div className="ap-stat-grid ap-blog-stat-grid">
-            <AdminIstatistikKarti etiket="Toplam" deger={istatistik.toplam} ikon="📰" vurgu="mavi" />
-            <AdminIstatistikKarti etiket="Yayında" deger={istatistik.yayinda} ikon="✅" vurgu="yesil" />
-            <AdminIstatistikKarti etiket="Taslak" deger={istatistik.taslak} ikon="📝" vurgu="amber" />
-            <AdminIstatistikKarti etiket="Öne Çıkan" deger={istatistik.oneCikan} ikon="⭐" vurgu="gri" />
-          </div>
-
-          <BlogGorunumPanel ayarlar={blogAyarlari} onDegistir={blogAyarlariGuncelle} />
-
-          <div className="ap-split-layout ap-blog-split">
-            <BlogListesi
-              bloglar={bloglar}
-              seciliId={seciliId}
-              onSec={(b) => {
-                setSeciliId(b.id);
-                setForm(blogdanForm(b));
-                setBasari('');
-                setHata('');
-              }}
-            />
-            <BlogDuzenleFormu form={form} seciliId={seciliId} onChange={setForm} />
-          </div>
-        </div>
+      {gorunum === 'liste' && (
+        <BlogListesiPanel bloglar={bloglar} seciliId={seciliId} onSec={yaziSec} />
       )}
+      {gorunum === 'editor' && (
+        <BlogEditorPanel form={form} seciliId={seciliId} onChange={setForm} />
+      )}
+      {gorunum === 'gorunum' && (
+        <BlogGorunumPaneli ayarlar={blogAyarlari} onDegistir={blogAyarlariGuncelle} />
+      )}
+
+      <BlogOnizlemeModal
+        acik={onizlemeAcik}
+        form={form}
+        tarih={seciliBlog?.olusturma}
+        onKapat={() => setOnizlemeAcik(false)}
+      />
     </AdminModulKabuk>
   );
 }

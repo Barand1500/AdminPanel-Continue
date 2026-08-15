@@ -13,21 +13,21 @@ const sayfaKartlari: RehberKart[] = [
     ikon: '➕',
     baslik: 'Yeni Sayfa Nasıl Eklenir?',
     aciklama:
-      'Alt bardan Yeni Ekle butonuna basın. Başlık yazın — slug otomatik üretilir. İçerik ve SEO sekmelerini doldurup Kaydet ile kaydedin.',
+      'Üstteki Yeni Sayfa sekmesine geçin. Başlık yazın — slug otomatik üretilir. İçerik ve SEO sekmelerini doldurup Kaydet ile kaydedin.',
     renk: 'mor',
   },
   {
     ikon: '✏️',
     baslik: 'Mevcut Sayfayı Düzenlemek',
     aciklama:
-      'İçerik sekmesinde zengin metin editörü ile başlık, liste ve bağlantı ekleyebilirsiniz. Kaydet ile güncelleyin.',
+      'Listeden sayfayı seçin, alt bardaki Düzenle ile açın. Alt sayfa eklemek için sayfayı seçip Yeni Alt Ekle kullanın.',
     renk: 'turuncu',
   },
   {
     ikon: '🚀',
     baslik: 'Yayınlamak',
     aciklama:
-      'Ayarlar sekmesinde Yayında anahtarını açabilir veya doğrudan alt bardaki Yayınla butonunu kullanabilirsiniz.',
+      'Ayarlar sekmesinde Yayında anahtarını açarak sayfayı yayına alabilirsiniz.',
     renk: 'mavi',
   },
   {
@@ -54,19 +54,19 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
       {
         ikon: '📊',
         baslik: 'Özet Kartları',
-        aciklama: 'Üstteki kartlar sayfa, blog, form ve widget sayılarını gösterir. Kurumsal sitenizin içerik durumunu buradan takip edin.',
+        aciklama: 'Üstteki kartlar sayfa, blog, form, widget ve medya sayılarını gösterir. Tıklayınca ilgili modül açılır.',
         renk: 'mavi',
       },
       {
         ikon: '🧭',
-        baslik: 'Modül Açma',
-        aciklama: 'Hızlı erişim kartlarına tıklayarak ilgili modülü yeni sekmede açabilirsiniz.',
+        baslik: 'Hızlı erişim',
+        aciklama: 'Sağdaki kısayollarla sık kullandığınız modüllere geçin. Düzenle ile listeyi kendiniz seçersiniz.',
         renk: 'mor',
       },
       {
         ikon: '📬',
-        baslik: 'Son Formlar',
-        aciklama: 'Gelen form başvuruları listelenir. Okunmamış kayıtlar vurgulanır; Formlar modülünden detay görürsünüz.',
+        baslik: 'Bekleyen iş',
+        aciklama: 'Okunmamış form gönderimi varsa üstte uyarı çıkar. Son hareket listesinden blog ve form kayıtlarına gidersiniz.',
         renk: 'turuncu',
       },
     ],
@@ -97,7 +97,7 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
         renk: 'yesil',
       },
     ],
-    ipucu: 'Değişiklikleri alt bardaki Kaydet ile kaydedin; Önizle ile public siteyi yeni sekmede açın.',
+    ipucu: 'Değişiklikleri alt bardaki Kaydet ile kaydedin; Önizle ile gündüz/gece tema önizlemesini modal olarak açın.',
   },
 
   sayfalar: {
@@ -181,13 +181,13 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
       {
         ikon: '📤',
         baslik: 'Dosya Yükleme',
-        aciklama: 'PNG, JPG, WEBP dosyalarını bilgisayardan yükleyin veya URL ile ekleyin. Max 15MB.',
+        aciklama: 'Dosyaları sürükleyip bırakın, Yeni Ekle ile seçin veya URL ile ekleyin. En fazla 15 MB.',
         renk: 'mor',
       },
       {
         ikon: '🔗',
         baslik: 'URL Kullanımı',
-        aciklama: "Yüklenen dosyanın URL'sini kopyalayıp sayfa, widget veya site ayarlarında kullanın.",
+        aciklama: 'Kartın üzerindeki Kopyala ile adresi alın. Büyüt ile görseli tam boyutta açın.',
         renk: 'mavi',
       },
       {
@@ -219,7 +219,8 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
       {
         ikon: '📄',
         baslik: 'Sayfa Bazlı SEO',
-        aciklama: 'Her sayfanın kendi SEO sekmesi vardır. Genel ayarlar tüm site için varsayılan olur.',
+        aciklama:
+          'Kategori veya Sayfa listesinden bir URL seçip Düzenle ile title ve description girin. Genel ayarlar tüm site için varsayılan olur.',
         renk: 'camgobegi',
       },
     ],
@@ -257,7 +258,7 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
         ikon: '✏️',
         baslik: 'Düzenleme',
         aciklama:
-          'Listeden kategori seçin; ad, slug, link, sıra ve görseli değiştirip Kaydet ile güncelleyin. Slug boş bırakılırsa başlıktan otomatik üretilir.',
+          'Listeden kategori seçip Düzenle ile açın. Ad, slug, link, sıra ve görseli değiştirip Kaydet ile güncelleyin. Slug boş bırakılırsa başlıktan otomatik üretilir.',
         renk: 'turuncu',
       },
       {
@@ -265,13 +266,6 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
         baslik: 'Aktif / Pasif',
         aciklama: 'Pasif kategoriler sitede görünmez; silmeden geçici olarak gizlemek için kullanın.',
         renk: 'mavi',
-      },
-      {
-        ikon: '🖥️',
-        baslik: 'Önizleme',
-        aciklama:
-          'Sağ paneldeki menü önizlemesi, Header Yönetimi’ndeki açılış modunu (dropdown, sidebar, liste) yansıtır.',
-        renk: 'camgobegi',
       },
       {
         ikon: '🔝',
@@ -292,7 +286,7 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
       {
         ikon: '🖼️',
         baslik: 'Slider Ekleme',
-        aciklama: 'Yeni Slider ile görsel yükleyin. Birden fazla slider otomatik döner.',
+        aciklama: 'Yeni Ekle ile görsel yükleyin. Birden fazla slider otomatik döner.',
         renk: 'mor',
       },
       {
@@ -351,19 +345,19 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
       {
         ikon: '📝',
         baslik: 'Yazı Ekleme',
-        aciklama: 'Başlık, içerik ve kapak görseli ile yeni yazı oluşturun. Slug otomatik üretilir.',
+        aciklama: 'Listeden yazı seçip Düzenle ile açın. Yeni Yazı yayında başlar; taslak için üstteki Yayında anahtarını kapatın.',
         renk: 'mor',
       },
       {
         ikon: '🚀',
         baslik: 'Yayınlama',
-        aciklama: 'Yayında anahtarı açık yazılar /blog sayfasında listelenir. Görünüm Ayarları ile ana sayfa, hizmetler ve header menüsünü yönetin.',
+        aciklama: 'Yayında anahtarı açık yazılar /blog sayfasında listelenir. Önizle ile kart görünümünü modalda kontrol edin.',
         renk: 'yesil',
       },
       {
         ikon: '📍',
-        baslik: 'Görünüm Yerleri',
-        aciklama: 'Ana sayfa bandı, hizmetler alanı ve varsayılan header menüsünde Blog linki ayrı ayrı açılıp kapatılabilir.',
+        baslik: 'Görünüm',
+        aciklama: 'Görünüm sekmesinde header menüsü, ana sayfa bandı ve hizmetler alanını açıp kapatın.',
         renk: 'mavi',
       },
       {
@@ -383,13 +377,13 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
       {
         ikon: '📋',
         baslik: 'Form Oluşturma',
-        aciklama: 'Form adı ve alanları tanımlayın. Metin, e-posta, telefon gibi alan tipleri seçilebilir.',
+        aciklama: 'Listeden form seçip Düzenle ile açın. Yeni Form yayında başlar; taslak için Yayında anahtarını kapatın.',
         renk: 'mor',
       },
       {
         ikon: '📬',
         baslik: 'Gelen Başvurular',
-        aciklama: 'Gönderilen formlar listede görünür. Okundu işareti ve detay görüntüleme mevcuttur.',
+        aciklama: 'Gönderimler sekmesinde form seçin. Okundu işaretleyebilir, kayıt silebilirsiniz.',
         renk: 'mavi',
       },
     ],

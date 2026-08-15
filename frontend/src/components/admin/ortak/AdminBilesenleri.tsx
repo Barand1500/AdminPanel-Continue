@@ -4,11 +4,12 @@ import { AdminSiteOnizleLink } from '@/components/admin/AdminHeader';
 import { adminIslemBildirimi } from '@/utils/adminBildirimOlaylari';
 
 interface AdminModulKabukProps {
-  baslik: string;
+  baslik?: string;
   aciklama?: string;
   children: ReactNode;
   onizleGoster?: boolean;
   ustAksiyon?: ReactNode;
+  ustIcerik?: ReactNode;
 }
 
 export function AdminModulKabuk({
@@ -17,20 +18,27 @@ export function AdminModulKabuk({
   children,
   onizleGoster = true,
   ustAksiyon,
+  ustIcerik,
 }: AdminModulKabukProps) {
   return (
     <div className="ap-modul-kabuk w-full min-w-0" data-ap-kesif="modul-kabuk">
-      <div className="ap-modul-baslik">
-        <div>
-          <h1 className="ap-heading text-xl font-bold">{baslik}</h1>
-          {aciklama && <p className="ap-muted mt-1 text-sm">{aciklama}</p>}
-        </div>
-        <div className="flex items-center gap-2">
-          {ustAksiyon}
-          {onizleGoster && <AdminSiteOnizleLink />}
-        </div>
-      </div>
-      <div className="mt-6">{children}</div>
+      {ustIcerik ? (
+        <div className="ap-modul-baslik ap-modul-baslik--saga">{ustIcerik}</div>
+      ) : (
+        (baslik || aciklama || ustAksiyon || onizleGoster) && (
+          <div className="ap-modul-baslik">
+            <div>
+              {baslik && <h1 className="ap-heading text-xl font-bold">{baslik}</h1>}
+              {aciklama && <p className="ap-muted mt-1 text-sm">{aciklama}</p>}
+            </div>
+            <div className="flex items-center gap-2">
+              {ustAksiyon}
+              {onizleGoster && <AdminSiteOnizleLink />}
+            </div>
+          </div>
+        )
+      )}
+      <div className={ustIcerik || baslik ? 'mt-6' : undefined}>{children}</div>
     </div>
   );
 }

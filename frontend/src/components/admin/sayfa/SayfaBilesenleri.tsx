@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react';
 import type { AltMenuGorunum, AltMenuTetikleyici, SayfaAcilisModu } from '@/types/site';
 import { SayfaMenuOnizleme } from '@/components/admin/sayfa/SayfaMenuOnizleme';
 
-const ACILIS_MODLARI: { id: SayfaAcilisModu; ad: string; aciklama: string }[] = [
-  { id: 'normal', ad: 'Normal sayfa', aciklama: 'İletişim sayfası gibi tam sayfa olarak açılır' },
-  { id: 'modal', ad: 'Modal pencere', aciklama: 'Menüye tıklanınca sayfa popup olarak açılır' },
-  { id: 'yeni_sekme', ad: 'Yeni sekme', aciklama: 'Tarayıcıda yeni sekmede açılır' },
+const ACILIS_MODLARI: { id: SayfaAcilisModu; ad: string; aciklama: string; ikon: string }[] = [
+  { id: 'normal', ad: 'Normal sayfa', aciklama: 'Tam sayfa olarak açılır', ikon: '📄' },
+  { id: 'modal', ad: 'Modal', aciklama: 'Popup pencerede açılır', ikon: '▢' },
+  { id: 'yeni_sekme', ad: 'Yeni sekme', aciklama: 'Tarayıcıda yeni sekme', ikon: '↗' },
 ];
 
 const ALT_MENU_GORUNUM: { id: AltMenuGorunum; ad: string; aciklama: string }[] = [
@@ -58,6 +58,7 @@ interface SayfaListesiPanelProps {
   onSec: (sayfa: AdminSayfa) => void;
   onSirala?: (sayfaId: string, yon: 'yukari' | 'asagi') => void;
   islemde?: boolean;
+  tamGenislik?: boolean;
 }
 
 function SayfaSiraTuslari({
@@ -262,6 +263,7 @@ export function SayfaListesiPanel({
   onSec,
   onSirala,
   islemde,
+  tamGenislik,
 }: SayfaListesiPanelProps) {
   const [arama, setArama] = useState('');
   const [daraltildi, setDaraltildi] = useState<Record<string, boolean>>({});
@@ -280,7 +282,7 @@ export function SayfaListesiPanel({
   }
 
   return (
-    <aside className="ap-sidebar-panel ap-sayfa-liste-panel">
+    <aside className={`ap-sidebar-panel ap-sayfa-liste-panel${tamGenislik ? ' ap-sayfa-liste-panel--tam' : ''}`}>
       <div className="ap-sidebar-baslik">
         <div>
           <h2 className="ap-heading text-sm font-semibold">Sayfa Listesi</h2>
@@ -296,18 +298,13 @@ export function SayfaListesiPanel({
           {duzenlemeModu ? 'Bitti' : 'Sırala'}
         </button>
       </div>
-      {duzenlemeModu && siralaAktif && (
-        <p className="ap-muted mb-2 px-1 text-[11px] leading-snug">
-          Aynı seviyedeki sayfaları ↑ ↓ ile sıralayın. Üst sayfa değiştirmek için Ayarlar sekmesini kullanın.
-        </p>
-      )}
       <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Başlık veya slug ara..." />
       <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
         {filtreliAgac.length === 0 ? (
           <AdminBosDurum
             ikon="📄"
             baslik={arama ? 'Sonuç yok' : 'Henüz sayfa yok'}
-            aciklama={arama ? 'Farklı bir arama deneyin' : 'Alttaki Yeni Ekle ile başlayın'}
+            aciklama={arama ? 'Farklı bir arama deneyin' : 'Üstten Yeni Sayfa sekmesine geçerek başlayın'}
           />
         ) : (
           <SayfaAgacDallari
@@ -449,44 +446,43 @@ export function SayfaEditorPanel({
       <div className="ap-editor-icerik">
         {sekme === 'icerik' && (
           <>
-            <AdminFormBolumu baslik="Temel Bilgiler" aciklama="Sayfa başlığı ve URL yolu">
-              <FormAlani etiket="Başlık" aciklama="Ziyaretçi ve menüde görünecek ad">
-                <input
-                  className={formInputSinifi}
-                  value={form.baslik}
-                  onChange={(e) => baslikDegistir(e.target.value)}
-                  placeholder="Örnek: Hakkımızda"
-                  required
-                />
-              </FormAlani>
-              <FormAlani
-                etiket="Slug (URL)"
-                aciklama={
-                  ustSayfa
-                    ? `Tam yol: /${form.slug || '...'}`
-                    : slugManuel
-                      ? 'Manuel düzenleme açık'
-                      : 'Başlıktan otomatik üretiliyor'
-                }
-              >
-                <div className="flex gap-2">
-                  <span className="ap-muted flex items-center rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface-2)] px-3 text-sm whitespace-nowrap">
-                    /{ustSayfa ? `${ustSayfa.slug}/` : ''}
-                  </span>
-                  <input
-                    className={`${formInputSinifi} flex-1`}
-                    value={ustSayfa ? segmentSlug : form.slug}
-                    onChange={(e) =>
-                      ustSayfa ? segmentDegistir(e.target.value) : segmentDegistir(e.target.value)
-                    }
-                    placeholder={ustSayfa ? 'hakkimizda' : 'kurumsal'}
-                  />
-                </div>
-              </FormAlani>
+            <AdminFormBolumu baslik="Temel Bilgiler">
+              <div className="ap-sayfa-temel-satir">
+                <FormAlani etiket="Başlık">
+                  <div className="ap-sayfa-baslik-alan">
+                    <SayfaIkonSecici ikon={form.ikon} onChange={(ikon) => onChange({ ...form, ikon })} />
+                    <input
+                      className={`${formInputSinifi} min-w-0 flex-1`}
+                      value={form.baslik}
+                      onChange={(e) => baslikDegistir(e.target.value)}
+                      placeholder="Örnek: Hakkımızda"
+                      required
+                    />
+                  </div>
+                </FormAlani>
+                <FormAlani etiket="Slug (URL)">
+                  <div className="ap-sayfa-slug-satir">
+                    <span className="ap-sayfa-slug-on-ek">
+                      /{ustSayfa ? `${ustSayfa.slug}/` : ''}
+                    </span>
+                    <input
+                      className={`${formInputSinifi} ap-sayfa-slug-input`}
+                      value={ustSayfa ? segmentSlug : form.slug}
+                      onChange={(e) => segmentDegistir(e.target.value)}
+                      placeholder={ustSayfa ? 'hakkimizda' : 'kurumsal'}
+                    />
+                  </div>
+                </FormAlani>
+              </div>
             </AdminFormBolumu>
 
-            <AdminFormBolumu baslik="İçerik" aciklama="Görsel editör veya HTML kodu ile sayfa içeriği oluşturun">
-              <FormAlani etiket="İçerik genişliği" aciklama="Özel HTML sayfalar için Tam genişlik (özel HTML) seçin">
+            <AdminFormBolumu
+              baslik="İçerik"
+              aciklama="İsterseniz açıp sayfa içeriği ekleyin"
+              akordeon
+              varsayilanAcik={false}
+            >
+              <FormAlani etiket="İçerik genişliği">
                 <div className="grid gap-2 sm:grid-cols-2">
                   {SAYFA_ICERIK_DUZENLER.map((secenek) => {
                     const secili = sayfaDuzenModuOku(form.icerik) === secenek.id;
@@ -530,17 +526,6 @@ export function SayfaEditorPanel({
                   İçerik boş bırakılırsa menüde tıklanınca yalnızca alt kategoriler gösterilir.
                 </p>
               )}
-            </AdminFormBolumu>
-
-            <AdminFormBolumu
-              baslik="Sayfa İkonu"
-              aciklama="Opsiyonel — sayfa listesinde ve ziyaretçi sitesinde başlığın yanında görünür"
-            >
-              <SayfaIkonSecici
-                ikon={form.ikon}
-                baslikOnizleme={form.baslik.trim() || 'Sayfa adı'}
-                onChange={(ikon) => onChange({ ...form, ikon })}
-              />
             </AdminFormBolumu>
           </>
         )}
@@ -615,78 +600,73 @@ export function SayfaEditorPanel({
             )}
 
             <AdminFormBolumu baslik="Yayın ve Menü">
-            {seciliId && (
-              <FormAlani
-                etiket="Üst sayfa"
-                aciklama="Sayfanın hangi kategori altında olduğunu seçin. Değiştirdikten sonra Kaydet'e basın — URL otomatik güncellenir."
-              >
-                <select
-                  className={formSelectSinifi}
-                  value={form.ustSayfaId ?? ''}
-                  onChange={(e) => ustSayfaDegistir(e.target.value)}
-                >
-                  <option value="">— Ana menü (üst sayfa yok) —</option>
-                  {ustSayfaSecenekleri(sayfalar, seciliId).map((s) => (
-                    <option key={s.id} value={s.id}>
-                      {s.baslik} (/{s.slug})
-                    </option>
-                  ))}
-                </select>
-              </FormAlani>
-            )}
-            <FormAlani etiket="Sayfa Açılış Modu" aciklama="Menüden tıklandığında sayfanın nasıl açılacağı">
-              <select
-                className={formSelectSinifi}
-                value={form.acilisModu}
-                onChange={(e) => onChange({ ...form, acilisModu: e.target.value as SayfaAcilisModu })}
-              >
-                {ACILIS_MODLARI.map((m) => (
-                  <option key={m.id} value={m.id}>
-                    {m.ad}
-                  </option>
-                ))}
-              </select>
-            </FormAlani>
-            {ustSayfa && (
-              <p className="ap-muted text-xs">
-                Mevcut üst: <strong>{ustSayfa.baslik}</strong> · /{ustSayfa.slug}
-              </p>
-            )}
-            <div className="ap-switch-grup">
-              <AdminAnahtarDugme
-                etiket="Yayında"
-                acik={form.yayinda}
-                onDegistir={(v) => onChange({ ...form, yayinda: v })}
-              />
-              <AdminAnahtarDugme
-                etiket={form.ustSayfaId ? 'Alt menüde göster' : 'Menüde göster'}
-                acik={form.menudeGoster}
-                onDegistir={(v) => onChange({ ...form, menudeGoster: v })}
-              />
-            </div>
-            <FormAlani
-              etiket="Sıra"
-              aciklama={
-                form.ustSayfaId
-                  ? 'Üst sayfa altındaki sıralama (küçük = önce)'
-                  : 'Ana menü sırası (küçük = önce)'
-              }
-            >
-              <input
-                type="number"
-                min={0}
-                className={`${formInputSinifi} max-w-[120px]`}
-                value={form.sira}
-                onChange={(e) => onChange({ ...form, sira: Number(e.target.value) })}
-              />
-              {siraCakisma && (
-                <div className="ap-sira-uyari" role="alert">
-                  <strong>⚠️ Sıra çakışması:</strong> Sıra <strong>{form.sira}</strong> zaten{' '}
-                  <strong>&quot;{siraCakisma.baslik}&quot;</strong> sayfasında kullanılıyor.
-                  Lütfen birinin sırasını değiştirin, aksi halde görüntüleme sırası belirsiz olur.
+              <div className="ap-sayfa-ayar-kompakt">
+                {seciliId && (
+                  <FormAlani etiket="Üst sayfa">
+                    <select
+                      className={formSelectSinifi}
+                      value={form.ustSayfaId ?? ''}
+                      onChange={(e) => ustSayfaDegistir(e.target.value)}
+                    >
+                      <option value="">— Ana menü (üst sayfa yok) —</option>
+                      {ustSayfaSecenekleri(sayfalar, seciliId).map((s) => (
+                        <option key={s.id} value={s.id}>
+                          {s.baslik} (/{s.slug})
+                        </option>
+                      ))}
+                    </select>
+                  </FormAlani>
+                )}
+
+                <div>
+                  <p className="ap-heading mb-2 text-sm font-medium">Sayfa Açılış Modu</p>
+                  <div className="ap-sayfa-acilis-modlar">
+                    {ACILIS_MODLARI.map((m) => {
+                      const secili = form.acilisModu === m.id;
+                      return (
+                        <button
+                          key={m.id}
+                          type="button"
+                          className={`ap-sayfa-acilis-kart ${secili ? 'ap-sayfa-acilis-kart-aktif' : ''}`}
+                          onClick={() => onChange({ ...form, acilisModu: m.id })}
+                        >
+                          <span className="ap-sayfa-acilis-kart-ikon" aria-hidden>
+                            {m.ikon}
+                          </span>
+                          <span className="ap-sayfa-acilis-kart-metin">
+                            <span className="ap-sayfa-acilis-kart-ad">{m.ad}</span>
+                            <span className="ap-muted text-[11px] leading-snug">{m.aciklama}</span>
+                          </span>
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
-              )}
-            </FormAlani>
+
+                <div className="ap-sayfa-ayar-alt-satir">
+                  <AdminAnahtarDugme
+                    etiket="Yayında"
+                    acik={form.yayinda}
+                    onDegistir={(v) => onChange({ ...form, yayinda: v })}
+                  />
+                  <label className="ap-sayfa-sira-kompakt">
+                    <span className="ap-heading text-sm font-medium">Sıra</span>
+                    <input
+                      type="number"
+                      min={0}
+                      className={formInputSinifi}
+                      value={form.sira}
+                      onChange={(e) => onChange({ ...form, sira: Number(e.target.value) })}
+                    />
+                  </label>
+                </div>
+                {siraCakisma && (
+                  <div className="ap-sira-uyari" role="alert">
+                    <strong>Sıra çakışması:</strong> Sıra <strong>{form.sira}</strong> zaten{' '}
+                    <strong>&quot;{siraCakisma.baslik}&quot;</strong> sayfasında kullanılıyor.
+                  </div>
+                )}
+              </div>
             </AdminFormBolumu>
           </>
         )}
@@ -777,7 +757,7 @@ export const bosSayfaForm: SayfaFormDegeri = {
   ikon: '',
   seoTitle: '',
   seoDesc: '',
-  yayinda: false,
+  yayinda: true,
   menudeGoster: true,
   sira: 1,
   acilisModu: 'normal',
@@ -793,7 +773,7 @@ export function varsayilanSayfaForm(sayfalar: AdminSayfa[], ustSayfa?: AdminSayf
     ustSayfaId,
     sira: sonrakiSayfaSira(sayfalar, ustSayfaId),
     menudeGoster: true,
-    yayinda: false,
+    yayinda: true,
     ...(ustSayfa
       ? {
           altMenuGorunum: ustSayfa.altMenuGorunum ?? 'dikey',

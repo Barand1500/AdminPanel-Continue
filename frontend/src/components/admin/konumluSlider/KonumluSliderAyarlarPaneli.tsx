@@ -1,260 +1,10 @@
-import type { KonumluSliderBolge, KonumluSliderConfig, KonumluSliderKayit } from '@/types/konumluSlider';
-import {
-  KONUMLU_SLIDER_BOSLUK_ETIKET,
-  KONUMLU_SLIDER_KONUM_ETIKET,
-} from '@/types/konumluSlider';
+import { formInputSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
+import { AdminAnahtarDugme } from '@/components/admin/ortak/AdminFormBilesenleri';
+import type { KonumluSliderBolge, KonumluSliderConfig, KonumluSliderKayit } from '@/types/konumluSlider';
+import { KONUMLU_SLIDER_KONUM_ETIKET } from '@/types/konumluSlider';
 import { uid } from '@/types/widget';
-import { yanKonumMu, ustAltKonumMu } from '@/utils/konumluSliderYerlesim';
-
-interface KonumluSliderAyarlarPaneliProps {
-  config: KonumluSliderConfig;
-  onChange: (config: KonumluSliderConfig) => void;
-}
-
-const formInput =
-  'w-full rounded-xl border border-[var(--ap-border)] bg-[var(--ap-surface)] px-3 py-2 text-sm text-[var(--ap-text)] outline-none focus:border-[var(--ap-accent)]';
-
-export function KonumluSliderAyarlarPaneli({ config, onChange }: KonumluSliderAyarlarPaneliProps) {
-  const gorunum = config.gorunum;
-  const ustAlt = ustAltKonumMu(config.yerlesim.tip);
-
-  function guncelle(parcalar: Partial<KonumluSliderConfig>) {
-    onChange({ ...config, ...parcalar });
-  }
-
-  function gorunumGuncelle(parcalar: Partial<KonumluSliderConfig['gorunum']>) {
-    onChange({ ...config, gorunum: { ...gorunum, ...parcalar } });
-  }
-
-  function slaytEkle() {
-    const yeni = {
-      id: uid(),
-      gorselUrl: '',
-      baslik: '',
-      sira: config.slaytlar.length + 1,
-      aktif: true,
-    };
-    guncelle({ slaytlar: [...config.slaytlar, yeni] });
-  }
-
-  function slaytGuncelle(id: string, parcalar: Partial<KonumluSliderConfig['slaytlar'][0]>) {
-    guncelle({
-      slaytlar: config.slaytlar.map((s) => (s.id === id ? { ...s, ...parcalar } : s)),
-    });
-  }
-
-  function slaytSil(id: string) {
-    guncelle({ slaytlar: config.slaytlar.filter((s) => s.id !== id) });
-  }
-
-  return (
-    <div className="ks-admin-ayarlar space-y-5">
-      <section className="ks-admin-bolum">
-        <h3 className="ks-admin-bolum-baslik">Yerleşim</h3>
-        <p className="ks-admin-bolum-aciklama">
-          {KONUMLU_SLIDER_KONUM_ETIKET[config.yerlesim.tip]} · {config.yerlesim.hedefWidgetIds.length} hedef
-        </p>
-        <div className="mt-3 grid grid-cols-2 gap-3">
-          <label className="ks-admin-alan">
-            <span>Yön</span>
-            <select
-              className={formInput}
-              value={config.yon}
-              onChange={(e) => guncelle({ yon: e.target.value as KonumluSliderConfig['yon'] })}
-            >
-              <option value="dikey">Dikey</option>
-              <option value="yatay">Yatay</option>
-            </select>
-          </label>
-          {ustAlt && (
-            <label className="ks-admin-alan">
-              <span>Widget arası boşluk</span>
-              <select
-                className={formInput}
-                value={config.bosluk ?? 'orta'}
-                onChange={(e) =>
-                  guncelle({ bosluk: e.target.value as KonumluSliderConfig['bosluk'] })
-                }
-              >
-                {Object.entries(KONUMLU_SLIDER_BOSLUK_ETIKET).map(([k, v]) => (
-                  <option key={k} value={k}>
-                    {v}
-                  </option>
-                ))}
-              </select>
-            </label>
-          )}
-        </div>
-      </section>
-
-      <section className="ks-admin-bolum">
-        <h3 className="ks-admin-bolum-baslik">Görünüm</h3>
-        <div className="mt-3 space-y-3">
-          <label className="ks-admin-alan">
-            <span>Köşe yuvarlaklığı ({gorunum.borderRadius}px)</span>
-            <input
-              type="range"
-              min={0}
-              max={32}
-              value={gorunum.borderRadius}
-              onChange={(e) => gorunumGuncelle({ borderRadius: Number(e.target.value) })}
-            />
-          </label>
-
-          <label className="ks-admin-switch">
-            <input
-              type="checkbox"
-              checked={gorunum.arkaplanTransparan}
-              onChange={(e) => gorunumGuncelle({ arkaplanTransparan: e.target.checked })}
-            />
-            <span>Arkaplan transparan</span>
-          </label>
-
-          {!gorunum.arkaplanTransparan && (
-            <label className="ks-admin-alan">
-              <span>Arkaplan rengi</span>
-              <input
-                type="color"
-                className="h-10 w-full cursor-pointer rounded-lg border border-[var(--ap-border)]"
-                value={gorunum.arkaplanRengi ?? '#f1f5f9'}
-                onChange={(e) => gorunumGuncelle({ arkaplanRengi: e.target.value })}
-              />
-            </label>
-          )}
-
-          <div className="grid grid-cols-2 gap-3">
-            <label className="ks-admin-alan">
-              <span>Katman (z-index)</span>
-              <select
-                className={formInput}
-                value={gorunum.zIndex}
-                onChange={(e) =>
-                  gorunumGuncelle({ zIndex: e.target.value as KonumluSliderConfig['gorunum']['zIndex'] })
-                }
-              >
-                <option value="alt">Altta (widget üstte)</option>
-                <option value="ust">Üstte (slider önde)</option>
-              </select>
-            </label>
-            <label className="ks-admin-alan">
-              <span>Görsel sığdırma</span>
-              <select
-                className={formInput}
-                value={gorunum.gorselKirpma}
-                onChange={(e) =>
-                  gorunumGuncelle({
-                    gorselKirpma: e.target.value as KonumluSliderConfig['gorunum']['gorselKirpma'],
-                  })
-                }
-              >
-                <option value="kapla">Kapla</option>
-                <option value="sigdir">Sığdır</option>
-                <option value="orijinal">Orijinal</option>
-              </select>
-            </label>
-          </div>
-
-          <label className="ks-admin-switch">
-            <input
-              type="checkbox"
-              checked={gorunum.butonGoster}
-              onChange={(e) => gorunumGuncelle({ butonGoster: e.target.checked })}
-            />
-            <span>Slayt butonu göster</span>
-          </label>
-
-          {gorunum.butonGoster && (
-            <label className="ks-admin-alan">
-              <span>Buton konumu</span>
-              <select
-                className={formInput}
-                value={gorunum.butonKonumu}
-                onChange={(e) =>
-                  gorunumGuncelle({
-                    butonKonumu: e.target.value as KonumluSliderConfig['gorunum']['butonKonumu'],
-                  })
-                }
-              >
-                <option value="sol-alt">Sol alt</option>
-                <option value="orta-alt">Orta alt</option>
-                <option value="sag-alt">Sağ alt</option>
-                <option value="sol-ust">Sol üst</option>
-                <option value="orta-ust">Orta üst</option>
-                <option value="sag-ust">Sağ üst</option>
-              </select>
-            </label>
-          )}
-        </div>
-      </section>
-
-      <section className="ks-admin-bolum">
-        <div className="flex items-center justify-between gap-2">
-          <h3 className="ks-admin-bolum-baslik">Slaytlar</h3>
-          <button type="button" className="ks-admin-btn ks-admin-btn--ghost" onClick={slaytEkle}>
-            + Slayt ekle
-          </button>
-        </div>
-        <div className="mt-3 space-y-4">
-          {config.slaytlar.length === 0 && (
-            <p className="text-sm text-[var(--ap-muted)]">En az bir slayt görseli ekleyin.</p>
-          )}
-          {config.slaytlar.map((s, i) => (
-            <div key={s.id} className="ks-admin-slayt-kart">
-              <div className="flex items-center justify-between gap-2">
-                <span className="text-xs font-semibold uppercase tracking-wide text-[var(--ap-muted)]">
-                  Slayt {i + 1}
-                </span>
-                <button
-                  type="button"
-                  className="text-xs text-red-500 hover:underline"
-                  onClick={() => slaytSil(s.id)}
-                >
-                  Sil
-                </button>
-              </div>
-              <GorselAlan
-                etiket="Görsel"
-                deger={s.gorselUrl}
-                onChange={(v) => slaytGuncelle(s.id, { gorselUrl: v })}
-              />
-              <input
-                className={formInput}
-                placeholder="Başlık (isteğe bağlı)"
-                value={s.baslik ?? ''}
-                onChange={(e) => slaytGuncelle(s.id, { baslik: e.target.value })}
-              />
-              {gorunum.butonGoster && (
-                <>
-                  <input
-                    className={formInput}
-                    placeholder="Buton metni"
-                    value={s.butonMetni ?? ''}
-                    onChange={(e) => slaytGuncelle(s.id, { butonMetni: e.target.value })}
-                  />
-                  <input
-                    className={formInput}
-                    placeholder="Buton linki"
-                    value={s.butonLink ?? ''}
-                    onChange={(e) => slaytGuncelle(s.id, { butonLink: e.target.value })}
-                  />
-                </>
-              )}
-              <label className="ks-admin-switch">
-                <input
-                  type="checkbox"
-                  checked={s.aktif}
-                  onChange={(e) => slaytGuncelle(s.id, { aktif: e.target.checked })}
-                />
-                <span>Aktif</span>
-              </label>
-            </div>
-          ))}
-        </div>
-      </section>
-    </div>
-  );
-}
+import { ustAltKonumMu, yanKonumMu } from '@/utils/konumluSliderYerlesim';
 
 export function konumSecimOzeti(config: KonumluSliderConfig) {
   const tip = KONUMLU_SLIDER_KONUM_ETIKET[config.yerlesim.tip];
@@ -283,4 +33,246 @@ export function bolgeEtiketi(bolge: KonumluSliderBolge) {
     footer_ustu: 'Footer üstü',
   };
   return map[bolge] ?? bolge;
+}
+
+export function SliderSlaytListesi({
+  config,
+  onChange,
+}: {
+  config: KonumluSliderConfig;
+  onChange: (config: KonumluSliderConfig) => void;
+}) {
+  const butonGoster = config.gorunum.butonGoster;
+
+  function slaytEkle() {
+    onChange({
+      ...config,
+      slaytlar: [
+        ...config.slaytlar,
+        {
+          id: uid(),
+          gorselUrl: '',
+          baslik: '',
+          sira: config.slaytlar.length + 1,
+          aktif: true,
+        },
+      ],
+    });
+  }
+
+  function slaytGuncelle(id: string, parcalar: Partial<KonumluSliderConfig['slaytlar'][0]>) {
+    onChange({
+      ...config,
+      slaytlar: config.slaytlar.map((s) => (s.id === id ? { ...s, ...parcalar } : s)),
+    });
+  }
+
+  function slaytSil(id: string) {
+    onChange({ ...config, slaytlar: config.slaytlar.filter((s) => s.id !== id) });
+  }
+
+  return (
+    <div className="ap-slider-slaytlar">
+      <div className="ap-slider-slayt-ust">
+        <p className="ap-muted text-xs">{config.slaytlar.length} slayt</p>
+        <button type="button" className="ap-slider-ekle-btn" onClick={slaytEkle}>
+          + Slayt ekle
+        </button>
+      </div>
+
+      {config.slaytlar.length === 0 && (
+        <p className="ap-muted text-sm">Henüz slayt yok. Görsel eklemek için yukarıdaki düğmeyi kullanın.</p>
+      )}
+
+      {config.slaytlar.map((s, i) => (
+        <div key={s.id} className="ap-slider-slayt-kart">
+          <div className="ap-slider-slayt-kart-ust">
+            <span>Slayt {i + 1}</span>
+            <button type="button" className="ap-slider-slayt-sil" onClick={() => slaytSil(s.id)}>
+              Kaldır
+            </button>
+          </div>
+          <GorselAlan etiket="Görsel" deger={s.gorselUrl} onChange={(v) => slaytGuncelle(s.id, { gorselUrl: v })} />
+          <input
+            className={formInputSinifi}
+            placeholder="Başlık (isteğe bağlı)"
+            value={s.baslik ?? ''}
+            onChange={(e) => slaytGuncelle(s.id, { baslik: e.target.value })}
+          />
+          {butonGoster && (
+            <>
+              <input
+                className={formInputSinifi}
+                placeholder="Buton metni"
+                value={s.butonMetni ?? ''}
+                onChange={(e) => slaytGuncelle(s.id, { butonMetni: e.target.value })}
+              />
+              <input
+                className={formInputSinifi}
+                placeholder="Buton linki"
+                value={s.butonLink ?? ''}
+                onChange={(e) => slaytGuncelle(s.id, { butonLink: e.target.value })}
+              />
+            </>
+          )}
+          <AdminAnahtarDugme
+            acik={s.aktif}
+            onDegistir={(v) => slaytGuncelle(s.id, { aktif: v })}
+            etiket="Aktif"
+          />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function GorunumPil<T extends string>({
+  etiket,
+  secenekler,
+  deger,
+  onDegistir,
+}: {
+  etiket: string;
+  secenekler: { id: T; ad: string }[];
+  deger: T;
+  onDegistir: (v: T) => void;
+}) {
+  return (
+    <div className="ap-slider-gorunum-satir-ayar">
+      <span className="ap-slider-gorunum-etiket">{etiket}</span>
+      <div className="ap-slider-piller" role="radiogroup" aria-label={etiket}>
+        {secenekler.map((s) => (
+          <button
+            key={s.id}
+            type="button"
+            role="radio"
+            aria-checked={deger === s.id}
+            className={`ap-slider-pil${deger === s.id ? ' ap-slider-pil--aktif' : ''}`}
+            onClick={() => onDegistir(s.id)}
+          >
+            {s.ad}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+const BUTON_KONUMLARI: { id: KonumluSliderConfig['gorunum']['butonKonumu']; ad: string }[] = [
+  { id: 'sol-ust', ad: 'Sol üst' },
+  { id: 'orta-ust', ad: 'Orta üst' },
+  { id: 'sag-ust', ad: 'Sağ üst' },
+  { id: 'sol-alt', ad: 'Sol alt' },
+  { id: 'orta-alt', ad: 'Orta alt' },
+  { id: 'sag-alt', ad: 'Sağ alt' },
+];
+
+export function SliderGorunumAyarlari({
+  config,
+  onChange,
+}: {
+  config: KonumluSliderConfig;
+  onChange: (config: KonumluSliderConfig) => void;
+}) {
+  const gorunum = config.gorunum;
+  const ustAlt = ustAltKonumMu(config.yerlesim.tip);
+
+  function guncelle(parcalar: Partial<KonumluSliderConfig>) {
+    onChange({ ...config, ...parcalar });
+  }
+
+  function gorunumGuncelle(parcalar: Partial<KonumluSliderConfig['gorunum']>) {
+    onChange({ ...config, gorunum: { ...gorunum, ...parcalar } });
+  }
+
+  return (
+    <div className="ap-slider-gorunum">
+      <div className="ap-slider-gorunum-grid">
+        <GorunumPil
+          etiket="Yön"
+          deger={config.yon}
+          onDegistir={(v) => guncelle({ yon: v })}
+          secenekler={[
+            { id: 'dikey', ad: 'Dikey' },
+            { id: 'yatay', ad: 'Yatay' },
+          ]}
+        />
+        <GorunumPil
+          etiket="Katman"
+          deger={gorunum.zIndex}
+          onDegistir={(v) => gorunumGuncelle({ zIndex: v })}
+          secenekler={[
+            { id: 'alt', ad: 'Altta' },
+            { id: 'ust', ad: 'Üstte' },
+          ]}
+        />
+        <GorunumPil
+          etiket="Sığdırma"
+          deger={gorunum.gorselKirpma}
+          onDegistir={(v) => gorunumGuncelle({ gorselKirpma: v })}
+          secenekler={[
+            { id: 'kapla', ad: 'Kapla' },
+            { id: 'sigdir', ad: 'Sığdır' },
+            { id: 'orijinal', ad: 'Orijinal' },
+          ]}
+        />
+        {ustAlt && (
+          <GorunumPil
+            etiket="Boşluk"
+            deger={(config.bosluk ?? 'orta') as 'kucuk' | 'orta' | 'buyuk'}
+            onDegistir={(v) => guncelle({ bosluk: v })}
+            secenekler={[
+              { id: 'kucuk', ad: 'Küçük' },
+              { id: 'orta', ad: 'Orta' },
+              { id: 'buyuk', ad: 'Büyük' },
+            ]}
+          />
+        )}
+        <div className="ap-slider-gorunum-satir-ayar">
+          <span className="ap-slider-gorunum-etiket">Köşe {gorunum.borderRadius}px</span>
+          <input
+            type="range"
+            className="ap-slider-range"
+            min={0}
+            max={32}
+            value={gorunum.borderRadius}
+            onChange={(e) => gorunumGuncelle({ borderRadius: Number(e.target.value) })}
+          />
+        </div>
+        {!gorunum.arkaplanTransparan && (
+          <div className="ap-slider-gorunum-satir-ayar">
+            <span className="ap-slider-gorunum-etiket">Renk</span>
+            <input
+              type="color"
+              className="ap-slider-renk"
+              value={gorunum.arkaplanRengi ?? '#f1f5f9'}
+              onChange={(e) => gorunumGuncelle({ arkaplanRengi: e.target.value })}
+            />
+          </div>
+        )}
+      </div>
+
+      <div className="ap-slider-gorunum-satir">
+        <AdminAnahtarDugme
+          acik={gorunum.arkaplanTransparan}
+          onDegistir={(v) => gorunumGuncelle({ arkaplanTransparan: v })}
+          etiket="Arkaplan transparan"
+        />
+        <AdminAnahtarDugme
+          acik={gorunum.butonGoster}
+          onDegistir={(v) => gorunumGuncelle({ butonGoster: v })}
+          etiket="Slayt butonu"
+        />
+      </div>
+
+      {gorunum.butonGoster && (
+        <GorunumPil
+          etiket="Buton"
+          deger={gorunum.butonKonumu}
+          onDegistir={(v) => gorunumGuncelle({ butonKonumu: v })}
+          secenekler={BUTON_KONUMLARI}
+        />
+      )}
+    </div>
+  );
 }

@@ -198,102 +198,11 @@
   }
 }
 
-/* Admin — Slider Yönetimi */
-.ks-yonetim-grid {
-  display: grid;
-  grid-template-columns: 240px minmax(0, 1fr) 320px;
-  gap: 1rem;
-  align-items: start;
-}
-@media (max-width: 1200px) {
-  .ks-yonetim-grid { grid-template-columns: 1fr; }
-}
-.ks-admin-select,
-.ks-admin-input {
-  width: 100%;
-  border-radius: 0.75rem;
-  border: 1px solid var(--ap-border);
-  background: var(--ap-surface);
-  padding: 0.5rem 0.75rem;
-  font-size: 0.875rem;
-  color: var(--ap-text);
-}
-.ks-admin-btn {
-  border-radius: 0.75rem;
-  padding: 0.5rem 1rem;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  border: 1px solid transparent;
-  cursor: pointer;
-  transition: background 0.15s, border-color 0.15s;
-}
-.ks-admin-btn--birincil {
-  background: var(--ap-accent);
-  color: #fff;
-}
-.ks-admin-btn--ghost {
-  background: transparent;
-  border-color: var(--ap-border);
-  color: var(--ap-text);
-}
-.ks-admin-btn--tehlike {
-  background: transparent;
-  border-color: #fecaca;
-  color: #dc2626;
-}
-.ks-admin-btn--mini { padding: 0.25rem 0.6rem; font-size: 0.75rem; }
-.ks-admin-alan { display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.8125rem; }
-.ks-admin-alan > span { color: var(--ap-muted); font-weight: 500; }
-.ks-admin-switch {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.8125rem;
-  cursor: pointer;
-}
-.ks-admin-bolum { padding-top: 0.25rem; border-top: 1px solid var(--ap-border); }
-.ks-admin-bolum:first-child { border-top: none; padding-top: 0; }
-.ks-admin-bolum-baslik { font-size: 0.8125rem; font-weight: 700; }
-.ks-admin-bolum-aciklama { font-size: 0.75rem; color: var(--ap-muted); margin-top: 0.15rem; }
-.ks-admin-slayt-kart {
-  border: 1px solid var(--ap-border);
-  border-radius: 0.875rem;
-  padding: 0.75rem;
+/* Admin — yerleşim önizlemesi */
+.ks-onizleme {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  background: var(--ap-surface-2, var(--ap-surface));
-}
-.ks-admin-secim-kutu {
-  border-radius: 0.75rem;
-  padding: 0.65rem 0.75rem;
-  background: color-mix(in srgb, var(--ap-accent) 8%, transparent);
-  border: 1px solid color-mix(in srgb, var(--ap-accent) 25%, transparent);
-}
-.ks-slider-liste { display: flex; flex-direction: column; gap: 0.35rem; }
-.ks-slider-liste-oge {
-  text-align: left;
-  border-radius: 0.75rem;
-  border: 1px solid var(--ap-border);
-  padding: 0.65rem 0.75rem;
-  background: var(--ap-surface);
-  cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s;
-}
-.ks-slider-liste-oge--aktif {
-  border-color: var(--ap-accent);
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--ap-accent) 40%, transparent);
-}
-.ks-slider-liste-ad { display: block; font-size: 0.8125rem; font-weight: 600; }
-.ks-slider-liste-alt { display: block; font-size: 0.7rem; color: var(--ap-muted); margin-top: 0.15rem; }
-.ks-slider-liste-pasif {
-  display: inline-block;
-  margin-top: 0.25rem;
-  font-size: 0.65rem;
-  padding: 0.1rem 0.4rem;
-  border-radius: 999px;
-  background: #fef3c7;
-  color: #92400e;
+  gap: 0.65rem;
 }
 
 .ks-onizleme-tuval {
@@ -326,7 +235,7 @@
   text-transform: uppercase;
   letter-spacing: 0.05em;
   padding: 0.35rem 0.65rem;
-  background: var(--ap-surface-2, #f8fafc);
+  background: var(--ap-surface-2);
   color: var(--ap-muted);
   border-bottom: 1px solid var(--ap-border);
 }
@@ -352,7 +261,7 @@
   border-radius: 0.65rem;
   border: 1px solid var(--ap-border);
   padding: 0.65rem 0.75rem;
-  background: #fff;
+  background: var(--ap-surface);
 }
 .ks-oniz-widget-ad { display: block; font-size: 0.8125rem; font-weight: 600; }
 .ks-oniz-widget-tip { display: block; font-size: 0.7rem; color: var(--ap-muted); margin-top: 0.1rem; }

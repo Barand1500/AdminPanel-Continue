@@ -10,6 +10,7 @@ import {
   BildirimKutusu,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
+import { AdminPilSekme } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import {
   adminSayfaGuncelle,
@@ -25,6 +26,34 @@ import type { AdminWidget } from '@/types/admin';
 import { idString } from '@/utils/idKarsilastir';
 import { sayfaSiraCakismasiBul, sonrakiSayfaSira } from '@/utils/sayfaSiraYardimci';
 
+type SayfaGorunum = 'liste' | 'editor';
+
+function ListeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01" />
+    </svg>
+  );
+}
+
+function YeniSayfaIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z" />
+      <path d="M14 2v6h6M12 18v-6M9 15h6" />
+    </svg>
+  );
+}
+
+function DuzenlemeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+    </svg>
+  );
+}
+
 export function SayfaYonetimiSayfasi() {
   const [sayfalar, setSayfalar] = useState<AdminSayfa[]>([]);
   const [widgetlar, setWidgetlar] = useState<AdminWidget[]>([]);
@@ -35,6 +64,7 @@ export function SayfaYonetimiSayfasi() {
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [hata, setHata] = useState('');
   const [basari, setBasari] = useState('');
+  const [gorunum, setGorunum] = useState<SayfaGorunum>('liste');
 
   async function yukle() {
     setYukleniyor(true);
@@ -68,13 +98,18 @@ export function SayfaYonetimiSayfasi() {
     });
   }, [sayfalar, seciliId]);
 
-  const yeniBaslat = useCallback(() => {
+  const formuSifirla = useCallback(() => {
     setSeciliId(null);
     setForm(varsayilanSayfaForm(sayfalar));
     setSlugManuel(false);
     setBasari('');
     setHata('');
   }, [sayfalar]);
+
+  const yeniBaslat = useCallback(() => {
+    formuSifirla();
+    setGorunum('editor');
+  }, [formuSifirla]);
 
   const altSayfaBaslat = useCallback(
     (ustSayfa: AdminSayfa) => {
@@ -83,6 +118,7 @@ export function SayfaYonetimiSayfasi() {
       setSlugManuel(false);
       setBasari('');
       setHata('');
+      setGorunum('editor');
     },
     [sayfalar]
   );
@@ -116,31 +152,6 @@ export function SayfaYonetimiSayfasi() {
     }
   }, [form, seciliId]);
 
-  const yayinla = useCallback(async () => {
-    const guncel = { ...form, yayinda: true };
-    setKaydediliyor(true);
-    setHata('');
-    setBasari('');
-    try {
-      if (seciliId) {
-        const guncellenen = await adminSayfaGuncelle(seciliId, guncel);
-        setForm(sayfadanForm(guncellenen));
-        setSeciliId(guncellenen.id);
-      } else {
-        const olusturulan = await adminSayfaOlustur(guncel);
-        setForm(sayfadanForm(olusturulan));
-        setSeciliId(olusturulan.id);
-        setSlugManuel(true);
-      }
-      setBasari('Sayfa yayınlandı.');
-      setSayfalar(await adminSayfalariGetir());
-    } catch (err) {
-      setHata(err instanceof Error ? err.message : 'Yayınlama başarısız');
-    } finally {
-      setKaydediliyor(false);
-    }
-  }, [form, seciliId]);
-
   const sil = useCallback(async () => {
     if (!seciliId || !confirm('Bu sayfayı silmek istediğinize emin misiniz?')) return;
     setKaydediliyor(true);
@@ -148,14 +159,15 @@ export function SayfaYonetimiSayfasi() {
     try {
       await adminSayfaSil(seciliId);
       setBasari('Sayfa silindi.');
-      yeniBaslat();
+      formuSifirla();
+      setGorunum('liste');
       await yukle();
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Silme başarısız');
     } finally {
       setKaydediliyor(false);
     }
-  }, [seciliId, yeniBaslat]);
+  }, [seciliId, formuSifirla]);
 
   const sayfaSirala = useCallback(
     async (sayfaId: string, yon: 'yukari' | 'asagi') => {
@@ -184,6 +196,11 @@ export function SayfaYonetimiSayfasi() {
     return widgetlar.filter((w) => w.sayfaId && idString(w.sayfaId) === seciliId);
   }, [widgetlar, seciliId]);
 
+  const duzenlemeyeGit = useCallback(() => {
+    if (!seciliId) return;
+    setGorunum('editor');
+  }, [seciliId]);
+
   useModulAksiyonlari(
     {
       kaydet,
@@ -193,19 +210,14 @@ export function SayfaYonetimiSayfasi() {
         if (secili) altSayfaBaslat(secili);
       },
       sil,
-      yayinla,
-      onizle: () => {
-        if (form.slug) window.open(`/${form.slug}`, '_blank');
-        else window.open('/', '_blank');
-      },
+      duzenle: duzenlemeyeGit,
     },
     {
-      kaydet: !kaydediliyor,
+      kaydet: gorunum === 'editor' && !kaydediliyor && (!!seciliId || Boolean(form.baslik.trim())),
       ekle: true,
-      altEkle: !!seciliId && !kaydediliyor,
+      altEkle: !!seciliId && gorunum === 'liste' && !kaydediliyor,
       sil: !!seciliId && !kaydediliyor,
-      yayinla: !kaydediliyor,
-      onizle: true,
+      duzenle: !!seciliId && gorunum === 'liste' && !kaydediliyor,
     }
   );
 
@@ -217,12 +229,26 @@ export function SayfaYonetimiSayfasi() {
     setHata('');
   }
 
+  function sayfaDuzenleAc(s: AdminSayfa) {
+    sayfaSec(s);
+    setGorunum('editor');
+  }
+
+  function gorunumDegistir(id: SayfaGorunum) {
+    if (id === gorunum) return;
+    if (id === 'liste') {
+      setGorunum('liste');
+      return;
+    }
+    yeniBaslat();
+  }
+
   useEffect(() => {
     function sayfaSecHandler(e: Event) {
       const id = (e as CustomEvent<{ sayfaId?: string }>).detail?.sayfaId;
       if (!id) return;
       const s = sayfalar.find((x) => x.id === id);
-      if (s) sayfaSec(s);
+      if (s) sayfaDuzenleAc(s);
     }
     function yeniSayfaHandler() {
       yeniBaslat();
@@ -236,39 +262,53 @@ export function SayfaYonetimiSayfasi() {
   }, [sayfalar, yeniBaslat]);
 
   return (
-      <AdminModulKabuk baslik="Sayfa Yönetimi" aciklama="Site sayfalarını oluşturun ve düzenleyin.">
+    <AdminModulKabuk
+      onizleGoster={false}
+      ustIcerik={
+        <AdminPilSekme
+          sekmeler={[
+            { id: 'liste', etiket: 'Sayfa Listesi', ikon: <ListeIkon /> },
+            {
+              id: 'editor',
+              etiket: gorunum === 'editor' && seciliId ? 'Düzenleme' : 'Yeni Sayfa',
+              ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniSayfaIkon />,
+            },
+          ]}
+          aktif={gorunum}
+          onDegistir={gorunumDegistir}
+        />
+      }
+    >
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
 
       {yukleniyor ? (
         <YukleniyorDurumu mesaj="Sayfalar yükleniyor..." />
+      ) : gorunum === 'liste' ? (
+        <SayfaListesiPanel
+          sayfalar={sayfalar}
+          seciliId={seciliId}
+          onSec={sayfaSec}
+          onSirala={sayfaSirala}
+          islemde={kaydediliyor}
+          tamGenislik
+        />
       ) : (
-        <>
-          <div className="ap-split-layout">
-            <SayfaListesiPanel
-              sayfalar={sayfalar}
-              seciliId={seciliId}
-              onSec={sayfaSec}
-              onSirala={sayfaSirala}
-              islemde={kaydediliyor}
-            />
-            <SayfaEditorPanel
-              form={form}
-              seciliId={seciliId}
-              slugManuel={slugManuel}
-              sayfalar={sayfalar}
-              sayfaWidgetlari={seciliSayfaWidgetlari}
-              onChange={setForm}
-              onSlugManuelChange={setSlugManuel}
-              onAltSayfaEkle={altSayfaBaslat}
-              onSayfaSec={sayfaSec}
-              onSirala={sayfaSirala}
-              islemde={kaydediliyor}
-            />
-          </div>
-        </>
+        <SayfaEditorPanel
+          form={form}
+          seciliId={seciliId}
+          slugManuel={slugManuel}
+          sayfalar={sayfalar}
+          sayfaWidgetlari={seciliSayfaWidgetlari}
+          onChange={setForm}
+          onSlugManuelChange={setSlugManuel}
+          onAltSayfaEkle={altSayfaBaslat}
+          onSayfaSec={sayfaSec}
+          onSirala={sayfaSirala}
+          islemde={kaydediliyor}
+        />
       )}
-      </AdminModulKabuk>
+    </AdminModulKabuk>
   );
 }

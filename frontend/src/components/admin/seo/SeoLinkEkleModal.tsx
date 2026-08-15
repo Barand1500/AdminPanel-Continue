@@ -71,6 +71,7 @@ export function SeoLinkEkleModal({ acik, hedefUrl, onKapat, onEkle }: SeoLinkEkl
 
   return (
     <div className="ap-admin-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="seo-link-modal-baslik">
+      <button type="button" className="ap-admin-modal-backdrop" aria-label="Kapat" onClick={kapat} />
       <div className="ap-admin-modal ap-seo-link-modal">
         <header className="ap-admin-modal-header">
           <h2 id="seo-link-modal-baslik" className="ap-heading text-base font-semibold">

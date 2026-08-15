@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { adminIslemBildirimi } from '@/utils/adminBildirimOlaylari';
 
-export type AksiyonId = 'kaydet' | 'hizliKaydet' | 'guncelle' | 'ekle' | 'altEkle' | 'sil' | 'onizle' | 'yayinla';
+export type AksiyonId = 'kaydet' | 'hizliKaydet' | 'guncelle' | 'ekle' | 'altEkle' | 'sil' | 'onizle' | 'yayinla' | 'duzenle';
 
 export interface AksiyonHandlerlar {
   kaydet?: () => Promise<void> | void;
@@ -20,6 +20,7 @@ export interface AksiyonHandlerlar {
   sil?: () => Promise<void> | void;
   onizle?: () => void;
   yayinla?: () => Promise<void> | void;
+  duzenle?: () => void;
 }
 
 export type AksiyonDurumlari = Partial<Record<AksiyonId, boolean>>;
@@ -133,6 +134,7 @@ export function AdminAksiyonProvider({ children }: { children: ReactNode }) {
         else if (id === 'ekle' && handlers.ekle) handlers.ekle();
         else if (id === 'altEkle' && handlers.altEkle) handlers.altEkle();
         else if (id === 'sil' && handlers.sil) await handlers.sil();
+        else if (id === 'duzenle' && handlers.duzenle) handlers.duzenle();
         else if (id === 'onizle' && handlers.onizle) handlers.onizle();
         else if (id === 'yayinla' && handlers.yayinla) await handlers.yayinla();
         else return;

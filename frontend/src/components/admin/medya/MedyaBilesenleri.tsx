@@ -1,83 +1,127 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import type { AdminMedya } from '@/features/admin/medyaApi';
 import { medyaTamUrl } from '@/features/admin/medyaApi';
 import { MEDYA_MAX_DOSYA_MB } from '@/constants/medya';
+import { AdminAramaKutusu, AdminBosDurum, AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
+import { adminIslemBildirimi } from '@/utils/adminBildirimOlaylari';
 
-interface MedyaGridProps {
+function boyutYazi(n?: number | null) {
+  if (!n || n <= 0) return '';
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${Math.round(n / 1024)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(1)} MB`;
+}
+
+function tarihYazi(iso?: string) {
+  if (!iso) return '';
+  try {
+    return new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short' }).format(new Date(iso));
+  } catch {
+    return '';
+  }
+}
+
+async function urlKopyala(url: string) {
+  try {
+    await navigator.clipboard.writeText(url);
+    adminIslemBildirimi('Adres kopyalandı', 'basari');
+  } catch {
+    adminIslemBildirimi('Kopyalanamadı', 'hata');
+  }
+}
+
+export function MedyaGrid({
+  medyalar,
+  seciliIds,
+  arama,
+  onArama,
+  onSecToggle,
+  onHepsiniSec,
+  onSecimiTemizle,
+  onOnizle,
+}: {
   medyalar: AdminMedya[];
   seciliIds: string[];
+  arama: string;
+  onArama: (v: string) => void;
   onSecToggle: (id: string) => void;
   onHepsiniSec?: () => void;
   onSecimiTemizle?: () => void;
-}
-
-export function MedyaGrid({ medyalar, seciliIds, onSecToggle, onHepsiniSec, onSecimiTemizle }: MedyaGridProps) {
-  if (medyalar.length === 0) {
-    return (
-      <div className="rounded-lg border border-dashed border-slate-600 bg-slate-800/50 py-16 text-center">
-        <p className="text-4xl">🖼️</p>
-        <p className="mt-2 text-sm text-slate-400">Henüz medya yok. Dosya yükleyin veya URL ekleyin.</p>
-      </div>
-    );
-  }
-
+  onOnizle: (medya: AdminMedya) => void;
+}) {
   const seciliSet = new Set(seciliIds);
   const hepsiSecili = medyalar.length > 0 && seciliIds.length === medyalar.length;
 
   return (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between text-xs text-slate-400">
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            className="rounded border border-slate-600 px-2 py-0.5 hover:border-blue-500 hover:text-blue-400"
-            onClick={hepsiSecili ? onSecimiTemizle : onHepsiniSec}
-          >
-            {hepsiSecili ? 'Seçimi temizle' : 'Tümünü seç'}
-          </button>
-          {seciliIds.length > 0 && <span>{seciliIds.length} öğe seçili</span>}
+    <div className="ap-medya-galeri">
+      <div className="ap-medya-ust">
+        <AdminAramaKutusu deger={arama} onChange={onArama} placeholder="Ada göre ara..." />
+        <div className="ap-medya-ust-sag">
+          {medyalar.length > 0 && (
+            <button
+              type="button"
+              className="ap-medya-metin-btn"
+              onClick={hepsiSecili ? onSecimiTemizle : onHepsiniSec}
+            >
+              {hepsiSecili ? 'Seçimi kaldır' : 'Tümünü seç'}
+            </button>
+          )}
+          <span className="ap-medya-sayac">
+            {seciliIds.length > 0 ? `${seciliIds.length} seçili · ` : ''}
+            {medyalar.length} görsel
+          </span>
         </div>
       </div>
-      <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        {medyalar.map((m) => {
-          const secili = seciliSet.has(m.id);
-          return (
-            <button
-              key={m.id}
-              type="button"
-              onClick={() => onSecToggle(m.id)}
-              className={`group overflow-hidden rounded-lg border text-left transition ${
-                secili ? 'border-blue-500 ring-2 ring-blue-500/40' : 'border-slate-700 hover:border-slate-500'
-              } bg-slate-800`}
-            >
-              <div className="relative aspect-square overflow-hidden bg-slate-900">
-                <img src={medyaTamUrl(m.url)} alt={m.ad} className="h-full w-full object-cover" />
-                <div
-                  className={`pointer-events-none absolute left-2 top-2 flex h-5 w-5 items-center justify-center rounded border text-[10px] ${
-                    secili ? 'border-blue-500 bg-blue-500 text-white' : 'border-slate-500 bg-black/40 text-slate-200'
-                  }`}
+
+      {medyalar.length === 0 ? (
+        <AdminBosDurum
+          ikon="🖼️"
+          baslik={arama ? 'Sonuç yok' : 'Henüz görsel yok'}
+          aciklama={arama ? 'Farklı bir arama deneyin' : 'Yukarıdan dosya bırakın veya seçin'}
+        />
+      ) : (
+        <div className="ap-medya-grid">
+          {medyalar.map((m) => {
+            const secili = seciliSet.has(m.id);
+            const tamUrl = medyaTamUrl(m.url);
+            const meta = [boyutYazi(m.boyut), tarihYazi(m.olusturma)].filter(Boolean).join(' · ');
+            return (
+              <article
+                key={m.id}
+                className={`ap-medya-kart${secili ? ' ap-medya-kart--secili' : ''}`}
+              >
+                <button
+                  type="button"
+                  className="ap-medya-kart-gorsel"
+                  onClick={() => onSecToggle(m.id)}
                 >
-                  {secili ? '✓' : ''}
+                  <img src={tamUrl} alt={m.ad} />
+                  <span className={`ap-medya-kart-check${secili ? ' ap-medya-kart-check--on' : ''}`}>
+                    {secili ? '✓' : ''}
+                  </span>
+                </button>
+                <div className="ap-medya-kart-hover">
+                  <button type="button" onClick={() => onOnizle(m)} title="Büyüt">
+                    Büyüt
+                  </button>
+                  <button type="button" onClick={() => void urlKopyala(tamUrl)} title="Adresi kopyala">
+                    Kopyala
+                  </button>
                 </div>
-              </div>
-              <div className="p-2">
-                <p className="truncate text-xs font-medium text-white">{m.ad}</p>
-                <p className="truncate text-[10px] text-slate-500">{m.url}</p>
-              </div>
-            </button>
-          );
-        })}
-      </div>
+                <div className="ap-medya-kart-bilgi">
+                  <p className="ap-medya-kart-ad" title={m.ad}>
+                    {m.ad}
+                  </p>
+                  {meta && <p className="ap-medya-kart-meta">{meta}</p>}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
-}
-
-interface MedyaYukleyiciProps {
-  urlForm: { ad: string; url: string };
-  yukleniyor: boolean;
-  yuklemeIlerleme?: { tamamlanan: number; toplam: number } | null;
-  onUrlFormChange: (form: { ad: string; url: string }) => void;
-  onDosyalarSec: (dosyalar: File[]) => void;
 }
 
 function dosyalariAyikla(liste: FileList | File[]): File[] {
@@ -88,10 +132,23 @@ export function MedyaYukleyici({
   urlForm,
   yukleniyor,
   yuklemeIlerleme,
+  kompakt,
+  dosyaInputRef,
   onUrlFormChange,
+  onUrlEkle,
   onDosyalarSec,
-}: MedyaYukleyiciProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+}: {
+  urlForm: { ad: string; url: string };
+  yukleniyor: boolean;
+  yuklemeIlerleme?: { tamamlanan: number; toplam: number } | null;
+  kompakt?: boolean;
+  dosyaInputRef?: RefObject<HTMLInputElement | null>;
+  onUrlFormChange: (form: { ad: string; url: string }) => void;
+  onUrlEkle: () => void;
+  onDosyalarSec: (dosyalar: File[]) => void;
+}) {
+  const icRef = useRef<HTMLInputElement>(null);
+  const inputRef = dosyaInputRef ?? icRef;
   const [surukleniyor, setSurukleniyor] = useState(false);
 
   const dosyaGonder = useCallback(
@@ -112,9 +169,11 @@ export function MedyaYukleyici({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="ap-medya-yukle">
       <div
-        className={`ap-medya-toplu-alan ${surukleniyor ? 'ap-medya-toplu-alan-surukle' : ''} ${yukleniyor ? 'ap-medya-toplu-alan-pasif' : ''}`}
+        className={`ap-medya-toplu-alan${kompakt ? ' ap-medya-toplu-alan--kompakt' : ''}${
+          surukleniyor ? ' ap-medya-toplu-alan-surukle' : ''
+        }${yukleniyor ? ' ap-medya-toplu-alan-pasif' : ''}`}
         onDragEnter={(e) => {
           e.preventDefault();
           if (!yukleniyor) setSurukleniyor(true);
@@ -132,19 +191,21 @@ export function MedyaYukleyici({
         <span className="ap-medya-toplu-ikon" aria-hidden>
           📤
         </span>
-        <p className="ap-medya-toplu-baslik">
-          {surukleniyor ? 'Dosyaları buraya bırakın' : 'Toplu görsel yükle'}
-        </p>
-        <p className="ap-medya-toplu-aciklama">
-          Görselleri sürükleyip bırakın veya bilgisayarınızdan seçin. PNG, JPG, WEBP — dosya başına max {MEDYA_MAX_DOSYA_MB}MB.
-        </p>
+        <div className="ap-medya-toplu-metin">
+          <p className="ap-medya-toplu-baslik">
+            {surukleniyor ? 'Dosyaları buraya bırakın' : kompakt ? 'Görsel ekle' : 'Görselleri buraya bırakın'}
+          </p>
+          <p className="ap-medya-toplu-aciklama">
+            PNG, JPG, WEBP — dosya başına en fazla {MEDYA_MAX_DOSYA_MB} MB
+          </p>
+        </div>
         <button
           type="button"
           className="ap-medya-toplu-dugme"
           disabled={yukleniyor}
           onClick={() => inputRef.current?.click()}
         >
-          {yukleniyor ? 'Yükleniyor...' : 'Dosya Seç'}
+          {yukleniyor ? 'Yükleniyor...' : 'Dosya seç'}
         </button>
         <input
           ref={inputRef}
@@ -173,25 +234,80 @@ export function MedyaYukleyici({
         )}
       </div>
 
-      <div className="rounded-lg border border-slate-700 bg-slate-800 p-4">
-        <h3 className="text-sm font-semibold text-white">URL ile Ekle</h3>
-        <p className="mt-1 text-xs text-slate-400">Harici bir görsel bağlantısı eklemek için alanları doldurup alt bardan Kaydet kullanın.</p>
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
-          <input
-            className="input-admin"
-            placeholder="Medya adı"
-            value={urlForm.ad}
-            onChange={(e) => onUrlFormChange({ ...urlForm, ad: e.target.value })}
-            required
-          />
-          <input
-            className="input-admin"
-            placeholder="https://..."
-            value={urlForm.url}
-            onChange={(e) => onUrlFormChange({ ...urlForm, url: e.target.value })}
-            required
-          />
+      <AdminFormBolumu
+        baslik="URL ile ekle"
+        aciklama="Harici bir görsel adresi kullanmak istiyorsanız."
+        akordeon
+        varsayilanAcik={false}
+      >
+        <div className="ap-medya-url-form">
+          <FormAlani etiket="Ad">
+            <input
+              className={formInputSinifi}
+              placeholder="Örn. Logo"
+              value={urlForm.ad}
+              onChange={(e) => onUrlFormChange({ ...urlForm, ad: e.target.value })}
+            />
+          </FormAlani>
+          <FormAlani etiket="Adres">
+            <input
+              className={formInputSinifi}
+              placeholder="https://..."
+              value={urlForm.url}
+              onChange={(e) => onUrlFormChange({ ...urlForm, url: e.target.value })}
+            />
+          </FormAlani>
+          <button
+            type="button"
+            className="ap-medya-toplu-dugme"
+            disabled={yukleniyor || !urlForm.ad.trim() || !urlForm.url.trim()}
+            onClick={onUrlEkle}
+          >
+            URL ekle
+          </button>
         </div>
+      </AdminFormBolumu>
+    </div>
+  );
+}
+
+export function MedyaOnizlemeModal({
+  medya,
+  onKapat,
+}: {
+  medya: AdminMedya | null;
+  onKapat: () => void;
+}) {
+  useEffect(() => {
+    if (!medya) return;
+    function tus(e: KeyboardEvent) {
+      if (e.key === 'Escape') onKapat();
+    }
+    document.addEventListener('keydown', tus);
+    return () => document.removeEventListener('keydown', tus);
+  }, [medya, onKapat]);
+
+  if (!medya) return null;
+  const tamUrl = medyaTamUrl(medya.url);
+
+  return (
+    <div className="ap-medya-oniz-overlay" onClick={onKapat} role="dialog" aria-modal="true">
+      <div className="ap-medya-oniz" onClick={(e) => e.stopPropagation()}>
+        <div className="ap-medya-oniz-ust">
+          <div>
+            <p className="ap-medya-oniz-ad">{medya.ad}</p>
+            <p className="ap-medya-oniz-url">{tamUrl}</p>
+          </div>
+          <div className="ap-medya-oniz-tuslar">
+            <button type="button" className="ap-medya-metin-btn" onClick={() => void urlKopyala(tamUrl)}>
+              Kopyala
+            </button>
+            <button type="button" className="ap-medya-metin-btn" onClick={onKapat}>
+              Kapat
+            </button>
+          </div>
+        </div>
+        <img src={tamUrl} alt={medya.ad} className="ap-medya-oniz-gorsel" />
       </div>
     </div>
   );
