@@ -1,4 +1,4 @@
-import type { Dispatch, SetStateAction } from 'react';
+import type { CSSProperties, Dispatch, SetStateAction } from 'react';
 import { Link } from 'react-router-dom';
 import type { SiteAyarlari } from '@/types/site';
 import { headerMarkaKapSinifi, logoBoyutuNormalize } from '@/types/logo';
@@ -189,7 +189,10 @@ export function HeaderKurumsal({ veri, ayarlar, menuAcik, setMenuAcik }: HeaderL
         <div className="container-site flex h-16 items-center justify-between gap-4">
           <MarkaAlani veri={veri} className="max-w-[250px]" />
           <DesktopMenu menu={veri.cevrilmisMenu} />
-          <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
+          <div className="flex items-center gap-2">
+            <CtaLink veri={veri} className="hidden sm:inline-flex" />
+            <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
+          </div>
         </div>
         <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
       </HeaderGovde>
@@ -228,11 +231,12 @@ export function HeaderOverlayKurumsal({
   const telefon = ayarlar?.telefon?.trim();
   const email = ayarlar?.email?.trim();
   const ust = veri.header.ustBant;
-  const ctaMetin = veri.tipEk.ctaMetni?.trim() || 'DEMO';
+  const ctaMetin = veri.tipEk.ctaMetni?.trim() || 'Katalog';
   const ctaLink = veri.tipEk.ctaLink?.trim() || '/iletisim';
+  const konumSinifi = veri.tipEk.sabit !== false ? 'fixed' : 'absolute';
 
   return (
-    <div className="site-header-overlay-shell absolute inset-x-0 top-0 z-50">
+    <div className={`site-header-overlay-shell ${konumSinifi} inset-x-0 top-0 z-50`}>
       {ustBantGoster && (
         <div className="site-header-overlay-ust">
           <div className="container-site flex flex-wrap items-center justify-between gap-2 py-2 text-xs">
@@ -358,9 +362,19 @@ export function HeaderImzaKurumsal({ veri, ayarlar, menuAcik, setMenuAcik }: Hea
   const ust = veri.header.ustBant;
   const ctaMetin = veri.tipEk.ctaMetni?.trim() || 'Katalog';
   const ctaLink = veri.tipEk.ctaLink?.trim() || '/katalog';
+  const sabit = veri.tipEk.sabit !== false;
+  const sabitSinifi = sabit ? 'fixed inset-x-0 top-0 z-40' : 'relative z-40';
+  const renkler = {
+    '--imza-ana': veri.tipEk.arkaPlanRengi || '#0b2a77',
+    '--imza-ust': veri.tipEk.ustBantRengi || '#08245f',
+    '--imza-metin': veri.tipEk.metinRengi || '#ffffff',
+    '--imza-btn': veri.tipEk.butonRengi || '#eef4ff',
+  } as CSSProperties;
 
   return (
-    <div className="site-header-imza-shell sticky top-0 z-40">
+    <>
+      {sabit && <div className={ust ? 'h-[6.4rem]' : 'h-[4.5rem]'} aria-hidden />}
+      <div className={`site-header-imza-shell ${sabitSinifi}`} style={renkler}>
       <div className="site-header-imza-ust">
         <div className="container-site flex flex-wrap items-center justify-between gap-2 py-2 text-xs">
           <div className="flex flex-wrap items-center gap-4">
@@ -416,7 +430,8 @@ export function HeaderImzaKurumsal({ veri, ayarlar, menuAcik, setMenuAcik }: Hea
         </div>
         <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
       </header>
-    </div>
+      </div>
+    </>
   );
 }
 

@@ -19,4 +19,14 @@ export function sayacDegerKaydet(ham: string): number | string {
   return metin;
 }
 
-export const SAYAC_VARSAYILAN_IKONLAR = ['⚡', '🔌', '💳', '🎨', '📊', '🚀', '🛡️', '⭐'] as const;
+/** Yeni sayaçlarda yönetim panelindeki çizgi ikon seçicisiyle uyumlu sabit değerler kullanılır. */
+export const SAYAC_VARSAYILAN_IKONLAR = [
+  'memnuniyet',
+  'proje',
+  'grafik',
+  'kalite',
+  'ekip',
+  'roket',
+  'guvenlik',
+  'yildiz',
+] as const;

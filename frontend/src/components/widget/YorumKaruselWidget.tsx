@@ -1,39 +1,72 @@
-import { useState } from 'react';
+import { useState, type CSSProperties } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetYorum } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
 
+function renkler(cfg: WidgetConfig) {
+  const g = cfg.gorunum ?? {};
+  return {
+    baslik: g.baslikRengi || '#111827',
+    metin: g.metinRengi || '#4b5563',
+    vurgu: g.vurguRengi || '#111827',
+    radius: g.borderRadius ?? 16,
+  };
+}
+
 function Baslik({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
+  const renk = renkler(cfg);
+  const cizgiGoster = cfg.gorunum?.baslikCizgi !== false;
+  if (!widget.baslik && !widget.altBaslik) return null;
+
   return (
-    <div className="mb-8 text-center">
-      {widget.altBaslik && <p className="text-sm font-semibold uppercase tracking-wide text-primary">{widget.altBaslik}</p>}
-      {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-slate-900`}>{widget.baslik}</h2>}
+    <div className="yk-baslik">
+      {widget.altBaslik && (
+        <div className="yk-alt-baslik-wrap">
+          <p className="yk-alt-baslik" style={{ color: renk.vurgu }}>
+            {widget.altBaslik}
+          </p>
+          {cizgiGoster && <span className="yk-baslik-cizgi" style={{ backgroundColor: renk.vurgu }} aria-hidden />}
+        </div>
+      )}
+      {widget.baslik && (
+        <h2 className={`${baslikSinifi(cfg)} yk-baslik-metin`} style={{ color: renk.baslik }}>
+          {widget.baslik}
+        </h2>
+      )}
     </div>
   );
 }
 
-function YazarBilgi({ y, koyu }: { y: WidgetYorum; koyu?: boolean }) {
+function YazarBilgi({ y, cfg, koyu = false }: { y: WidgetYorum; cfg: WidgetConfig; koyu?: boolean }) {
+  const renk = renkler(cfg);
+  const adRengi = koyu ? (cfg.gorunum?.baslikRengi || '#ffffff') : renk.baslik;
+  const firmaRengi = koyu ? (cfg.gorunum?.metinRengi || 'rgba(255, 255, 255, 0.68)') : renk.metin;
+
   return (
-    <div className="flex items-center justify-center gap-3">
-      {y.gorselUrl && (
-        <img src={medyaUrl(y.gorselUrl)} alt={y.ad} className="h-12 w-12 rounded-full object-cover" />
+    <div className="yk-yazar">
+      {y.gorselUrl ? (
+        <img src={medyaUrl(y.gorselUrl)} alt={y.ad} className="yk-yazar-avatar" />
+      ) : (
+        <span className="yk-yazar-avatar yk-yazar-avatar-bos" style={{ borderColor: renk.vurgu, color: renk.vurgu }} aria-hidden>
+          {y.ad.charAt(0) || '?'}
+        </span>
       )}
-      <div className="text-left">
-        <p className={`font-semibold ${koyu ? 'text-white' : 'text-slate-900'}`}>{y.ad}</p>
-        <p className={`text-sm ${koyu ? 'text-slate-400' : 'text-slate-500'}`}>{y.firma}</p>
+      <div className="yk-yazar-metin">
+        <p style={{ color: adRengi }}>{y.ad}</p>
+        {y.firma && <p style={{ color: firmaRengi }}>{y.firma}</p>}
       </div>
     </div>
   );
 }
 
-function Yildizlar({ puan }: { puan: number }) {
-  const p = Math.min(5, Math.max(0, Math.round(puan)));
+function Yildizlar({ puan, renk }: { puan: number; renk: string }) {
+  const deger = Math.min(5, Math.max(0, Math.round(puan)));
   return (
-    <div className="flex justify-center gap-0.5">
-      {Array.from({ length: 5 }, (_, i) => (
-        <span key={i} className="text-sm" style={{ color: i < p ? '#facc15' : '#e2e8f0' }}>
+    <div className="yk-yildizlar" aria-label={`${deger} / 5 yıldız`}>
+      {Array.from({ length: 5 }, (_, indeks) => (
+        <span key={indeks} style={{ color: indeks < deger ? renk : '#dbe2ea' }} aria-hidden>
           ★
         </span>
       ))}
@@ -50,68 +83,73 @@ function KartKarusel({
   cfg: WidgetConfig;
   yorumlar: WidgetYorum[];
 }) {
-  const [aktif, setAktif] = useState(0);
-  const y = yorumlar[aktif];
+  const [baslangic, setBaslangic] = useState(0);
+  const renk = renkler(cfg);
+  const gorunenAdet = Math.min(3, yorumlar.length);
+  const gorunenYorumlar = Array.from({ length: gorunenAdet }, (_, sira) => yorumlar[(baslangic + sira) % yorumlar.length]);
+
+  function kaydir(yon: 'onceki' | 'sonraki') {
+    setBaslangic((mevcut) =>
+      yon === 'onceki' ? (mevcut - 1 + yorumlar.length) % yorumlar.length : (mevcut + 1) % yorumlar.length,
+    );
+  }
 
   return (
     <>
-      <Baslik widget={widget} cfg={cfg} />
-      <div className="mx-auto max-w-3xl rounded-2xl bg-white p-8 text-center shadow-md">
-        <p className="text-lg leading-relaxed text-slate-600">&ldquo;{y.metin}&rdquo;</p>
-        <div className="mt-6">
-          <YazarBilgi y={y} />
-        </div>
+      <div className="yk-baslik-satir">
+        <Baslik widget={widget} cfg={cfg} />
+        {yorumlar.length > gorunenAdet && (
+          <div className="yk-gezinme" aria-label="Müşteri yorumları gezinme">
+            <button type="button" onClick={() => kaydir('onceki')} aria-label="Önceki yorumlar">
+              ‹
+            </button>
+            <button type="button" onClick={() => kaydir('sonraki')} aria-label="Sonraki yorumlar">
+              ›
+            </button>
+          </div>
+        )}
       </div>
-      {yorumlar.length > 1 && (
-        <div className="mt-6 flex justify-center gap-2">
-          {yorumlar.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setAktif(i)}
-              className={`h-2.5 w-2.5 rounded-full ${i === aktif ? 'bg-primary' : 'bg-slate-300'}`}
-              aria-label={`Yorum ${i + 1}`}
-            />
-          ))}
-        </div>
-      )}
+      <div className="yk-kart-grid" style={{ '--yk-vurgu': renk.vurgu } as CSSProperties}>
+        {gorunenYorumlar.map((yorum, indeks) => (
+          <article key={`${yorum.id}-${baslangic}-${indeks}`} className="yk-kart" style={{ borderRadius: `${renk.radius}px` }}>
+            <div className="yk-kart-icerik">
+              <Yildizlar puan={yorum.yildiz ?? 5} renk={renk.vurgu} />
+              <p className="yk-yorum-metin" style={{ color: renk.metin }}>
+                “{yorum.metin}”
+              </p>
+            </div>
+            <footer className="yk-kart-alt">
+              <YazarBilgi y={yorum} cfg={cfg} />
+            </footer>
+          </article>
+        ))}
+      </div>
     </>
   );
 }
 
 function TekAlinti({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetConfig; yorumlar: WidgetYorum[] }) {
   const [aktif, setAktif] = useState(0);
-  const y = yorumlar[aktif];
+  const yorum = yorumlar[aktif];
+  const renk = renkler(cfg);
 
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <blockquote className="mx-auto max-w-4xl text-center">
-        <p className="text-2xl font-medium italic leading-relaxed text-violet-800 md:text-4xl">
-          &ldquo;{y.metin}&rdquo;
-        </p>
-        <footer className="mt-8">
-          <p className="text-lg font-bold text-slate-900">{y.ad}</p>
-          {y.firma && <p className="text-sm text-violet-600">{y.firma}</p>}
+      <blockquote className="yk-tek-alinti">
+        <Yildizlar puan={yorum.yildiz ?? 5} renk={renk.vurgu} />
+        <p style={{ color: renk.metin }}>“{yorum.metin}”</p>
+        <footer>
+          <YazarBilgi y={yorum} cfg={cfg} />
         </footer>
       </blockquote>
       {yorumlar.length > 1 && (
-        <div className="mt-8 flex justify-center gap-3">
-          <button
-            type="button"
-            onClick={() => setAktif((a) => Math.max(0, a - 1))}
-            className="rounded-lg border border-slate-300 px-3 py-1 text-sm"
-            disabled={aktif === 0}
-          >
-            ←
+        <div className="yk-gezinme yk-gezinme-orta" aria-label="Müşteri yorumları gezinme">
+          <button type="button" onClick={() => setAktif((mevcut) => (mevcut - 1 + yorumlar.length) % yorumlar.length)} aria-label="Önceki yorum">
+            ‹
           </button>
-          <button
-            type="button"
-            onClick={() => setAktif((a) => Math.min(yorumlar.length - 1, a + 1))}
-            className="rounded-lg border border-slate-300 px-3 py-1 text-sm"
-            disabled={aktif === yorumlar.length - 1}
-          >
-            →
+          <button type="button" onClick={() => setAktif((mevcut) => (mevcut + 1) % yorumlar.length)} aria-label="Sonraki yorum">
+            ›
           </button>
         </div>
       )}
@@ -120,15 +158,16 @@ function TekAlinti({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetConfi
 }
 
 function KompaktYildiz({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetConfig; yorumlar: WidgetYorum[] }) {
+  const renk = renkler(cfg);
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="mx-auto grid max-w-4xl gap-3 sm:grid-cols-2">
-        {yorumlar.map((y) => (
-          <article key={y.id} className="rounded-xl border border-violet-100 bg-violet-50/50 p-4">
-            <Yildizlar puan={y.yildiz ?? 5} />
-            <p className="mt-2 text-sm leading-relaxed text-slate-600 line-clamp-3">&ldquo;{y.metin}&rdquo;</p>
-            <p className="mt-2 text-xs font-semibold text-violet-800">{y.ad}</p>
+      <div className="yk-kompakt-grid">
+        {yorumlar.map((yorum) => (
+          <article key={yorum.id} className="yk-kompakt-kart" style={{ borderColor: `${renk.vurgu}24`, borderRadius: `${renk.radius}px` }}>
+            <Yildizlar puan={yorum.yildiz ?? 5} renk={renk.vurgu} />
+            <p style={{ color: renk.metin }}>“{yorum.metin}”</p>
+            <YazarBilgi y={yorum} cfg={cfg} />
           </article>
         ))}
       </div>
@@ -138,31 +177,34 @@ function KompaktYildiz({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetC
 
 function KoyuPanel({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetConfig; yorumlar: WidgetYorum[] }) {
   const [aktif, setAktif] = useState(0);
-  const y = yorumlar[aktif];
+  const yorum = yorumlar[aktif];
+  const renk = renkler(cfg);
 
   return (
-    <div className="rounded-2xl bg-slate-900 px-6 py-12 md:px-12">
-      <div className="mb-8 text-center">
-        {widget.altBaslik && <p className="text-sm font-semibold uppercase tracking-wide text-slate-400">{widget.altBaslik}</p>}
-        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-white`}>{widget.baslik}</h2>}
+    <div
+      className="yk-koyu-panel"
+      style={{
+        borderRadius: `${renk.radius}px`,
+        '--yk-koyu-metin': renk.metin,
+      } as CSSProperties}
+    >
+      <div className="yk-koyu-baslik">
+        {widget.altBaslik && <p style={{ color: renk.vurgu }}>{widget.altBaslik}</p>}
+        {widget.baslik && <h2 className={baslikSinifi(cfg)} style={{ color: renk.baslik }}>{widget.baslik}</h2>}
       </div>
-      <div className="mx-auto max-w-3xl text-center">
-        <p className="text-lg leading-relaxed text-slate-300">&ldquo;{y.metin}&rdquo;</p>
-        <div className="mt-6">
-          <YazarBilgi y={y} koyu />
-        </div>
+      <div className="yk-koyu-icerik">
+        <Yildizlar puan={yorum.yildiz ?? 5} renk={renk.vurgu} />
+        <p>“{yorum.metin}”</p>
+        <YazarBilgi y={yorum} cfg={cfg} koyu />
       </div>
       {yorumlar.length > 1 && (
-        <div className="mt-6 flex justify-center gap-2">
-          {yorumlar.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setAktif(i)}
-              className={`h-2.5 w-2.5 rounded-full ${i === aktif ? 'bg-sky-400' : 'bg-slate-600'}`}
-              aria-label={`Yorum ${i + 1}`}
-            />
-          ))}
+        <div className="yk-gezinme yk-gezinme-orta" aria-label="Müşteri yorumları gezinme">
+          <button type="button" onClick={() => setAktif((mevcut) => (mevcut - 1 + yorumlar.length) % yorumlar.length)} aria-label="Önceki yorum">
+            ‹
+          </button>
+          <button type="button" onClick={() => setAktif((mevcut) => (mevcut + 1) % yorumlar.length)} aria-label="Sonraki yorum">
+            ›
+          </button>
         </div>
       )}
     </div>
@@ -171,28 +213,25 @@ function KoyuPanel({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetConfi
 
 function OkyanusKart({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetConfig; yorumlar: WidgetYorum[] }) {
   const [aktif, setAktif] = useState(0);
-  const y = yorumlar[aktif];
+  const yorum = yorumlar[aktif];
+  const renk = renkler(cfg);
 
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="mx-auto max-w-3xl rounded-2xl border border-sky-200 bg-gradient-to-br from-sky-50 to-blue-100 p-8 text-center shadow-md">
-        <p className="text-lg leading-relaxed text-blue-900">&ldquo;{y.metin}&rdquo;</p>
-        <div className="mt-6">
-          <YazarBilgi y={y} />
-        </div>
-      </div>
+      <article className="yk-okyanus-kart" style={{ borderColor: `${renk.vurgu}38`, borderRadius: `${renk.radius}px` }}>
+        <Yildizlar puan={yorum.yildiz ?? 5} renk={renk.vurgu} />
+        <p style={{ color: renk.metin }}>“{yorum.metin}”</p>
+        <YazarBilgi y={yorum} cfg={cfg} />
+      </article>
       {yorumlar.length > 1 && (
-        <div className="mt-6 flex justify-center gap-2">
-          {yorumlar.map((_, i) => (
-            <button
-              key={i}
-              type="button"
-              onClick={() => setAktif(i)}
-              className={`h-2.5 w-2.5 rounded-full ${i === aktif ? 'bg-sky-500' : 'bg-sky-200'}`}
-              aria-label={`Yorum ${i + 1}`}
-            />
-          ))}
+        <div className="yk-gezinme yk-gezinme-orta" aria-label="Müşteri yorumları gezinme">
+          <button type="button" onClick={() => setAktif((mevcut) => (mevcut - 1 + yorumlar.length) % yorumlar.length)} aria-label="Önceki yorum">
+            ‹
+          </button>
+          <button type="button" onClick={() => setAktif((mevcut) => (mevcut + 1) % yorumlar.length)} aria-label="Sonraki yorum">
+            ›
+          </button>
         </div>
       )}
     </>
@@ -200,18 +239,16 @@ function OkyanusKart({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetCon
 }
 
 function MintMinimal({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetConfig; yorumlar: WidgetYorum[] }) {
+  const renk = renkler(cfg);
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="mx-auto max-w-2xl space-y-6">
-        {yorumlar.map((y) => (
-          <div key={y.id} className="border-l-2 border-teal-400 pl-4">
-            <p className="text-sm leading-relaxed text-slate-600">&ldquo;{y.metin}&rdquo;</p>
-            <p className="mt-2 text-xs font-semibold text-teal-800">
-              {y.ad}
-              {y.firma ? ` · ${y.firma}` : ''}
-            </p>
-          </div>
+      <div className="yk-minimal-liste">
+        {yorumlar.map((yorum) => (
+          <article key={yorum.id} className="yk-minimal-yorum" style={{ borderLeftColor: renk.vurgu }}>
+            <p style={{ color: renk.metin }}>“{yorum.metin}”</p>
+            <YazarBilgi y={yorum} cfg={cfg} />
+          </article>
         ))}
       </div>
     </>
@@ -221,7 +258,7 @@ function MintMinimal({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetCon
 export function YorumKaruselWidget({ widget }: { widget: Widget }) {
   const cfg = configOkuFromWidget(widget);
   const yorumlar = cfg.yorumlar ?? [];
-  const gt = widgetGorunumTipiAl(widget);
+  const gorunumTipi = widgetGorunumTipiAl(widget);
 
   if (yorumlar.length === 0) return null;
 
@@ -229,12 +266,12 @@ export function YorumKaruselWidget({ widget }: { widget: Widget }) {
 
   return (
     <WidgetKabuk widget={widget}>
-      {gt === 'tek-alinti' && <TekAlinti {...ortak} />}
-      {gt === 'kompakt-yildiz' && <KompaktYildiz {...ortak} />}
-      {gt === 'koyu-panel' && <KoyuPanel {...ortak} />}
-      {gt === 'okyanus-kart' && <OkyanusKart {...ortak} />}
-      {gt === 'mint-minimal' && <MintMinimal {...ortak} />}
-      {gt === 'kart-karusel' && <KartKarusel {...ortak} />}
+      {gorunumTipi === 'tek-alinti' && <TekAlinti {...ortak} />}
+      {gorunumTipi === 'kompakt-yildiz' && <KompaktYildiz {...ortak} />}
+      {gorunumTipi === 'koyu-panel' && <KoyuPanel {...ortak} />}
+      {gorunumTipi === 'okyanus-kart' && <OkyanusKart {...ortak} />}
+      {gorunumTipi === 'mint-minimal' && <MintMinimal {...ortak} />}
+      {(gorunumTipi === 'kart-karusel' || !gorunumTipi) && <KartKarusel {...ortak} />}
     </WidgetKabuk>
   );
 }

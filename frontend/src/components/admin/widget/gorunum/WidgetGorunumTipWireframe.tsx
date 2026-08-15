@@ -49,9 +49,70 @@ export function WidgetGorunumTipWireframe({
       </div>
     ),
     'MARKA_SERIDI:cift-serit': (
-      <div className="space-y-1 p-1" style={{ background: renk.bg }}>
-        <div className="flex gap-1 rounded px-1 py-0.5" style={{ background: renk.accent, opacity: 0.9 }}>{strip(3, `${bar} h-0.5 w-2 bg-white/70`)}</div>
-        <div className="flex gap-1 rounded px-1 py-0.5 opacity-70" style={{ background: renk.surface }}>{strip(3, `${bar} h-0.5 w-2`)}</div>
+      <div className="flex items-center gap-0.5 p-1" style={{ background: '#f4f6fa' }}>
+        <div className="h-3 w-1 rounded" style={{ background: '#fff' }} />
+        <div className="grid flex-1 grid-cols-5 gap-0.5">
+          {[1, 2, 3, 4, 5].map((i) => <div key={i} className="h-4 rounded border" style={{ borderColor: '#e5e7eb', background: '#fff' }} />)}
+        </div>
+        <div className="h-3 w-1 rounded" style={{ background: '#fff' }} />
+      </div>
+    ),
+    'HIZMET_KARTLARI:masonry-duvar': (
+      <div className="grid grid-cols-4 gap-0.5 p-1" style={{ background: renk.bg }}>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="space-y-0.5 rounded border p-0.5" style={{ borderColor: `${renk.accent}22`, background: '#fff' }}>
+            <div className="h-1.5 w-1.5 rounded" style={{ background: renk.accent }} />
+            <div className="h-0.5 w-full rounded" style={{ background: renk.text, opacity: 0.35 }} />
+            <div className="h-0.5 w-2/3 rounded" style={{ background: renk.accent, opacity: 0.45 }} />
+          </div>
+        ))}
+      </div>
+    ),
+    'GORSEL_ETIKET_KARTLARI:masonry-galeri': (
+      <div className="grid grid-cols-3 gap-0.5 p-1" style={{ background: renk.bg }}>
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="relative h-6 overflow-hidden rounded" style={{ background: renk.surface }}>
+            <div className="absolute inset-x-0 bottom-0 h-2" style={{ background: renk.text, opacity: 0.65 }} />
+          </div>
+        ))}
+      </div>
+    ),
+    'GORSEL_ETIKET_KARTLARI:flip-kart': (
+      <div className="grid grid-cols-3 gap-0.5 p-1" style={{ background: renk.bg }}>
+        {[1, 2, 3, 4, 5, 6].map((i) => (
+          <div key={i} className="space-y-0.5 rounded border p-0.5" style={{ borderColor: `${renk.accent}22`, background: '#fff' }}>
+            <div className="h-2.5 rounded" style={{ background: renk.surface }} />
+            <div className="h-0.5 w-3/4 rounded" style={{ background: renk.text, opacity: 0.45 }} />
+            <div className="h-0.5 w-1/2 rounded" style={{ background: renk.accent }} />
+          </div>
+        ))}
+      </div>
+    ),
+    'BLOG_KARUSEL:overlay-sinematik': (
+      <div className="grid grid-cols-4 gap-0.5 p-1" style={{ background: renk.bg }}>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="space-y-0.5 rounded border p-0.5" style={{ borderColor: '#dfe6ef', background: '#fff' }}>
+            <div className="h-2.5 rounded" style={{ background: renk.surface }} />
+            <div className="h-0.5 w-1/2 rounded" style={{ background: renk.accent, opacity: 0.75 }} />
+            <div className="h-0.5 w-full rounded" style={{ background: renk.text, opacity: 0.4 }} />
+          </div>
+        ))}
+      </div>
+    ),
+    'ILETISIM_BLOK:split-kart-harita': (
+      <div className="flex gap-0.5 p-1" style={{ background: renk.bg }}>
+        <div className="grid w-2/5 grid-cols-2 gap-0.5">
+          {[1, 2, 3, 4].map((i) => <div key={i} className="h-2 rounded border" style={{ borderColor: `${renk.accent}22`, background: '#fff' }} />)}
+        </div>
+        <div className="h-6 flex-1 rounded" style={{ background: renk.surface }} />
+      </div>
+    ),
+    'HARITA:yan-ikon-liste': (
+      <div className="flex gap-0.5 p-1" style={{ background: '#f8fafc' }}>
+        <div className="grid w-3/5 grid-cols-2 gap-0.5">
+          {[1, 2, 3, 4].map((i) => <div key={i} className="h-2 rounded" style={{ background: `${renk.accent}18` }} />)}
+        </div>
+        <div className="h-6 flex-1 rounded bg-white shadow-sm" />
       </div>
     ),
     'SUREC_ADIMLARI:renkli-kart': (
@@ -310,13 +371,48 @@ export function WidgetGorunumTipWireframe({
       </div>
     ),
     'SITE_HAKKINDA:bento-hakkimizda': (
-      <div className="grid grid-cols-4 gap-0.5 p-1">
-        <div className="col-span-2 row-span-2 h-5 rounded p-1" style={{ background: renk.bg }}>
+      <div className="flex gap-0.5 p-1">
+        <div className="h-6 w-3 rounded-tr-xl rounded-bl-xl" style={{ background: renk.accent, opacity: 0.42 }} />
+        <div className="flex-1 space-y-0.5 p-0.5" style={{ background: renk.bg }}>
           <div className="h-0.5 w-3 rounded" style={{ background: renk.accent }} />
+          <div className="grid grid-cols-2 gap-0.5 pt-0.5">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-1 rounded border" style={{ borderColor: `${renk.accent}33` }} />
+            ))}
+          </div>
         </div>
-        <div className="col-span-2 h-2.5 rounded" style={{ background: renk.surface }} />
-        <div className="h-1.5 rounded" style={{ background: renk.surface }} />
-        <div className="h-1.5 rounded" style={{ background: renk.accent, opacity: 0.4 }} />
+      </div>
+    ),
+    'EKIP_KARUSEL:marquee-spotlight': (
+      <div className="grid grid-cols-4 gap-0.5 p-1" style={{ background: renk.bg }}>
+        {[1, 2, 3, 4].map((i) => (
+          <div key={i} className="relative h-6 overflow-hidden rounded" style={{ background: renk.surface }}>
+            <div className="absolute inset-x-0 bottom-0 h-2" style={{ background: renk.accent, opacity: 0.75 }} />
+          </div>
+        ))}
+      </div>
+    ),
+    'SAYAC_BLOK:altin-premium': (
+      <div className="flex items-end justify-center gap-1 p-1" style={{ background: renk.bg }}>
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="flex flex-col items-center gap-0.5">
+            <div className="h-2 w-2 rounded-full" style={{ background: renk.accent }} />
+            <div className="h-0.5 w-2 rounded" style={{ background: renk.text, opacity: 0.35 }} />
+          </div>
+        ))}
+      </div>
+    ),
+    'GALERI:karusel-merkez': (
+      <div className="flex items-center gap-0.5 p-1" style={{ background: renk.bg }}>
+        <div className="h-3 w-1 rounded" style={{ background: renk.surface }} />
+        <div className="grid flex-1 grid-cols-4 gap-0.5">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="relative h-5 overflow-hidden rounded" style={{ background: renk.surface }}>
+              <div className="absolute bottom-0 left-0 h-1 w-3/5" style={{ background: renk.accent, opacity: 0.8 }} />
+            </div>
+          ))}
+        </div>
+        <div className="h-3 w-1 rounded" style={{ background: renk.surface }} />
       </div>
     ),
   };

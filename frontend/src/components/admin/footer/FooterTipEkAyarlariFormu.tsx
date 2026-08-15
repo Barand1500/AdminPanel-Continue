@@ -1,4 +1,5 @@
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
+import { RenkSecici } from '@/components/form/RenkSecici';
 import type { FooterAyarlari, FooterTipEkAyarlari } from '@/types/footer';
 import type { FooterTipi } from '@/data/footerTipleri';
 import { footerTipTanimiBul } from '@/data/footerTipleri';
@@ -96,12 +97,20 @@ export function FooterTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: FooterTipEk
         )}
 
         {tip === 'kurumsal' && (
+          <div className="space-y-3">
+            <div className="grid gap-3 sm:grid-cols-2">
+              <RenkSecici etiket="Footer ana arka planı" deger={tipEk.arkaPlanRengi ?? ''} varsayilan="#0b2a77" onChange={(arkaPlanRengi) => guncelle({ arkaPlanRengi })} />
+              <RenkSecici etiket="Alt bant arka planı" deger={tipEk.altBantRengi ?? ''} varsayilan="#08245f" onChange={(altBantRengi) => guncelle({ altBantRengi })} />
+              <RenkSecici etiket="Yazı rengi" deger={tipEk.metinRengi ?? ''} varsayilan="#ffffff" onChange={(metinRengi) => guncelle({ metinRengi })} />
+              <RenkSecici etiket="İkon kutusu" deger={tipEk.ikonArkaPlanRengi ?? ''} varsayilan="#08245f" onChange={(ikonArkaPlanRengi) => guncelle({ ikonArkaPlanRengi })} />
+            </div>
           <ToggleSatir
             etiket="Güven bandı vurgusu"
             aciklama="Rozetler daha belirgin görünür"
             acik={tipEk.guvenVurgu !== false}
             onDegistir={(guvenVurgu) => guncelle({ guvenVurgu })}
           />
+          </div>
         )}
 
         {tip === 'sade' && (

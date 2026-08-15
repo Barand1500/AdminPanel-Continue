@@ -7,6 +7,7 @@ import {
   configOku,
   WIDGET_GORUNUM_GORSEL_TIPLERI,
   WIDGET_GORUNUM_GRID_TIPLERI,
+  WIDGET_GORUNUM_HABER_TIPLERI,
   WIDGET_GORUNUM_METIN_TIPLERI,
 } from '@/types/widget';
 import { SecimAlani } from '../panels/WidgetPanelOrtak';
@@ -27,6 +28,20 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
   const karsilastirmaEk = tip === 'KARSILASTIRMA_TABLOSU';
   const popupEk = tip === 'POPUP';
   const iletisimCtaEk = tip === 'ILETISIM_FORMU';
+  const haberWidget = WIDGET_GORUNUM_HABER_TIPLERI.has(tip);
+  // Sadece çizgiyi gerçekten render eden iki başlıklı widgetlarda gösterilir.
+  // Böylece ayar, desteklenmeyen eski widgetlarda etkisiz bir anahtar olarak kalmaz.
+  const ikiBaslikli = [
+    'SITE_HAKKINDA',
+    'HIZMET_KARTLARI',
+    'GORSEL_ETIKET_KARTLARI',
+    'SAYAC_BLOK',
+    'EKIP_KARUSEL',
+    'YORUM_KARUSEL',
+    'BLOG_KARUSEL',
+    'GALERI',
+    'FIYATLANDIRMA',
+  ].includes(tip);
   const gorunumTipi = g.gorunumTipi ?? 'merkez-basit';
   const tipEk = g.tipEk ?? {};
 
@@ -95,10 +110,10 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
       <AdminFormBolumu baslik="Renkler ve boşluk">
         <RenkSecici etiket="Arka plan" deger={form.arkaPlanRenk} varsayilan="#ffffff" onChange={(v) => onChange({ ...form, arkaPlanRenk: v })} />
         <RenkSecici etiket="Genel yazı rengi" deger={form.yaziRenk} varsayilan="#111827" onChange={(v) => onChange({ ...form, yaziRenk: v })} />
-        {(metinGoster || gridGoster) && (
+        {(metinGoster || gridGoster || ikiBaslikli) && (
           <>
-            <RenkSecici etiket="Başlık rengi" deger={g.baslikRengi ?? ''} varsayilan="#0f172a" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, baslikRengi: v } })))} />
-            <RenkSecici etiket="Metin rengi" deger={g.metinRengi ?? ''} varsayilan="#475569" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, metinRengi: v } })))} />
+            <RenkSecici etiket="Başlık rengi" deger={g.baslikRengi ?? ''} varsayilan="#111827" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, baslikRengi: v } })))} />
+            <RenkSecici etiket="Metin rengi" deger={g.metinRengi ?? ''} varsayilan="#4b5563" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, metinRengi: v } })))} />
           </>
         )}
         {karsilastirmaEk && (
@@ -107,8 +122,15 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
             <RenkSecici etiket="Tablo başlık arka planı" deger={g.tabloBaslikArkaPlan ?? ''} varsayilan="#f8fafc" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, tabloBaslikArkaPlan: v } })))} />
           </>
         )}
-        {(karsilastirmaEk || popupEk || tip === 'SSS') && (
-          <RenkSecici etiket="Vurgu rengi" deger={g.vurguRengi ?? ''} varsayilan="#7c3aed" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, vurguRengi: v } })))} />
+        {(metinGoster || gridGoster || ikiBaslikli || karsilastirmaEk || popupEk || tip === 'SSS') && !haberWidget && (
+          <RenkSecici etiket="Vurgu / üst etiket rengi" deger={g.vurguRengi ?? ''} varsayilan="#111827" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, vurguRengi: v } })))} />
+        )}
+        {ikiBaslikli && !haberWidget && (
+          <AdminAnahtarDugme
+            etiket="Üst başlık alt çizgisi"
+            acik={g.baslikCizgi !== false}
+            onDegistir={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, baslikCizgi: v } })))}
+          />
         )}
         {(popupEk || tip === 'SSS') && (
           <FormAlani etiket="Köşe yuvarlaklığı (px)">

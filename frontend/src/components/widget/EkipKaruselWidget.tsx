@@ -1,4 +1,4 @@
-import { useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetEkipUyesi } from '@/types/widget';
@@ -9,22 +9,26 @@ import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
 function renkler(cfg: WidgetConfig) {
   const g = cfg.gorunum ?? {};
   return {
-    baslik: g.baslikRengi || '#0f172a',
-    metin: g.metinRengi || '#64748b',
-    vurgu: g.vurguRengi || g.baslikRengi || '#7c3aed',
+    baslik: g.baslikRengi || '#111827',
+    metin: g.metinRengi || '#4b5563',
+    vurgu: g.vurguRengi || '#111827',
     radius: g.borderRadius ?? 16,
   };
 }
 
 function Baslik({ widget, cfg, ortala = true }: { widget: Widget; cfg: WidgetConfig; ortala?: boolean }) {
   const renk = renkler(cfg);
+  const cizgiGoster = cfg.gorunum?.baslikCizgi !== false;
   if (!widget.baslik && !widget.altBaslik) return null;
   return (
     <div className={`ek-baslik${ortala ? ' ek-baslik-orta' : ''}`}>
       {widget.altBaslik && (
-        <p className="ek-alt-baslik" style={{ color: renk.vurgu }}>
-          {widget.altBaslik}
-        </p>
+        <div className="ek-alt-baslik-wrap">
+          <p className="ek-alt-baslik" style={{ color: renk.vurgu }}>
+            {widget.altBaslik}
+          </p>
+          {cizgiGoster && <span className="ek-baslik-cizgi" style={{ backgroundColor: renk.vurgu }} aria-hidden />}
+        </div>
       )}
       {widget.baslik && (
         <h2 className={`${baslikSinifi(cfg)} ek-baslik-metin`} style={{ color: renk.baslik }}>
@@ -344,70 +348,94 @@ function MarqueeSpotlight({
   cfg: WidgetConfig;
   uyeler: WidgetEkipUyesi[];
 }) {
-  const [aktif, setAktif] = useState(0);
-  const secili = uyeler[aktif] ?? uyeler[0];
-  const ticker = uyeler.slice(0, 10);
-  const cift = [...ticker, ...ticker];
-  const renk = renkler(cfg);
+  const [baslangic, setBaslangic] = useState(0);
+  const [seciliUye, setSeciliUye] = useState<WidgetEkipUyesi | null>(null);
+  const gorunenAdet = Math.min(4, uyeler.length);
+  const gorunenUyeler = Array.from({ length: gorunenAdet }, (_, indeks) => uyeler[(baslangic + indeks) % uyeler.length]);
+
+  function kaydir(yon: 'onceki' | 'sonraki') {
+    setBaslangic((mevcut) =>
+      yon === 'onceki' ? (mevcut - 1 + uyeler.length) % uyeler.length : (mevcut + 1) % uyeler.length
+    );
+  }
 
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      {ticker.length > 1 && (
-        <div className="ek-ticker-alan">
-          <div className="ek-ticker-iz">
-            {cift.map((u, i) => (
-              <button
-                key={`${u.id}-${i}`}
-                type="button"
-                className="ek-ticker-tus"
-                onClick={() => setAktif(i % uyeler.length)}
-              >
-                <span className="ek-ticker-nokta" style={{ background: renk.vurgu }} />
-                {u.ad}
-              </button>
-            ))}
-          </div>
-        </div>
-      )}
-      {secili && (
-        <article className="ek-spotlight" style={{ borderRadius: `${renk.radius}px` }}>
-          <div className="ek-spotlight-gorsel">
-            <UyeAvatar u={secili} boyut="xl" />
-          </div>
-          <div className="ek-spotlight-icerik">
-            <h3 className="ek-spotlight-ad" style={{ color: renk.baslik }}>
-              {secili.ad}
-            </h3>
-            <p className="ek-uye-unvan" style={{ color: renk.vurgu }}>
-              {secili.unvan}
-            </p>
-            {secili.departman && <p className="ek-uye-dep">{secili.departman}</p>}
-            {secili.aciklama && (
-              <p className="ek-uye-aciklama" style={{ color: renk.metin }}>
-                {secili.aciklama}
-              </p>
-            )}
-            {uyeler.length > 1 && (
-              <div className="ek-spotlight-secici">
-                {uyeler.map((u, i) => (
-                  <button
-                    key={u.id}
-                    type="button"
-                    className={`ek-spotlight-nokta${i === aktif ? ' ek-spotlight-nokta-aktif' : ''}`}
-                    style={i === aktif ? { borderColor: renk.vurgu } : undefined}
-                    onClick={() => setAktif(i)}
-                    aria-label={u.ad}
-                  >
-                    <UyeAvatar u={u} boyut="sm" />
-                  </button>
-                ))}
+      <div className="ek-portre-grid">
+        {gorunenUyeler.map((uye) => (
+          <button
+            key={`${uye.id}-${baslangic}`}
+            type="button"
+            className="ek-portre-kart"
+            onClick={() => setSeciliUye(uye)}
+            aria-haspopup="dialog"
+            aria-label={`${uye.ad} detayını aç`}
+          >
+            {uye.gorselUrl ? (
+              <img src={medyaUrl(uye.gorselUrl)} alt={uye.ad} className="ek-portre-gorsel" />
+            ) : (
+              <div className="ek-portre-gorsel ek-portre-gorsel-bos" aria-hidden>
+                {uye.ad.charAt(0) || '?'}
               </div>
             )}
-          </div>
-        </article>
+            <div className="ek-portre-kimlik ek-portre-kimlik--lacivert">
+              <h3>{uye.ad}</h3>
+              <p>{uye.unvan}</p>
+            </div>
+          </button>
+        ))}
+      </div>
+      {uyeler.length > gorunenAdet && (
+        <div className="ek-portre-gezinme">
+          <button type="button" onClick={() => kaydir('onceki')} aria-label="Önceki ekip üyeleri">
+            ‹
+          </button>
+          <button type="button" onClick={() => kaydir('sonraki')} aria-label="Sonraki ekip üyeleri">
+            ›
+          </button>
+        </div>
       )}
+      <EkipDetayModal uye={seciliUye} onKapat={() => setSeciliUye(null)} />
     </>
+  );
+}
+
+function EkipDetayModal({ uye, onKapat }: { uye: WidgetEkipUyesi | null; onKapat: () => void }) {
+  const kapatRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!uye) return;
+    kapatRef.current?.focus();
+    const escape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onKapat();
+    };
+    document.addEventListener('keydown', escape);
+    return () => document.removeEventListener('keydown', escape);
+  }, [uye, onKapat]);
+
+  if (!uye) return null;
+
+  return (
+    <div className="ek-detay-modal" role="dialog" aria-modal="true" aria-label={`${uye.ad} ekip detayı`} onClick={onKapat}>
+      <section className="ek-detay-kart" onClick={(event) => event.stopPropagation()}>
+        <button ref={kapatRef} type="button" className="ek-detay-kapat" onClick={onKapat} aria-label="Kapat">×</button>
+        <div className="ek-detay-gorsel-alan">
+          {uye.gorselUrl ? (
+            <img src={medyaUrl(uye.gorselUrl)} alt={uye.ad} className="ek-detay-gorsel" />
+          ) : (
+            <div className="ek-detay-gorsel ek-detay-gorsel-bos" aria-hidden>{uye.ad.charAt(0) || '?'}</div>
+          )}
+        </div>
+        <div className="ek-detay-icerik">
+          <p className="ek-detay-unvan">{uye.unvan}</p>
+          <h3>{uye.ad}</h3>
+          {uye.departman && <p className="ek-detay-departman">{uye.departman}</p>}
+          {uye.aciklama && <p className="ek-detay-aciklama">{uye.aciklama}</p>}
+          {uye.linkedin && <SosyalLink href={uye.linkedin} className="ek-detay-link">LinkedIn profili →</SosyalLink>}
+        </div>
+      </section>
+    </div>
   );
 }
 

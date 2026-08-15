@@ -74,6 +74,16 @@ export interface DilDestegiAyarlari {
 }
 
 export interface HeaderTipEkAyarlari {
+  /** Sayfa kaydırılırken header'ın üstte kalmasını belirler. */
+  sabit?: boolean;
+  /** İmza kurumsal ana gezinme zemini. */
+  arkaPlanRengi?: string;
+  /** İmza kurumsal iletişim üst bandı zemini. */
+  ustBantRengi?: string;
+  /** İmza kurumsal menü ve iletişim metin rengi. */
+  metinRengi?: string;
+  /** İmza kurumsal katalog/CTA butonu zemini. */
+  butonRengi?: string;
   aramaGoster?: boolean;
   aramaModu?: 'tam' | 'ikon';
   /** false ise header sağındaki hesap / giriş ikonu gizlenir */

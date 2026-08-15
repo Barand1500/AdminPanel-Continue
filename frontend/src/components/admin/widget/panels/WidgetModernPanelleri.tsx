@@ -98,6 +98,7 @@ export function MarkaSeridiIcerik({ form, onChange }: WidgetPanelProps) {
   const markalar = cfg.markalar ?? [];
   const gorunumTipi = cfg.gorunum?.gorunumTipi ?? 'logo-kayan';
   const istatistikMod = gorunumTipi === 'istatistik-kapsul';
+  const logoKartModu = gorunumTipi === 'cift-serit';
 
   return (
     <AdminFormBolumu
@@ -105,13 +106,15 @@ export function MarkaSeridiIcerik({ form, onChange }: WidgetPanelProps) {
       aciklama={
         istatistikMod
           ? 'KPI kapsül şeridi — her satır bir istatistik'
+          : logoKartModu
+            ? 'Logolar beyaz kartlarda gösterilir; oklarla ileri ve geri gezilebilir.'
           : gorunumTipi === 'egik-metin-seridi'
             ? 'Metin maddeleri eğik kayan bandda gösterilir'
             : 'Logolar yatay kayan şeritte gösterilir'
       }
     >
       <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} /></FormAlani>
-      {!istatistikMod && (
+      {!istatistikMod && !logoKartModu && (
         <SecimAlani
           etiket="Kaydırma hızı"
           deger={cfg.markaHizi ?? 'normal'}

@@ -1,5 +1,6 @@
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
+import { RenkSecici } from '@/components/form/RenkSecici';
 import type { HeaderAyarlari, HeaderTipEkAyarlari } from '@/types/header';
 import type { HeaderTipi } from '@/data/headerTipleri';
 import { headerTipTanimiBul } from '@/data/headerTipleri';
@@ -58,6 +59,22 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
   return (
     <AdminPanelKarti baslik="Ek Ayarlar" altBaslik={`${tanim.ad} tipine özel alanlar`}>
       <div className="space-y-4">
+        {tip === 'imza-kurumsal' && (
+          <>
+            <ToggleSatir
+              etiket="Kaydırırken sabit kalsın"
+              aciklama="Kapatıldığında header sayfa ile birlikte yukarı kayar"
+              acik={tipEk.sabit !== false}
+              onDegistir={(sabit) => guncelle({ sabit })}
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <RenkSecici etiket="Ana header arka planı" deger={tipEk.arkaPlanRengi ?? ''} varsayilan="#0b2a77" onChange={(arkaPlanRengi) => guncelle({ arkaPlanRengi })} />
+              <RenkSecici etiket="Üst iletişim bandı" deger={tipEk.ustBantRengi ?? ''} varsayilan="#08245f" onChange={(ustBantRengi) => guncelle({ ustBantRengi })} />
+              <RenkSecici etiket="Menü / metin rengi" deger={tipEk.metinRengi ?? ''} varsayilan="#ffffff" onChange={(metinRengi) => guncelle({ metinRengi })} />
+              <RenkSecici etiket="Katalog butonu" deger={tipEk.butonRengi ?? ''} varsayilan="#eef4ff" onChange={(butonRengi) => guncelle({ butonRengi })} />
+            </div>
+          </>
+        )}
         {(tip === 'sade' || tip === 'kompakt' || tip === 'arama-odakli' || tip === 'imza-kurumsal') && (
           <>
             <ToggleSatir
@@ -100,21 +117,21 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
           </FormAlani>
         )}
 
-        {(tip === 'modern' || tip === 'imza-kurumsal') && (
+        {(tip === 'modern' || tip === 'kurumsal' || tip === 'imza-kurumsal') && (
           <>
-            <FormAlani etiket={tip === 'imza-kurumsal' ? 'Katalog buton metni' : 'CTA buton metni'}>
+            <FormAlani etiket={tip === 'imza-kurumsal' || tip === 'kurumsal' ? 'Katalog buton metni' : 'CTA buton metni'}>
               <input
                 className={formInputSinifi}
                 value={tipEk.ctaMetni ?? ''}
                 onChange={(e) => guncelle({ ctaMetni: e.target.value })}
               />
             </FormAlani>
-            <FormAlani etiket={tip === 'imza-kurumsal' ? 'Katalog link' : 'CTA link'}>
+            <FormAlani etiket={tip === 'imza-kurumsal' || tip === 'kurumsal' ? 'Katalog link' : 'CTA link'}>
               <input
                 className={formInputSinifi}
                 value={tipEk.ctaLink ?? ''}
                 onChange={(e) => guncelle({ ctaLink: e.target.value })}
-                placeholder={tip === 'imza-kurumsal' ? '/katalog' : '/iletisim'}
+                placeholder={tip === 'imza-kurumsal' || tip === 'kurumsal' ? '/katalog' : '/iletisim'}
               />
             </FormAlani>
           </>

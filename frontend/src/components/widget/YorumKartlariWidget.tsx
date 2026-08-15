@@ -139,8 +139,8 @@ function YataySerit({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetConf
   return (
     <>
       <div className="yk-serit-baslik">
-        <BaslikAlani widget={widget} cfg={cfg} ortala={false} />
-        {yorumlar.length > 1 && (
+        <BaslikAlani widget={widget} cfg={cfg} />
+        {yorumlar.length > 3 && (
           <div className="yk-serit-nav">
             <button type="button" className="yk-serit-ok" onClick={() => kaydir('sol')} aria-label="Önceki">
               ‹

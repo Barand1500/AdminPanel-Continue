@@ -9,9 +9,9 @@ import { configOkuFromWidget } from './widgetHelpers';
 function renkler(cfg: WidgetConfig) {
   const g = cfg.gorunum ?? {};
   return {
-    baslik: g.baslikRengi || '#0f172a',
-    metin: g.metinRengi || '#64748b',
-    vurgu: g.vurguRengi || g.baslikRengi || '#7c3aed',
+    baslik: g.baslikRengi || '#111827',
+    metin: g.metinRengi || '#4b5563',
+    vurgu: g.vurguRengi || '#111827',
     radius: g.borderRadius ?? 16,
   };
 }
@@ -35,12 +35,20 @@ function Baslik({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
   );
 }
 
-function OzellikListesi({ paket, renk }: { paket: WidgetFiyatPaketi; renk: string }) {
+function OzellikListesi({
+  paket,
+  vurgu,
+  metin,
+}: {
+  paket: WidgetFiyatPaketi;
+  vurgu: string;
+  metin: string;
+}) {
   return (
     <ul className="fp-ozellikler">
       {(paket.ozellikler ?? []).map((o, i) => (
-        <li key={i} className={`fp-ozellik${o.dahil ? '' : ' fp-ozellik-kapali'}`}>
-          <span style={{ color: o.dahil ? renk : '#94a3b8' }}>{o.dahil ? '✓' : '✕'}</span>
+        <li key={i} className={`fp-ozellik${o.dahil ? '' : ' fp-ozellik-kapali'}`} style={{ color: metin }}>
+          <span style={{ color: o.dahil ? vurgu : '#94a3b8' }}>{o.dahil ? '✓' : '✕'}</span>
           <span>{o.metin}</span>
         </li>
       ))}
@@ -48,10 +56,20 @@ function OzellikListesi({ paket, renk }: { paket: WidgetFiyatPaketi; renk: strin
   );
 }
 
-function PaketButon({ paket, vurgu, outline = false }: { paket: WidgetFiyatPaketi; vurgu: string; outline?: boolean }) {
+function PaketButon({
+  paket,
+  vurgu,
+  outline = false,
+  footer = false,
+}: {
+  paket: WidgetFiyatPaketi;
+  vurgu: string;
+  outline?: boolean;
+  footer?: boolean;
+}) {
   if (!paket.butonLink) return null;
-  const sinif = outline ? 'fp-btn fp-btn-outline' : 'fp-btn';
-  const stil = outline ? { borderColor: vurgu, color: vurgu } : { background: vurgu };
+  const sinif = `fp-btn${outline ? ' fp-btn-outline' : ''}${footer ? ' fp-btn-footer' : ''}`;
+  const stil = footer ? { color: '#fff' } : outline ? { borderColor: vurgu, color: vurgu } : { background: vurgu };
   const href = paket.butonLink;
   const children = paket.butonMetni || 'Satın Al';
   if (href.startsWith('/')) {
@@ -84,14 +102,29 @@ function PaketKart({
   return (
     <article
       className={`fp-paket-kart${v ? ' fp-paket-one-cikan' : ''} ${sinif}`.trim()}
-      style={{ borderRadius: `${renk.radius}px`, borderColor: v ? renk.vurgu : undefined }}
+      style={
+        {
+          '--fp-vurgu': renk.vurgu,
+          '--fp-metin': renk.metin,
+          borderRadius: `${renk.radius}px`,
+          borderColor: v ? renk.vurgu : undefined,
+        } as CSSProperties
+      }
     >
       {v && <span className="fp-rozet" style={{ background: renk.vurgu }}>Önerilen</span>}
-      <h3 className="fp-paket-ad" style={{ color: renk.baslik }}>{paket.ad}</h3>
-      <p className="fp-paket-fiyat" style={{ color: v ? renk.vurgu : renk.baslik }}>{paket.fiyat}</p>
-      {paket.aciklama && <p className="fp-paket-aciklama" style={{ color: renk.metin }}>{paket.aciklama}</p>}
-      <OzellikListesi paket={paket} renk={renk.vurgu} />
-      <PaketButon paket={paket} vurgu={renk.vurgu} outline={!v} />
+      <header className="fp-paket-ust" style={{ background: renk.vurgu }}>
+        <h3 className="fp-paket-ad">{paket.ad}</h3>
+      </header>
+      <div className="fp-paket-govde">
+        <p className="fp-paket-fiyat" style={{ color: renk.baslik }}>{paket.fiyat}</p>
+        {paket.aciklama && <p className="fp-paket-aciklama" style={{ color: renk.metin }}>{paket.aciklama}</p>}
+        <OzellikListesi paket={paket} vurgu={renk.vurgu} metin={renk.metin} />
+      </div>
+      {paket.butonLink && (
+        <footer className="fp-paket-alt" style={{ background: renk.vurgu }}>
+          <PaketButon paket={paket} vurgu={renk.vurgu} footer />
+        </footer>
+      )}
     </article>
   );
 }
@@ -281,7 +314,7 @@ function KartDestesi({ widget, cfg, paketler }: { widget: Widget; cfg: WidgetCon
             >
               <h3 className="fp-paket-ad" style={{ color: renk.baslik }}>{p.ad}</h3>
               <p className="fp-paket-fiyat" style={{ color: renk.vurgu }}>{p.fiyat}</p>
-              <OzellikListesi paket={p} renk={renk.vurgu} />
+              <OzellikListesi paket={p} vurgu={renk.vurgu} metin={renk.metin} />
               <PaketButon paket={p} vurgu={renk.vurgu} outline={!p.oneCikan} />
             </article>
           ))}

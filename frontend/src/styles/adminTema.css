@@ -89,48 +89,99 @@ html:has(.admin-panel[data-tema='acik']) body {
   z-index: 40;
   flex-shrink: 0;
   width: 100%;
+  --ap-aksiyon-kenarlik-kalinlik: 2px;
 }
 
-/* Alt aksiyon cubugu butonlari */
+.admin-panel .ap-footer.ap-gorev-cubugu {
+  border-top: var(--ap-aksiyon-kenarlik-kalinlik) solid var(--ap-accent);
+}
+
+/* Alt aksiyon cubugu — metin sekmeleri */
+.ap-aksiyon-cubugu-sol {
+  align-self: stretch;
+}
+
 .ap-aksiyon-btn {
-  border: 1px solid transparent;
-  color: var(--ap-text);
+  position: relative;
+  display: inline-flex;
+  min-width: 2.75rem;
+  align-self: stretch;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  isolation: isolate;
+  margin: 0;
+  padding: 0 0.9rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ap-text-muted);
+  cursor: pointer;
+}
+
+.ap-aksiyon-harf {
+  position: relative;
+  display: inline-block;
+  z-index: 1;
+}
+
+.ap-aksiyon-btn:not(:disabled):not(.ap-aksiyon-basari):not(.ap-aksiyon-hata) .ap-aksiyon-harf::after {
+  position: absolute;
+  inset: 0;
+  content: attr(data-etiket);
+  color: var(--ap-accent);
+  clip-path: inset(0 100% 0 0);
+  white-space: nowrap;
+  transition: clip-path 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.ap-aksiyon-btn:not(:disabled):not(.ap-aksiyon-basari):not(.ap-aksiyon-hata):is(:hover, :focus-visible) .ap-aksiyon-harf::after {
+  clip-path: inset(0);
+}
+
+.ap-aksiyon-btn:not(:disabled):not(.ap-aksiyon-basari):not(.ap-aksiyon-hata):is(:hover, :focus-visible) .ap-aksiyon-harf {
+  color: transparent;
+}
+
+.ap-aksiyon-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ap-accent) 72%, transparent);
+  outline-offset: -3px;
 }
 
 .ap-aksiyon-aktif {
-  background: var(--ap-surface-2);
-  border-color: var(--ap-border);
-  color: var(--ap-heading);
-}
-
-.ap-aksiyon-aktif:hover {
-  background: var(--ap-hover);
+  color: var(--ap-text-muted);
 }
 
 .ap-aksiyon-birincil {
-  background: var(--ap-accent);
-  border-color: var(--ap-accent);
-  color: #fff;
+  color: var(--ap-heading);
+  font-weight: 600;
 }
 
-.ap-aksiyon-birincil:hover {
-  filter: brightness(1.08);
+.ap-aksiyon-pasif {
+  color: var(--ap-text-muted);
+  cursor: not-allowed;
 }
 
 .ap-aksiyon-basari {
-  background: #16a34a !important;
-  border-color: #16a34a !important;
-  color: #fff !important;
+  color: #16a34a !important;
   animation: ap-aksiyon-pulse 0.35s ease;
   cursor: default;
 }
 
 .ap-aksiyon-hata {
-  background: #dc2626 !important;
-  border-color: #dc2626 !important;
-  color: #fff !important;
+  color: #dc2626 !important;
   animation: ap-aksiyon-pulse 0.35s ease;
   cursor: default;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ap-aksiyon-btn,
+  .ap-aksiyon-harf::after,
+  .ap-aksiyon-basari,
+  .ap-aksiyon-hata {
+    animation: none;
+    transition: none;
+  }
 }
 
 @keyframes ap-aksiyon-pulse {
@@ -500,20 +551,11 @@ html:has(.admin-panel[data-tema='acik']) body {
   height: 0;
 }
 
-/* Ust sekme kaydirma oklari */
+/* Ust sekme cubugu */
 .ap-sekme-scroll-wrap {
   display: flex;
   min-width: 0;
   height: 100%;
-  flex: 1;
-  align-items: flex-end;
-  overflow: hidden;
-}
-
-.ap-sekme-scroll-track {
-  position: relative;
-  display: flex;
-  min-width: 0;
   flex: 1;
   align-items: flex-end;
   overflow: hidden;
@@ -540,53 +582,9 @@ html:has(.admin-panel[data-tema='acik']) body {
   height: 0;
 }
 
-.ap-sekme-scroll-btn {
-  position: absolute;
-  z-index: 2;
-  top: 50%;
-  display: flex;
-  height: 1.75rem;
-  width: 1.5rem;
-  align-items: center;
-  justify-content: center;
-  transform: translateY(-50%);
-  border-radius: 0.375rem;
-  border: 1px solid var(--ap-border);
-  background: var(--ap-surface);
-  color: var(--ap-heading);
-  font-size: 1.125rem;
-  line-height: 1;
-  box-shadow: 0 2px 8px rgb(0 0 0 / 0.15);
-  transition: background-color 0.15s;
-}
-
-.ap-sekme-scroll-btn:hover {
-  background: var(--ap-hover);
-}
-
-.ap-sekme-scroll-sol {
-  left: 0;
-}
-
-.ap-sekme-scroll-sag {
-  right: 0;
-}
-
-.ap-sekme-scroll-wrap:has(.ap-sekme-arama) .ap-sekme-scroll-sag {
-  right: 0;
-}
-
 .ap-sekme-scroll-wrap .ap-sekme-scroll {
   padding-left: 0.25rem;
   padding-right: 0.25rem;
-}
-
-.ap-sekme-scroll-wrap:has(.ap-sekme-scroll-sol) .ap-sekme-scroll {
-  padding-left: 1.75rem;
-}
-
-.ap-sekme-scroll-wrap:has(.ap-sekme-scroll-sag) .ap-sekme-scroll-track:has(.ap-sekme-scroll-sag) .ap-sekme-scroll {
-  padding-right: 1.75rem;
 }
 
 .ap-sekme-onizleme-alan {
@@ -8280,7 +8278,7 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 .ap-gorev-cubugu-ust-cizgi-yol {
   stroke: var(--ap-accent);
-  stroke-width: var(--ap-aksiyon-kenarlik-kalinlik);
+  stroke-width: var(--ap-aksiyon-kenarlik-kalinlik, 2px);
   stroke-linecap: butt;
   stroke-linejoin: miter;
 }
@@ -8333,14 +8331,6 @@ html:has(.admin-panel[data-tema='acik']) body {
   overflow: hidden;
 }
 
-.ap-sekme-scroll-ayrac {
-  flex-shrink: 0;
-  width: 1px;
-  align-self: stretch;
-  margin: 0.25rem 0;
-  background: var(--ap-border);
-}
-
 .ap-sekme-scroll--ortada {
   flex: 1;
   min-width: 0;
@@ -8369,70 +8359,6 @@ html:has(.admin-panel[data-tema='acik']) body {
   height: 0;
 }
 
-.ap-sekme-scroll-btn {
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: center;
-  height: 2.5rem;
-  width: 2.25rem;
-  min-height: 2.5rem;
-  min-width: 2.25rem;
-  border-radius: 0.375rem;
-  border: 1px solid transparent;
-  background: transparent;
-  color: var(--ap-heading);
-  cursor: pointer;
-  transition: background-color 0.15s, border-color 0.15s, opacity 0.15s;
-}
-
-.ap-sekme-scroll-btn--sabit {
-  align-self: center;
-  margin: 0 0.15rem;
-}
-
-.ap-sekme-scroll-btn--sabit:disabled {
-  opacity: 0.3;
-  cursor: default;
-  pointer-events: none;
-}
-
-.ap-sekme-scroll-btn-ikon {
-  width: 1.125rem;
-  height: 1.125rem;
-  flex-shrink: 0;
-}
-
-.ap-sekme-scroll-btn:hover:not(:disabled) {
-  background: var(--ap-hover);
-  border-color: color-mix(in srgb, var(--ap-accent) 25%, transparent);
-}
-
-.ap-sekme-scroll-btn:active:not(:disabled) {
-  transform: scale(0.96);
-}
-
-.ap-sekme-scroll-wrap--kare .ap-sekme-scroll-rail {
-  align-items: flex-end;
-}
-
-.ap-sekme-scroll-wrap--kare .ap-sekme-scroll-btn--sabit {
-  align-self: flex-end;
-  margin-bottom: 0;
-  height: calc(var(--ap-sekme-kare-boyut, 4.25rem) - 0.15rem);
-  min-height: calc(var(--ap-sekme-kare-boyut, 4.25rem) - 0.15rem);
-  width: 2.5rem;
-  min-width: 2.5rem;
-}
-
-.ap-sekme-scroll-wrap--kare .ap-sekme-scroll-ayrac {
-  margin-bottom: 0;
-}
-
-.ap-sekme-scroll-wrap--kare .ap-sekme-scroll-btn-ikon {
-  width: 1.25rem;
-  height: 1.25rem;
-}
 /* Kare sekme / BaÅŸlat â€” animasyonlu kenarlÄ±k (sol alt â†’ yukarÄ± â†’ saÄŸ alt) */
 .ap-kenarlik-anim {
   position: absolute;

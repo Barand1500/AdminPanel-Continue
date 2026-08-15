@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState, type RefObject } from 'react';
 
-const CIZGI_KALINLIK = 5;
+const CIZGI_KALINLIK = 2;
 const PANEL_YARICAP = 10;
 
 function ustCizgiYoluOlustur(
@@ -62,6 +62,7 @@ export function AksiyonCubuguUstCizgi({ footerRef, panelEl, panelAktif }: Aksiyo
       if (!footer) return;
 
       const fr = footer.getBoundingClientRect();
+      const kenarlikUstOfseti = -footer.clientTop;
       const lineY = CIZGI_KALINLIK / 2;
 
       if (!panelEl) {
@@ -69,7 +70,7 @@ export function AksiyonCubuguUstCizgi({ footerRef, panelEl, panelAktif }: Aksiyo
           yol: `M 0 ${lineY} H ${Math.round(fr.width)}`,
           genislik: fr.width,
           yukseklik: CIZGI_KALINLIK + 2,
-          ustOfset: 0,
+          ustOfset: kenarlikUstOfseti,
         });
         return;
       }
@@ -85,7 +86,7 @@ export function AksiyonCubuguUstCizgi({ footerRef, panelEl, panelAktif }: Aksiyo
         yol,
         genislik: fr.width,
         yukseklik,
-        ustOfset: pr.top - fr.top,
+        ustOfset: pr.top - fr.top + kenarlikUstOfseti,
       });
     };
 

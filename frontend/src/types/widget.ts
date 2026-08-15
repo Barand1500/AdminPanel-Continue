@@ -155,6 +155,7 @@ export const WIDGET_GORUNUM_METIN_TIPLERI = new Set([
   'YORUM_KARTLARI',
   'MODUL_LOGO_BLOK',
   'SITE_HAKKINDA',
+  'HARITA',
   'UCRETSIZ_DENEME',
   'BULTEN_KAYIT',
 ]);
@@ -202,6 +203,10 @@ export interface WidgetGorunumAyarlari {
   gorunumTipi?: string;
   /** Seçilen görünüm tipine özel ek ayarlar */
   tipEk?: Record<string, unknown>;
+  /** İletişim CTA: bandın arkasında gösterilen isteğe bağlı görsel */
+  ctaArkaPlanGorselUrl?: string;
+  /** İletişim CTA: birincil buton metninin solunda gösterilen emoji ikonu */
+  ctaButonIkon?: string;
 }
 
 export interface WidgetEkAyarlar {
@@ -259,6 +264,8 @@ export interface WidgetBlogKart {
   gorselUrl: string;
   link: string;
   butonMetni: string;
+  /** Kart üstünde gösterilen yayın tarihi */
+  tarih?: string;
   /** Sekmeli kategori görünümü için */
   kategori?: string;
   /** Kısa özet (hero / ticker görünümleri) */
@@ -281,6 +288,16 @@ export interface WidgetEtiketKarti {
   etiket: string;
   gorselUrl: string;
   link: string;
+  /** Ürün vitrini görünümü için kısa kart açıklaması */
+  aciklama?: string;
+  /** Eski içeriklerle uyumlu alternatif açıklama anahtarı */
+  kisaAciklama?: string;
+  /** Ürün vitrini fiyat bilgisi */
+  fiyat?: string;
+  /** İndirimli ürünlerde üstü çizili önceki fiyat */
+  eskiFiyat?: string;
+  /** Örn. Yeni, Popüler, İndirim */
+  rozet?: string;
 }
 
 export interface WidgetEkipUyesi {
@@ -299,6 +316,7 @@ export interface WidgetSayac {
   deger: number | string;
   sonEk: string;
   etiket: string;
+  /** CizgiIkonlari içindeki sabit anahtar; eski emoji değerleri geriye uyumlu okunur. */
   ikon?: string;
 }
 
@@ -330,6 +348,7 @@ export interface WidgetFiyatPaketi {
 
 export interface WidgetIkonKart {
   id: string;
+  /** CizgiIkonlari içindeki sabit anahtar; eski emoji değerleri geriye uyumlu okunur. */
   ikon: string;
   metin: string;
 }
@@ -493,7 +512,16 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     gorselKirpma: 'kapla',
     borderRadius: 12,
     baslikBoyutu: 'lg',
-    gorunumTipi: varsayilanWidgetGorunumTipi(tip),
+    baslikRengi: '#111827',
+    metinRengi: '#4b5563',
+    vurguRengi: '#111827',
+    baslikCizgi: true,
+    gorunumTipi:
+      tip === 'MARKA_SERIDI'
+        ? 'cift-serit'
+        : tip === 'HARITA'
+          ? 'yan-ikon-liste'
+          : varsayilanWidgetGorunumTipi(tip),
   };
   const ek: WidgetEkAyarlar = { girisAnimasyonu: 'yok' };
   const yerlesim: WidgetYerlesim = { bolge: 'icerik_alani' };
@@ -559,7 +587,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     case 'EKIP_KARUSEL':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4 }, ek, uyeler: [], filtreler: [], otomatikKaydir: true };
     case 'SAYAC_BLOK':
-      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4 }, ek, sayaclar: [] };
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 5 }, ek, sayaclar: [] };
     case 'YORUM_KARUSEL':
       return { yerlesim, gorunum, ek, yorumlar: [], otomatikKaydir: true };
     case 'YORUM_KARTLARI':
@@ -609,7 +637,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     case 'UCRETSIZ_DENEME':
       return {
         yerlesim: { bolge: 'icerik_alani' },
-        gorunum: { ...gorunum, vurguRengi: '#7c3aed', borderRadius: 16 },
+        gorunum: { ...gorunum, borderRadius: 16 },
         ek,
         formSlug: 'ucretsiz-deneme',
         bultenKvkk: 'Kişisel verileriniz gizlilik politikamız kapsamında korunmaktadır.',
@@ -640,7 +668,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     case 'KRIPTO_LISTESI':
       return {
         yerlesim,
-        gorunum: { ...gorunum, vurguRengi: '#dc2626' },
+        gorunum,
         ek,
         kriptoKaynak: 'api',
         kriptoLimit: 10,
@@ -649,11 +677,11 @@ export function varsayilanConfig(tip: string): WidgetConfig {
         tumunuGorLink: '#',
       };
     case 'GUNCEL_KONULAR':
-      return { yerlesim, gorunum: { ...gorunum, vurguRengi: '#dc2626' }, ek, haberKartlari: [] };
+      return { yerlesim, gorunum, ek, haberKartlari: [] };
     case 'SIRKET_GIRIS_CIKIS':
       return {
         yerlesim,
-        gorunum: { ...gorunum, vurguRengi: '#2563eb' },
+        gorunum,
         ek,
         sirketKonum: 'Merkez Ofis — İstanbul',
         sirketAnlikSaat: '09:50:28',
@@ -723,11 +751,13 @@ export function widgetGorunumStili(
   const g = cfg.gorunum ?? {};
   const paddingMap = { dar: '2rem 0', normal: '4rem 0', genis: '6rem 0' };
   return {
-    backgroundColor: widget.arkaPlanRenk || undefined,
-    color: widget.yaziRenk || g.metinRengi || undefined,
+    backgroundColor: widget.arkaPlanRenk || (widget.tip === 'MARKA_SERIDI' ? 'transparent' : '#ffffff'),
+    color: widget.yaziRenk || g.metinRengi || '#111827',
     padding: paddingMap[g.padding ?? 'normal'],
     fontFamily: g.font || undefined,
-    ['--widget-baslik-renk' as string]: g.baslikRengi || widget.yaziRenk || undefined,
+    ['--widget-baslik-renk' as string]: g.baslikRengi || widget.yaziRenk || '#111827',
+    ['--widget-metin-renk' as string]: g.metinRengi || widget.yaziRenk || '#4b5563',
+    ['--widget-vurgu-renk' as string]: g.vurguRengi || '#111827',
     ['--widget-kolon' as string]: String(g.kolonSayisi ?? 3),
   };
 }

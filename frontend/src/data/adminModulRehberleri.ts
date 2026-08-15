@@ -144,7 +144,7 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
         renk: 'turuncu',
       },
     ],
-    ipucu: 'Safir tarzı site için: Metin+Görsel (hakkımızda), Hizmet Kartları, Görsel Etiket Kartları, Ekip Karuseli, Sayaç, Yorum ve Fiyatlandırma widgetlarını kullanın.',
+    ipucu: 'Kurumsal vitrin için: Kurumsal Tanıtım, Hizmet Kartları, Ürün / Görsel Kartları, Ekip Karuseli, Sayaç, Haber, Galeri ve Marka Şeridi widgetlarını kullanın.',
   },
 
   'menu-yonetimi': {

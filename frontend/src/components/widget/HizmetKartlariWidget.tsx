@@ -1,4 +1,15 @@
 import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import {
+  IconArrowRight,
+  IconBriefcase2,
+  IconDeviceDesktop,
+  IconHeadset,
+  IconSearch,
+  IconSettings,
+  IconTool,
+  IconUsersGroup,
+  IconWorld,
+} from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetKartOgesi } from '@/types/widget';
@@ -22,12 +33,34 @@ function ikonGoster(ikon: string): string {
   return eskiIkonHaritasi[ikon] ?? ikon;
 }
 
+function HizmetCizgiIkonu({ ikon }: { ikon: string }) {
+  const anahtar = ikon.trim().toLocaleLowerCase('tr-TR');
+  const Ikon =
+    anahtar.includes('globe') || anahtar.includes('web') || anahtar.includes('dünya')
+      ? IconWorld
+      : anahtar.includes('search') || anahtar.includes('ara') || anahtar.includes('analiz')
+        ? IconSearch
+        : anahtar.includes('user') || anahtar.includes('ekip') || anahtar.includes('çalış')
+      ? IconUsersGroup
+      : anahtar.includes('monitor') || anahtar.includes('bilgisayar') || anahtar.includes('yazılım')
+        ? IconDeviceDesktop
+        : anahtar.includes('headset') || anahtar.includes('destek')
+          ? IconHeadset
+          : anahtar.includes('wrench') || anahtar.includes('teknik') || anahtar.includes('araç')
+            ? IconTool
+            : anahtar.includes('setting') || anahtar.includes('ayar')
+              ? IconSettings
+            : IconBriefcase2;
+
+  return <Ikon aria-hidden size={25} stroke={1.7} />;
+}
+
 function renkler(cfg: WidgetConfig) {
   const g = cfg.gorunum ?? {};
   return {
-    baslik: g.baslikRengi || 'var(--widget-baslik-renk, #0f172a)',
-    metin: g.metinRengi || '#64748b',
-    vurgu: g.vurguRengi || g.baslikRengi || 'var(--color-primary, #7c3aed)',
+    baslik: g.baslikRengi || 'var(--widget-baslik-renk, #111827)',
+    metin: g.metinRengi || 'var(--widget-metin-renk, #4b5563)',
+    vurgu: g.vurguRengi || '#111827',
   };
 }
 
@@ -60,25 +93,37 @@ function KartButon({
   cevir,
   sinif = 'hk-kart-cta',
   vurgu,
+  metinBaglantisi = false,
 }: {
   kart: WidgetKartOgesi;
   cevir: (k: string, f: string) => string;
   sinif?: string;
   vurgu?: string;
+  metinBaglantisi?: boolean;
 }) {
   if (!kart.link) return null;
-  const metin = `${kart.butonMetni || cevir('site.detaylariGor', 'Detayları Gör')} →`;
-  const stil = vurgu ? { backgroundColor: vurgu } : undefined;
+  const metin = kart.butonMetni || cevir('site.detaylariGor', 'Detayları Gör');
+  const stil: CSSProperties | undefined = vurgu
+    ? metinBaglantisi
+      ? { color: vurgu }
+      : { backgroundColor: vurgu }
+    : undefined;
+  const icerik = (
+    <>
+      <span>{metin}</span>
+      {metinBaglantisi ? <IconArrowRight aria-hidden size={15} stroke={2} /> : <span aria-hidden> →</span>}
+    </>
+  );
   if (kart.link.startsWith('/')) {
     return (
       <Link to={kart.link} className={sinif} style={stil}>
-        {metin}
+        {icerik}
       </Link>
     );
   }
   return (
     <a href={kart.link} className={sinif} style={stil}>
-      {metin}
+      {icerik}
     </a>
   );
 }
@@ -128,14 +173,30 @@ function MasonryDuvar({
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="hk-masonry">
-        {kartlar.map((kart, i) => (
-          <article
-            key={kart.id}
-            className={`hk-masonry-kart hk-masonry-kart-${(i % 3) + 1}`}
-            style={{ borderColor: `${renk.vurgu}22` }}
-          >
-            <KartGovde kart={kart} cfg={cfg} cevir={cevir} />
+      <div
+        className="hk-dengeli-grid"
+        style={{ '--hk-dengeli-vurgu': renk.vurgu } as CSSProperties}
+      >
+        {kartlar.map((kart) => (
+          <article key={kart.id} className="hk-dengeli-kart">
+            <span className="hk-dengeli-ikon" style={{ color: renk.vurgu }}>
+              <HizmetCizgiIkonu ikon={`${kart.ikon} ${kart.baslik}`} />
+            </span>
+            <h3 className="hk-dengeli-baslik" style={{ color: renk.baslik }}>
+              {kart.baslik}
+            </h3>
+            {kart.aciklama && (
+              <p className="hk-dengeli-aciklama" style={{ color: renk.metin }}>
+                {kart.aciklama}
+              </p>
+            )}
+            <KartButon
+              kart={kart}
+              cevir={cevir}
+              sinif="hk-dengeli-cta"
+              vurgu={renk.vurgu}
+              metinBaglantisi
+            />
           </article>
         ))}
       </div>

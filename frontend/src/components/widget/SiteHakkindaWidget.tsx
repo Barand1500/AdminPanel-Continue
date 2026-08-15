@@ -5,15 +5,25 @@ import type { WidgetIkonKart } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
+import { CizgiIkon, type CizgiIkonYedegi } from './CizgiIkonlari';
 
 type Cfg = ReturnType<typeof configOkuFromWidget>;
+
+const IKON_KARTI_YEDEKLERI: readonly CizgiIkonYedegi[] = [
+  'memnuniyet',
+  'kalite',
+  'basari',
+  'whatsapp',
+  'ekip',
+  'hedef',
+];
 
 function renkler(cfg: Cfg) {
   const g = cfg.gorunum ?? {};
   return {
-    baslik: g.baslikRengi || 'var(--widget-baslik-renk, #0f172a)',
-    metin: g.metinRengi || '#64748b',
-    vurgu: g.vurguRengi || g.baslikRengi || 'var(--color-primary, #0d9488)',
+    baslik: g.baslikRengi || '#111827',
+    metin: g.metinRengi || '#4b5563',
+    vurgu: g.vurguRengi || g.baslikRengi || '#111827',
   };
 }
 
@@ -95,10 +105,10 @@ function OzellikListesi({
   if (varyant === 'kutu') {
     return (
       <div className="sh-ozellik-kutular">
-        {kartlar.map((k) => (
+        {kartlar.map((k, i) => (
           <div key={k.id} className="sh-ozellik-kutu">
             <span className="sh-ozellik-kutu-ikon" style={{ color: renk.vurgu }}>
-              {k.ikon || '✓'}
+              <CizgiIkon deger={k.ikon || k.metin} yedek={IKON_KARTI_YEDEKLERI[i % IKON_KARTI_YEDEKLERI.length]} />
             </span>
             <span>{k.metin}</span>
           </div>
@@ -110,9 +120,11 @@ function OzellikListesi({
   if (varyant === 'pill') {
     return (
       <div className="sh-ozellik-pills">
-        {kartlar.map((k) => (
+        {kartlar.map((k, i) => (
           <span key={k.id} className="sh-ozellik-pill" style={{ borderColor: `${renk.vurgu}33`, color: renk.metin }}>
-            <span style={{ color: renk.vurgu }}>{k.ikon || '•'}</span>
+            <span className="inline-flex" style={{ color: renk.vurgu }}>
+              <CizgiIkon deger={k.ikon || k.metin} yedek={IKON_KARTI_YEDEKLERI[i % IKON_KARTI_YEDEKLERI.length]} boyut={18} />
+            </span>
             {k.metin}
           </span>
         ))}
@@ -136,9 +148,11 @@ function OzellikListesi({
   if (varyant === 'emoji') {
     return (
       <div className="sh-ozellik-emoji-grid">
-        {kartlar.map((k) => (
+        {kartlar.map((k, i) => (
           <div key={k.id} className="sh-ozellik-emoji-kart">
-            <span className="sh-ozellik-emoji-buyuk">{k.ikon || '✨'}</span>
+            <span className="sh-ozellik-emoji-buyuk" style={{ color: renk.vurgu }}>
+              <CizgiIkon deger={k.ikon || k.metin} yedek={IKON_KARTI_YEDEKLERI[i % IKON_KARTI_YEDEKLERI.length]} boyut={32} />
+            </span>
             <span className="sh-ozellik-emoji-metin">{k.metin}</span>
           </div>
         ))}
@@ -148,10 +162,10 @@ function OzellikListesi({
 
   return (
     <ul className="sh-ozellik-check-grid">
-      {kartlar.map((k) => (
+      {kartlar.map((k, i) => (
         <li key={k.id} className="sh-ozellik-check">
           <span className="sh-ozellik-check-ikon" style={{ background: renk.vurgu }}>
-            {k.ikon || '✓'}
+            <CizgiIkon deger={k.ikon || k.metin} yedek={IKON_KARTI_YEDEKLERI[i % IKON_KARTI_YEDEKLERI.length]} boyut={17} />
           </span>
           <span style={{ color: renk.metin }}>{k.metin}</span>
         </li>
@@ -309,21 +323,33 @@ function GradientKart({ widget, cfg, gorselUrl }: { widget: Widget; cfg: Cfg; go
 function BentoHakkimizda({ widget, cfg, gorselUrl }: { widget: Widget; cfg: Cfg; gorselUrl?: string | null }) {
   const renk = renkler(cfg);
   const ikonKartlar = cfg.ikonKartlar ?? [];
+  const kurumsalYedekleri: CizgiIkonYedegi[] = ['memnuniyet', 'kalite', 'basari', 'whatsapp'];
   return (
-    <div className="sh-bento">
-      <div className="sh-bento-icerik">
+    <div className="sh-kurumsal-split">
+      <GorselAlani gorselUrl={gorselUrl} widget={widget} sinif="sh-kurumsal-gorsel sh-kurumsal-gorsel-clip" />
+      <div className="sh-kurumsal-icerik">
         <BaslikAlani widget={widget} cfg={cfg} renk={renk} />
         <MetinParagraf cfg={cfg} renk={renk} />
+        {ikonKartlar.length > 0 && (
+          <ul className="sh-kurumsal-ozellik-grid">
+            {ikonKartlar.map((kart, indeks) => (
+              <li key={kart.id} className="sh-kurumsal-ozellik">
+                <span
+                  className="sh-kurumsal-ozellik-ikon"
+                  style={{ color: renk.vurgu }}
+                  aria-hidden
+                >
+                  <CizgiIkon deger={kart.ikon || kart.metin} yedek={kurumsalYedekleri[indeks % kurumsalYedekleri.length]} />
+                </span>
+                <span className="sh-kurumsal-ozellik-metin" style={{ color: renk.baslik }}>
+                  {kart.metin}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+        <CtaButon widget={widget} sinif="sh-cta sh-kurumsal-cta" play />
       </div>
-      <GorselAlani gorselUrl={gorselUrl} widget={widget} sinif="sh-bento-gorsel" />
-      <div className="sh-bento-ozellikler">
-        <OzellikListesi kartlar={ikonKartlar} renk={renk} varyant="emoji" />
-      </div>
-      {(widget.butonMetni && widget.butonLink) && (
-        <div className="sh-bento-cta">
-          <CtaButon widget={widget} sinif="sh-cta sh-cta-bento" play />
-        </div>
-      )}
     </div>
   );
 }

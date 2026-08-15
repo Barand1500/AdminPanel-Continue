@@ -201,8 +201,6 @@ export function UstSekmeCubugu({
   const [dropMod, setDropMod] = useState<DropMod | null>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollTrackRef = useRef<HTMLDivElement>(null);
-  const [solOk, setSolOk] = useState(false);
-  const [sagOk, setSagOk] = useState(false);
   const [kenarlikAnimKey, setKenarlikAnimKey] = useState(0);
   const surukleBaslangic = useRef<{ x: number; y: number; id: string } | null>(null);
 
@@ -226,26 +224,6 @@ export function UstSekmeCubugu({
 
   const ogeler = useMemo(() => sekmeleriGrupla(sekmeler), [sekmeler]);
 
-  const kaydirmaGuncelle = () => {
-    const el = scrollRef.current;
-    if (!el) return;
-    setSolOk(el.scrollLeft > 4);
-    setSagOk(el.scrollLeft + el.clientWidth < el.scrollWidth - 4);
-  };
-
-  useEffect(() => {
-    kaydirmaGuncelle();
-    const el = scrollRef.current;
-    if (!el) return;
-    el.addEventListener('scroll', kaydirmaGuncelle, { passive: true });
-    const gozlemci = new ResizeObserver(kaydirmaGuncelle);
-    gozlemci.observe(el);
-    return () => {
-      el.removeEventListener('scroll', kaydirmaGuncelle);
-      gozlemci.disconnect();
-    };
-  }, [ogeler]);
-
   useEffect(() => {
     const alan = scrollTrackRef.current;
     if (!alan) return;
@@ -264,13 +242,6 @@ export function UstSekmeCubugu({
     alan.addEventListener('wheel', tekerlekKaydir, { passive: false });
     return () => alan.removeEventListener('wheel', tekerlekKaydir);
   }, [ogeler]);
-
-  function kaydir(yon: 'sol' | 'sag') {
-    const el = scrollRef.current;
-    if (!el) return;
-    const miktar = Math.max(200, Math.round(el.clientWidth * 0.65));
-    el.scrollBy({ left: yon === 'sol' ? -miktar : miktar, behavior: 'smooth' });
-  }
 
   function onDragStart(e: DragEvent, id: string) {
     setSurukleniyor(id);
@@ -358,20 +329,6 @@ export function UstSekmeCubugu({
   return (
     <div className="ap-sekme-scroll-wrap" style={tabCss} data-ap-kesif="sekme-cubugu">
       <div ref={scrollTrackRef} className="ap-sekme-scroll-rail">
-        <button
-          type="button"
-          className="ap-sekme-scroll-btn ap-sekme-scroll-btn--sabit ap-sekme-scroll-sol"
-          onClick={() => kaydir('sol')}
-          disabled={!solOk}
-          aria-label="Sola kaydır"
-        >
-          <svg viewBox="0 0 24 24" className="ap-sekme-scroll-btn-ikon" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 18l-6-6 6-6" />
-          </svg>
-        </button>
-
-        <div className="ap-sekme-scroll-ayrac" aria-hidden />
-
         <div ref={scrollRef} className="ap-sekme-scroll ap-sekme-scroll--ortada">
           {ogeler.map((oge) => {
             if (oge.tip === 'tek') {
@@ -403,20 +360,6 @@ export function UstSekmeCubugu({
             );
           })}
         </div>
-
-        <div className="ap-sekme-scroll-ayrac" aria-hidden />
-
-        <button
-          type="button"
-          className="ap-sekme-scroll-btn ap-sekme-scroll-btn--sabit ap-sekme-scroll-sag"
-          onClick={() => kaydir('sag')}
-          disabled={!sagOk}
-          aria-label="Sağa kaydır"
-        >
-          <svg viewBox="0 0 24 24" className="ap-sekme-scroll-btn-ikon" fill="none" stroke="currentColor" strokeWidth="2.5" aria-hidden>
-            <path strokeLinecap="round" strokeLinejoin="round" d="M9 18l6-6-6-6" />
-          </svg>
-        </button>
       </div>
 
       {ayarlar.sekmeAramaAktif && onModulSec && (

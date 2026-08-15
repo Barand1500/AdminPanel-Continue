@@ -52,10 +52,10 @@ export function HaberGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
       {baslikAyarGoster && (
         <AdminFormBolumu baslik="Bölüm başlığı">
           <RenkSecici
-            etiket="Vurgu / başlık rengi"
-            deger={g.vurguRengi ?? g.baslikRengi ?? ''}
-            varsayilan="#dc2626"
-            onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, vurguRengi: v, baslikRengi: v } })))}
+            etiket="Üst başlık / vurgu rengi"
+            deger={g.vurguRengi ?? ''}
+            varsayilan="#111827"
+            onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, vurguRengi: v } })))}
           />
           <div className="flex items-center gap-3">
             <span className="text-sm text-[var(--ap-muted)]">Başlık ikonu</span>

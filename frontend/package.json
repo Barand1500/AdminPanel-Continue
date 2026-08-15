@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@tabler/icons-react": "^3.46.0",
     "@tiptap/extension-link": "^3.26.1",
     "@tiptap/extension-text-align": "^3.26.1",
     "@tiptap/extension-underline": "^3.26.1",

@@ -129,6 +129,13 @@ async function main() {
           linkedin_icon: 'solid',
           instagram_icon: 'brand',
         },
+        blogAyarlariJson: {
+          headerMenu: false,
+          anaSayfa: false,
+          anaSayfaKonum: 'urunler-ustu',
+          hizmetlerAlani: false,
+          listeAdet: 3,
+        },
         heroJson: HERO_VARSAYILAN,
         seoBaslik: 'Güzel Teknoloji — Kurumsal Web Çözümleri',
         seoAciklama: 'Kurumsal tanıtım sitesi, içerik yönetimi ve dijital danışmanlık.',
@@ -239,6 +246,10 @@ async function main() {
           { id: 'email', tip: 'email', etiket: 'E-posta', zorunlu: true },
           { id: 'mesaj', tip: 'textarea', etiket: 'Mesajınız', zorunlu: true },
         ],
+        ayarlarJson: {
+          tumSayfalarda: false,
+          sayfaSluglari: [],
+        },
       },
     });
   }
@@ -524,6 +535,24 @@ async function main() {
           gorunum: { kolonSayisi: 3 },
         },
       },
+      {
+        ad: 'Marka Logoları',
+        tip: WidgetTipi.MARKA_SERIDI,
+        sira: 80,
+        configJson: {
+          yerlesim: { bolge: 'footer_ustu' },
+          gorunum: { gorunumTipi: 'cift-serit', borderRadius: 8 },
+          markaHizi: 'normal',
+          markalar: [
+            { id: 'm1', ad: 'NOVA', gorselUrl: '' },
+            { id: 'm2', ad: 'KORU', gorselUrl: '' },
+            { id: 'm3', ad: 'MİRA', gorselUrl: '' },
+            { id: 'm4', ad: 'VERA', gorselUrl: '' },
+            { id: 'm5', ad: 'PUSULA', gorselUrl: '' },
+            { id: 'm6', ad: 'BİRLİK', gorselUrl: '' },
+          ],
+        },
+      },
     ];
 
     for (const w of demoWidgetlar) {
@@ -564,6 +593,35 @@ async function main() {
       },
     });
     console.log('Kurumsal Hero demo widget olusturuldu.');
+  }
+
+  const markaSeridiVar = await prisma.widget.findFirst({
+    where: { siteId: site.id, tip: WidgetTipi.MARKA_SERIDI },
+  });
+  if (!markaSeridiVar) {
+    await prisma.widget.create({
+      data: {
+        siteId: site.id,
+        ad: 'Marka Logoları',
+        tip: WidgetTipi.MARKA_SERIDI,
+        sira: 80,
+        aktif: true,
+        configJson: {
+          yerlesim: { bolge: 'footer_ustu' },
+          gorunum: { gorunumTipi: 'cift-serit', borderRadius: 8 },
+          markaHizi: 'normal',
+          markalar: [
+            { id: 'm1', ad: 'NOVA', gorselUrl: '' },
+            { id: 'm2', ad: 'KORU', gorselUrl: '' },
+            { id: 'm3', ad: 'MİRA', gorselUrl: '' },
+            { id: 'm4', ad: 'VERA', gorselUrl: '' },
+            { id: 'm5', ad: 'PUSULA', gorselUrl: '' },
+            { id: 'm6', ad: 'BİRLİK', gorselUrl: '' },
+          ],
+        },
+      },
+    });
+    console.log('Marka logoları demo widgetı oluşturuldu.');
   }
 
   console.log('Seed tamamlandı.');

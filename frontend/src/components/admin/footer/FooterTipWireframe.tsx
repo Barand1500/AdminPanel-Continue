@@ -36,20 +36,18 @@ export function FooterTipWireframe({ tip }: { tip: FooterTipi }) {
       </div>
     ),
     kurumsal: (
-      <div className="space-y-1 p-2">
-        <div className="grid grid-cols-3 gap-1">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="space-y-0.5">
-              <div className={`h-1 w-5 ${bar}`} />
-              <div className={`h-0.5 w-full ${line}`} />
+      <div className="rounded bg-[#0b2a77] p-2">
+        <div className="grid grid-cols-4 gap-1">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="space-y-1">
+              <div className="h-1 w-5 rounded bg-white/75" />
+              <div className="h-px w-full rounded bg-white/20" />
+              <div className="h-0.5 w-4/5 rounded bg-white/45" />
+              <div className="h-0.5 w-3/5 rounded bg-white/30" />
             </div>
           ))}
         </div>
-        <div className="flex justify-center gap-1">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className={`h-2 w-8 rounded ${muted}`} />
-          ))}
-        </div>
+        <div className="mt-1.5 h-px w-full bg-white/20" />
       </div>
     ),
     magaza: (

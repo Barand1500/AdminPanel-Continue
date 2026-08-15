@@ -91,31 +91,31 @@ function mockConfig(tip: string): WidgetConfig {
       return {
         metin: 'Şirketimiz hakkında kısa ve etkileyici bir tanıtım metni burada yer alır.',
         ikonKartlar: [
-          { id: id(), ikon: '🛡️', metin: 'Güvenilir hizmet' },
-          { id: id(), ikon: '⚡', metin: 'Hızlı teslimat' },
-          { id: id(), ikon: '🎯', metin: 'Müşteri odaklı' },
+          { id: id(), ikon: 'guvenlik', metin: 'Güvenilir hizmet' },
+          { id: id(), ikon: 'hiz', metin: 'Hızlı teslimat' },
+          { id: id(), ikon: 'hedef', metin: 'Müşteri odaklı' },
         ],
       };
     case 'SITE_HAKKINDA':
       return {
         metin: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sektörde uzun yıllardır güvenilir hizmet sunuyoruz.',
         ikonKartlar: [
-          { id: id(), ikon: '✓', metin: 'Müşteri Memnuniyeti' },
-          { id: id(), ikon: '✓', metin: 'Sektörün Lideri' },
-          { id: id(), ikon: '✓', metin: '7x24 Whatsapp Desteği' },
-          { id: id(), ikon: '✓', metin: 'Güvenilir Hizmet' },
-          { id: id(), ikon: '✓', metin: 'Güçlü Kadro' },
-          { id: id(), ikon: '✓', metin: 'Öncü Hizmet' },
+          { id: id(), ikon: 'memnuniyet', metin: 'Müşteri Memnuniyeti' },
+          { id: id(), ikon: 'basari', metin: 'Sektörün Lideri' },
+          { id: id(), ikon: 'whatsapp', metin: '7x24 Whatsapp Desteği' },
+          { id: id(), ikon: 'kalite', metin: 'Güvenilir Hizmet' },
+          { id: id(), ikon: 'ekip', metin: 'Güçlü Kadro' },
+          { id: id(), ikon: 'hedef', metin: 'Öncü Hizmet' },
         ],
       };
     case 'BLOG_KARUSEL':
       return {
         blogKartlari: [
-          { id: id(), baslik: 'Yeni Ürün Lansmanı', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku', kategori: 'Teknoloji', ozet: 'Yeni nesil ürünümüz piyasaya çıktı.' },
-          { id: id(), baslik: 'Sektör Trendleri 2026', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku', kategori: 'Analiz', ozet: '2026 yılında öne çıkan teknoloji trendleri.' },
-          { id: id(), baslik: 'Müşteri Başarı Hikayesi', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku', kategori: 'Teknoloji', ozet: 'Kurumsal müşterimizin dijital dönüşüm yolculuğu.' },
-          { id: id(), baslik: 'E-Ticaret Rehberi', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku', kategori: 'Rehber', ozet: 'Online satışa başlamak için adım adım kılavuz.' },
-          { id: id(), baslik: 'Güvenlik İpuçları', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Daha Fazla Oku', kategori: 'Analiz', ozet: 'Siber güvenlik için temel öneriler.' },
+          { id: id(), baslik: 'Yeni Ürün Lansmanı', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Devamını Oku', tarih: '11 Ağustos 2026', kategori: 'Teknoloji', ozet: 'Yeni nesil ürünümüz piyasaya çıktı.' },
+          { id: id(), baslik: 'Sektör Trendleri 2026', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Devamını Oku', tarih: '08 Ağustos 2026', kategori: 'Analiz', ozet: '2026 yılında öne çıkan teknoloji trendleri.' },
+          { id: id(), baslik: 'Müşteri Başarı Hikayesi', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Devamını Oku', tarih: '04 Ağustos 2026', kategori: 'Teknoloji', ozet: 'Kurumsal müşterimizin dijital dönüşüm yolculuğu.' },
+          { id: id(), baslik: 'E-Ticaret Rehberi', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Devamını Oku', tarih: '30 Temmuz 2026', kategori: 'Rehber', ozet: 'Online satışa başlamak için adım adım kılavuz.' },
+          { id: id(), baslik: 'Güvenlik İpuçları', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Devamını Oku', tarih: '25 Temmuz 2026', kategori: 'Analiz', ozet: 'Siber güvenlik için temel öneriler.' },
         ],
         filtreler: ['Teknoloji', 'Analiz', 'Rehber'],
         tumunuGorMetin: 'Tümünü Gör',
@@ -165,10 +165,11 @@ function mockConfig(tip: string): WidgetConfig {
     case 'SAYAC_BLOK':
       return {
         sayaclar: [
-          { id: id(), deger: 500, sonEk: '+', etiket: 'Mutlu Müşteri', ikon: '⚡' },
-          { id: id(), deger: 1200, sonEk: '', etiket: 'Tamamlanan Proje', ikon: '🔌' },
-          { id: id(), deger: 15, sonEk: '', etiket: 'Yıllık Deneyim', ikon: '💳' },
-          { id: id(), deger: 98, sonEk: '%', etiket: 'Memnuniyet', ikon: '🎨' },
+          { id: id(), deger: 500, sonEk: '+', etiket: 'Mutlu Müşteri', ikon: 'memnuniyet' },
+          { id: id(), deger: 1200, sonEk: '', etiket: 'Tamamlanan Proje', ikon: 'proje' },
+          { id: id(), deger: 15, sonEk: '', etiket: 'Yıllık Deneyim', ikon: 'grafik' },
+          { id: id(), deger: 98, sonEk: '%', etiket: 'Memnuniyet', ikon: 'kalite' },
+          { id: id(), deger: 40, sonEk: '', etiket: 'Ekip Üyesi', ikon: 'ekip' },
         ],
       };
     case 'YORUM_KARUSEL':
@@ -312,6 +313,14 @@ function mockConfig(tip: string): WidgetConfig {
         haritaLat: '41.0082',
         haritaLng: '28.9784',
         haritaZoom: 14,
+        iletisimKartlari: [
+          { id: id(), etiket: 'Merkez Şube', deger: 'Muratpaşa/Antalya', ikon: 'konum' },
+          { id: id(), etiket: 'Sabit Telefon', deger: '0 123 456 78 90', ikon: 'telefon' },
+          { id: id(), etiket: 'Cep Telefonu', deger: '0 123 456 78 90', ikon: 'cep' },
+          { id: id(), etiket: 'Whatsapp', deger: '0555 111 22 33', ikon: 'whatsapp' },
+          { id: id(), etiket: 'E-posta Adresimiz', deger: 'bilgi@siteadresi.com', ikon: 'eposta' },
+          { id: id(), etiket: 'Çalışma Saatleri', deger: 'Pts – Cts: 09:00-20:00', ikon: 'saat' },
+        ],
         ikonKartlar: [
           { id: id(), ikon: '📍', metin: 'Maslak Mah. Büyükdere Cad. No:1 İstanbul' },
           { id: id(), ikon: '📞', metin: '+90 212 000 00 00' },
@@ -324,7 +333,12 @@ function mockConfig(tip: string): WidgetConfig {
         ],
       };
     case 'ILETISIM_FORMU':
-      return {};
+      return {
+        gorunum: {
+          ctaArkaPlanGorselUrl: ONIZLEME_GORSEL,
+          ctaButonIkon: '✉️',
+        },
+      };
     case 'POPUP':
       return { popupGecikme: 0, popupTetikleyici: 'sayfa_yukle' };
     case 'ZAMAN_CIZELGESI':
@@ -581,6 +595,10 @@ const HABER_PORTAL_TIPLERI = new Set([
 
 function configBirlestir(mevcut: WidgetConfig, mock: WidgetConfig, tip?: string): WidgetConfig {
   const sonuc: WidgetConfig = { ...mevcut };
+
+  if (tip === 'ILETISIM_FORMU' && mock.gorunum) {
+    sonuc.gorunum = { ...mock.gorunum, ...sonuc.gorunum };
+  }
 
   if (!sonuc.modulIkon && mock.modulIkon) sonuc.modulIkon = mock.modulIkon;
   if (!sonuc.dahaFazlaMetin && mock.dahaFazlaMetin) sonuc.dahaFazlaMetin = mock.dahaFazlaMetin;

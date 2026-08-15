@@ -39,7 +39,7 @@ export const HEADER_TIP_TANIMLARI: HeaderTipTanimi[] = [
     id: 'imza-kurumsal',
     ad: 'İmza Kurumsal',
     aciklama: 'Üst iletişim bandı + ikonlu menü, katalog ve arama',
-    ilham: 'Kurumsal CMS',
+    ilham: 'Kurumsal site',
     ustBant: true,
     kategoriArama: false,
     ekAyarlari: true,
@@ -81,6 +81,11 @@ export function varsayilanTipEk(tip: HeaderTipi): HeaderTipEkAyarlari {
     case 'imza-kurumsal':
       return {
         ...ortak,
+        sabit: true,
+        arkaPlanRengi: '#0b2a77',
+        ustBantRengi: '#08245f',
+        metinRengi: '#ffffff',
+        butonRengi: '#eef4ff',
         aramaModu: 'ikon',
         aramaGoster: true,
         kullaniciGoster: false,

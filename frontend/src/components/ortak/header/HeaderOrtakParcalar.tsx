@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import type { CSSProperties, ReactNode } from 'react';
+import { useState, type CSSProperties, type ReactNode } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
 import { kullaniciAlaniGoster } from '@/types/header';
 import type { HeaderVeri } from './useHeaderVeri';
@@ -119,20 +119,32 @@ export function IkinciMarka({ veri }: { veri: HeaderVeri }) {
 }
 
 export function AramaAlani({ veri, className = '' }: { veri: HeaderVeri; className?: string }) {
+  const [acik, setAcik] = useState(false);
   if (veri.tipEk.aramaGoster === false) return null;
 
   const arama = veri.header.arama!;
+  const imzaArama = className.includes('site-header-imza-arama');
 
-  if (veri.tipEk.aramaModu === 'ikon') {
+  if (veri.tipEk.aramaModu === 'ikon' && !imzaArama) {
     return (
-      <button
-        type="button"
-        className={`site-header-arama-ikon rounded-full p-2 transition hover:opacity-80 ${className}`}
-        style={{ color: 'inherit' }}
-        aria-label="Ara"
-      >
-        <HeaderIkon ikon={arama.ikon} grup="arama" className="h-5 w-5" />
-      </button>
+      <div className={`site-header-arama-acilir relative ${className}`}>
+        <button
+          type="button"
+          className="site-header-arama-ikon rounded-full p-2 transition hover:opacity-80"
+          style={{ color: 'inherit' }}
+          aria-label="Ara"
+          aria-expanded={acik}
+          onClick={() => setAcik((onceki) => !onceki)}
+        >
+          <HeaderIkon ikon={arama.ikon} grup="arama" className="h-5 w-5" />
+        </button>
+        {acik && (
+          <form className="site-header-arama-panel" role="search" onSubmit={(e) => e.preventDefault()}>
+            <input autoFocus type="search" placeholder={arama.placeholder} aria-label="Site içinde ara" />
+            <button type="submit" aria-label="Aramayı gönder">→</button>
+          </form>
+        )}
+      </div>
     );
   }
 

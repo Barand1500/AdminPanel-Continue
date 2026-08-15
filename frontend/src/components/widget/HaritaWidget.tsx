@@ -5,6 +5,7 @@ import type { WidgetConfig, WidgetHaritaSube } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, haritaEmbedUrl } from './widgetHelpers';
+import { CizgiIkon } from './CizgiIkonlari';
 
 type Cfg = ReturnType<typeof configOkuFromWidget>;
 
@@ -131,38 +132,54 @@ function UstBantAlt({ widget, cfg, src }: { widget: Widget; cfg: Cfg; src: strin
 
 function YanIkonListe({ widget, cfg, src }: { widget: Widget; cfg: Cfg; src: string }) {
   const renk = renkler(cfg);
-  const satirlar = cfg.ikonKartlar ?? [];
+  const kartlar =
+    cfg.iletisimKartlari ??
+    (cfg.ikonKartlar ?? []).map((kart) => ({
+      id: kart.id,
+      etiket: '',
+      deger: kart.metin,
+      ikon: kart.ikon,
+    }));
+
   return (
-    <div className="hr-yan-wrap">
-      <div className="hr-yan-sol">
+    <div className="hr-iletisim-split">
+      <div className="hr-iletisim-bilgi">
+        {widget.altBaslik && (
+          <p className="hr-iletisim-ust-etiket" style={{ color: renk.vurgu }}>
+            {widget.altBaslik}
+          </p>
+        )}
         {widget.baslik && (
-          <h2 className={`${baslikSinifi(cfg)} hr-yan-baslik`} style={{ color: renk.baslik }}>
+          <h2 className={`${baslikSinifi(cfg)} hr-iletisim-baslik`} style={{ color: renk.baslik }}>
             {widget.baslik}
           </h2>
         )}
         {widget.aciklama && (
-          <p className="hr-yan-aciklama" style={{ color: renk.metin }}>
+          <p className="hr-iletisim-aciklama" style={{ color: renk.metin }}>
             {widget.aciklama}
           </p>
         )}
-        <div className="hr-harita-kapsul hr-yan-harita" style={{ borderRadius: renk.radius }}>
-          <HaritaIframe src={src} />
+        {kartlar.length > 0 && (
+          <div className="hr-iletisim-kart-grid">
+            {kartlar.map((kart) => (
+              <div key={kart.id} className="hr-iletisim-kart" style={{ borderRadius: renk.radius }}>
+                <span className="hr-iletisim-kart-ikon" style={{ backgroundColor: `${renk.vurgu}14`, color: renk.vurgu }}>
+                  <CizgiIkon deger={`${kart.ikon ?? ''} ${kart.etiket} ${kart.deger}`} yedek="konum" boyut={25} />
+                </span>
+                <span className="hr-iletisim-kart-metin">
+                  {kart.etiket && <span className="hr-iletisim-kart-etiket" style={{ color: renk.metin }}>{kart.etiket}</span>}
+                  <span className="hr-iletisim-kart-deger" style={{ color: renk.baslik }}>{kart.deger}</span>
+                </span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="hr-iletisim-harita" style={{ borderRadius: renk.radius }}>
+        <div className="hr-iletisim-harita-ic" style={{ borderRadius: Math.max(0, renk.radius - 3) }}>
+          <HaritaIframe src={src} className="hr-iletisim-iframe" />
         </div>
       </div>
-      {satirlar.length > 0 && (
-        <ul className="hr-ikon-liste">
-          {satirlar.map((k) => (
-            <li key={k.id} className="hr-ikon-oge" style={{ borderRadius: renk.radius }}>
-              <span className="hr-ikon-kutu" style={{ backgroundColor: `${renk.vurgu}18`, color: renk.vurgu }}>
-                {k.ikon}
-              </span>
-              <span className="hr-ikon-metin" style={{ color: renk.baslik }}>
-                {k.metin}
-              </span>
-            </li>
-          ))}
-        </ul>
-      )}
     </div>
   );
 }

@@ -1,4 +1,5 @@
-import { useState, type CSSProperties, type ReactNode } from 'react';
+import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetEtiketKarti } from '@/types/widget';
@@ -6,25 +7,29 @@ import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, gorselSinifi, medyaUrl } from './widgetHelpers';
 
-function renkler(cfg: WidgetConfig) {
+function renkler(widget: Widget, cfg: WidgetConfig) {
   const g = cfg.gorunum ?? {};
   return {
-    baslik: g.baslikRengi || '#0f172a',
-    metin: g.metinRengi || '#64748b',
-    vurgu: g.vurguRengi || g.baslikRengi || 'var(--color-primary, #7c3aed)',
+    baslik: g.baslikRengi || 'var(--widget-baslik-renk, #111827)',
+    metin: g.metinRengi || widget.yaziRenk || 'var(--widget-metin-renk, #4b5563)',
+    // Üst etiket başlıktan bağımsızdır. Eski içeriklerde genel yazı rengi
+    // mantıklı bir geri dönüş değeri olur; yeni içeriklerde Vurgu seçicisi kullanılır.
+    vurgu: g.vurguRengi || widget.yaziRenk || '#111827',
   };
 }
 
 function Baslik({ widget, cfg, ortala = true }: { widget: Widget; cfg: WidgetConfig; ortala?: boolean }) {
-  if (!widget.baslik) return null;
-  const renk = renkler(cfg);
+  if (!widget.baslik && !widget.altBaslik) return null;
+  const renk = renkler(widget, cfg);
   return (
-    <h2
-      className={`${baslikSinifi(cfg)} gek-baslik${ortala ? ' gek-baslik-orta' : ''}`}
-      style={{ color: renk.baslik }}
-    >
-      {widget.baslik}
-    </h2>
+    <div className={`gek-baslik${ortala ? ' gek-baslik-orta' : ''}`}>
+      {widget.altBaslik && <p className="gek-alt-baslik" style={{ color: renk.vurgu }}>{widget.altBaslik}</p>}
+      {widget.baslik && (
+        <h2 className={baslikSinifi(cfg)} style={{ color: renk.baslik }}>
+          {widget.baslik}
+        </h2>
+      )}
+    </div>
   );
 }
 
@@ -54,43 +59,46 @@ function KartLink({
   );
 }
 
-function GorselImg({ k, cfg, sinif = '' }: { k: WidgetEtiketKarti; cfg: WidgetConfig; sinif?: string }) {
+function GorselImg({
+  k,
+  cfg,
+  sinif = '',
+  kutuIci = false,
+}: {
+  k: WidgetEtiketKarti;
+  cfg: WidgetConfig;
+  sinif?: string;
+  /** Kartın kendi oranını koruduğu medya alanlarında genel max-height / rounded sınıflarını kullanma. */
+  kutuIci?: boolean;
+}) {
   if (!k.gorselUrl) return null;
   return (
     <img
       src={medyaUrl(k.gorselUrl)}
       alt={k.etiket}
-      className={`gek-gorsel ${gorselSinifi(cfg)} ${sinif}`.trim()}
+      className={`gek-gorsel${kutuIci ? '' : ` ${gorselSinifi(cfg)}`} ${sinif}`.trim()}
     />
   );
 }
 
-function MasonryGaleri({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
-  const renk = renkler(cfg);
+function UrunGrubuKartlari({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
+  const renk = renkler(widget, cfg);
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className="gek-masonry">
-        {kartlar.map((k, i) => (
-          <KartLink
-            key={k.id}
-            k={k}
-            className={`gek-masonry-kart gek-masonry-kart-${(i % 3) + 1}`}
-          >
-            <div className="gek-masonry-gorsel-wrap">
+      <div className="gek-urun-grup-grid">
+        {kartlar.slice(0, 3).map((k) => (
+          <KartLink key={k.id} k={k} className="gek-urun-grup-kart">
+            <div className="gek-urun-grup-gorsel">
               {k.gorselUrl ? (
-                <GorselImg k={k} cfg={cfg} />
+                <GorselImg k={k} cfg={cfg} kutuIci />
               ) : (
                 <div className="gek-gorsel-bos">Görsel</div>
               )}
-              <div className="gek-masonry-overlay">
-                <span style={{ color: '#fff' }}>{k.etiket}</span>
-                <span className="gek-ok-beyaz">→</span>
-              </div>
             </div>
-            <span className="gek-masonry-etiket" style={{ color: renk.baslik }}>
-              {k.etiket}
-            </span>
+            <div className="gek-urun-grup-footer">
+              <h3 className="gek-urun-grup-baslik" style={{ color: renk.metin }}>{k.etiket}</h3>
+            </div>
           </KartLink>
         ))}
       </div>
@@ -99,7 +107,7 @@ function MasonryGaleri({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetCo
 }
 
 function HeroMiniGrid({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
-  const renk = renkler(cfg);
+  const renk = renkler(widget, cfg);
   const [hero, ...mini] = kartlar;
 
   return (
@@ -139,7 +147,7 @@ function HeroMiniGrid({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetCon
 }
 
 function HoverZoom({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
-  const renk = renkler(cfg);
+  const renk = renkler(widget, cfg);
   const kolon = cfg.gorunum?.kolonSayisi ?? 3;
 
   return (
@@ -167,7 +175,7 @@ function HoverZoom({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig
 }
 
 function PolaroidKolaj({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
-  const renk = renkler(cfg);
+  const renk = renkler(widget, cfg);
 
   return (
     <>
@@ -198,7 +206,7 @@ function PolaroidKolaj({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetCo
 
 function SplitPanel({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
   const [aktif, setAktif] = useState(0);
-  const renk = renkler(cfg);
+  const renk = renkler(widget, cfg);
   const secili = kartlar[aktif] ?? kartlar[0];
 
   return (
@@ -247,32 +255,79 @@ function SplitPanel({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfi
   );
 }
 
-function FlipKart({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
-  const renk = renkler(cfg);
-  const kolon = cfg.gorunum?.kolonSayisi ?? 3;
+type UrunVitrinKarti = WidgetEtiketKarti & {
+  rozet?: string;
+  aciklama?: string;
+  kisaAciklama?: string;
+  fiyat?: string;
+  eskiFiyat?: string;
+};
+
+function OneCikanUrunKaruseli({ widget, cfg, kartlar }: { widget: Widget; cfg: WidgetConfig; kartlar: WidgetEtiketKarti[] }) {
+  const renk = renkler(widget, cfg);
+  const seritRef = useRef<HTMLDivElement>(null);
+  const seritId = `gek-onecikan-urun-${widget.id}`;
+
+  const kaydir = (yon: -1 | 1) => {
+    const serit = seritRef.current;
+    const kart = serit?.querySelector<HTMLElement>('.gek-onecikan-urun-kart');
+    if (!serit || !kart) return;
+
+    const kartGenisligi = kart.getBoundingClientRect().width;
+    const aralik = Number.parseFloat(window.getComputedStyle(serit).gap) || 0;
+    serit.scrollBy({ left: yon * (kartGenisligi + aralik), behavior: 'smooth' });
+  };
 
   return (
     <>
-      <Baslik widget={widget} cfg={cfg} />
-      <div className={`gek-flip-grid gek-flip-grid-${Math.min(kolon, 4)}`}>
-        {kartlar.map((k) => (
-          <KartLink key={k.id} k={k} className="gek-flip-kart">
-            <div className="gek-flip-ic">
-              <div className="gek-flip-on">
+      <Baslik widget={widget} cfg={cfg} ortala={false} />
+      <div
+        id={seritId}
+        ref={seritRef}
+        className="gek-onecikan-urun-serit"
+        role="region"
+        aria-label={widget.baslik || 'Öne çıkan ürünler'}
+        style={{ '--gek-urun-vurgu': renk.vurgu } as CSSProperties}
+      >
+        {kartlar.map((k) => {
+          const urun = k as UrunVitrinKarti;
+          const fiyatVar = Boolean(urun.fiyat || urun.eskiFiyat);
+
+          return (
+            <KartLink key={k.id} k={k} className="gek-onecikan-urun-kart">
+              <div className="gek-onecikan-urun-gorsel">
                 {k.gorselUrl ? (
-                  <GorselImg k={k} cfg={cfg} />
+                  <GorselImg k={k} cfg={cfg} kutuIci />
                 ) : (
                   <div className="gek-gorsel-bos">Görsel</div>
                 )}
+                {fiyatVar && (
+                  <span className="gek-onecikan-urun-fiyatlar">
+                    {urun.eskiFiyat && <del>{urun.eskiFiyat}</del>}
+                    {urun.fiyat && <strong>{urun.fiyat}</strong>}
+                  </span>
+                )}
+                {urun.rozet && <span className="gek-onecikan-urun-rozet">{urun.rozet}</span>}
               </div>
-              <div className="gek-flip-arka" style={{ background: renk.vurgu }}>
-                <span className="gek-flip-etiket">{k.etiket}</span>
-                <span className="gek-flip-git">Görüntüle →</span>
+              <div className="gek-onecikan-urun-footer">
+                <h3 className="gek-onecikan-urun-baslik" style={{ color: renk.metin }}>
+                  {k.etiket}
+                </h3>
               </div>
-            </div>
-          </KartLink>
-        ))}
+            </KartLink>
+          );
+        })}
       </div>
+      {kartlar.length > 1 && (
+        <div className="gek-onecikan-urun-gezinme" aria-label="Ürün karuseli kontrolleri">
+          <button type="button" onClick={() => kaydir(-1)} aria-controls={seritId} aria-label="Önceki ürünler">
+            <IconChevronLeft size={17} stroke={2} />
+          </button>
+          <button type="button" onClick={() => kaydir(1)} aria-controls={seritId} aria-label="Sonraki ürünler">
+            <IconChevronRight size={17} stroke={2} />
+          </button>
+        </div>
+      )}
     </>
   );
 }
@@ -289,7 +344,7 @@ export function GorselEtiketKartlariWidget({ widget }: { widget: Widget }) {
 
   switch (gt) {
     case 'masonry-galeri':
-      icerik = <MasonryGaleri {...ortak} />;
+      icerik = <UrunGrubuKartlari {...ortak} />;
       break;
     case 'hero-mini-grid':
       icerik = <HeroMiniGrid {...ortak} />;
@@ -304,10 +359,10 @@ export function GorselEtiketKartlariWidget({ widget }: { widget: Widget }) {
       icerik = <SplitPanel {...ortak} />;
       break;
     case 'flip-kart':
-      icerik = <FlipKart {...ortak} />;
+      icerik = <OneCikanUrunKaruseli {...ortak} />;
       break;
     default:
-      icerik = <MasonryGaleri {...ortak} />;
+      icerik = <UrunGrubuKartlari {...ortak} />;
   }
 
   return <WidgetKabuk widget={widget}>{icerik}</WidgetKabuk>;

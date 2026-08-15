@@ -33,8 +33,10 @@ export const BLOG_GORUNUM_KONUM_ETIKET: Record<BlogGorunumKonum, string> = {
 
 export function varsayilanBlogAyarlari(): BlogAyarlari {
   return {
-    headerMenu: true,
-    anaSayfa: true,
+    // Blog, widget akışından bağımsız bir modüldür. Yeni/eksik ayarlı sitelerde
+    // kendiliğinden sayfaya veya menüye eklenmemesi için görünürlük açıkça seçilir.
+    headerMenu: false,
+    anaSayfa: false,
     anaSayfaKonum: 'urunler-ustu',
     hizmetlerAlani: false,
     listeAdet: 3,

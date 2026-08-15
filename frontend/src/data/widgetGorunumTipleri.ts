@@ -66,7 +66,7 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('vetahsilat-lavanta', 'Lavanta', 'Lavanta ton hero', 'lavanta'),
   ],
   HIZMET_KARTLARI: [
-    gt('masonry-duvar', 'Masonry Duvar', 'Farklı yükseklikte Pinterest tarzı duvar', 'notr'),
+    gt('masonry-duvar', 'Dengeli Hizmet Kartları', 'Eşit dört kart, çizgi ikon ve metinsel bağlantı', 'notr'),
     gt('hover-flip', 'Hover Flip', 'Ön yüz ikon, arka yüz detay + CTA', 'mor', 'Stripe'),
     gt('sekmeli-panel', 'Sekmeli Panel', 'Sekme seçince detay paneli açılır', 'okyanus'),
     gt('orbit-duzen', 'Orbit Düzen', 'Ortada başlık, etrafında dairesel kartlar', 'lavanta'),
@@ -103,13 +103,13 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('lightbox-odak', 'Lightbox Odak', 'Grid + tam ekran modal', 'gece'),
     gt('sekmeli-kategori', 'Sekmeli Kategori', 'Üst sekmelerle filtreleme', 'lavanta'),
     gt('hover-zoom-etiket', 'Hover Zoom Etiket', 'Kare grid, hover zoom', 'yesil'),
-    gt('karusel-merkez', 'Karusel Merkez', 'Ortada büyük slayt, yan önizleme', 'altin'),
+    gt('karusel-merkez', 'Fotoğraf Kart Karuseli', 'Dört fotoğraflı şerit, hover katmanı ve gezinme', 'notr'),
   ],
   HARITA: [
     gt('split-sol-bilgi', 'Split Sol Bilgi', 'Sol metin + sağ harita', 'okyanus'),
     gt('split-ters', 'Split Ters', 'Sol harita, sağ bilgi', 'lavanta'),
     gt('ust-bant-alt', 'Üst Bant Alt', 'Üst başlık bandı + harita', 'gunes'),
-    gt('yan-ikon-liste', 'Yan İkon Liste', 'Harita + ikonlu bilgi listesi', 'yesil'),
+    gt('yan-ikon-liste', 'İletişim Bilgi + Harita', 'Solda kartlı iletişim bilgileri, sağda harita', 'notr'),
     gt('kompakt-kart', 'Kompakt Kart', 'Ortalanmış kart + CTA', 'notr'),
     gt('sekme-subeler', 'Sekmeli Şubeler', 'Sekmelerle çoklu konum', 'mor'),
   ],
@@ -150,7 +150,7 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('hero-mini-grid', 'Hero Mini Grid', 'Sol büyük yazı, sağ 2×2 mini kartlar', 'okyanus'),
     gt('kart-destesi', 'Kart Destesi', 'Üst üste yığılmış hover deste', 'lavanta'),
     gt('sekmeli-kategori', 'Sekmeli Kategori', 'Üst sekme, altta filtrelenmiş kartlar', 'mor'),
-    gt('overlay-sinematik', 'Overlay Sinematik', 'Tam genişlik gradient overlay kaydırma', 'gece', 'Netflix'),
+    gt('overlay-sinematik', 'Kurumsal Haber Kartları', 'Tarih, özet ve bağlantı içeren açık haber kartları', 'notr'),
     gt('ticker-hero', 'Ticker Hero', 'Üstte kayan başlık şeridi + büyük öne çıkan kart', 'gunes'),
   ],
   LINK_KARTLARI: [
@@ -170,12 +170,12 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('flip-kart', 'Flip Kart', 'Ön görsel, arka açıklama + link', 'mint'),
   ],
   GORSEL_ETIKET_KARTLARI: [
-    gt('masonry-galeri', 'Masonry Galeri', 'Pinterest tarzı farklı yükseklikte duvar', 'notr'),
+    gt('masonry-galeri', 'Ürün Grubu Kartları', 'Eşit görsel kartlar, kalıcı başlık ve yönlendirme', 'notr'),
     gt('hero-mini-grid', 'Hero + Mini Grid', 'İlk kategori büyük vitrin kartı', 'gunes'),
     gt('hover-zoom', 'Hover Zoom', 'Hover\'da zoom + etiket reveal', 'mor'),
     gt('polaroid-kolaj', 'Polaroid Kolaj', 'Döndürülmüş polaroid çerçeveler', 'korall'),
     gt('split-panel', 'Split Panel', 'Sol büyük görsel, sağ thumbnail listesi', 'okyanus'),
-    gt('flip-kart', 'Flip Kart', 'Ön görsel, arka etiket + link', 'lavanta'),
+    gt('flip-kart', 'Öne Çıkan Ürün Vitrini', 'Rozet, fiyat ve açıklama içeren ürün kartları', 'notr'),
   ],
   EKIP_KARUSEL: [
     gt('hero-merkez', 'Hero Merkez', 'Büyük öne çıkan üye + mini avatar grid', 'okyanus'),
@@ -183,7 +183,7 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('sekmeli-departman', 'Sekmeli Departman', 'Departman sekmeleri + üye kartları', 'mor'),
     gt('orbit-duzen', 'Orbit Düzen', 'Ortada başlık, etrafında dairesel avatarlar', 'mint'),
     gt('hover-flip', 'Hover Flip', 'Ön foto, arka biyografi + LinkedIn', 'gunes'),
-    gt('marquee-spotlight', 'Marquee Spotlight', 'Kayan isim şeridi + büyük profil', 'notr'),
+    gt('marquee-spotlight', 'Portre Kart Karuseli', 'Dört portre kartı, lacivert kimlik katmanı ve gezinme', 'notr'),
   ],
   SAYAC_BLOK: [
     gt('buyuk-rakam', 'Büyük Rakam', 'Büyük rakam grid', 'notr'),
@@ -191,7 +191,7 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('cam-kartlar', 'Cam Kartlar', 'Glassmorphism sayaç', 'lavanta'),
     gt('koyu-neon', 'Koyu Neon', 'Koyu neon rakamlar', 'gece'),
     gt('yesil-artis', 'Yeşil Artış', 'Yeşil trend vurgusu', 'yesil'),
-    gt('altin-premium', 'Altın Premium', 'Altın premium sayaç', 'altin'),
+    gt('altin-premium', 'Halka İkonlu Sayaçlar', 'Dairesel ikon çerçevesiyle kurumsal KPI sayaçları', 'notr'),
   ],
   YORUM_KARUSEL: [
     gt('kart-karusel', 'Kart Karusel', 'Yorum kart karuseli', 'notr'),
@@ -231,7 +231,7 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('ust-alt-genis', 'Üst Alt Geniş', 'Üstte metin, altta tam genişlik görsel + CTA şeridi', 'mint'),
     gt('capraz-panel', 'Çapraz Panel', 'Diyagonal kesimli görsel + pill ikonlar', 'mor'),
     gt('gradient-kart', 'Gradient Kart', 'Gradient kart içinde split + yıldız ikonlar', 'lavanta'),
-    gt('bento-hakkimizda', 'Bento Hakkımızda', 'Asimetrik bento grid + emoji özellikler', 'gunes'),
+    gt('bento-hakkimizda', 'Kurumsal Tanıtım', 'Solda fotoğraf, sağda özellik kartları ve video CTA', 'notr'),
   ],
   ZAMAN_CIZELGESI: [
     gt('dikey-cizgi', 'Dikey Çizgi', 'Dikey timeline', 'notr'),
@@ -255,7 +255,7 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('istatistik-kapsul', 'İstatistik Kapsül', 'KPI pill şerit', 'okyanus', 'Dashboard'),
     gt('neon-gece', 'Neon Gece', 'Koyu neon kayan metin', 'gece'),
     gt('dalga-mor', 'Dalga Mor', 'Mor-pembe dalga gradient', 'mor'),
-    gt('cift-serit', 'Çift Şerit', 'Zıt yönde çift şerit', 'mint'),
+    gt('cift-serit', 'Logo Kart Karuseli', 'Oklarla gezilen sabit logo kartları', 'notr'),
   ],
   KARSILASTIRMA_TABLOSU: [
     gt('tam-tablo', 'Tam Tablo', 'Klasik karşılaştırma tablosu', 'notr'),

@@ -49,11 +49,11 @@ function AltAksiyonCubuguGovde({
   return (
     <footer
       ref={footerRef}
-      className={`ap-footer ap-gorev-cubugu flex h-12 shrink-0 items-center gap-2 border-t px-3${panelAcik ? ' ap-gorev-cubugu--panel-acik' : ''}`}
+      className={`ap-footer ap-gorev-cubugu flex h-12 shrink-0 items-center gap-2 px-3${panelAcik ? ' ap-gorev-cubugu--panel-acik' : ''}`}
       data-ap-kesif="aksiyon-cubugu"
     >
       <AksiyonCubuguUstCizgiSlot footerRef={footerRef} />
-      <div className="ap-aksiyon-cubugu-sol flex min-w-0 flex-1 items-center gap-2 overflow-x-auto">
+      <div className="ap-aksiyon-cubugu-sol flex min-w-0 flex-1 self-stretch items-stretch gap-0 overflow-x-auto">
         {aksiyonlar.map((aksiyon) => {
           const geriBildirim =
             aksiyonGeriBildirim?.aksiyonId === aksiyon.id ? aksiyonGeriBildirim : null;
@@ -65,7 +65,7 @@ function AltAksiyonCubuguGovde({
               type="button"
               disabled={!aksiyon.aktif && !geriBildirim}
               onClick={() => onAksiyon?.(aksiyon.id)}
-              className={`ap-aksiyon-btn shrink-0 rounded px-4 py-1.5 text-sm font-medium transition ${
+              className={`ap-aksiyon-btn shrink-0 whitespace-nowrap text-sm font-medium ${
                 geriBildirim?.tur === 'basari'
                   ? 'ap-aksiyon-basari'
                   : geriBildirim?.tur === 'hata'
@@ -77,7 +77,7 @@ function AltAksiyonCubuguGovde({
                         : 'ap-aksiyon-aktif'
               }`}
             >
-              {etiket}
+              <span className="ap-aksiyon-harf" data-etiket={etiket}>{etiket}</span>
             </button>
           );
         })}

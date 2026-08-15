@@ -12,10 +12,11 @@ export function WidgetKabuk({ widget, children }: { widget: Widget; children: Re
   const id = cfg.ek?.bolumId;
   const sinif = cfg.ek?.ozelSinif;
   const tamEkran = widgetTamEkranMi(cfg);
+  const baslikCizgi = cfg.gorunum?.baslikCizgi !== false;
   return (
     <section
       id={id || undefined}
-      className={`${widgetSectionClass(widget, sinif)} ${widgetGorunumSinifAl(widget)}${tamEkran ? ' widget-bolum-tam-ekran' : ''}`}
+      className={`${widgetSectionClass(widget, sinif)} ${widgetGorunumSinifAl(widget)}${tamEkran ? ' widget-bolum-tam-ekran' : ''}${baslikCizgi ? ' widget-baslik-cizgili' : ''}`}
       style={widgetSectionStyle(widget)}
     >
       {tamEkran ? <div className="widget-icerik-tam-ekran w-full">{children}</div> : <div className="container-site">{children}</div>}

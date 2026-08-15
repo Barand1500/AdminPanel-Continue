@@ -8,7 +8,7 @@ import {
 export type { FooterTipi };
 
 export type FooterSema = 'dort-kolon' | 'uc-kolon' | 'iki-kolon' | 'merkezi';
-export type FooterLinkIkon = 'chevron' | 'ok' | 'bullet' | 'yok';
+export type FooterLinkIkon = 'chevron' | 'ok' | 'bullet' | 'kare-chevron' | 'kare-ok' | 'kare-nokta' | 'yok';
 
 export interface FooterLink {
   id: string;
@@ -21,6 +21,8 @@ export interface FooterLink {
 
 export interface FooterKolon {
   id: string;
+  /** Başlığın üzerindeki ince çizgi yanında gösterilen kısa etiket. */
+  ustEtiket?: string;
   baslik: string;
   aktif: boolean;
   sira: number;
@@ -81,6 +83,16 @@ export interface FooterGorselDekor {
 }
 
 export interface FooterTipEkAyarlari {
+  /** Marka kolonunun ince çizgi yanında gösterilen kısa etiket. */
+  markaUstEtiket?: string;
+  /** Koyu kurumsal footer ana zemini. */
+  arkaPlanRengi?: string;
+  /** Koyu kurumsal footer alt bantlarının zemini. */
+  altBantRengi?: string;
+  /** Koyu kurumsal footer metin rengi. */
+  metinRengi?: string;
+  /** Koyu kurumsal link/iletişim ikon kutusu zemini. */
+  ikonArkaPlanRengi?: string;
   newsletterBaslik?: string;
   newsletterPlaceholder?: string;
   newsletterButon?: string;
@@ -125,12 +137,18 @@ export const FOOTER_GORSEL_KONUM_ETIKET: Record<FooterGorselKonum, string> = {
   alt: 'Alt',
 };
 
-export const FOOTER_LINK_IKON_ETIKET: Record<FooterLinkIkon, string> = {
+export const FOOTER_LINK_IKON_ETIKET: Partial<Record<FooterLinkIkon, string>> = {
   chevron: '› Chevron',
   ok: '→ Ok',
   bullet: '• Nokta',
   yok: 'İkonsuz',
 };
+
+Object.assign(FOOTER_LINK_IKON_ETIKET, {
+  'kare-chevron': 'Kutu içinde chevron',
+  'kare-ok': 'Kutu içinde ok',
+  'kare-nokta': 'Kutu içinde nokta',
+});
 
 export function yeniFooterId(): string {
   return crypto.randomUUID();
@@ -359,6 +377,9 @@ export function footerLinkIkonGoster(tip: FooterLinkIkon): string | null {
   if (tip === 'chevron') return '›';
   if (tip === 'ok') return '→';
   if (tip === 'bullet') return '•';
+  if (tip === 'kare-chevron') return '›';
+  if (tip === 'kare-ok') return '→';
+  if (tip === 'kare-nokta') return '•';
   return null;
 }
 

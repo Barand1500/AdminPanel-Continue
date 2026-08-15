@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetMarkaLogosu } from '@/types/widget';
 import { widgetTamEkranMi } from '@/types/widget';
@@ -11,15 +12,25 @@ const HIZ_SINIF: Record<string, string> = {
   hizli: 'marka-seridi-iz-hizli',
 };
 
+function renkler(cfg: WidgetConfig) {
+  const g = cfg.gorunum ?? {};
+  return {
+    baslik: g.baslikRengi || '#111827',
+    metin: g.metinRengi || '#4b5563',
+    vurgu: g.vurguRengi || '#111827',
+  };
+}
+
 function BaslikAlani({ widget, cfg, tamEkran }: { widget: Widget; cfg: WidgetConfig; tamEkran: boolean }) {
+  const renk = renkler(cfg);
   if (!widget.baslik && !widget.altBaslik) return null;
   return (
     <div className={`mb-10 text-center${tamEkran ? ' container-site' : ''}`}>
       {widget.altBaslik && (
-        <p className="text-sm font-semibold uppercase tracking-widest text-primary">{widget.altBaslik}</p>
+        <p className="text-sm font-semibold uppercase tracking-widest" style={{ color: renk.vurgu }}>{widget.altBaslik}</p>
       )}
       {widget.baslik && (
-        <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-slate-900`}>{widget.baslik}</h2>
+        <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold`} style={{ color: renk.baslik }}>{widget.baslik}</h2>
       )}
     </div>
   );
@@ -34,10 +45,10 @@ function LogoKayan({ widget, cfg, markalar }: { widget: Widget; cfg: WidgetConfi
     <>
       <BaslikAlani widget={widget} cfg={cfg} tamEkran={tamEkran} />
       <div
-        className={`marka-seridi-kapsul relative overflow-hidden py-8 ${
+        className={`marka-seridi-kapsul marka-seridi-seffaf relative overflow-hidden py-8 ${
           tamEkran
-            ? 'marka-seridi-kapsul-tam border-y border-slate-100 bg-gradient-to-r from-slate-50 via-white to-slate-50'
-            : 'rounded-2xl border border-slate-100 bg-gradient-to-r from-slate-50 via-white to-slate-50'
+            ? 'marka-seridi-kapsul-tam border-y border-slate-100 bg-transparent'
+            : 'rounded-2xl border border-slate-100 bg-transparent'
         }`}
       >
         <div className="marka-seridi-soluk marka-seridi-soluk-sol" aria-hidden />
@@ -89,15 +100,16 @@ function EgikMetinSeridi({ widget, cfg, markalar }: { widget: Widget; cfg: Widge
 }
 
 function IstatistikKapsul({ widget, cfg, markalar }: { widget: Widget; cfg: WidgetConfig; markalar: WidgetMarkaLogosu[] }) {
+  const renk = renkler(cfg);
   return (
     <div className="marka-seridi-istatistik-wrap py-6">
       <div className="marka-seridi-istatistik-satir">
         {widget.baslik && (
           <div className="marka-seridi-istatistik-baslik-alan">
             {widget.altBaslik && (
-              <p className="text-xs font-semibold uppercase tracking-widest text-primary">{widget.altBaslik}</p>
+              <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: renk.vurgu }}>{widget.altBaslik}</p>
             )}
-            <h2 className={`${baslikSinifi(cfg)} font-bold text-slate-900`}>{widget.baslik}</h2>
+            <h2 className={`${baslikSinifi(cfg)} font-bold`} style={{ color: renk.baslik }}>{widget.baslik}</h2>
           </div>
         )}
         <div className="marka-seridi-istatistik-kapsul">
@@ -156,22 +168,79 @@ function DalgaMorSeridi({ markalar }: { markalar: WidgetMarkaLogosu[] }) {
   );
 }
 
-function CiftSerit({ markalar }: { markalar: WidgetMarkaLogosu[] }) {
-  const hiz = HIZ_SINIF.normal;
-  const serit = [...markalar, ...markalar];
+function LogoKartKaruseli({
+  widget,
+  cfg,
+  markalar,
+}: {
+  widget: Widget;
+  cfg: WidgetConfig;
+  markalar: WidgetMarkaLogosu[];
+}) {
+  const [baslangic, setBaslangic] = useState(0);
+  const gorunenAdet = Math.min(6, markalar.length);
+  const gorunenMarkalar = Array.from({ length: gorunenAdet }, (_, sira) => {
+    const markaIndeksi = (baslangic + sira) % markalar.length;
+    return markalar[markaIndeksi];
+  });
+
+  function kaydir(yon: 'onceki' | 'sonraki') {
+    setBaslangic((mevcut) =>
+      yon === 'onceki' ? (mevcut - 1 + markalar.length) % markalar.length : (mevcut + 1) % markalar.length,
+    );
+  }
+
   return (
-    <div className="marka-seridi-cift space-y-3 py-4">
-      <div className={`marka-seridi-cift-iz marka-seridi-cift-ileri ${hiz}`}>
-        {serit.map((m, i) => (
-          <span key={`a-${m.id}-${i}`} className="marka-seridi-cift-oge">{m.ad}</span>
-        ))}
+    <>
+      <BaslikAlani widget={widget} cfg={cfg} tamEkran={widgetTamEkranMi(cfg)} />
+      <div className="marka-kart-karusel">
+        {markalar.length > 1 && (
+          <button
+            type="button"
+            className="marka-kart-karusel-ok"
+            onClick={() => kaydir('onceki')}
+            aria-label="Önceki markalar"
+          >
+            ‹
+          </button>
+        )}
+        <div className="marka-kart-karusel-liste">
+          {gorunenMarkalar.map((m) => {
+            const icerik = m.gorselUrl ? (
+              <img src={medyaUrl(m.gorselUrl)} alt={m.ad} className="marka-kart-karusel-logo" loading="lazy" />
+            ) : (
+              <span className="marka-kart-karusel-metin">{m.ad}</span>
+            );
+
+            return m.link ? (
+              <a
+                key={`${m.id}-${baslangic}`}
+                href={m.link}
+                className="marka-kart-karusel-kart"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                {icerik}
+              </a>
+            ) : (
+              <div key={`${m.id}-${baslangic}`} className="marka-kart-karusel-kart">
+                {icerik}
+              </div>
+            );
+          })}
+        </div>
+        {markalar.length > 1 && (
+          <button
+            type="button"
+            className="marka-kart-karusel-ok"
+            onClick={() => kaydir('sonraki')}
+            aria-label="Sonraki markalar"
+          >
+            ›
+          </button>
+        )}
       </div>
-      <div className={`marka-seridi-cift-iz marka-seridi-cift-geri ${hiz}`}>
-        {serit.map((m, i) => (
-          <span key={`b-${m.id}-${i}`} className="marka-seridi-cift-oge marka-seridi-cift-oge-alt">{m.ad}</span>
-        ))}
-      </div>
-    </div>
+    </>
   );
 }
 
@@ -188,7 +257,7 @@ export function MarkaSeridiWidget({ widget }: { widget: Widget }) {
       {gt === 'istatistik-kapsul' && <IstatistikKapsul widget={widget} cfg={cfg} markalar={markalar} />}
       {gt === 'neon-gece' && <NeonGeceSeridi markalar={markalar} />}
       {gt === 'dalga-mor' && <DalgaMorSeridi markalar={markalar} />}
-      {gt === 'cift-serit' && <CiftSerit markalar={markalar} />}
+      {gt === 'cift-serit' && <LogoKartKaruseli widget={widget} cfg={cfg} markalar={markalar} />}
       {gt === 'logo-kayan' && <LogoKayan widget={widget} cfg={cfg} markalar={markalar} />}
     </WidgetKabuk>
   );

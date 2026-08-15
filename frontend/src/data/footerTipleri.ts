@@ -44,9 +44,9 @@ export const FOOTER_TIP_TANIMLARI: FooterTipTanimi[] = [
   },
   {
     id: 'kurumsal',
-    ad: 'Kurumsal',
+    ad: 'Koyu Kurumsal',
     aciklama: 'Güven rozetleri vurgulu, resmi kolon düzeni',
-    ilham: 'Microsoft',
+    ilham: 'Kurumsal site',
     semaGoster: true,
     kolonlar: true,
     ekAyarlari: true,
@@ -120,7 +120,14 @@ export function varsayilanFooterTipEk(tip: FooterTipi): FooterTipEkAyarlari {
     case 'newsletter':
       return { ...ortak, newsletterBaslik: 'Yeniliklerden haberdar olun', newsletterButon: 'Kaydol' };
     case 'kurumsal':
-      return { ...ortak, guvenVurgu: true };
+      return {
+        ...ortak,
+        guvenVurgu: true,
+        arkaPlanRengi: '#0b2a77',
+        altBantRengi: '#08245f',
+        metinRengi: '#ffffff',
+        ikonArkaPlanRengi: '#08245f',
+      };
     case 'kompakt':
       return { ...ortak, kompaktKoyuTema: true };
     case 'sade':

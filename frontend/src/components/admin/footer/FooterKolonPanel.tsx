@@ -132,6 +132,13 @@ export function FooterKolonPanel({ footer, onDegistir }: FooterKolonPanelProps) 
                 <div className="flex flex-wrap items-center gap-2">
                   <input
                     type="text"
+                    value={kolon.ustEtiket ?? ''}
+                    onChange={(e) => kolonGuncelle(kolon.id, { ustEtiket: e.target.value })}
+                    className={`${formInputSinifi} min-w-0 flex-1`}
+                    placeholder="Çizgi üstü kısa etiket"
+                  />
+                  <input
+                    type="text"
                     value={kolon.baslik}
                     onChange={(e) => kolonGuncelle(kolon.id, { baslik: e.target.value })}
                     className={`${formInputSinifi} min-w-0 flex-1`}

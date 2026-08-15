@@ -1,19 +1,20 @@
-import { useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetGaleriOgesi } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, gridStyle, medyaUrl } from './widgetHelpers';
+import { CizgiIkon } from './CizgiIkonlari';
 
 type Cfg = ReturnType<typeof configOkuFromWidget>;
 
 function renkler(cfg: WidgetConfig) {
   const g = cfg.gorunum ?? {};
   return {
-    baslik: g.baslikRengi || '#0f172a',
-    metin: g.metinRengi || '#64748b',
-    vurgu: g.vurguRengi || '#7c3aed',
+    baslik: g.baslikRengi || '#111827',
+    metin: g.metinRengi || '#4b5563',
+    vurgu: g.vurguRengi || '#111827',
     radius: g.borderRadius ?? 14,
   };
 }
@@ -56,15 +57,74 @@ function GorselLink({
   );
 }
 
+function GaleriLightboxModal({
+  acik,
+  indeks,
+  galeri,
+  onKapat,
+  onIndeksDegistir,
+}: {
+  acik: WidgetGaleriOgesi | null;
+  indeks: number;
+  galeri: WidgetGaleriOgesi[];
+  onKapat: () => void;
+  onIndeksDegistir: (indeks: number) => void;
+}) {
+  const kapatRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!acik) return;
+    kapatRef.current?.focus();
+    const escapeDinleyici = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') onKapat();
+    };
+    document.addEventListener('keydown', escapeDinleyici);
+    return () => document.removeEventListener('keydown', escapeDinleyici);
+  }, [acik, onKapat]);
+
+  if (!acik) return null;
+
+  function kaydir(yon: 'onceki' | 'sonraki') {
+    const sonrakiIndeks = yon === 'onceki' ? (indeks - 1 + galeri.length) % galeri.length : (indeks + 1) % galeri.length;
+    onIndeksDegistir(sonrakiIndeks);
+  }
+
+  return (
+    <div className="gl-lightbox-modal" role="dialog" aria-modal="true" aria-label={acik.baslik || 'Görsel önizleme'} onClick={onKapat}>
+      <button ref={kapatRef} type="button" className="gl-lightbox-kapat" onClick={onKapat} aria-label="Kapat">
+        ×
+      </button>
+      {galeri.length > 1 && (
+        <>
+          <button type="button" className="gl-lightbox-ok gl-lightbox-ok-sol" onClick={(e) => { e.stopPropagation(); kaydir('onceki'); }} aria-label="Önceki">
+            ‹
+          </button>
+          <button type="button" className="gl-lightbox-ok gl-lightbox-ok-sag" onClick={(e) => { e.stopPropagation(); kaydir('sonraki'); }} aria-label="Sonraki">
+            ›
+          </button>
+        </>
+      )}
+      <figure className="gl-lightbox-icerik" onClick={(e) => e.stopPropagation()}>
+        {acik.gorselUrl && <img src={medyaUrl(acik.gorselUrl)} alt={acik.baslik} className="gl-lightbox-buyuk" />}
+        {acik.baslik && <figcaption>{acik.baslik}</figcaption>}
+      </figure>
+    </div>
+  );
+}
+
 function BolumBaslik({ widget, cfg }: { widget: Widget; cfg: Cfg }) {
   const renk = renkler(cfg);
+  const cizgiGoster = cfg.gorunum?.baslikCizgi !== false;
   if (!widget.baslik && !widget.altBaslik && !widget.aciklama) return null;
   return (
     <div className="gl-bolum-baslik">
       {widget.altBaslik && (
-        <p className="gl-alt-baslik" style={{ color: renk.vurgu }}>
-          {widget.altBaslik}
-        </p>
+        <div className="gl-alt-baslik-wrap">
+          <p className="gl-alt-baslik" style={{ color: renk.vurgu }}>
+            {widget.altBaslik}
+          </p>
+          {cizgiGoster && <span className="gl-baslik-cizgi" style={{ backgroundColor: renk.vurgu }} aria-hidden />}
+        </div>
       )}
       {widget.baslik && (
         <h2 className={`${baslikSinifi(cfg)} gl-baslik`} style={{ color: renk.baslik }}>
@@ -107,7 +167,7 @@ function HeroVitrin({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri:
   return (
     <>
       <BolumBaslik widget={widget} cfg={cfg} />
-      <div className="gl-hero-vitrin">
+      <div className="gl-hero-vitrin" style={{ '--gl-vurgu': renk.vurgu } as CSSProperties}>
         <GorselLink g={hero} className="gl-hero-ana" style={{ borderRadius: renk.radius }}>
           {hero.gorselUrl && <img src={medyaUrl(hero.gorselUrl)} alt={hero.baslik} className="gl-hero-gorsel" />}
           <div className="gl-hero-overlay" />
@@ -146,12 +206,6 @@ function LightboxOdak({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galer
     setIndeks(i);
   }
 
-  function kaydir(yon: 'onceki' | 'sonraki') {
-    const yeni = yon === 'onceki' ? (indeks - 1 + galeri.length) % galeri.length : (indeks + 1) % galeri.length;
-    setIndeks(yeni);
-    setAcik(galeri[yeni]);
-  }
-
   return (
     <>
       <BolumBaslik widget={widget} cfg={cfg} />
@@ -172,27 +226,16 @@ function LightboxOdak({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galer
           ))}
         </div>
       </div>
-      {acik && (
-        <div className="gl-lightbox-modal" onClick={() => setAcik(null)}>
-          <button type="button" className="gl-lightbox-kapat" onClick={() => setAcik(null)} aria-label="Kapat">
-            ×
-          </button>
-          {galeri.length > 1 && (
-            <>
-              <button type="button" className="gl-lightbox-ok gl-lightbox-ok-sol" onClick={(e) => { e.stopPropagation(); kaydir('onceki'); }} aria-label="Önceki">
-                ‹
-              </button>
-              <button type="button" className="gl-lightbox-ok gl-lightbox-ok-sag" onClick={(e) => { e.stopPropagation(); kaydir('sonraki'); }} aria-label="Sonraki">
-                ›
-              </button>
-            </>
-          )}
-          <figure className="gl-lightbox-icerik" onClick={(e) => e.stopPropagation()}>
-            {acik.gorselUrl && <img src={medyaUrl(acik.gorselUrl)} alt={acik.baslik} className="gl-lightbox-buyuk" />}
-            {acik.baslik && <figcaption>{acik.baslik}</figcaption>}
-          </figure>
-        </div>
-      )}
+      <GaleriLightboxModal
+        acik={acik}
+        indeks={indeks}
+        galeri={galeri}
+        onKapat={() => setAcik(null)}
+        onIndeksDegistir={(yeniIndeks) => {
+          setIndeks(yeniIndeks);
+          setAcik(galeri[yeniIndeks]);
+        }}
+      />
     </>
   );
 }
@@ -260,63 +303,69 @@ function HoverZoomEtiket({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; ga
 }
 
 function KaruselMerkez({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
-  const [aktif, setAktif] = useState(0);
+  const [baslangic, setBaslangic] = useState(0);
+  const [acik, setAcik] = useState<WidgetGaleriOgesi | null>(null);
+  const [indeks, setIndeks] = useState(0);
   const renk = renkler(cfg);
-  const n = galeri.length;
+  const gorunenAdet = Math.min(4, galeri.length);
+  const gorunenGaleri = Array.from({ length: gorunenAdet }, (_, sira) => {
+    const ogeIndeksi = (baslangic + sira) % galeri.length;
+    return { oge: galeri[ogeIndeksi], indeks: ogeIndeksi };
+  });
 
   function kaydir(yon: 'onceki' | 'sonraki') {
-    setAktif((i) => (yon === 'onceki' ? (i - 1 + n) % n : (i + 1) % n));
+    setBaslangic((mevcut) =>
+      yon === 'onceki' ? (mevcut - 1 + galeri.length) % galeri.length : (mevcut + 1) % galeri.length
+    );
   }
-
-  const onceki = galeri[(aktif - 1 + n) % n];
-  const merkez = galeri[aktif];
-  const sonraki = galeri[(aktif + 1) % n];
 
   return (
     <>
       <BolumBaslik widget={widget} cfg={cfg} />
-      <div className="gl-karusel-wrap">
-        {n > 1 && (
-          <button type="button" className="gl-karusel-ok" onClick={() => kaydir('onceki')} aria-label="Önceki">
+      <div className="gl-foto-karusel" style={{ '--gl-foto-vurgu': renk.vurgu } as CSSProperties}>
+        {galeri.length > 1 && (
+          <button type="button" className="gl-foto-ok" onClick={() => kaydir('onceki')} aria-label="Önceki fotoğraflar">
             ‹
           </button>
         )}
-        <div className="gl-karusel-uc">
-          {n > 1 && (
-            <button type="button" className="gl-karusel-yan gl-karusel-sol" onClick={() => kaydir('onceki')}>
-              {onceki.gorselUrl && <img src={medyaUrl(onceki.gorselUrl)} alt={onceki.baslik} />}
+        <div className="gl-foto-kartlar">
+          {gorunenGaleri.map(({ oge, indeks: ogeIndeksi }) => (
+            <button
+              key={`${oge.id}-${baslangic}`}
+              type="button"
+              className="gl-foto-kart"
+              style={{ borderRadius: renk.radius }}
+              onClick={() => {
+                setIndeks(ogeIndeksi);
+                setAcik(oge);
+              }}
+              aria-label={`${oge.baslik || 'Görsel'} görselini büyüt`}
+            >
+              {oge.gorselUrl && <img src={medyaUrl(oge.gorselUrl)} alt={oge.baslik} className="gl-foto-gorsel" />}
+              <span className="gl-foto-overlay" aria-hidden />
+              {oge.baslik && <span className="gl-foto-etiket">{oge.baslik}</span>}
+              <span className="gl-foto-incele" aria-hidden>
+                <CizgiIkon yedek="zoom" boyut={22} />
+              </span>
             </button>
-          )}
-          <GorselLink g={merkez} className="gl-karusel-merkez" style={{ borderRadius: renk.radius }}>
-            {merkez.gorselUrl && <img src={medyaUrl(merkez.gorselUrl)} alt={merkez.baslik} className="gl-karusel-merkez-gorsel" />}
-            {merkez.baslik && <span className="gl-karusel-merkez-etiket">{merkez.baslik}</span>}
-          </GorselLink>
-          {n > 1 && (
-            <button type="button" className="gl-karusel-yan gl-karusel-sag" onClick={() => kaydir('sonraki')}>
-              {sonraki.gorselUrl && <img src={medyaUrl(sonraki.gorselUrl)} alt={sonraki.baslik} />}
-            </button>
-          )}
+          ))}
         </div>
-        {n > 1 && (
-          <button type="button" className="gl-karusel-ok" onClick={() => kaydir('sonraki')} aria-label="Sonraki">
+        {galeri.length > 1 && (
+          <button type="button" className="gl-foto-ok" onClick={() => kaydir('sonraki')} aria-label="Sonraki fotoğraflar">
             ›
           </button>
         )}
       </div>
-      {n > 1 && (
-        <div className="gl-karusel-noktalar">
-          {galeri.map((g, i) => (
-            <button
-              key={g.id}
-              type="button"
-              className={`gl-karusel-nokta ${i === aktif ? 'gl-karusel-nokta-aktif' : ''}`}
-              style={i === aktif ? { backgroundColor: renk.vurgu } : undefined}
-              onClick={() => setAktif(i)}
-              aria-label={`Slayt ${i + 1}`}
-            />
-          ))}
-        </div>
-      )}
+      <GaleriLightboxModal
+        acik={acik}
+        indeks={indeks}
+        galeri={galeri}
+        onKapat={() => setAcik(null)}
+        onIndeksDegistir={(yeniIndeks) => {
+          setIndeks(yeniIndeks);
+          setAcik(galeri[yeniIndeks]);
+        }}
+      />
     </>
   );
 }

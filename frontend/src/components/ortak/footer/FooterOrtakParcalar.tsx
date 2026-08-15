@@ -135,11 +135,17 @@ export function FooterKolonlar({
           .sort((a, b) => a.sira - b.sira);
         return (
           <div key={kolon.id} className="footer-kolon">
+            {kolon.ustEtiket && <p className="footer-kolon-ust-etiket">{metinCevir(cevir, kolon.ustEtiket)}</p>}
             <h4 className="site-footer-baslik">{metinCevir(cevir, kolon.baslik)}</h4>
             <ul className="mt-4 space-y-2.5 text-sm">
               {linkler.map((l) => (
                 <li key={l.id}>
-                  <FooterNavLink link={l} ikon={linkIkon} cevir={cevir} />
+                  <FooterNavLink
+                    link={l}
+                    ikon={linkIkon}
+                    cevir={cevir}
+                    className={`site-footer-link group flex items-start gap-2 footer-link--${footer.linkIkon}`}
+                  />
                 </li>
               ))}
             </ul>

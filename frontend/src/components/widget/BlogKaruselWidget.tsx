@@ -10,9 +10,9 @@ import { useSiteDil } from '@/contexts/SiteDilContext';
 function renkler(cfg: WidgetConfig) {
   const g = cfg.gorunum ?? {};
   return {
-    baslik: g.baslikRengi || '#0f172a',
-    metin: g.metinRengi || '#64748b',
-    vurgu: g.vurguRengi || '#0d9488',
+    baslik: g.baslikRengi || '#111827',
+    metin: g.metinRengi || '#4b5563',
+    vurgu: g.vurguRengi || '#111827',
     radius: g.borderRadius ?? 16,
   };
 }
@@ -33,9 +33,18 @@ function BaslikSatir({
   ek?: ReactNode;
 }) {
   const renk = renkler(cfg);
+  const cizgiGoster = cfg.gorunum?.baslikCizgi !== false;
   return (
     <div className="bk-baslik-satir">
-      <div>
+      <div className="bk-baslik-grup">
+        {widget.altBaslik && (
+          <div className="bk-alt-baslik-wrap">
+            <p className="bk-alt-baslik" style={{ color: renk.vurgu }}>
+              {widget.altBaslik}
+            </p>
+            {cizgiGoster && <span className="bk-baslik-cizgi" style={{ backgroundColor: renk.vurgu }} aria-hidden />}
+          </div>
+        )}
         {widget.baslik && (
           <h2 className={`${baslikSinifi(cfg)} bk-baslik`} style={{ color: renk.baslik }}>
             {widget.baslik}
@@ -152,11 +161,7 @@ function SnapSerit({
               <img src={medyaUrl(k.gorselUrl)} alt="" className="bk-snap-gorsel" />
             )}
             <div className="bk-snap-icerik">
-              {k.kategori && (
-                <span className="bk-kategori-etiket" style={{ color: renk.vurgu }}>
-                  {k.kategori}
-                </span>
-              )}
+              <KartMeta kart={k} renk={renk} />
               <h3 className="bk-kart-baslik" style={{ color: renk.baslik }}>
                 {k.baslik}
               </h3>
@@ -209,11 +214,7 @@ function HeroMiniGrid({
               <img src={medyaUrl(hero.gorselUrl)} alt="" className="bk-hero-buyuk-gorsel" />
             )}
             <div className="bk-hero-buyuk-icerik">
-              {hero.kategori && (
-                <span className="bk-kategori-etiket" style={{ color: renk.vurgu }}>
-                  {hero.kategori}
-                </span>
-              )}
+              <KartMeta kart={hero} renk={renk} />
               <h3 className="bk-hero-buyuk-baslik" style={{ color: renk.baslik }}>
                 {hero.baslik}
               </h3>
@@ -237,9 +238,12 @@ function HeroMiniGrid({
               {k.gorselUrl && (
                 <img src={medyaUrl(k.gorselUrl)} alt="" className="bk-mini-gorsel" />
               )}
-              <h4 className="bk-mini-baslik" style={{ color: renk.baslik }}>
-                {k.baslik}
-              </h4>
+              <div className="bk-mini-icerik">
+                <KartMeta kart={k} renk={renk} />
+                <h4 className="bk-mini-baslik" style={{ color: renk.baslik }}>
+                  {k.baslik}
+                </h4>
+              </div>
             </KartLink>
           ))}
         </div>
@@ -281,6 +285,7 @@ function KartDestesi({
               {k.gorselUrl && (
                 <img src={medyaUrl(k.gorselUrl)} alt="" className="bk-deste-gorsel" />
               )}
+              <KartMeta kart={k} renk={renk} />
               <h3 className="bk-kart-baslik" style={{ color: renk.baslik }}>
                 {k.baslik}
               </h3>
@@ -345,6 +350,7 @@ function SekmeliKategori({
           <article key={k.id} className="bk-sekme-kart" style={{ borderRadius: `${renk.radius}px` }}>
             {k.gorselUrl && <img src={medyaUrl(k.gorselUrl)} alt="" className="bk-sekme-gorsel" />}
             <div className="bk-sekme-icerik">
+              <KartMeta kart={k} renk={renk} />
               <h3 className="bk-kart-baslik" style={{ color: renk.baslik }}>{k.baslik}</h3>
               {k.link && (
                 <KartLink href={k.link} className="bk-kart-link" style={{ color: renk.vurgu }}>
@@ -359,7 +365,7 @@ function SekmeliKategori({
   );
 }
 
-function OverlaySinematik({
+function KurumsalHaberKartlari({
   widget,
   cfg,
   kartlar,
@@ -370,12 +376,8 @@ function OverlaySinematik({
   kartlar: WidgetBlogKart[];
   cevir: (k: string, f: string) => string;
 }) {
-  const scrollRef = useRef<HTMLDivElement>(null);
   const renk = renkler(cfg);
-
-  function kaydir(yon: 'sol' | 'sag') {
-    scrollRef.current?.scrollBy({ left: yon === 'sol' ? -400 : 400, behavior: 'smooth' });
-  }
+  const gorunenKartlar = kartlar.slice(0, 4);
 
   return (
     <>
@@ -385,36 +387,55 @@ function OverlaySinematik({
         tumunuGorLink={cfg.tumunuGorLink}
         tumunuGorMetin={cfg.tumunuGorMetin}
         cevir={cevir}
-        ek={
-          <div className="bk-serit-nav">
-            <button type="button" className="bk-serit-ok bk-serit-ok-koyu" onClick={() => kaydir('sol')} aria-label="Önceki">‹</button>
-            <button type="button" className="bk-serit-ok bk-serit-ok-koyu" onClick={() => kaydir('sag')} aria-label="Sonraki">›</button>
-          </div>
-        }
       />
-      <div className="bk-overlay-scroll" ref={scrollRef}>
-        {kartlar.map((k) => (
-          <KartLink
+      <div className="bk-kurumsal-grid">
+        {gorunenKartlar.map((k) => (
+          <article
             key={k.id}
-            href={k.link || '#'}
-            className="bk-overlay-kart"
+            className="bk-kurumsal-kart"
             style={{ borderRadius: `${renk.radius}px` }}
           >
-            {k.gorselUrl && (
-              <img src={medyaUrl(k.gorselUrl)} alt="" className="bk-overlay-gorsel" />
-            )}
-            <div className="bk-overlay-gradient" />
-            <div className="bk-overlay-metin">
-              {k.kategori && <span className="bk-overlay-kat">{k.kategori}</span>}
-              <h3 className="bk-overlay-baslik">{k.baslik}</h3>
-              <span className="bk-overlay-oku">
-                {k.butonMetni || cevir('site.dahaFazlaOku', 'Oku')} →
-              </span>
+            <div className="bk-kurumsal-gorsel-alan">
+              {k.gorselUrl ? (
+                <img src={medyaUrl(k.gorselUrl)} alt="" className="bk-kurumsal-gorsel" />
+              ) : (
+                <div className="bk-kurumsal-gorsel-bos" aria-hidden />
+              )}
             </div>
-          </KartLink>
+            <div className="bk-kurumsal-icerik">
+              <KartMeta kart={k} renk={renk} />
+              <h3 className="bk-kurumsal-baslik" style={{ color: renk.baslik }}>
+                {k.baslik}
+              </h3>
+              {k.ozet && <p className="bk-kurumsal-ozet" style={{ color: renk.metin }}>{k.ozet}</p>}
+              {k.link && (
+                <KartLink href={k.link} className="bk-kurumsal-cta" style={{ color: renk.vurgu }}>
+                  {k.butonMetni || cevir('site.dahaFazlaOku', 'Devamını Oku')} <span aria-hidden>→</span>
+                </KartLink>
+              )}
+            </div>
+          </article>
         ))}
       </div>
     </>
+  );
+}
+
+function KartMeta({ kart, renk }: { kart: WidgetBlogKart; renk: ReturnType<typeof renkler> }) {
+  if (!kart.kategori && !kart.tarih) return null;
+  return (
+    <div className="bk-kart-meta">
+      {kart.kategori && (
+        <span className="bk-kategori-etiket" style={{ color: renk.vurgu }}>
+          {kart.kategori}
+        </span>
+      )}
+      {kart.tarih && (
+        <time className="bk-kart-tarih" style={{ color: renk.metin }}>
+          {kart.tarih}
+        </time>
+      )}
+    </div>
   );
 }
 
@@ -455,11 +476,7 @@ function TickerHero({
             <img src={medyaUrl(hero.gorselUrl)} alt="" className="bk-ticker-hero-gorsel" />
           )}
           <div className="bk-ticker-hero-icerik">
-            {hero.kategori && (
-              <span className="bk-kategori-etiket" style={{ color: renk.vurgu }}>
-                {hero.kategori}
-              </span>
-            )}
+            <KartMeta kart={hero} renk={renk} />
             <h3 className="bk-ticker-hero-baslik" style={{ color: renk.baslik }}>
               {hero.baslik}
             </h3>
@@ -491,7 +508,7 @@ export function BlogKaruselWidget({ widget }: { widget: Widget }) {
       {gt === 'hero-mini-grid' && <HeroMiniGrid {...ortak} />}
       {gt === 'kart-destesi' && <KartDestesi {...ortak} />}
       {gt === 'sekmeli-kategori' && <SekmeliKategori {...ortak} />}
-      {gt === 'overlay-sinematik' && <OverlaySinematik {...ortak} />}
+      {gt === 'overlay-sinematik' && <KurumsalHaberKartlari {...ortak} />}
       {gt === 'ticker-hero' && <TickerHero {...ortak} />}
       {(gt === 'snap-serit' || !gt) && <SnapSerit {...ortak} />}
     </WidgetKabuk>

@@ -116,7 +116,9 @@ export const KOSUL_OPERATORLERI: { value: FormKosulOperator; label: string }[] =
 
 export const VARSAYILAN_FORM_AYARLARI: FormAyarlar = {
   gorunumTipi: 'sayfa-ici',
-  tumSayfalarda: true,
+  // Formlar widget değildir; yayınlandıktan sonra tüm sayfalara otomatik eklenmez.
+  // Yönetici yerleşim sekmesinden hedef sayfa(ları) özellikle seçer.
+  tumSayfalarda: false,
   sayfaSluglari: [],
   sayfaKonumu: 'icerik-sonu',
   genislik: 'orta',
