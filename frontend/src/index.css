@@ -834,7 +834,8 @@ body:has(.site-public)::-webkit-scrollbar,
 .site-header-imza-kurumsal,
 .site-header-varyant-imza-kurumsal {
   position: relative;
-  overflow: hidden;
+  /* Alt menüler header sınırının dışında açılır; burada kırpılmamalıdır. */
+  overflow: visible;
   border: none;
   box-shadow: none;
   color: #fff;
@@ -924,6 +925,14 @@ button.site-header-imza-arama {
 .site-header-imza-arama.site-header-arama-ikon {
   border-radius: 0.35rem !important;
 }
+
+/* Yönetim ekranında header yalnız canlı önizlemenin kendi alanında görünmelidir. */
+html:has(.admin-panel) .site-header-imza-shell {
+  position: relative !important;
+  inset: auto !important;
+}
+
+html:has(.admin-panel) .site-header-imza-bosluk { display: none; }
 
 .site-header-imza-arama .input-search {
   width: 15rem;
@@ -1148,7 +1157,8 @@ button.site-header-imza-arama {
   position: absolute;
   left: 0;
   top: 100%;
-  z-index: 50;
+  /* Sabit header ve sayfa içeriklerinin üstünde, eksiksiz görünür. */
+  z-index: 70;
   min-width: 220px;
   padding-top: 0.5rem;
   opacity: 0;

@@ -373,7 +373,7 @@ export function HeaderImzaKurumsal({ veri, ayarlar, menuAcik, setMenuAcik }: Hea
 
   return (
     <>
-      {sabit && <div className={ust ? 'h-[6.4rem]' : 'h-[4.5rem]'} aria-hidden />}
+      {sabit && <div className={`site-header-imza-bosluk ${ust ? 'h-[6.4rem]' : 'h-[4.5rem]'}`} aria-hidden />}
       <div className={`site-header-imza-shell ${sabitSinifi}`} style={renkler}>
       <div className="site-header-imza-ust">
         <div className="container-site flex flex-wrap items-center justify-between gap-2 py-2 text-xs">
