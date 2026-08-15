@@ -8,6 +8,17 @@ import {
 } from '@/utils/widgetFormYardimci';
 import { AKTIF_WIDGET_TIPLERI, DEPRECATED_WIDGET_TIPLERI } from '@/types/widget';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
+import {
+  kurumsalHeroFormdanYerelWidget,
+  kurumsalHeroYerelGuncelle,
+  kurumsalHeroYerelIdMi,
+  kurumsalHeroYerelKayitId,
+  kurumsalHeroYerelKayitVarMi,
+  kurumsalHeroYerelMod,
+  kurumsalHeroYerelOlustur,
+  kurumsalHeroYerelSil,
+  kurumsalHeroYerelWidgetlariBirlestir,
+} from '@/utils/kurumsalHeroLocalDepo';
 
 function widgetAdUret(form: WidgetFormDegeri) {
   const ad = form.ad.trim();
@@ -98,32 +109,72 @@ export async function widgetlariGetir(tip?: string): Promise<AdminWidget[]> {
   });
   const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widgetlar?: AdminWidget[] }>(yanit);
   if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widgetlar alinamadi'));
-  return (veri.widgetlar as AdminWidget[]).map(adminWidgetNormalize);
+  const apiWidgetlar = (veri.widgetlar as AdminWidget[]).map(adminWidgetNormalize);
+  const birlesik = kurumsalHeroYerelWidgetlariBirlestir(apiWidgetlar);
+  if (!tip) return birlesik;
+  return birlesik.filter((w) => w.tip === tip);
 }
 
 export async function widgetOlustur(form: WidgetFormDegeri): Promise<AdminWidget> {
+  const payload = payloadHazirla(form);
+  if (kurumsalHeroYerelMod() && form.tip === 'KURUMSAL_HERO') {
+    const taslak = kurumsalHeroFormdanYerelWidget(form, payload);
+    return kurumsalHeroYerelOlustur(taslak);
+  }
+
   const yanit = await fetch(`${API_URL}/admin/widgetlar`, {
     method: 'POST',
     headers: authHeaders(),
-    body: JSON.stringify(payloadHazirla(form)),
+    body: JSON.stringify(payload),
   });
   const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widget?: AdminWidget }>(yanit);
-  if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widget olusturulamadi'));
+  if (!yanit.ok) {
+    if (kurumsalHeroYerelMod() && form.tip === 'KURUMSAL_HERO') {
+      const taslak = kurumsalHeroFormdanYerelWidget(form, payload);
+      return kurumsalHeroYerelOlustur(taslak);
+    }
+    throw new Error(apiHataMesaji(veri, 'Widget olusturulamadi'));
+  }
   return adminWidgetNormalize(veri.widget as AdminWidget);
 }
 
 export async function widgetGuncelle(id: string, form: WidgetFormDegeri): Promise<AdminWidget> {
+  const payload = payloadHazirla(form, true);
+  if (kurumsalHeroYerelMod() && (kurumsalHeroYerelIdMi(id) || form.tip === 'KURUMSAL_HERO')) {
+    const yerelId = kurumsalHeroYerelKayitId(id);
+    const taslak = kurumsalHeroFormdanYerelWidget(form, payload, yerelId);
+    if (kurumsalHeroYerelKayitVarMi(id)) {
+      return kurumsalHeroYerelGuncelle(yerelId, taslak);
+    }
+    return kurumsalHeroYerelOlustur(taslak);
+  }
+
   const yanit = await fetch(`${API_URL}/admin/widgetlar/${id}`, {
     method: 'PUT',
     headers: authHeaders(),
-    body: JSON.stringify(payloadHazirla(form, true)),
+    body: JSON.stringify(payload),
   });
   const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widget?: AdminWidget }>(yanit);
-  if (!yanit.ok) throw new Error(apiHataMesaji(veri, 'Widget guncellenemedi'));
+  if (!yanit.ok) {
+    if (kurumsalHeroYerelMod() && form.tip === 'KURUMSAL_HERO') {
+      const yerelId = kurumsalHeroYerelKayitId(id);
+      const taslak = kurumsalHeroFormdanYerelWidget(form, payload, yerelId);
+      if (kurumsalHeroYerelKayitVarMi(id)) {
+        return kurumsalHeroYerelGuncelle(yerelId, taslak);
+      }
+      return kurumsalHeroYerelOlustur(taslak);
+    }
+    throw new Error(apiHataMesaji(veri, 'Widget guncellenemedi'));
+  }
   return adminWidgetNormalize(veri.widget as AdminWidget);
 }
 
 export async function widgetSil(id: string): Promise<void> {
+  if (kurumsalHeroYerelMod() && (kurumsalHeroYerelIdMi(id) || kurumsalHeroYerelKayitVarMi(id))) {
+    kurumsalHeroYerelSil(kurumsalHeroYerelKayitId(id));
+    return;
+  }
+
   const yanit = await fetch(`${API_URL}/admin/widgetlar/${id}`, {
     method: 'DELETE',
     headers: authHeaders(),

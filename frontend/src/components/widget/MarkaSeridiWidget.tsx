@@ -178,17 +178,54 @@ function LogoKartKaruseli({
   markalar: WidgetMarkaLogosu[];
 }) {
   const [baslangic, setBaslangic] = useState(0);
+  const [kaymaYonu, setKaymaYonu] = useState<'onceki' | 'sonraki' | null>(null);
+  const [kaymaAsama, setKaymaAsama] = useState<'durak' | 'cikis' | 'giris'>('durak');
   const gorunenAdet = Math.min(6, markalar.length);
+  const kayiyor = kaymaAsama !== 'durak';
   const gorunenMarkalar = Array.from({ length: gorunenAdet }, (_, sira) => {
     const markaIndeksi = (baslangic + sira) % markalar.length;
     return markalar[markaIndeksi];
   });
 
   function kaydir(yon: 'onceki' | 'sonraki') {
-    setBaslangic((mevcut) =>
-      yon === 'onceki' ? (mevcut - 1 + markalar.length) % markalar.length : (mevcut + 1) % markalar.length,
-    );
+    if (markalar.length <= 1 || kayiyor) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setBaslangic((mevcut) =>
+        yon === 'onceki'
+          ? (mevcut - 1 + markalar.length) % markalar.length
+          : (mevcut + 1) % markalar.length,
+      );
+      return;
+    }
+    setKaymaYonu(yon);
+    setKaymaAsama('cikis');
   }
+
+  function animasyonBitti() {
+    if (kaymaAsama === 'cikis' && kaymaYonu) {
+      setBaslangic((mevcut) =>
+        kaymaYonu === 'onceki'
+          ? (mevcut - 1 + markalar.length) % markalar.length
+          : (mevcut + 1) % markalar.length,
+      );
+      setKaymaAsama('giris');
+      return;
+    }
+    if (kaymaAsama === 'giris') {
+      setKaymaAsama('durak');
+      setKaymaYonu(null);
+    }
+  }
+
+  const listeSinif = [
+    'marka-kart-karusel-liste',
+    kaymaAsama === 'cikis' && kaymaYonu === 'sonraki' && 'marka-kart-karusel-liste--cikis-sol',
+    kaymaAsama === 'giris' && kaymaYonu === 'sonraki' && 'marka-kart-karusel-liste--giris-sol',
+    kaymaAsama === 'cikis' && kaymaYonu === 'onceki' && 'marka-kart-karusel-liste--cikis-sag',
+    kaymaAsama === 'giris' && kaymaYonu === 'onceki' && 'marka-kart-karusel-liste--giris-sag',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
     <>
@@ -199,41 +236,48 @@ function LogoKartKaruseli({
             type="button"
             className="marka-kart-karusel-ok"
             onClick={() => kaydir('onceki')}
+            disabled={kayiyor}
             aria-label="Önceki markalar"
           >
             ‹
           </button>
         )}
-        <div className="marka-kart-karusel-liste">
-          {gorunenMarkalar.map((m) => {
-            const icerik = m.gorselUrl ? (
-              <img src={medyaUrl(m.gorselUrl)} alt={m.ad} className="marka-kart-karusel-logo" loading="lazy" />
-            ) : (
-              <span className="marka-kart-karusel-metin">{m.ad}</span>
-            );
+        <div className="marka-kart-karusel-akis">
+          <div className={listeSinif} onAnimationEnd={animasyonBitti}>
+            {gorunenMarkalar.map((m, sira) => {
+              const icerik = m.gorselUrl ? (
+                <img src={medyaUrl(m.gorselUrl)} alt={m.ad} className="marka-kart-karusel-logo" loading="lazy" />
+              ) : (
+                <span className="marka-kart-karusel-metin">{m.ad}</span>
+              );
 
-            return m.link ? (
-              <a
-                key={`${m.id}-${baslangic}`}
-                href={m.link}
-                className="marka-kart-karusel-kart"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                {icerik}
-              </a>
-            ) : (
-              <div key={`${m.id}-${baslangic}`} className="marka-kart-karusel-kart">
-                {icerik}
-              </div>
-            );
-          })}
+              const kartSinif = 'marka-kart-karusel-kart';
+              const anahtar = `${m.id}-${baslangic}-${sira}`;
+
+              return m.link ? (
+                <a
+                  key={anahtar}
+                  href={m.link}
+                  className={kartSinif}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {icerik}
+                </a>
+              ) : (
+                <div key={anahtar} className={kartSinif}>
+                  {icerik}
+                </div>
+              );
+            })}
+          </div>
         </div>
         {markalar.length > 1 && (
           <button
             type="button"
             className="marka-kart-karusel-ok"
             onClick={() => kaydir('sonraki')}
+            disabled={kayiyor}
             aria-label="Sonraki markalar"
           >
             ›

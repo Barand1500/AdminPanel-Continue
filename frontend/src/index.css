@@ -12482,22 +12482,77 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .marka-kart-karusel {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.85rem;
   background: transparent;
-  padding: 1.5rem 1rem;
+  padding: 1.35rem 1rem;
+}
+
+.marka-kart-karusel-akis {
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 .marka-kart-karusel-liste {
-  display: grid;
+  display: flex;
   min-width: 0;
-  flex: 1;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.75rem;
+  width: 100%;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.85rem;
+  will-change: transform, opacity;
+}
+
+.marka-kart-karusel-liste--cikis-sol {
+  animation: marka-kart-kay-cikis-sol 0.32s ease forwards;
+}
+
+.marka-kart-karusel-liste--giris-sol {
+  animation: marka-kart-kay-giris-sol 0.32s ease forwards;
+}
+
+.marka-kart-karusel-liste--cikis-sag {
+  animation: marka-kart-kay-cikis-sag 0.32s ease forwards;
+}
+
+.marka-kart-karusel-liste--giris-sag {
+  animation: marka-kart-kay-giris-sag 0.32s ease forwards;
+}
+
+@keyframes marka-kart-kay-cikis-sol {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(-10%); opacity: 0; }
+}
+
+@keyframes marka-kart-kay-giris-sol {
+  from { transform: translateX(10%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes marka-kart-kay-cikis-sag {
+  from { transform: translateX(0); opacity: 1; }
+  to { transform: translateX(10%); opacity: 0; }
+}
+
+@keyframes marka-kart-kay-giris-sag {
+  from { transform: translateX(-10%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marka-kart-karusel-liste--cikis-sol,
+  .marka-kart-karusel-liste--giris-sol,
+  .marka-kart-karusel-liste--cikis-sag,
+  .marka-kart-karusel-liste--giris-sag {
+    animation: none;
+  }
 }
 
 .marka-kart-karusel-kart {
   display: flex;
+  min-width: 0;
   min-height: 5.5rem;
+  flex: 1 1 0;
   align-items: center;
   justify-content: center;
   overflow: hidden;
@@ -12530,15 +12585,16 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 
 .marka-kart-karusel-ok:hover { background: #111827; border-color: #111827; color: #fff; }
+.marka-kart-karusel-ok:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.marka-kart-karusel-ok:disabled:hover { background: #fff; border-color: #e3e8f0; color: #111827; }
 .marka-kart-karusel-ok:focus-visible { outline: 3px solid #111827; outline-offset: 3px; }
 
-@media (min-width: 640px) {
-  .marka-kart-karusel-liste { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-
 @media (min-width: 1024px) {
-  .marka-kart-karusel { padding: 2rem; }
-  .marka-kart-karusel-liste { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 1.15rem; }
+  .marka-kart-karusel { padding: 1.75rem 1.25rem; }
+  .marka-kart-karusel-liste { gap: 1.15rem; }
 }
 
 /* İletişim + harita: mevcut split düzeninin daha hafif kart detayı */
