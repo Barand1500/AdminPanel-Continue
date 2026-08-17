@@ -27,6 +27,9 @@ interface HeaderLayoutProps {
   ayarlar?: SiteAyarlari | null;
   menuAcik: boolean;
   setMenuAcik: Dispatch<SetStateAction<boolean>>;
+  /** Kurumsal hero üstüne binme: şablon değişmez, yalnızca konum/şeffaflık. */
+  heroOverlay?: boolean;
+  ustBantGoster?: boolean;
 }
 
 export function HeaderKlasik({ veri, ayarlar, menuAcik, setMenuAcik }: HeaderLayoutProps) {
@@ -363,7 +366,7 @@ export function HeaderImzaKurumsal({
   setMenuAcik,
   heroOverlay = false,
   ustBantGoster = true,
-}: HeaderLayoutProps & { heroOverlay?: boolean; ustBantGoster?: boolean }) {
+}: HeaderLayoutProps) {
   const telefon = ayarlar?.telefon?.trim();
   const email = ayarlar?.email?.trim();
   const ust = veri.header.ustBant;
@@ -530,7 +533,13 @@ export function HeaderLayoutSec(props: HeaderLayoutProps) {
     case 'seffaf-hero':
       return <HeaderSeffafHero {...props} />;
     case 'imza-kurumsal':
-      return <HeaderImzaKurumsal {...props} />;
+      return (
+        <HeaderImzaKurumsal
+          {...props}
+          heroOverlay={props.heroOverlay}
+          ustBantGoster={props.ustBantGoster}
+        />
+      );
     case 'yuzen-hap':
       return <HeaderYuzenHap {...props} />;
     case 'masthead':

@@ -1,11 +1,4 @@
-import {
-  createContext,
-  useCallback,
-  useContext,
-  useMemo,
-  useState,
-  type ReactNode,
-} from 'react';
+import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import type { KurumsalHeroYukseklik } from '@/types/kurumsalHero';
 
 export interface KurumsalHeroOverlayState {
@@ -27,27 +20,20 @@ const VARSAYILAN: KurumsalHeroOverlayState = {
 
 const KurumsalHeroOverlayContext = createContext<KurumsalHeroOverlayContextValue | null>(null);
 
-export function KurumsalHeroOverlayProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<KurumsalHeroOverlayState>(VARSAYILAN);
-
-  const activate = useCallback(
-    (opts: { yukseklik?: KurumsalHeroYukseklik; ustBantGoster?: boolean }) => {
-      setState({
-        active: true,
-        yukseklik: opts.yukseklik ?? '85vh',
-        ustBantGoster: opts.ustBantGoster ?? true,
-      });
-    },
-    []
-  );
-
-  const deactivate = useCallback(() => {
-    setState(VARSAYILAN);
-  }, []);
-
-  const value = useMemo(
-    () => ({ ...state, activate, deactivate }),
-    [state, activate, deactivate]
+export function KurumsalHeroOverlayProvider({
+  children,
+  durum = VARSAYILAN,
+}: {
+  children: ReactNode;
+  durum?: KurumsalHeroOverlayState;
+}) {
+  const value = useMemo<KurumsalHeroOverlayContextValue>(
+    () => ({
+      ...durum,
+      activate: () => {},
+      deactivate: () => {},
+    }),
+    [durum]
   );
 
   return (

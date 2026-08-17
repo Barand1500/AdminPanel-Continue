@@ -1,4 +1,4 @@
-import { useMemo, useEffect } from 'react';
+import { useMemo } from 'react';
 import { Outlet, useMatches } from 'react-router-dom';
 import { SayfaModalProvider } from '@/contexts/SayfaModalContext';
 import { SiteDilProvider } from '@/contexts/SiteDilContext';
@@ -24,7 +24,7 @@ import { EklentiYukleyici } from '@/components/ortak/eklentiler/EklentiYukleyici
 import { useAktifEklentiler } from '@/hooks/useAktifEklentiler';
 import { KonumluSliderKatman } from '@/components/konumluSlider/KonumluSliderKatman';
 import { useAktifSayfaId } from '@/hooks/useAktifSayfaId';
-import { KurumsalHeroOverlayProvider, useKurumsalHeroOverlay } from '@/contexts/KurumsalHeroOverlayContext';
+import { KurumsalHeroOverlayProvider } from '@/contexts/KurumsalHeroOverlayContext';
 import {
   kurumsalHeroOverlayAyarlariBul,
   kurumsalHeroSayfaWidgetBul,
@@ -47,21 +47,18 @@ function SiteLayoutIcerik() {
   const aktifEklentiler = useAktifEklentiler(veri);
   const aktifSayfaId = useAktifSayfaId(veri.sayfalar);
   const konumluSliderlar = veri.konumluSliderlar ?? [];
-  const overlay = useKurumsalHeroOverlay();
 
   const kurumsalHeroSayfa = useMemo(
     () => kurumsalHeroSayfaWidgetBul(veri.widgetlar, aktifSayfaId),
     [veri.widgetlar, aktifSayfaId]
   );
-
-  useEffect(() => {
+  const overlay = useMemo(() => {
     const ayar = kurumsalHeroOverlayAyarlariBul(kurumsalHeroSayfa);
     if (!ayar) {
-      overlay.deactivate();
-      return;
+      return { active: false as const, yukseklik: '85vh' as const, ustBantGoster: true };
     }
-    overlay.activate(ayar);
-  }, [kurumsalHeroSayfa, overlay.activate, overlay.deactivate]);
+    return { active: true as const, yukseklik: ayar.yukseklik, ustBantGoster: ayar.ustBantGoster };
+  }, [kurumsalHeroSayfa]);
 
   useSiteTemaUygula(site.ayarlar, site.ad);
 
@@ -88,6 +85,7 @@ function SiteLayoutIcerik() {
   }
 
   return (
+    <KurumsalHeroOverlayProvider durum={overlay}>
     <SiteDilProvider ayarlar={site.ayarlar} sayfalar={veri.sayfalar} navKategoriler={veri.navKategoriler}>
       <SiteScriptEnjektor scriptAyarlari={sistem.scriptAyarlari} />
       <SeoYonlendirmeKontrol yonlendirmeler={veri.seoYonlendirmeler} />
@@ -139,6 +137,7 @@ function SiteLayoutIcerik() {
         <EklentiYukleyici aktifEklentiler={aktifEklentiler} />
       </div>
     </SiteDilProvider>
+    </KurumsalHeroOverlayProvider>
   );
 }
 
@@ -147,9 +146,7 @@ export function SiteLayout() {
     <SiteTemaProvider>
       <SiteAuthProvider>
         <SayfaModalProvider>
-          <KurumsalHeroOverlayProvider>
-            <SiteLayoutIcerik />
-          </KurumsalHeroOverlayProvider>
+          <SiteLayoutIcerik />
         </SayfaModalProvider>
       </SiteAuthProvider>
     </SiteTemaProvider>
