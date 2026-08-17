@@ -98,6 +98,9 @@ export interface FooterTipEkAyarlari {
   newsletterButon?: string;
   kompaktKoyuTema?: boolean;
   guvenVurgu?: boolean;
+  ctaMetni?: string;
+  ctaLink?: string;
+  ctaAltMetin?: string;
 }
 
 export interface FooterAyarlari {

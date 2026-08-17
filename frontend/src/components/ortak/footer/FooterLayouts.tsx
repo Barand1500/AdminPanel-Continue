@@ -4,6 +4,7 @@ import { footerSemaGridSinifi } from '@/types/footer';
 import { FooterNavLink } from '@/components/ortak/FooterNavLink';
 import { footerLinkIkonGoster } from '@/types/footer';
 import type { FooterBirlesik, CevirFn } from './FooterOrtakParcalar';
+import { SosyalMedyaIkonSatirlari } from '@/components/ortak/SosyalMedyaIkon';
 import {
   FooterMarka,
   FooterKolonlar,
@@ -165,6 +166,110 @@ function FooterLayoutDetayli({ siteAdi, ayarlar, footer, cevir }: FooterLayoutPr
   );
 }
 
+function FooterLayoutSplit({ siteAdi, ayarlar, footer, cevir }: FooterLayoutProps) {
+  return (
+    <>
+      <div className="container-site py-8 lg:py-10">
+        <div className="footer-split-ic">
+          <div className="footer-split-marka">
+            <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} cevir={cevir} />
+          </div>
+          <div className="footer-split-kolonlar">
+            <FooterKolonlar footer={footer} cevir={cevir} />
+          </div>
+        </div>
+      </div>
+      <FooterTelifBand siteAdi={siteAdi} ayarlar={ayarlar} cevir={cevir} />
+    </>
+  );
+}
+
+function FooterLayoutCtaSerit({ siteAdi, ayarlar, footer, cevir }: FooterLayoutProps) {
+  const ek = footer.tipEk;
+  const baslik = ek?.ctaMetni?.trim() || 'Projenizi konuşalım';
+  const alt = ek?.ctaAltMetin?.trim() || '';
+  const buton = ek?.newsletterButon?.trim() || 'İletişime geç';
+  const href = ek?.ctaLink?.trim() || '/iletisim';
+  const linkIkon = footerLinkIkonGoster(footer.linkIkon);
+  const linkler = footerDuzLinkler(footer).slice(0, 8);
+
+  return (
+    <>
+      <div className="footer-cta-serit">
+        <div className="container-site footer-cta-serit-ic">
+          <div className="footer-cta-serit-metin">
+            {alt ? <p className="footer-cta-serit-alt">{alt}</p> : null}
+            <h3 className="footer-cta-serit-baslik">{baslik}</h3>
+          </div>
+          <FooterNavLink
+            link={{ id: 'footer-cta', ad: buton, link: href, yeniSekme: false, aktif: true, sira: 0 }}
+            ikon={null}
+            className="footer-cta-serit-btn"
+            cevir={cevir}
+          />
+        </div>
+      </div>
+      <div className="container-site py-6">
+        <div className="footer-cta-alt flex flex-col items-center gap-4 sm:flex-row sm:justify-between">
+          <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} cevir={cevir} kompakt />
+          {linkler.length > 0 && (
+            <nav className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
+              {linkler.map((l) => (
+                <FooterNavLink key={l.id} link={l} ikon={linkIkon} cevir={cevir} />
+              ))}
+            </nav>
+          )}
+        </div>
+      </div>
+      <FooterTelifBand siteAdi={siteAdi} ayarlar={ayarlar} cevir={cevir} />
+    </>
+  );
+}
+
+function FooterLayoutSosyalSahne({ siteAdi, ayarlar, footer, cevir }: FooterLayoutProps) {
+  const sosyal = ayarlar?.sosyalMedyaJson ?? {};
+  const markaFooter = {
+    ...footer,
+    marka: { ...footer.marka, sosyalGoster: false },
+  };
+  const linkIkon = footerLinkIkonGoster(footer.linkIkon);
+  const linkler = footerDuzLinkler(footer).slice(0, 5);
+
+  return (
+    <>
+      <div className="container-site footer-sosyal-sahne">
+        <p className="footer-sosyal-sahne-etiket">{cevir('site.biziTakipEdin', 'Bizi takip edin')}</p>
+        <SosyalMedyaIkonSatirlari sosyal={sosyal} ikonSinifi="h-11 w-11" className="footer-sosyal-sahne-ikonlar" />
+        <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={markaFooter} cevir={cevir} kompakt />
+        {linkler.length > 0 && (
+          <nav className="footer-sosyal-sahne-linkler">
+            {linkler.map((l) => (
+              <FooterNavLink key={l.id} link={l} ikon={linkIkon} cevir={cevir} />
+            ))}
+          </nav>
+        )}
+      </div>
+      <FooterTelifBand siteAdi={siteAdi} ayarlar={ayarlar} cevir={cevir} />
+    </>
+  );
+}
+
+function FooterLayoutKartlar({ siteAdi, ayarlar, footer, cevir }: FooterLayoutProps) {
+  return (
+    <>
+      <div className="container-site py-10">
+        <div className="footer-kartlar-grid">
+          <div className="footer-kart footer-kart--marka">
+            <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} cevir={cevir} />
+          </div>
+          <FooterKolonlar footer={footer} cevir={cevir} />
+        </div>
+      </div>
+      <FooterTelifBand siteAdi={siteAdi} ayarlar={ayarlar} cevir={cevir} />
+    </>
+  );
+}
+
 export function FooterLayoutSec(props: FooterLayoutProps) {
   const tip = footerTipiNormalize(props.footer.footerTipi);
   switch (tip) {
@@ -182,6 +287,14 @@ export function FooterLayoutSec(props: FooterLayoutProps) {
       return <FooterLayoutKurumsal {...props} />;
     case 'detayli':
       return <FooterLayoutDetayli {...props} />;
+    case 'split':
+      return <FooterLayoutSplit {...props} />;
+    case 'cta-serit':
+      return <FooterLayoutCtaSerit {...props} />;
+    case 'sosyal-sahne':
+      return <FooterLayoutSosyalSahne {...props} />;
+    case 'kartlar':
+      return <FooterLayoutKartlar {...props} />;
     default:
       return <FooterLayoutKlasik {...props} />;
   }

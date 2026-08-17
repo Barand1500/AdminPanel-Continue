@@ -86,6 +86,76 @@ export function FooterTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: FooterTipEk
           onDegistir={(kompaktKoyuTema) => guncelle({ kompaktKoyuTema })}
         />
       )}
+
+      {tip === 'split' && (
+        <div className="ap-header-form-grid">
+          <RenkSecici
+            etiket="Sol panel rengi"
+            deger={tipEk.arkaPlanRengi ?? ''}
+            varsayilan="#0f172a"
+            onChange={(arkaPlanRengi) => guncelle({ arkaPlanRengi })}
+          />
+          <RenkSecici
+            etiket="Sol panel yazı rengi"
+            deger={tipEk.metinRengi ?? ''}
+            varsayilan="#ffffff"
+            onChange={(metinRengi) => guncelle({ metinRengi })}
+          />
+        </div>
+      )}
+
+      {tip === 'cta-serit' && (
+        <div className="ap-header-form-grid">
+          <FormAlani etiket="Çağrı başlığı">
+            <input
+              type="text"
+              className={formInputSinifi}
+              value={tipEk.ctaMetni ?? ''}
+              onChange={(e) => guncelle({ ctaMetni: e.target.value })}
+              placeholder="Projenizi konuşalım"
+            />
+          </FormAlani>
+          <FormAlani etiket="Alt metin">
+            <input
+              type="text"
+              className={formInputSinifi}
+              value={tipEk.ctaAltMetin ?? ''}
+              onChange={(e) => guncelle({ ctaAltMetin: e.target.value })}
+              placeholder="Ücretsiz keşif görüşmesi"
+            />
+          </FormAlani>
+          <FormAlani etiket="Buton metni">
+            <input
+              type="text"
+              className={formInputSinifi}
+              value={tipEk.newsletterButon ?? ''}
+              onChange={(e) => guncelle({ newsletterButon: e.target.value })}
+              placeholder="İletişime geç"
+            />
+          </FormAlani>
+          <FormAlani etiket="Buton linki">
+            <input
+              type="text"
+              className={formInputSinifi}
+              value={tipEk.ctaLink ?? ''}
+              onChange={(e) => guncelle({ ctaLink: e.target.value })}
+              placeholder="/iletisim"
+            />
+          </FormAlani>
+          <RenkSecici
+            etiket="Bant rengi"
+            deger={tipEk.arkaPlanRengi ?? ''}
+            varsayilan="#2563eb"
+            onChange={(arkaPlanRengi) => guncelle({ arkaPlanRengi })}
+          />
+          <RenkSecici
+            etiket="Bant yazı rengi"
+            deger={tipEk.metinRengi ?? ''}
+            varsayilan="#ffffff"
+            onChange={(metinRengi) => guncelle({ metinRengi })}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -9,6 +9,10 @@ export const FOOTER_TIPLERI = [
   'newsletter',
   'kompakt',
   'detayli',
+  'split',
+  'cta-serit',
+  'sosyal-sahne',
+  'kartlar',
 ] as const;
 
 export type FooterTipi = (typeof FOOTER_TIPLERI)[number];
@@ -104,6 +108,46 @@ export const FOOTER_TIP_TANIMLARI: FooterTipTanimi[] = [
     kolonlar: true,
     ekAyarlari: false,
   },
+  {
+    id: 'split',
+    ad: 'Split Vitrin',
+    aciklama:
+      'Sol taraf renkli marka paneli, sağ taraf link kolonları. Eşit ızgara yerine ikiye bölünmüş bir sahne; stüdyo ve yazılım sitelerine yakışır.',
+    ilham: 'Stripe',
+    semaGoster: false,
+    kolonlar: true,
+    ekAyarlari: true,
+  },
+  {
+    id: 'cta-serit',
+    ad: 'Çağrı Bandı',
+    aciklama:
+      'Üstte tam genişlik renkli çağrı şeridi ve buton, altında ince link satırı. Bülten formu değil; ziyaretçiyi tek bir aksiyona çeker.',
+    ilham: 'Webflow',
+    semaGoster: false,
+    kolonlar: true,
+    ekAyarlari: true,
+  },
+  {
+    id: 'sosyal-sahne',
+    ad: 'Sosyal Sahne',
+    aciklama:
+      'Ortada büyük sosyal ikonlar, altında küçük marka. Kolon yok; yaratıcı ajans ve kişisel marka sitelerinde öne çıkar.',
+    ilham: 'Behance',
+    semaGoster: false,
+    kolonlar: false,
+    ekAyarlari: false,
+  },
+  {
+    id: 'kartlar',
+    ad: 'Kart \u0130zgara',
+    aciklama:
+      'Marka ve her kolon ayrı yuvarlak kartta durur. Düz sütunlardan farklı, kutu kutu bir düzen; hizmet sitelerinde okunur.',
+    ilham: 'Notion',
+    semaGoster: false,
+    kolonlar: true,
+    ekAyarlari: false,
+  },
 ];
 
 export function footerTipiNormalize(tip?: string | null): FooterTipi {
@@ -127,6 +171,16 @@ export function varsayilanFooterTipEk(tip: FooterTipi): FooterTipEkAyarlari {
   switch (tip) {
     case 'newsletter':
       return { ...ortak, newsletterBaslik: 'Yeniliklerden haberdar olun', newsletterButon: 'Kaydol' };
+    case 'cta-serit':
+      return {
+        ...ortak,
+        ctaMetni: 'Projenizi konuşalım',
+        ctaLink: '/iletisim',
+        ctaAltMetin: 'Ücretsiz keşif görüşmesi',
+        newsletterButon: 'İletişime geç',
+      };
+    case 'split':
+      return { ...ortak, arkaPlanRengi: '#0f172a', metinRengi: '#ffffff' };
     case 'kurumsal':
       return {
         ...ortak,

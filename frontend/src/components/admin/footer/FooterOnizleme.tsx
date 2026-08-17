@@ -2,7 +2,7 @@ import { useMemo } from 'react';
 import type { CSSProperties } from 'react';
 import type { SiteAyarlari } from '@/types/site';
 import type { FooterAyarlari } from '@/types/footer';
-import { footerTipiNormalize } from '@/data/footerTipleri';
+import { footerTipiNormalize, varsayilanFooterTipEk } from '@/data/footerTipleri';
 import { footerTipDemoPaketi } from '@/data/footerTipDemoVerisi';
 import { SiteFooter } from '@/components/ortak/SiteFooter';
 import { AdminPanelKarti } from '@/components/admin/ortak/AdminBilesenleri';
@@ -50,6 +50,7 @@ export function FooterOnizleme({
       sosyalMedyaJson: demo.sosyalMedya,
       footerAyarlariJson: {
         ...footer,
+        tipEk: varsayilanFooterTipEk(tip),
         kolonlar: demo.kolonlar,
         pazaryeri: {
           aktif: demo.pazaryeri.length > 0,

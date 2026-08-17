@@ -53,7 +53,20 @@ const eskiYuzucuButonlarSchema = z.object({
 
 export const footerAyarlariSchema = z.object({
   footerTipi: z
-    .enum(['klasik', 'sade', 'kurumsal', 'magaza', 'merkezi', 'newsletter', 'kompakt', 'detayli'])
+    .enum([
+      'klasik',
+      'sade',
+      'kurumsal',
+      'magaza',
+      'merkezi',
+      'newsletter',
+      'kompakt',
+      'detayli',
+      'split',
+      'cta-serit',
+      'sosyal-sahne',
+      'kartlar',
+    ])
     .optional(),
   tipEk: z
     .object({
@@ -62,6 +75,13 @@ export const footerAyarlariSchema = z.object({
       newsletterButon: z.string().max(40).optional(),
       kompaktKoyuTema: z.boolean().optional(),
       guvenVurgu: z.boolean().optional(),
+      arkaPlanRengi: z.string().max(20).optional(),
+      altBantRengi: z.string().max(20).optional(),
+      metinRengi: z.string().max(20).optional(),
+      ikonArkaPlanRengi: z.string().max(20).optional(),
+      ctaMetni: z.string().max(120).optional(),
+      ctaLink: z.string().max(500).optional(),
+      ctaAltMetin: z.string().max(160).optional(),
     })
     .optional(),
   sema: z.enum(['dort-kolon', 'uc-kolon', 'iki-kolon', 'merkezi']),
