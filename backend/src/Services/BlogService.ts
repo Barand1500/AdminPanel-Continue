@@ -11,6 +11,26 @@ function slugOlustur(baslik: string) {
     .replace(/\s+/g, '-');
 }
 
+function linktenSlug(link?: string | null): string | null {
+  if (!link?.trim()) return null;
+  const temiz = link
+    .trim()
+    .toLowerCase()
+    .replace(/^\/blog\//, '')
+    .replace(/^#+$/, '');
+  if (!temiz) return null;
+  return temiz.replace(/[^a-z0-9-]/g, '');
+}
+
+interface KaruselBlogKart {
+  id?: string;
+  baslik?: string;
+  gorselUrl?: string;
+  link?: string;
+  ozet?: string;
+  kategori?: string;
+}
+
 export class BlogService {
   async listeleAdmin(siteId: number) {
     return blogRepo.findAdminBySiteId(siteId);
@@ -74,5 +94,35 @@ export class BlogService {
     const mevcut = await blogRepo.findByIdAndSiteId(blogId, siteId);
     if (!mevcut) throw new Error('Blog yazisi bulunamadi');
     await blogRepo.deleteForSite(blogId, siteId);
+  }
+
+  /** Blog karusel widget kartlarını Blog & Haberler modülüne yazar (upsert). */
+  async karuselKartlariniSenkronizeEt(siteId: number, kartlar: KaruselBlogKart[]) {
+    for (const kart of kartlar) {
+      const baslik = kart.baslik?.trim();
+      if (!baslik) continue;
+
+      const slug = linktenSlug(kart.link) ?? slugOlustur(baslik);
+      if (!slug) continue;
+
+      const mevcut = await blogRepo.findBySlugAndSiteId(siteId, slug);
+      const veri = {
+        baslik,
+        slug,
+        ozet: kart.ozet?.trim() || baslik,
+        icerik: kart.ozet?.trim()
+          ? `<p>${kart.ozet.trim()}</p>`
+          : `<p>${baslik}</p>`,
+        kapakGorsel: kart.gorselUrl?.trim() || null,
+        kategori: kart.kategori?.trim() || null,
+        yayinda: true,
+      };
+
+      if (mevcut) {
+        await blogRepo.updateForSite(mevcut.id, veri);
+      } else {
+        await blogRepo.createForSite(siteId, veri);
+      }
+    }
   }
 }

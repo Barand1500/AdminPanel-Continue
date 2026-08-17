@@ -1,9 +1,11 @@
 import { useOutletContext } from 'react-router-dom';
 import type { SitePublicData } from '@/types/site';
 import { BlogKart } from '@/components/blog/BlogKart';
+import { siteBlogYazilariHazirla } from '@/utils/blogKaruselYardimci';
 
 export function BlogSayfasi() {
-  const { bloglar } = useOutletContext<SitePublicData>();
+  const { bloglar, widgetlar } = useOutletContext<SitePublicData>();
+  const gosterilecekBloglar = siteBlogYazilariHazirla(bloglar, widgetlar);
 
   return (
     <>
@@ -21,7 +23,7 @@ export function BlogSayfasi() {
 
       <section className="py-16">
         <div className="container-site">
-          {bloglar.length === 0 ? (
+          {gosterilecekBloglar.length === 0 ? (
             <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 py-16 text-center">
               <p className="text-4xl">📰</p>
               <p className="mt-4 text-lg font-semibold text-slate-700">Henüz yayınlanmış yazı yok</p>
@@ -29,7 +31,7 @@ export function BlogSayfasi() {
             </div>
           ) : (
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {bloglar.map((yazi) => (
+              {gosterilecekBloglar.map((yazi) => (
                 <BlogKart key={yazi.id} yazi={yazi} />
               ))}
             </div>

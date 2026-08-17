@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
 import type { Kategori } from '@/data/kategoriler';
 import { useHeaderVeri } from './header/useHeaderVeri';
-import { HeaderLayoutSec, HeaderOverlayKurumsal } from './header/HeaderLayouts';
+import { HeaderImzaKurumsal, HeaderLayoutSec, HeaderOverlayKurumsal } from './header/HeaderLayouts';
 import { useKurumsalHeroOverlay } from '@/contexts/KurumsalHeroOverlayContext';
 
 interface SiteHeaderProps {
@@ -16,6 +16,19 @@ export function SiteHeader({ siteAdi: _siteAdi, ayarlar, menuOgeleri, kategorile
   const [menuAcik, setMenuAcik] = useState(false);
   const veri = useHeaderVeri({ ayarlar, menuOgeleri, kategoriler });
   const overlay = useKurumsalHeroOverlay();
+
+  if (veri.headerTipi === 'imza-kurumsal') {
+    return (
+      <HeaderImzaKurumsal
+        veri={veri}
+        ayarlar={ayarlar}
+        menuAcik={menuAcik}
+        setMenuAcik={setMenuAcik}
+        heroOverlay={overlay.active}
+        ustBantGoster={overlay.active ? overlay.ustBantGoster : true}
+      />
+    );
+  }
 
   if (overlay.active) {
     return (

@@ -10,6 +10,7 @@ import { FormRepository } from '../Infrastructure/repositories/FormRepository.js
 import { SeoYonlendirmeRepository } from '../Infrastructure/repositories/SeoYonlendirmeRepository.js';
 import { KonumluSliderRepository } from '../Infrastructure/repositories/KonumluSliderRepository.js';
 import { EklentiService } from './EklentiService.js';
+import { BlogService } from './BlogService.js';
 import {
   sistemAyariSatirdanJson,
   sistemAyarlariJsonCozKayit,
@@ -27,6 +28,13 @@ const yonlendirmeRepo = new SeoYonlendirmeRepository();
 const konumluSliderRepo = new KonumluSliderRepository();
 const sistemAyariRepo = new SistemAyariRepository();
 const eklentiService = new EklentiService();
+const blogService = new BlogService();
+
+function blogKaruselKartlari(configJson: unknown): Array<Record<string, unknown>> {
+  if (!configJson || typeof configJson !== 'object') return [];
+  const kartlar = (configJson as { blogKartlari?: unknown }).blogKartlari;
+  return Array.isArray(kartlar) ? (kartlar as Array<Record<string, unknown>>) : [];
+}
 
 function sayfaPublicUrl(slug: string): string {
   if (slug === 'anasayfa' || slug === 'home') return '/';
@@ -57,7 +65,7 @@ export class SiteService {
 
     await sayfaService.hiyerarsiOnar(site.id);
 
-    const [sayfalar, widgetlar, konumluSliderlar, bloglar, navKategoriler, formlar, seoYonlendirmeler, sistemSatiri] = await Promise.all([
+    const [sayfalar, widgetlar, konumluSliderlar, bloglarHam, navKategoriler, formlar, seoYonlendirmeler, sistemSatiri] = await Promise.all([
       sayfaRepo.findBySiteId(site.id),
       widgetRepo.findBySiteId(site.id),
       konumluSliderRepo.findPublicBySiteId(site.id),
@@ -67,6 +75,20 @@ export class SiteService {
       yonlendirmeRepo.findPublicBySiteId(site.id),
       sistemAyariRepo.findBySiteId(site.id),
     ]);
+
+    let bloglar = bloglarHam;
+    if (bloglar.length === 0) {
+      const karusel = widgetlar.find((w) => w.tip === 'BLOG_KARUSEL' && w.aktif);
+      const kartlar = karusel ? blogKaruselKartlari(karusel.configJson) : [];
+      if (kartlar.length > 0) {
+        try {
+          await blogService.karuselKartlariniSenkronizeEt(site.id, kartlar as never);
+          bloglar = await blogRepo.findPublicBySiteId(site.id);
+        } catch (err) {
+          console.error('[SiteService] blog karusel senkron hatasi:', err instanceof Error ? err.message : err);
+        }
+      }
+    }
 
     const sistemAyarlariJson = publicSistemAyarlari(
       site.siteAyarlari,

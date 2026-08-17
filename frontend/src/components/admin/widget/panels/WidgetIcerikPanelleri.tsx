@@ -355,10 +355,52 @@ export function ReferanslarIcerik({ form, onChange }: WidgetPanelProps) {
 export function BlogKaruselIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const kartlar = cfg.blogKartlari ?? [];
+  const otomatikKaynak = cfg.blogKaynagi !== 'manuel';
   return (
     <>
       <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
-      <AdminFormBolumu baslik="Blog kartları">
+      <AdminFormBolumu
+        baslik="Blog kaynağı"
+        aciklama="Kartlar Blog & Haberler modülüne kaydedilir; karusel ve /blog sayfası aynı yazıları gösterir."
+      >
+        <SecimAlani
+          etiket="Kart kaynağı"
+          deger={otomatikKaynak ? 'otomatik' : 'manuel'}
+          secenekler={[
+            { id: 'otomatik', etiket: 'Blog & Haberler (otomatik)' },
+            { id: 'manuel', etiket: 'Manuel kartlar' },
+          ]}
+          onChange={(v) =>
+            onChange(
+              configGuncelle(form, (c) => ({
+                ...c,
+                blogKaynagi: v === 'manuel' ? 'manuel' : 'otomatik',
+              })),
+            )
+          }
+        />
+        {otomatikKaynak && (
+          <FormAlani etiket="Gösterilecek yazı adedi">
+            <input
+              type="number"
+              min={1}
+              max={12}
+              className={formInputSinifi}
+              value={cfg.blogAdet ?? 6}
+              onChange={(e) =>
+                onChange(
+                  configGuncelle(form, (c) => ({
+                    ...c,
+                    blogAdet: Math.max(1, Math.min(12, Number(e.target.value) || 6)),
+                  })),
+                )
+              }
+            />
+          </FormAlani>
+        )}
+      </AdminFormBolumu>
+      {!otomatikKaynak && (
+      <AdminFormBolumu baslik="Manuel blog kartları">
       <ListeSiralayici<WidgetBlogKart>
         ogeler={kartlar}
         onDegistir={(k) => onChange(configGuncelle(form, (c) => ({ ...c, blogKartlari: k })))}
@@ -397,6 +439,7 @@ export function BlogKaruselIcerik({ form, onChange }: WidgetPanelProps) {
         )}
       />
     </AdminFormBolumu>
+      )}
     </>
   );
 }

@@ -71,7 +71,7 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
       case 'SITE_HAKKINDA':
         return <SiteHakkindaWidget widget={widget} />;
       case 'BLOG_KARUSEL':
-        return <BlogKaruselWidget widget={widget} />;
+        return <BlogKaruselWidget widget={widget} onizleme={onizleme} />;
       case 'LINK_KARTLARI':
         return <LinkKartlariWidget widget={widget} />;
       case 'GORSEL_GRID_BLOK':

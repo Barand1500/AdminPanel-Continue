@@ -50,6 +50,10 @@ export class BlogRepository {
     return prisma.blogYazisi.findFirst({ where: { id, siteId } });
   }
 
+  async findBySlugAndSiteId(siteId: number, slug: string) {
+    return prisma.blogYazisi.findFirst({ where: { siteId, slug } });
+  }
+
   async createForSite(siteId: number, data: Omit<Prisma.BlogYazisiUncheckedCreateInput, 'siteId'>) {
     return prisma.blogYazisi.create({ data: { ...data, siteId } });
   }

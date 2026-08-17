@@ -760,6 +760,25 @@ body:has(.site-public)::-webkit-scrollbar,
   --imza-btn-text: #0b2a77;
 }
 
+.site-header-imza-shell--hero-overlay {
+  pointer-events: none;
+}
+
+.site-header-imza-shell--hero-overlay > * {
+  pointer-events: auto;
+}
+
+.site-header-imza-shell--hero-overlay .site-header-imza-ust {
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+  background: rgb(15 23 42 / 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.site-header-imza-shell--hero-overlay .site-header-imza-kurumsal {
+  background: linear-gradient(180deg, rgb(15 23 42 / 0.45) 0%, rgb(15 23 42 / 0.15) 100%);
+  backdrop-filter: blur(4px);
+}
+
 .site-header-imza-ust {
   background: var(--imza-ust);
   color: var(--imza-metin, #fff);
@@ -876,6 +895,21 @@ body:has(.site-public)::-webkit-scrollbar,
 .site-header-imza-nav .site-menu-dropdown-acik > .site-header-imza-link {
   color: #fff !important;
   border-bottom-color: rgb(255 255 255 / 0.75);
+}
+
+.site-header-imza-kurumsal .site-menu-dropdown-tetik {
+  color: rgb(255 255 255 / 0.92) !important;
+}
+
+.site-header-imza-kurumsal .site-menu-dropdown-acik .site-menu-dropdown-tetik,
+.site-header-imza-kurumsal .site-menu-dropdown:hover .site-menu-dropdown-tetik {
+  color: #fff !important;
+  border-bottom-color: rgb(255 255 255 / 0.75);
+}
+
+.site-header-imza-kurumsal .site-menu-dropdown-panel {
+  border: 1px solid rgb(15 23 42 / 0.08);
+  box-shadow: 0 14px 30px rgb(15 23 42 / 0.18);
 }
 
 .site-header-imza-katalog {
@@ -6626,6 +6660,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   gap: 1rem;
   max-width: 74rem;
   margin: 0 auto;
+  align-items: start;
 }
 
 @media (min-width: 720px) {
@@ -6687,8 +6722,8 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   justify-content: center;
   min-height: 4.85rem;
   padding: 0.9rem 1.25rem;
-  border-top: 1px solid color-mix(in srgb, var(--yk-vurgu, #111827) 12%, #e5e7eb);
-  background: color-mix(in srgb, var(--yk-vurgu, #111827) 5%, #fff);
+  border-top: 1px solid #e5e7eb;
+  background: #fff;
 }
 
 .yk-yazar {

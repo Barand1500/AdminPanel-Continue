@@ -110,12 +110,14 @@ function mockConfig(tip: string): WidgetConfig {
       };
     case 'BLOG_KARUSEL':
       return {
+        blogKaynagi: 'otomatik',
+        blogAdet: 6,
         blogKartlari: [
-          { id: id(), baslik: 'Yeni Ürün Lansmanı', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Devamını Oku', tarih: '11 Ağustos 2026', kategori: 'Teknoloji', ozet: 'Yeni nesil ürünümüz piyasaya çıktı.' },
-          { id: id(), baslik: 'Sektör Trendleri 2026', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Devamını Oku', tarih: '08 Ağustos 2026', kategori: 'Analiz', ozet: '2026 yılında öne çıkan teknoloji trendleri.' },
-          { id: id(), baslik: 'Müşteri Başarı Hikayesi', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Devamını Oku', tarih: '04 Ağustos 2026', kategori: 'Teknoloji', ozet: 'Kurumsal müşterimizin dijital dönüşüm yolculuğu.' },
-          { id: id(), baslik: 'E-Ticaret Rehberi', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Devamını Oku', tarih: '30 Temmuz 2026', kategori: 'Rehber', ozet: 'Online satışa başlamak için adım adım kılavuz.' },
-          { id: id(), baslik: 'Güvenlik İpuçları', gorselUrl: ONIZLEME_GORSEL, link: '#', butonMetni: 'Devamını Oku', tarih: '25 Temmuz 2026', kategori: 'Analiz', ozet: 'Siber güvenlik için temel öneriler.' },
+          { id: id(), baslik: 'Yeni Ürün Lansmanı', gorselUrl: ONIZLEME_GORSEL, link: '/blog/yeni-urun-lansmani', butonMetni: 'Devamını Oku', tarih: '11 Ağustos 2026', kategori: 'Teknoloji', ozet: 'Yeni nesil ürünümüz piyasaya çıktı.' },
+          { id: id(), baslik: 'Sektör Trendleri 2026', gorselUrl: ONIZLEME_GORSEL, link: '/blog/sektor-trendleri-2026', butonMetni: 'Devamını Oku', tarih: '08 Ağustos 2026', kategori: 'Analiz', ozet: '2026 yılında öne çıkan teknoloji trendleri.' },
+          { id: id(), baslik: 'Müşteri Başarı Hikayesi', gorselUrl: ONIZLEME_GORSEL, link: '/blog/musteri-basari-hikayesi', butonMetni: 'Devamını Oku', tarih: '04 Ağustos 2026', kategori: 'Teknoloji', ozet: 'Kurumsal müşterimizin dijital dönüşüm yolculuğu.' },
+          { id: id(), baslik: 'E-Ticaret Rehberi', gorselUrl: ONIZLEME_GORSEL, link: '/blog/e-ticaret-rehberi', butonMetni: 'Devamını Oku', tarih: '30 Temmuz 2026', kategori: 'Rehber', ozet: 'Online satışa başlamak için adım adım kılavuz.' },
+          { id: id(), baslik: 'Güvenlik İpuçları', gorselUrl: ONIZLEME_GORSEL, link: '/blog/guvenlik-ipuclari', butonMetni: 'Devamını Oku', tarih: '25 Temmuz 2026', kategori: 'Analiz', ozet: 'Siber güvenlik için temel öneriler.' },
         ],
         filtreler: ['Teknoloji', 'Analiz', 'Rehber'],
         tumunuGorMetin: 'Tümünü Gör',
@@ -616,7 +618,15 @@ function configBirlestir(mevcut: WidgetConfig, mock: WidgetConfig, tip?: string)
   sonuc.sorular = dizi(sonuc.sorular, mock.sorular ?? []);
   sonuc.referanslar = dizi(sonuc.referanslar, mock.referanslar ?? []);
   sonuc.linkler = dizi(sonuc.linkler, mock.linkler ?? []);
-  sonuc.blogKartlari = dizi(sonuc.blogKartlari, mock.blogKartlari ?? []);
+  if (tip !== 'BLOG_KARUSEL') {
+    sonuc.blogKartlari = dizi(sonuc.blogKartlari, mock.blogKartlari ?? []);
+  } else if (sonuc.blogKaynagi !== 'manuel') {
+    sonuc.blogKaynagi = 'otomatik';
+    sonuc.blogAdet = sonuc.blogAdet ?? mock.blogAdet ?? 6;
+    sonuc.blogKartlari = dizi([], mock.blogKartlari ?? []);
+  } else {
+    sonuc.blogKartlari = dizi(sonuc.blogKartlari, mock.blogKartlari ?? []);
+  }
   sonuc.gridKartlar = dizi(sonuc.gridKartlar, mock.gridKartlar ?? []);
   sonuc.etiketKartlar = dizi(sonuc.etiketKartlar, mock.etiketKartlar ?? []);
   sonuc.uyeler = dizi(sonuc.uyeler, mock.uyeler ?? []);
@@ -814,6 +824,15 @@ export function widgetFormMockUygula(form: WidgetFormDegeri): WidgetFormDegeri {
     if (!configJson.sirketAnlikSaat?.trim()) {
       configJson = { ...configJson, sirketAnlikSaat: saat };
     }
+  }
+
+  if (form.tip === 'BLOG_KARUSEL' && configJson.blogKaynagi !== 'manuel') {
+    configJson = {
+      ...configJson,
+      blogKaynagi: 'otomatik',
+      blogAdet: configJson.blogAdet ?? 6,
+      blogKartlari: [],
+    };
   }
 
   return {

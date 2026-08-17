@@ -356,14 +356,25 @@ function KatalogPdfIkon({ className = 'h-4 w-4' }: { className?: string }) {
   );
 }
 
-export function HeaderImzaKurumsal({ veri, ayarlar, menuAcik, setMenuAcik }: HeaderLayoutProps) {
+export function HeaderImzaKurumsal({
+  veri,
+  ayarlar,
+  menuAcik,
+  setMenuAcik,
+  heroOverlay = false,
+  ustBantGoster = true,
+}: HeaderLayoutProps & { heroOverlay?: boolean; ustBantGoster?: boolean }) {
   const telefon = ayarlar?.telefon?.trim();
   const email = ayarlar?.email?.trim();
   const ust = veri.header.ustBant;
   const ctaMetin = veri.tipEk.ctaMetni?.trim() || 'Katalog';
   const ctaLink = veri.tipEk.ctaLink?.trim() || '/katalog';
   const sabit = veri.tipEk.sabit !== false;
-  const sabitSinifi = sabit ? 'fixed inset-x-0 top-0 z-40' : 'relative z-40';
+  const sabitSinifi = sabit
+    ? heroOverlay
+      ? 'fixed inset-x-0 top-0 z-50'
+      : 'fixed inset-x-0 top-0 z-40'
+    : 'relative z-40';
   const renkler = {
     '--imza-ana': veri.tipEk.arkaPlanRengi || '#0b2a77',
     '--imza-ust': veri.tipEk.ustBantRengi || '#08245f',
@@ -373,63 +384,72 @@ export function HeaderImzaKurumsal({ veri, ayarlar, menuAcik, setMenuAcik }: Hea
 
   return (
     <>
-      {sabit && <div className={`site-header-imza-bosluk ${ust ? 'h-[6.4rem]' : 'h-[4.5rem]'}`} aria-hidden />}
-      <div className={`site-header-imza-shell ${sabitSinifi}`} style={renkler}>
-      <div className="site-header-imza-ust">
-        <div className="container-site flex flex-wrap items-center justify-between gap-2 py-2 text-xs">
-          <div className="flex flex-wrap items-center gap-4">
-            {ust?.telefonGoster !== false && telefon && (
-              <a href={`tel:${telefon.replace(/\s/g, '')}`} className="site-header-imza-iletisim">
-                <span aria-hidden>📞</span>
-                <span>{telefon}</span>
-              </a>
-            )}
-            {ust?.emailGoster !== false && email && (
-              <a href={`mailto:${email}`} className="site-header-imza-iletisim">
-                <span aria-hidden>✉️</span>
-                <span>{email}</span>
-              </a>
-            )}
+      {sabit && !heroOverlay && (
+        <div className={`site-header-imza-bosluk ${ust ? 'h-[6.4rem]' : 'h-[4.5rem]'}`} aria-hidden />
+      )}
+      <div
+        className={`site-header-imza-shell ${sabitSinifi}${heroOverlay ? ' site-header-imza-shell--hero-overlay' : ''}`}
+        style={renkler}
+      >
+        {ustBantGoster && (
+          <div className="site-header-imza-ust">
+            <div className="container-site flex flex-wrap items-center justify-between gap-2 py-2 text-xs">
+              <div className="flex flex-wrap items-center gap-4">
+                {ust?.telefonGoster !== false && telefon && (
+                  <a href={`tel:${telefon.replace(/\s/g, '')}`} className="site-header-imza-iletisim">
+                    <span aria-hidden>📞</span>
+                    <span>{telefon}</span>
+                  </a>
+                )}
+                {ust?.emailGoster !== false && email && (
+                  <a href={`mailto:${email}`} className="site-header-imza-iletisim">
+                    <span aria-hidden>✉️</span>
+                    <span>{email}</span>
+                  </a>
+                )}
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                {ust?.sosyalGoster !== false && ayarlar?.sosyalMedyaJson && (
+                  <SosyalMedyaIkonSatirlari
+                    sosyal={ayarlar.sosyalMedyaJson}
+                    className="site-header-imza-sosyal"
+                    ikonSinifi="h-3.5 w-3.5"
+                  />
+                )}
+                {veri.header.dilDestegi?.aktif && (
+                  <HeaderDilSecici ayar={veri.header.dilDestegi} className="site-header-imza-dil" satir />
+                )}
+              </div>
+            </div>
           </div>
-          <div className="flex flex-wrap items-center gap-3">
-            {ust?.sosyalGoster !== false && ayarlar?.sosyalMedyaJson && (
-              <SosyalMedyaIkonSatirlari
-                sosyal={ayarlar.sosyalMedyaJson}
-                className="site-header-imza-sosyal"
-                ikonSinifi="h-3.5 w-3.5"
-              />
-            )}
-            {veri.header.dilDestegi?.aktif && (
-              <HeaderDilSecici ayar={veri.header.dilDestegi} className="site-header-imza-dil" satir />
-            )}
-          </div>
-        </div>
-      </div>
+        )}
 
-      <header className={`site-header site-header-imza-kurumsal site-header-varyant-imza-kurumsal ${veri.tipSinifi} border-0 shadow-none`}>
-        <div className="container-site flex min-h-[4.5rem] items-center justify-between gap-4 py-2">
-          <MarkaAlani veri={veri} className="site-header-imza-marka max-w-[220px] shrink-0" />
-          <DesktopMenu
-            menu={veri.cevrilmisMenu}
-            className="site-header-imza-nav flex-1 justify-end gap-1 xl:gap-2"
-            linkClassName="site-header-imza-link site-menu-nav-link"
-          />
-          <div className="flex shrink-0 items-center gap-2">
-            <Link to={ctaLink} className="site-header-imza-katalog hidden sm:inline-flex">
-              <KatalogPdfIkon />
-              <span>{ctaMetin}</span>
-            </Link>
-            <AramaAlani veri={veri} className="site-header-imza-arama" />
-            <IkonGrubu
-              veri={veri}
-              menuAcik={menuAcik}
-              onMenuToggle={() => setMenuAcik((v) => !v)}
-              sadeceHamburger
+        <header
+          className={`site-header site-header-imza-kurumsal site-header-varyant-imza-kurumsal ${veri.tipSinifi} border-0 shadow-none`}
+        >
+          <div className="container-site flex min-h-[4.5rem] items-center justify-between gap-4 py-2">
+            <MarkaAlani veri={veri} className="site-header-imza-marka max-w-[220px] shrink-0" />
+            <DesktopMenu
+              menu={veri.cevrilmisMenu}
+              className="site-header-imza-nav hidden flex-1 justify-center gap-1 lg:flex xl:gap-2"
+              linkClassName="site-header-imza-link site-menu-nav-link"
             />
+            <div className="flex shrink-0 items-center gap-2">
+              <Link to={ctaLink} className="site-header-imza-katalog hidden sm:inline-flex">
+                <KatalogPdfIkon />
+                <span>{ctaMetin}</span>
+              </Link>
+              <AramaAlani veri={veri} className="site-header-imza-arama" />
+              <IkonGrubu
+                veri={veri}
+                menuAcik={menuAcik}
+                onMenuToggle={() => setMenuAcik((v) => !v)}
+                sadeceHamburger
+              />
+            </div>
           </div>
-        </div>
-        <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
-      </header>
+          <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
+        </header>
       </div>
     </>
   );

@@ -1,8 +1,11 @@
 import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
 import type { Widget } from '@/types/site';
+import type { SitePublicData } from '@/types/site';
 import type { WidgetBlogKart, WidgetConfig } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
+import { blogKaruselKartlariHazirla } from '@/utils/blogKaruselYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
 import { useSiteDil } from '@/contexts/SiteDilContext';
@@ -493,10 +496,13 @@ function TickerHero({
   );
 }
 
-export function BlogKaruselWidget({ widget }: { widget: Widget }) {
+export function BlogKaruselWidget({ widget, onizleme }: { widget: Widget; onizleme?: boolean }) {
   const { cevir } = useSiteDil();
+  const siteVeri = useOutletContext<SitePublicData | undefined>();
+  const bloglar = siteVeri?.bloglar ?? [];
+  const widgetlar = siteVeri?.widgetlar ?? [];
   const cfg = configOkuFromWidget(widget);
-  const kartlar = cfg.blogKartlari ?? [];
+  const kartlar = blogKaruselKartlariHazirla(bloglar, widgetlar, cfg, { onizleme });
   const gt = widgetGorunumTipiAl(widget);
 
   if (kartlar.length === 0) return null;
