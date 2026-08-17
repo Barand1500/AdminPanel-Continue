@@ -1,11 +1,22 @@
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
+import fs from 'fs';
 import path from 'path';
 
-// Backend varsayılanı backend/src/config/env.ts ile aynı (PORT ?? 4000).
-// Farklı port için: VITE_BACKEND_URL=http://127.0.0.1:PORT
-const backendUrl = process.env.VITE_BACKEND_URL ?? 'http://127.0.0.1:4000';
+function backendProxyUrl(): string {
+  if (process.env.VITE_BACKEND_URL) return process.env.VITE_BACKEND_URL;
+
+  const envPath = path.resolve(__dirname, '../backend/.env');
+  if (fs.existsSync(envPath)) {
+    const port = fs.readFileSync(envPath, 'utf8').match(/^PORT=(\d+)/m)?.[1];
+    if (port) return `http://127.0.0.1:${port}`;
+  }
+
+  return 'http://127.0.0.1:4000';
+}
+
+const backendUrl = backendProxyUrl();
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],

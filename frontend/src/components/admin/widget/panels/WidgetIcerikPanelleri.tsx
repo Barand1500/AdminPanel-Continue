@@ -215,21 +215,21 @@ export function HizmetKartlariIcerik({ form, onChange }: WidgetPanelProps) {
       <ListeSiralayici<WidgetKartOgesi>
         ogeler={kartlar}
         onDegistir={(k) => onChange(configGuncelle(form, (c) => ({ ...c, kartlar: k })))}
-        yeniEkle={() => ({ id: uid(), baslik: '', aciklama: '', ikon: '💼', link: '' })}
+        yeniEkle={() => ({ id: uid(), baslik: '', aciklama: '', ikon: 'proje', link: '' })}
         renderOge={(k, i) => (
           <div className="grid gap-2 sm:grid-cols-2">
             <input className={formInputSinifi} placeholder="Başlık" value={k.baslik} onChange={(e) => {
               const kopya = [...kartlar]; kopya[i] = { ...k, baslik: e.target.value };
               onChange(configGuncelle(form, (c) => ({ ...c, kartlar: kopya })));
             }} />
-            <FormAlani etiket="İkon">
-              <EmojiSecici
+            <FormAlani etiket="Çizgi ikon">
+              <CizgiIkonSecici
                 deger={k.ikon}
-                onChange={(emoji) => {
-                  const kopya = [...kartlar]; kopya[i] = { ...k, ikon: emoji };
+                varsayilan="proje"
+                onChange={(ikon) => {
+                  const kopya = [...kartlar]; kopya[i] = { ...k, ikon };
                   onChange(configGuncelle(form, (c) => ({ ...c, kartlar: kopya })));
                 }}
-                placeholder="Emoji seçin"
               />
             </FormAlani>
             <textarea className={`${formInputSinifi} sm:col-span-2`} placeholder="Açıklama" rows={2} value={k.aciklama} onChange={(e) => {

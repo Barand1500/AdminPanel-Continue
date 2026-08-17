@@ -238,6 +238,7 @@ export interface WidgetKartOgesi {
   id: string;
   baslik: string;
   aciklama: string;
+  /** CizgiIkonlari içindeki sabit anahtar; eski emoji değerleri geriye uyumlu okunur. */
   ikon: string;
   link: string;
   butonMetni?: string;

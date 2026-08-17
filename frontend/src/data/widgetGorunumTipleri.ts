@@ -66,7 +66,7 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('vetahsilat-lavanta', 'Lavanta', 'Lavanta ton hero', 'lavanta'),
   ],
   HIZMET_KARTLARI: [
-    gt('masonry-duvar', 'Dengeli Hizmet Kartları', 'Eşit dört kart, çizgi ikon ve metinsel bağlantı', 'notr'),
+    gt('masonry-duvar', 'Dengeli Hizmet Kartları', 'Eşit kartlar, çizgi ikon ve metinsel bağlantı', 'notr'),
     gt('hover-flip', 'Hover Flip', 'Ön yüz ikon, arka yüz detay + CTA', 'mor', 'Stripe'),
     gt('sekmeli-panel', 'Sekmeli Panel', 'Sekme seçince detay paneli açılır', 'okyanus'),
     gt('orbit-duzen', 'Orbit Düzen', 'Ortada başlık, etrafında dairesel kartlar', 'lavanta'),

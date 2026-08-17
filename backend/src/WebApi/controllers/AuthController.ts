@@ -38,9 +38,10 @@ export class AuthController {
       if (dbMesaj) {
         return res.status(503).json({ mesaj: dbMesaj });
       }
-      if (err instanceof Error && err.message.includes('Prisma')) {
-        console.error('[Auth]', err.message);
-        return res.status(503).json({ mesaj: 'Veritabani hatasi. Sunucu loglarini kontrol edin.' });
+      const ham = err instanceof Error ? err.message : String(err);
+      if (/prisma/i.test(ham)) {
+        console.error('[Auth]', ham);
+        return res.status(503).json({ mesaj: 'Veritabani hatasi. npm run postpull calistirin.' });
       }
       const mesaj = err instanceof Error ? err.message : 'Giris basarisiz';
       return res.status(401).json({ mesaj });

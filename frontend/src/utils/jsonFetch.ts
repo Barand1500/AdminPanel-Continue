@@ -14,7 +14,13 @@ export function apiYanitHataMesaji(status: number, metin: string): string {
 export async function jsonYanitOku<T>(yanit: Response): Promise<T> {
   const metin = await yanit.text();
   if (!metin.trim()) {
-    if (!yanit.ok) throw new Error(`Sunucu hatasi (${yanit.status})`);
+    if (!yanit.ok) {
+      throw new Error(
+        yanit.status === 502 || yanit.status === 503 || yanit.status === 504
+          ? `Backend'e baglanilamadi (${yanit.status}). Backend calisiyor mu? npm run dev:backend`
+          : `Sunucu hatasi (${yanit.status})`,
+      );
+    }
     return {} as T;
   }
   try {

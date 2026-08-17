@@ -1,15 +1,5 @@
 import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
-import {
-  IconArrowRight,
-  IconBriefcase2,
-  IconDeviceDesktop,
-  IconHeadset,
-  IconSearch,
-  IconSettings,
-  IconTool,
-  IconUsersGroup,
-  IconWorld,
-} from '@tabler/icons-react';
+import { IconArrowRight } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetKartOgesi } from '@/types/widget';
@@ -17,42 +7,10 @@ import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget } from './widgetHelpers';
 import { useSiteDil } from '@/contexts/SiteDilContext';
+import { CizgiIkon } from './CizgiIkonlari';
 
-const eskiIkonHaritasi: Record<string, string> = {
-  globe: '🌐',
-  settings: '⚙️',
-  search: '🔍',
-  users: '👥',
-  monitor: '🖥️',
-  headset: '🎧',
-  wrench: '🔧',
-};
-
-function ikonGoster(ikon: string): string {
-  if (!ikon.trim()) return '📦';
-  return eskiIkonHaritasi[ikon] ?? ikon;
-}
-
-function HizmetCizgiIkonu({ ikon }: { ikon: string }) {
-  const anahtar = ikon.trim().toLocaleLowerCase('tr-TR');
-  const Ikon =
-    anahtar.includes('globe') || anahtar.includes('web') || anahtar.includes('dünya')
-      ? IconWorld
-      : anahtar.includes('search') || anahtar.includes('ara') || anahtar.includes('analiz')
-        ? IconSearch
-        : anahtar.includes('user') || anahtar.includes('ekip') || anahtar.includes('çalış')
-      ? IconUsersGroup
-      : anahtar.includes('monitor') || anahtar.includes('bilgisayar') || anahtar.includes('yazılım')
-        ? IconDeviceDesktop
-        : anahtar.includes('headset') || anahtar.includes('destek')
-          ? IconHeadset
-          : anahtar.includes('wrench') || anahtar.includes('teknik') || anahtar.includes('araç')
-            ? IconTool
-            : anahtar.includes('setting') || anahtar.includes('ayar')
-              ? IconSettings
-            : IconBriefcase2;
-
-  return <Ikon aria-hidden size={25} stroke={1.7} />;
+function HizmetIkon({ kart, boyut = 22 }: { kart: WidgetKartOgesi; boyut?: number }) {
+  return <CizgiIkon deger={kart.ikon} yedek="proje" boyut={boyut} />;
 }
 
 function renkler(cfg: WidgetConfig) {
@@ -143,7 +101,7 @@ function KartGovde({
   return (
     <>
       <span className="hk-kart-ikon" style={{ color: renk.vurgu }}>
-        {ikonGoster(kart.ikon)}
+        <HizmetIkon kart={kart} />
       </span>
       <h3 className="hk-kart-baslik" style={{ color: renk.baslik }}>
         {kart.baslik}
@@ -156,6 +114,17 @@ function KartGovde({
       <KartButon kart={kart} cevir={cevir} vurgu={renk.vurgu} />
     </>
   );
+}
+
+function gridKolon(cfg: WidgetConfig) {
+  return Math.min(Math.max(Number(cfg.gorunum?.kolonSayisi) || 3, 1), 6);
+}
+
+function gridAralik(cfg: WidgetConfig) {
+  const aralik = cfg.gorunum?.kartAraligi;
+  if (aralik === 'dar') return '0.85rem';
+  if (aralik === 'genis') return '2.1rem';
+  return '1.55rem';
 }
 
 function MasonryDuvar({
@@ -175,12 +144,18 @@ function MasonryDuvar({
       <Baslik widget={widget} cfg={cfg} />
       <div
         className="hk-dengeli-grid"
-        style={{ '--hk-dengeli-vurgu': renk.vurgu } as CSSProperties}
+        style={
+          {
+            '--hk-dengeli-vurgu': renk.vurgu,
+            '--hk-kolon': String(gridKolon(cfg)),
+            '--hk-gap': gridAralik(cfg),
+          } as CSSProperties
+        }
       >
         {kartlar.map((kart) => (
           <article key={kart.id} className="hk-dengeli-kart">
             <span className="hk-dengeli-ikon" style={{ color: renk.vurgu }}>
-              <HizmetCizgiIkonu ikon={`${kart.ikon} ${kart.baslik}`} />
+              <HizmetIkon kart={kart} boyut={25} />
             </span>
             <h3 className="hk-dengeli-baslik" style={{ color: renk.baslik }}>
               {kart.baslik}
@@ -216,11 +191,14 @@ function HoverFlip({
   cevir: (k: string, f: string) => string;
 }) {
   const renk = renkler(cfg);
-  const kolon = cfg.gorunum?.kolonSayisi ?? 3;
+  const kolon = gridKolon(cfg);
   return (
     <>
       <Baslik widget={widget} cfg={cfg} />
-      <div className={`hk-flip-grid hk-flip-grid-${Math.min(kolon, 4)}`}>
+      <div
+        className={`hk-flip-grid hk-flip-grid-${kolon}`}
+        style={{ '--hk-gap': gridAralik(cfg) } as CSSProperties}
+      >
         {kartlar.map((kart) => (
           <article key={kart.id} className="hk-flip-kart">
             <div className="hk-flip-ic">
@@ -229,7 +207,7 @@ function HoverFlip({
                 style={{ background: `linear-gradient(145deg, ${renk.vurgu}12, ${renk.vurgu}28)` }}
               >
                 <span className="hk-flip-ikon" style={{ color: renk.vurgu }}>
-                  {ikonGoster(kart.ikon)}
+                  <HizmetIkon kart={kart} boyut={28} />
                 </span>
                 <h3 style={{ color: renk.baslik }}>{kart.baslik}</h3>
               </div>
@@ -279,7 +257,7 @@ function SekmeliPanel({
               }
               onClick={() => setAktif(i)}
             >
-              <span>{ikonGoster(kart.ikon)}</span>
+              <span><HizmetIkon kart={kart} boyut={16} /></span>
               <span>{kart.baslik}</span>
             </button>
           ))}
@@ -291,7 +269,7 @@ function SekmeliPanel({
             style={{ borderColor: `${renk.vurgu}33` }}
           >
             <span className="hk-sekme-panel-ikon" style={{ color: renk.vurgu }}>
-              {ikonGoster(secili.ikon)}
+              <HizmetIkon kart={secili} boyut={28} />
             </span>
             <h3 style={{ color: renk.baslik }}>{secili.baslik}</h3>
             <p style={{ color: renk.metin }}>{secili.aciklama}</p>
@@ -331,7 +309,7 @@ function OrbitDuzen({
               style={{ '--hk-orbit-i': i } as CSSProperties}
             >
               <div className="hk-orbit-kart" style={{ borderColor: `${renk.vurgu}44` }}>
-                <span style={{ color: renk.vurgu }}>{ikonGoster(kart.ikon)}</span>
+                <span style={{ color: renk.vurgu }}><HizmetIkon kart={kart} /></span>
                 <h3 style={{ color: renk.baslik }}>{kart.baslik}</h3>
                 <p style={{ color: renk.metin }}>{kart.aciklama}</p>
                 <KartButon kart={kart} cevir={cevir} sinif="hk-kart-cta hk-kart-cta-kucuk" vurgu={renk.vurgu} />
@@ -375,7 +353,7 @@ function HeroMiniGrid({
           style={{ background: `linear-gradient(135deg, ${renk.vurgu}18, ${renk.vurgu}08)` }}
         >
           <span className="hk-hero-ikon" style={{ color: renk.vurgu }}>
-            {ikonGoster(hero.ikon)}
+            <HizmetIkon kart={hero} boyut={32} />
           </span>
           <h3 className="hk-hero-baslik" style={{ color: renk.baslik }}>
             {hero.baslik}
@@ -389,7 +367,7 @@ function HeroMiniGrid({
           <div className={`hk-mini-grid hk-mini-grid-${kolon}`}>
             {mini.map((kart) => (
               <article key={kart.id} className="hk-mini-kart" style={{ borderColor: `${renk.vurgu}22` }}>
-                <span style={{ color: renk.vurgu }}>{ikonGoster(kart.ikon)}</span>
+                <span style={{ color: renk.vurgu }}><HizmetIkon kart={kart} boyut={20} /></span>
                 <h4 style={{ color: renk.baslik }}>{kart.baslik}</h4>
                 <p style={{ color: renk.metin }}>{kart.aciklama}</p>
                 <KartButon kart={kart} cevir={cevir} sinif="hk-kart-cta hk-kart-cta-kucuk" vurgu={renk.vurgu} />

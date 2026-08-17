@@ -5185,7 +5185,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 /* 2 Hover Flip */
 .hk-flip-grid {
   display: grid;
-  gap: 1.25rem;
+  gap: var(--hk-gap, 1.25rem);
   grid-template-columns: 1fr;
 }
 
@@ -5201,9 +5201,19 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   grid-template-columns: repeat(4, 1fr);
 }
 
+.hk-flip-grid-5 {
+  grid-template-columns: repeat(5, 1fr);
+}
+
+.hk-flip-grid-6 {
+  grid-template-columns: repeat(6, 1fr);
+}
+
 @media (max-width: 1023px) {
   .hk-flip-grid-3,
-  .hk-flip-grid-4 {
+  .hk-flip-grid-4,
+  .hk-flip-grid-5,
+  .hk-flip-grid-6 {
     grid-template-columns: repeat(2, 1fr);
   }
 }
@@ -5211,7 +5221,9 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 @media (max-width: 639px) {
   .hk-flip-grid-2,
   .hk-flip-grid-3,
-  .hk-flip-grid-4 {
+  .hk-flip-grid-4,
+  .hk-flip-grid-5,
+  .hk-flip-grid-6 {
     grid-template-columns: 1fr;
   }
 }
@@ -12267,9 +12279,10 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 
 .hk-dengeli-grid {
+  --hk-kolon: var(--widget-kolon, 3);
   display: grid;
   grid-template-columns: 1fr;
-  gap: 1.25rem;
+  gap: var(--hk-gap, 1.25rem);
 }
 
 .hk-dengeli-kart {
@@ -12340,11 +12353,16 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .hk-dengeli-cta:hover { text-decoration: underline; }
 
 @media (min-width: 640px) {
-  .hk-dengeli-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hk-dengeli-grid {
+    grid-template-columns: repeat(min(2, var(--hk-kolon, 3)), minmax(0, 1fr));
+  }
 }
 
 @media (min-width: 1024px) {
-  .hk-dengeli-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.55rem; }
+  .hk-dengeli-grid {
+    grid-template-columns: repeat(var(--hk-kolon, 3), minmax(0, 1fr));
+    gap: var(--hk-gap, 1.55rem);
+  }
 }
 
 .gek-urun-grup-grid {

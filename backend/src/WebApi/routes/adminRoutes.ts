@@ -58,6 +58,7 @@ import { medyaYukle } from '../middleware/medyaYukle.js';
 import { yedekYukle } from '../middleware/yedekYukle.js';
 import { eklentiYukle } from '../middleware/eklentiYukle.js';
 import { validateBySchema } from '../middleware/dogrulama.js';
+import { asyncHandler } from '../middleware/asyncHandler.js';
 
 const router = Router();
 const authController = new AuthController();
@@ -90,13 +91,23 @@ const yD = yetkiMiddleware('duzenleme');
 const yS = yetkiMiddleware('silme');
 const yK = yetkiMiddleware('kullanici_yonetimi');
 
-router.post('/auth/giris', validateBySchema(girisSchema), (req, res) => authController.giris(req, res));
-router.get('/auth/ben', authMiddleware, (req, res) => authController.ben(req, res));
-router.patch('/auth/profil', authMiddleware, validateBySchema(adminProfilGuncelleSchema), (req, res) =>
-  authController.profilGuncelle(req, res)
+router.post(
+  '/auth/giris',
+  validateBySchema(girisSchema),
+  asyncHandler((req, res) => authController.giris(req, res)),
 );
-router.patch('/auth/tercihler', authMiddleware, validateBySchema(tercihlerGuncelleSchema), (req, res) =>
-  authController.tercihlerGuncelle(req, res)
+router.get('/auth/ben', authMiddleware, asyncHandler((req, res) => authController.ben(req, res)));
+router.patch(
+  '/auth/profil',
+  authMiddleware,
+  validateBySchema(adminProfilGuncelleSchema),
+  asyncHandler((req, res) => authController.profilGuncelle(req, res)),
+);
+router.patch(
+  '/auth/tercihler',
+  authMiddleware,
+  validateBySchema(tercihlerGuncelleSchema),
+  asyncHandler((req, res) => authController.tercihlerGuncelle(req, res)),
 );
 
 router.get('/dashboard', authMiddleware, yG, (req, res) => dashboardController.ozet(req, res));
