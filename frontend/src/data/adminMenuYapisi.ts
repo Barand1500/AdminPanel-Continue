@@ -5,12 +5,12 @@ export const adminModulleri: AdminModul[] = [
   { id: 'site-ayarlari', baslik: 'Site Ayarları', ikon: '⚙️', kategori: 'Hızlı Erişim', yol: '/gt-admin/site-ayarlari' },
   { id: 'sayfalar', baslik: 'Sayfalar', ikon: '📄', kategori: 'Hızlı Erişim', yol: '/gt-admin/sayfalar' },
   { id: 'widget-yonetimi', baslik: 'Widget Yönetimi', ikon: '🧩', kategori: 'Hızlı Erişim', yol: '/gt-admin/widgetlar' },
-  { id: 'slider-yonetimi', baslik: 'Slider Yönetimi', ikon: '🎠', kategori: 'Hızlı Erişim', yol: '/gt-admin/sliderlar' },
+  { id: 'slider-yonetimi', baslik: 'Banner Yönetimi', ikon: '🎠', kategori: 'Hızlı Erişim', yol: '/gt-admin/sliderlar' },
   { id: 'medya', baslik: 'Medya Galerisi', ikon: '🖼️', kategori: 'Hızlı Erişim', yol: '/gt-admin/medya' },
   { id: 'seo', baslik: 'SEO Ayarları', ikon: '🔍', kategori: 'Hızlı Erişim', yol: '/gt-admin/seo' },
 
   { id: 'header', baslik: 'Header Yönetimi', ikon: '🔝', kategori: 'Site Yönetimi', yol: '/gt-admin/header' },
-  { id: 'kategoriler', baslik: 'Kategori Yönetimi', ikon: '📂', kategori: 'Site Yönetimi', yol: '/gt-admin/kategoriler' },
+  { id: 'kategoriler', baslik: 'Menü Yönetimi', ikon: '📂', kategori: 'Site Yönetimi', yol: '/gt-admin/kategoriler' },
   { id: 'hero', baslik: 'Hero Yönetimi', ikon: '🏠', kategori: 'Site Yönetimi', yol: '/gt-admin/hero' },
   { id: 'footer', baslik: 'Footer Yönetimi', ikon: '🔻', kategori: 'Site Yönetimi', yol: '/gt-admin/footer' },
 

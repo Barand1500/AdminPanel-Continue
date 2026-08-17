@@ -227,7 +227,7 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
   {
     id: 'site-gorunumu',
     baslik: 'Site Görünümü',
-    aciklama: 'Header, hero, footer ve kategoriler.',
+    aciklama: 'Header, hero, footer ve menü.',
     ikon: '🏠',
     adimlar: [
       {
@@ -237,7 +237,7 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         okYonu: 'sag' as const,
         baslik: 'Site Yönetimi Kategorisi',
         aciklama:
-          'Başlat menüsünde "Site Yönetimi" altında sitenin görsel iskeletini oluşturan modüller vardır: üst menü (Header), ana banner (Hero), alt bilgi (Footer) ve kategoriler.',
+          'Başlat menüsünde "Site Yönetimi" altında sitenin görsel iskeletini oluşturan modüller vardır: üst menü (Header), ana banner (Hero), alt bilgi (Footer) ve menü.',
       },
       {
         id: 'header',
@@ -272,9 +272,9 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         ...MODUL_HEDEF,
         modulId: 'kategoriler',
         okYonu: 'alt' as const,
-        baslik: 'Kategori Yönetimi',
+        baslik: 'Menü Yönetimi',
         aciklama:
-          'Header’daki Tüm Kategoriler menüsünü ağaç olarak yönetin. Listeden seçip Düzenle; Yeni Alt Ekle ile 3 seviyeye kadar alt kategori ekleyin.',
+          'Header’daki menüyü ağaç olarak yönetin. Listeden seçip Düzenle; Yeni Alt Ekle ile 3 seviyeye kadar alt menü ekleyin.',
       },
     ],
   },

@@ -88,7 +88,7 @@ export function SliderListesiPanel({
     <aside className="ap-sidebar-panel ap-sayfa-liste-panel ap-sayfa-liste-panel--tam">
       <div className="ap-sidebar-baslik">
         <div>
-          <h2 className="ap-heading text-sm font-semibold">Slider Listesi</h2>
+          <h2 className="ap-heading text-sm font-semibold">Banner Listesi</h2>
           <p className="ap-muted text-xs">{sliderlar.length} kayıt</p>
         </div>
       </div>
@@ -109,11 +109,11 @@ export function SliderListesiPanel({
         {filtreli.length === 0 ? (
           <AdminBosDurum
             ikon="🎠"
-            baslik={arama || sayfaFiltre !== 'hepsi' ? 'Sonuç yok' : 'Henüz slider yok'}
+            baslik={arama || sayfaFiltre !== 'hepsi' ? 'Sonuç yok' : 'Henüz banner yok'}
             aciklama={
               arama || sayfaFiltre !== 'hepsi'
                 ? 'Filtreyi temizleyip tekrar deneyin'
-                : 'Üstten Yeni Slider sekmesine geçerek başlayın'
+                : 'Üstten Yeni Banner sekmesine geçerek başlayın'
             }
           />
         ) : (
@@ -198,7 +198,7 @@ export function SliderEditorPanel({
   return (
     <div className="ap-editor-panel ap-slider-editor">
       <div className="ap-slider-editor-ust">
-        <FormAlani etiket="Slider adı">
+        <FormAlani etiket="Banner adı">
           <input
             className={formInputSinifi}
             value={ad}
@@ -223,7 +223,7 @@ export function SliderEditorPanel({
         {sekme === 'slaytlar' && (
           <AdminFormBolumu
             baslik="Görseller"
-            aciklama="Sliderda sırayla gösterilecek slaytları ekleyin. En az bir aktif görsel gerekir."
+            aciklama="Bannerda sırayla gösterilecek slaytları ekleyin. En az bir aktif görsel gerekir."
           >
             <SliderSlaytListesi config={config} onChange={onConfig} />
           </AdminFormBolumu>

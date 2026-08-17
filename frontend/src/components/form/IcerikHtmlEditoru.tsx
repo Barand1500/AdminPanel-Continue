@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import type { AdminWidget } from '@/types/admin';
 import { ZenginMetinEditoru } from '@/components/form/ZenginMetinEditoru';
 import { HtmlKodEditoru } from '@/components/form/HtmlKodEditoru';
@@ -10,28 +10,38 @@ interface IcerikHtmlEditoruProps {
   onChange: (html: string) => void;
   placeholder?: string;
   sayfaWidgetlari?: AdminWidget[];
+  ustEk?: ReactNode;
 }
 
-export function IcerikHtmlEditoru({ deger, onChange, placeholder, sayfaWidgetlari }: IcerikHtmlEditoruProps) {
+export function IcerikHtmlEditoru({
+  deger,
+  onChange,
+  placeholder,
+  sayfaWidgetlari,
+  ustEk,
+}: IcerikHtmlEditoruProps) {
   const [mod, setMod] = useState<EditorModu>('gorsel');
 
   return (
     <div className="ap-icerik-editor">
-      <div className="ap-icerik-editor-modlar">
-        <button
-          type="button"
-          className={mod === 'gorsel' ? 'ap-icerik-editor-mod-aktif' : ''}
-          onClick={() => setMod('gorsel')}
-        >
-          Görsel Editör
-        </button>
-        <button
-          type="button"
-          className={mod === 'html' ? 'ap-icerik-editor-mod-aktif' : ''}
-          onClick={() => setMod('html')}
-        >
-          HTML Kodu
-        </button>
+      <div className="ap-icerik-editor-ust">
+        <div className="ap-icerik-editor-modlar">
+          <button
+            type="button"
+            className={mod === 'gorsel' ? 'ap-icerik-editor-mod-aktif' : ''}
+            onClick={() => setMod('gorsel')}
+          >
+            Görsel Editör
+          </button>
+          <button
+            type="button"
+            className={mod === 'html' ? 'ap-icerik-editor-mod-aktif' : ''}
+            onClick={() => setMod('html')}
+          >
+            HTML Kodu
+          </button>
+        </div>
+        {ustEk}
       </div>
 
       {mod === 'gorsel' ? (

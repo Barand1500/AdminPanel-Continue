@@ -234,7 +234,14 @@ function AdminPanelGovde() {
       if (!sekme) return;
       setAyriPencereler((p) => {
         if (p.some((x) => x.sekmeId === sekmeId)) return p;
-        return [...p, { sekmeId, modulId: sekme.modulId, baslik: sekme.baslik }];
+        return [
+          ...p,
+          {
+            sekmeId,
+            modulId: sekme.modulId,
+            baslik: modulBul(sekme.modulId)?.baslik ?? sekme.baslik,
+          },
+        ];
       });
     },
     [sekmeler]

@@ -13,6 +13,10 @@ export const FOOTER_TIPLERI = [
   'cta-serit',
   'sosyal-sahne',
   'kartlar',
+  'split-vitrin',
+  'yuzen',
+  'masthead',
+  'cam-panel',
 ] as const;
 
 export type FooterTipi = (typeof FOOTER_TIPLERI)[number];
@@ -140,13 +144,53 @@ export const FOOTER_TIP_TANIMLARI: FooterTipTanimi[] = [
   },
   {
     id: 'kartlar',
-    ad: 'Kart \u0130zgara',
+    ad: 'Kart Izgara',
     aciklama:
       'Marka ve her kolon ayrı yuvarlak kartta durur. Düz sütunlardan farklı, kutu kutu bir düzen; hizmet sitelerinde okunur.',
     ilham: 'Notion',
     semaGoster: false,
     kolonlar: true,
     ekAyarlari: false,
+  },
+  {
+    id: 'split-vitrin',
+    ad: 'İki Panel Vitrin',
+    aciklama:
+      'Sol yarıda marka, sağda vitrin kolonları. Mağaza ve katalog sitelerinde alt bilgiyi iki eşit panele böler.',
+    ilham: 'Vitrin mağaza',
+    semaGoster: false,
+    kolonlar: true,
+    ekAyarlari: false,
+  },
+  {
+    id: 'yuzen',
+    ad: 'Yüzen',
+    aciklama:
+      'Yuvarlatılmış kart gibi durur, sayfadan hafifçe ayrılır. Modern marka sitelerinde hafif bir kapanış.',
+    ilham: 'Kart footer',
+    semaGoster: false,
+    kolonlar: false,
+    ekAyarlari: true,
+  },
+  {
+    id: 'masthead',
+    ad: 'Masthead',
+    aciklama:
+      'Üstte geniş marka bandı, altında kolonlar. Kurumsal sitelerde imza gibi duran güçlü bir kapanış.',
+    ilham: 'Kurumsal masthead',
+    semaGoster: true,
+    kolonlar: true,
+    ekAyarlari: false,
+  },
+  {
+    id: 'cam-panel',
+    ad: 'Cam Panel',
+    aciklama:
+      'Buzlu cam zeminde marka ve kolonlar. Şeffaf hero sayfalarında header ile uyumlu, hafif bir alt bilgi.',
+    ilham: 'Glassmorphism',
+    semaGoster: true,
+    kolonlar: true,
+    ekAyarlari: true,
   },
 ];
 
@@ -193,6 +237,10 @@ export function varsayilanFooterTipEk(tip: FooterTipi): FooterTipEkAyarlari {
     case 'kompakt':
       return { ...ortak, kompaktKoyuTema: true };
     case 'sade':
+      return { ...ortak, kompaktKoyuTema: false };
+    case 'yuzen':
+      return { ...ortak, kompaktKoyuTema: false };
+    case 'cam-panel':
       return { ...ortak, kompaktKoyuTema: false };
     default:
       return ortak;

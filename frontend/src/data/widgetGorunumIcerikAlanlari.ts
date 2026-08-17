@@ -165,7 +165,7 @@ export const WIDGET_GORUNUM_ICERIK_ALANLARI: Record<string, WidgetIcerikAlanHari
     _varsayilan: ['baslik', 'altBaslik', 'aciklama'],
     'split-kart-harita': ['baslik', 'altBaslik', 'aciklama'],
     'harita-ust-kart-alt': ['baslik', 'aciklama'],
-    'overlay-yuzen-kart': ['baslik', 'altBaslik', 'aciklama', 'butonMetni', 'butonLink'],
+    'overlay-yuzen-kart': ['baslik', 'butonMetni'],
     'ikon-serit-harita': ['baslik', 'altBaslik'],
     'cam-panel-harita': ['baslik', 'altBaslik', 'aciklama', 'butonMetni', 'butonLink'],
     'sidebar-liste-harita': ['baslik', 'aciklama'],

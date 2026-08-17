@@ -1,8 +1,10 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { WidgetRender } from '@/components/widget/WidgetAlani';
 import { formToWidgetOnizleme } from '@/types/widget';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 import type { WidgetFormDegeri } from '@/types/admin';
+
+const ONIZLEME_TUVAL_GENISLIK = 1180;
 
 interface WidgetOnizlemeModalProps {
   acik: boolean;
@@ -12,6 +14,10 @@ interface WidgetOnizlemeModalProps {
 }
 
 export function WidgetOnizlemeModal({ acik, form, otomatikDoldur = false, onKapat }: WidgetOnizlemeModalProps) {
+  const govdeRef = useRef<HTMLDivElement>(null);
+  const tuvalRef = useRef<HTMLDivElement>(null);
+  const [olcek, setOlcek] = useState(1);
+
   useEffect(() => {
     if (!acik) return;
     function tus(e: KeyboardEvent) {
@@ -27,6 +33,22 @@ export function WidgetOnizlemeModal({ acik, form, otomatikDoldur = false, onKapa
       document.body.style.overflow = '';
     };
   }, [acik, onKapat]);
+
+  useEffect(() => {
+    if (!acik) return;
+    const govde = govdeRef.current;
+    if (!govde) return;
+
+    function olc() {
+      const kutuGenislik = govde.clientWidth;
+      setOlcek(kutuGenislik > 0 ? Math.min(1, kutuGenislik / ONIZLEME_TUVAL_GENISLIK) : 1);
+    }
+
+    olc();
+    const ro = new ResizeObserver(olc);
+    ro.observe(govde);
+    return () => ro.disconnect();
+  }, [acik, form.tip, form.configJsonMetin, form.baslik, otomatikDoldur]);
 
   if (!acik) return null;
 
@@ -49,8 +71,19 @@ export function WidgetOnizlemeModal({ acik, form, otomatikDoldur = false, onKapa
             ✕ ESC
           </button>
         </header>
-        <div className="ap-scroll ap-widget-oniz-govde">
-          <WidgetRender widget={widget} onizleme />
+        <div ref={govdeRef} className="ap-scroll ap-widget-oniz-govde">
+          <div className="ap-widget-oniz-olcek-sarici">
+            <div
+              ref={tuvalRef}
+              className="ap-widget-oniz-olcek"
+              style={{
+                width: ONIZLEME_TUVAL_GENISLIK,
+                zoom: olcek,
+              }}
+            >
+              <WidgetRender widget={widget} onizleme />
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -50,6 +50,11 @@ export const headerAyarlariSchema = z.object({
   ),
   tipEk: z
     .object({
+      sabit: z.boolean().optional(),
+      arkaPlanRengi: z.string().max(20).optional(),
+      ustBantRengi: z.string().max(20).optional(),
+      metinRengi: z.string().max(20).optional(),
+      butonRengi: z.string().max(20).optional(),
       aramaGoster: z.boolean().optional(),
       aramaModu: z.enum(['tam', 'ikon']).optional(),
       kullaniciGoster: z.boolean().optional(),

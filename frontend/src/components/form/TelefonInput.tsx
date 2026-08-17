@@ -1,12 +1,6 @@
 import { useState } from 'react';
 import { FormAlani, formInputSinifi } from './FormAlani';
-import {
-  ORNEK_TELEFON_0850,
-  ORNEK_TELEFON_KISA,
-  ORNEK_TELEFON_SIFIRLI,
-  ORNEK_TELEFON_SIFIRSIZ,
-  telefonFormatla,
-} from '@/utils/telefonFormat';
+import { telefonFormatla } from '@/utils/telefonFormat';
 
 interface TelefonInputProps {
   etiket?: string;
@@ -18,10 +12,10 @@ interface TelefonInputProps {
 
 export function TelefonInput({
   etiket = 'Telefon',
-  aciklama = `${ORNEK_TELEFON_SIFIRLI} · ${ORNEK_TELEFON_0850} · ${ORNEK_TELEFON_SIFIRSIZ} · ${ORNEK_TELEFON_KISA}`,
+  aciklama,
   deger,
   onChange,
-  placeholder = ORNEK_TELEFON_0850,
+  placeholder = '',
 }: TelefonInputProps) {
   const [odak, setOdak] = useState(false);
 

@@ -210,11 +210,11 @@ export function SliderYonetimiSayfasi() {
     setHata('');
     setBasari('');
     if (!ad.trim()) {
-      setHata('Slider adı gerekli.');
+      setHata('Banner adı gerekli.');
       return;
     }
     if (secimler.length === 0) {
-      setHata('Konum sekmesinden sliderın duracağı yeri seçin.');
+      setHata('Konum sekmesinden bannerın duracağı yeri seçin.');
       return;
     }
     if (!config.slaytlar.some((s) => s.aktif && s.gorselUrl)) {
@@ -237,12 +237,12 @@ export function SliderYonetimiSayfasi() {
       if (seciliSliderId) {
         const guncel = await konumluSliderGuncelle(seciliSliderId, form);
         setSliderlar((liste) => liste.map((s) => (s.id === guncel.id ? guncel : s)));
-        setBasari('Slider güncellendi.');
+        setBasari('Banner güncellendi.');
       } else {
         const yeni = await konumluSliderOlustur(form);
         setSliderlar((liste) => [...liste, yeni]);
         setSeciliSliderId(yeni.id);
-        setBasari('Slider oluşturuldu.');
+        setBasari('Banner oluşturuldu.');
       }
       siteVerisiGuncellendiYayinla();
     } catch (err) {
@@ -253,13 +253,13 @@ export function SliderYonetimiSayfasi() {
   }, [ad, secimler, config, anaSayfaMi, sayfaId, aktif, seciliSliderId, sliderlar, sayfaSliderlari.length]);
 
   const sil = useCallback(async () => {
-    if (!seciliSliderId || !window.confirm('Bu slider silinsin mi?')) return;
+    if (!seciliSliderId || !window.confirm('Bu banner silinsin mi?')) return;
     setKaydediliyor(true);
     setHata('');
     try {
       await konumluSliderSil(seciliSliderId);
       setSliderlar((liste) => liste.filter((s) => s.id !== seciliSliderId));
-      setBasari('Slider silindi.');
+      setBasari('Banner silindi.');
       formuSifirla();
       setGorunum('liste');
       siteVerisiGuncellendiYayinla();
@@ -301,7 +301,7 @@ export function SliderYonetimiSayfasi() {
   if (yukleniyor) {
     return (
       <AdminModulKabuk onizleGoster={false}>
-        <YukleniyorDurumu mesaj="Sliderlar yükleniyor..." />
+        <YukleniyorDurumu mesaj="Bannerlar yükleniyor..." />
       </AdminModulKabuk>
     );
   }
@@ -312,10 +312,10 @@ export function SliderYonetimiSayfasi() {
       ustIcerik={
         <AdminPilSekme
           sekmeler={[
-            { id: 'liste', etiket: 'Slider Listesi', ikon: <ListeIkon /> },
+            { id: 'liste', etiket: 'Banner Listesi', ikon: <ListeIkon /> },
             {
               id: 'editor',
-              etiket: gorunum === 'editor' && seciliSliderId ? 'Düzenleme' : 'Yeni Slider',
+              etiket: gorunum === 'editor' && seciliSliderId ? 'Düzenleme' : 'Yeni Banner',
               ikon: gorunum === 'editor' && seciliSliderId ? <DuzenlemeIkon /> : <YeniIkon />,
             },
           ]}

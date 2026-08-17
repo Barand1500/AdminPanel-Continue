@@ -70,7 +70,7 @@ export function KategoriYonetimiSayfasi() {
     try {
       setKategoriler(await navKategorileriGetir());
     } catch (err) {
-      const mesaj = err instanceof Error ? err.message : 'Kategoriler alınamadı';
+      const mesaj = err instanceof Error ? err.message : 'Menü öğeleri alınamadı';
       setHata(
         mesaj === 'Endpoint bulunamadi'
           ? 'Sunucudaki backend henüz güncellenmemiş. nav-kategoriler API’si deploy edilmeden bu modül çalışmaz — backend’i yeniden build edip sunucuya yükleyin, ardından PM2’yi yeniden başlatın.'
@@ -100,7 +100,7 @@ export function KategoriYonetimiSayfasi() {
   const altEkle = useCallback(
     (ust: NavKategoriKayit) => {
       if (navKategoriDerinlik(kategoriler, ust.id) >= 3) {
-        setHata('En fazla 3 seviye kategori oluşturulabilir');
+        setHata('En fazla 3 seviye menü oluşturulabilir');
         return;
       }
       setSeciliId(null);
@@ -115,7 +115,7 @@ export function KategoriYonetimiSayfasi() {
 
   const kaydet = useCallback(async () => {
     if (!form.baslik.trim()) {
-      setHata('Kategori adı zorunludur');
+      setHata('Menü adı zorunludur');
       return;
     }
     setKaydediliyor(true);
@@ -125,12 +125,12 @@ export function KategoriYonetimiSayfasi() {
       if (seciliId) {
         const g = await navKategoriGuncelle(seciliId, form);
         setForm(kategoridenForm(g));
-        setBasari('Kategori güncellendi.');
+        setBasari('Menü güncellendi.');
       } else {
         const o = await navKategoriOlustur(form);
         setForm(kategoridenForm(o));
         setSeciliId(o.id);
-        setBasari('Kategori eklendi.');
+        setBasari('Menü eklendi.');
       }
       setKategoriler(await navKategorileriGetir());
     } catch (err) {
@@ -142,11 +142,11 @@ export function KategoriYonetimiSayfasi() {
   }, [form, seciliId]);
 
   const sil = useCallback(async () => {
-    if (!seciliId || !confirm('Bu kategoriyi silmek istediğinize emin misiniz?')) return;
+    if (!seciliId || !confirm('Bu menü öğesini silmek istediğinize emin misiniz?')) return;
     setKaydediliyor(true);
     try {
       await navKategoriSil(seciliId);
-      setBasari('Kategori silindi.');
+      setBasari('Menü silindi.');
       formuSifirla();
       setGorunum('liste');
       await yukle();
@@ -212,7 +212,7 @@ export function KategoriYonetimiSayfasi() {
       setHata('');
       try {
         await siteAyarlariKaydet({ header: yeniHeader });
-        setBasari(acik ? 'Tüm Kategoriler menüsü açıldı.' : 'Tüm Kategoriler menüsü kapatıldı.');
+        setBasari(acik ? 'Menü sitede gösterilecek.' : 'Menü sitede gizlendi.');
       } catch (err) {
         setHata(err instanceof Error ? err.message : 'Menü ayarı kaydedilemedi');
       }
@@ -225,12 +225,12 @@ export function KategoriYonetimiSayfasi() {
       ? 'Düzenleme'
       : gorunum === 'editor' && form.ustKategoriId
         ? 'Yeni Alt'
-        : 'Yeni Kategori';
+        : 'Yeni Menü';
 
   if (yukleniyor) {
     return (
       <AdminModulKabuk onizleGoster={false}>
-        <YukleniyorDurumu mesaj="Kategoriler yükleniyor..." />
+        <YukleniyorDurumu mesaj="Menü yükleniyor..." />
       </AdminModulKabuk>
     );
   }
@@ -241,7 +241,7 @@ export function KategoriYonetimiSayfasi() {
       ustIcerik={
         <AdminPilSekme
           sekmeler={[
-            { id: 'liste', etiket: 'Kategori Listesi', ikon: <ListeIkon /> },
+            { id: 'liste', etiket: 'Menü Listesi', ikon: <ListeIkon /> },
             {
               id: 'editor',
               etiket: editorEtiket,

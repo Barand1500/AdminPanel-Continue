@@ -36,7 +36,7 @@ export const HEADER_TIP_TANIMLARI: HeaderTipTanimi[] = [
     ilham: 'Trendyol',
     ustBant: true,
     kategoriArama: true,
-    ekAyarlari: false,
+    ekAyarlari: true,
   },
   {
     id: 'sade',

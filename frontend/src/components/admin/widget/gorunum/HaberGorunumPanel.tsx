@@ -2,6 +2,7 @@ import { EmojiSecici } from '@/components/form/EmojiSecici';
 import { RenkSecici } from '@/components/form/RenkSecici';
 import { AdminAnahtarDugme, AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { configGuncelle, configOku, WIDGET_GORUNUM_HABER_TIPLERI } from '@/types/widget';
+import { widgetGorunumTipiNormalize } from '@/data/widgetGorunumTipleri';
 import { SecimAlani } from '../panels/WidgetPanelOrtak';
 import type { WidgetGorunumPanelProps } from '../panels/types';
 
@@ -45,7 +46,8 @@ export function HaberGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
   ].includes(tip);
   const kartStiliGoster = ['KATEGORI_HABER_LISTESI', 'KATEGORI_HABER_OVERLAY', 'HABER_MAGAZIN'].includes(tip);
   const baslikAyarGoster = !['HAVA_DURUMU', 'SIRKET_GIRIS_CIKIS'].includes(tip);
-  const haritaDuzen = tip === 'ILETISIM_BLOK';
+  const haritaDuzen =
+    tip === 'ILETISIM_BLOK' && widgetGorunumTipiNormalize(tip, g.gorunumTipi) !== 'overlay-yuzen-kart';
 
   return (
     <>

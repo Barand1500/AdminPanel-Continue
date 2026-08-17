@@ -37,6 +37,7 @@ import {
   dogrudanAltSayfalar,
   sayfaAgaciOlustur,
   type SayfaAgacDugumu,
+  sayfaIcerikOzeti,
   sayfaIcerikVar,
   sayfaSegmentSlug,
   sayfaTamSlugOlustur,
@@ -389,7 +390,20 @@ export function SayfaEditorPanel({
       const segment = slugUret(baslik);
       guncel.slug = ustSayfa ? sayfaTamSlugOlustur(ustSayfa.slug, segment) : segment;
     }
+    if (!form.seoTitle.trim() || form.seoTitle.trim() === form.baslik.trim()) {
+      guncel.seoTitle = baslik;
+    }
     onChange(guncel);
+  }
+
+  function icerikDegistir(icerik: string) {
+    const duzen = sayfaDuzenModuOku(form.icerik);
+    const yeniIcerik = duzen === 'normal' ? icerik : sayfaDuzenEtiketiGuncelle(icerik, duzen);
+    const oncekiOzet = sayfaIcerikOzeti(form.icerik);
+    const yeniOzet = sayfaIcerikOzeti(yeniIcerik);
+    const seoDesc =
+      !form.seoDesc.trim() || form.seoDesc.trim() === oncekiOzet ? yeniOzet : form.seoDesc;
+    onChange({ ...form, icerik: yeniIcerik, seoDesc });
   }
 
   function segmentDegistir(segment: string) {
@@ -478,48 +492,39 @@ export function SayfaEditorPanel({
 
             <AdminFormBolumu
               baslik="İçerik"
-              aciklama="İsterseniz açıp sayfa içeriği ekleyin"
               akordeon
-              varsayilanAcik={false}
+              varsayilanAcik
             >
-              <FormAlani etiket="İçerik genişliği">
-                <div className="grid gap-2 sm:grid-cols-2">
-                  {SAYFA_ICERIK_DUZENLER.map((secenek) => {
-                    const secili = sayfaDuzenModuOku(form.icerik) === secenek.id;
-                    return (
-                      <button
-                        key={secenek.id}
-                        type="button"
-                        onClick={() =>
-                          onChange({
-                            ...form,
-                            icerik: sayfaDuzenEtiketiGuncelle(form.icerik, secenek.id),
-                          })
-                        }
-                        className={`rounded-lg border p-3 text-left text-sm transition ${
-                          secili
-                            ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)]/10'
-                            : 'border-[var(--ap-border)] hover:border-[var(--ap-accent)]/40'
-                        }`}
-                      >
-                        <span className="font-semibold">{secenek.ad}</span>
-                        <span className="ap-muted mt-0.5 block text-xs">{secenek.aciklama}</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              </FormAlani>
               <IcerikHtmlEditoru
                 deger={form.icerik}
-                onChange={(icerik) => {
-                  const duzen = sayfaDuzenModuOku(form.icerik);
-                  onChange({
-                    ...form,
-                    icerik: duzen === 'normal' ? icerik : sayfaDuzenEtiketiGuncelle(icerik, duzen),
-                  });
-                }}
+                onChange={icerikDegistir}
                 placeholder="Sayfa içeriğinizi yazın..."
                 sayfaWidgetlari={seciliId ? sayfaWidgetlari : []}
+                ustEk={
+                  <div className="ap-sayfa-duzen-piller" role="radiogroup" aria-label="İçerik genişliği">
+                    {SAYFA_ICERIK_DUZENLER.map((secenek) => {
+                      const secili = sayfaDuzenModuOku(form.icerik) === secenek.id;
+                      return (
+                        <button
+                          key={secenek.id}
+                          type="button"
+                          role="radio"
+                          aria-checked={secili}
+                          title={secenek.aciklama}
+                          onClick={() =>
+                            onChange({
+                              ...form,
+                              icerik: sayfaDuzenEtiketiGuncelle(form.icerik, secenek.id),
+                            })
+                          }
+                          className={`ap-sayfa-duzen-pil${secili ? ' ap-sayfa-duzen-pil--aktif' : ''}`}
+                        >
+                          {secenek.id === 'tam-basliksiz' ? 'Özel HTML' : secenek.ad}
+                        </button>
+                      );
+                    })}
+                  </div>
+                }
               />
               {!sayfaIcerikVar(form.icerik) && altSayi > 0 && (
                 <p className="ap-muted mt-2 text-xs">
@@ -537,7 +542,6 @@ export function SayfaEditorPanel({
                 className={formInputSinifi}
                 value={form.seoTitle}
                 onChange={(e) => onChange({ ...form, seoTitle: e.target.value })}
-                placeholder={form.baslik || 'Sayfa başlığı'}
               />
             </FormAlani>
             <FormAlani etiket="Meta Açıklama" aciklama="Arama sonuçlarında görünen özet">
@@ -546,7 +550,6 @@ export function SayfaEditorPanel({
                 rows={3}
                 value={form.seoDesc}
                 onChange={(e) => onChange({ ...form, seoDesc: e.target.value })}
-                placeholder="Kısa açıklama..."
               />
             </FormAlani>
           </AdminFormBolumu>
@@ -738,8 +741,8 @@ export function sayfadanForm(s: AdminSayfa): SayfaFormDegeri {
     slug: s.slug,
     icerik: s.icerik,
     ikon: s.ikon ?? '',
-    seoTitle: s.seoTitle ?? '',
-    seoDesc: s.seoDesc ?? '',
+    seoTitle: s.seoTitle?.trim() || s.baslik || '',
+    seoDesc: s.seoDesc?.trim() || sayfaIcerikOzeti(s.icerik) || '',
     yayinda: s.yayinda,
     menudeGoster: s.menudeGoster,
     sira: s.sira,

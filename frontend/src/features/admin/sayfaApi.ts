@@ -1,6 +1,6 @@
 import { adminHeaders, adminJsonFetch } from './adminFetch';
 import { idString } from '@/utils/idKarsilastir';
-import { sayfaHiyerarsisiTamamla } from '@/utils/sayfaAgaci';
+import { sayfaHiyerarsisiTamamla, sayfaIcerikOzeti } from '@/utils/sayfaAgaci';
 
 import type { AltMenuGorunum, AltMenuTetikleyici, SayfaAcilisModu } from '@/types/site';
 
@@ -142,8 +142,8 @@ function payloadHazirla(form: SayfaFormDegeri) {
     slug: form.slug.trim() || undefined,
     icerik: form.icerik,
     ikon: form.ikon.trim() || null,
-    seoTitle: form.seoTitle.trim() || null,
-    seoDesc: form.seoDesc.trim() || null,
+    seoTitle: form.seoTitle.trim() || form.baslik.trim() || null,
+    seoDesc: form.seoDesc.trim() || sayfaIcerikOzeti(form.icerik) || null,
     yayinda: form.yayinda,
     menudeGoster: form.menudeGoster,
     sira: form.sira,

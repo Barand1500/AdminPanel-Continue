@@ -117,7 +117,7 @@ export function KonumluSliderOnizleme({
                     className={zoneSinif(seciliMi('header-ustu', 'header', null), 'ust')}
                     onClick={() => tikla(noktaOlustur('header-ustu', 'header', null, widgetlar))}
                   >
-                    Üstüne slider
+                    Üstüne banner
                   </button>
                   <div className="ks-oniz-header-govde">Site menüsü</div>
                   <button
@@ -125,7 +125,7 @@ export function KonumluSliderOnizleme({
                     className={zoneSinif(seciliMi('header-alti', 'header', null), 'alt')}
                     onClick={() => tikla(noktaOlustur('header-alti', 'header', null, widgetlar))}
                   >
-                    Altına slider
+                    Altına banner
                   </button>
                 </div>
               </div>
@@ -142,7 +142,7 @@ export function KonumluSliderOnizleme({
                     className={zoneSinif(seciliMi('footer-ustu', 'footer', null), 'ust')}
                     onClick={() => tikla(noktaOlustur('footer-ustu', 'footer', null, widgetlar))}
                   >
-                    Üstüne slider
+                    Üstüne banner
                   </button>
                   <div className="ks-oniz-footer-govde">Site alt bilgi</div>
                   <button
@@ -150,7 +150,7 @@ export function KonumluSliderOnizleme({
                     className={zoneSinif(seciliMi('footer-alti', 'footer', null), 'alt')}
                     onClick={() => tikla(noktaOlustur('footer-alti', 'footer', null, widgetlar))}
                   >
-                    Altına slider
+                    Altına banner
                   </button>
                 </div>
               </div>

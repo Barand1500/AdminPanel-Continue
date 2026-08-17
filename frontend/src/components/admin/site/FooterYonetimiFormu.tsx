@@ -25,6 +25,7 @@ import {
 import {
   AdminAnahtarDugme,
   AdminPilSekme,
+  AdminIkiEkranSlider,
 } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { footerAyarlariBirlestir, type FooterAyarlari } from '@/types/footer';
 import type { SiteAyarlari } from '@/types/site';
@@ -222,10 +223,11 @@ export function FooterYonetimiFormu() {
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
-      {gorunum === 'galeri' && <FooterTipGaleri secili={aktifTip} onSec={tipSec} />}
-
-      {gorunum === 'editor' && (
-        <div className="ap-editor-panel ap-form-editor ap-header-editor">
+      <AdminIkiEkranSlider
+        aktif={gorunum === 'editor' ? 'iki' : 'bir'}
+        birinci={<FooterTipGaleri secili={aktifTip} onSec={tipSec} />}
+        ikinci={
+          <div className="ap-editor-panel ap-form-editor ap-header-editor">
           <div className="ap-form-editor-ust">
             <div>
               <h2 className="ap-heading text-sm font-semibold">Footer düzenle</h2>
@@ -452,7 +454,8 @@ export function FooterYonetimiFormu() {
             </div>
           </div>
         </div>
-      )}
+        }
+      />
 
       <FooterOnizlemeModal
         acik={onizlemeAcik}

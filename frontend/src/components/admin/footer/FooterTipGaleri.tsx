@@ -5,9 +5,9 @@ import { FooterTipWireframe } from './FooterTipWireframe';
 
 const GALERI_KATEGORILER: { id: string; etiket: string; ids: FooterTipi[] | null }[] = [
   { id: 'tumu', etiket: 'Tümü', ids: null },
-  { id: 'eticaret', etiket: 'E-ticaret', ids: ['klasik', 'magaza', 'detayli', 'cta-serit'] },
-  { id: 'kurumsal', etiket: 'Kurumsal', ids: ['kurumsal', 'newsletter', 'split', 'kartlar'] },
-  { id: 'minimal', etiket: 'Minimal', ids: ['sade', 'merkezi', 'kompakt', 'sosyal-sahne'] },
+  { id: 'eticaret', etiket: 'E-ticaret', ids: ['klasik', 'magaza', 'detayli', 'cta-serit', 'split-vitrin'] },
+  { id: 'kurumsal', etiket: 'Kurumsal', ids: ['kurumsal', 'newsletter', 'split', 'kartlar', 'masthead', 'cam-panel'] },
+  { id: 'minimal', etiket: 'Minimal', ids: ['sade', 'merkezi', 'kompakt', 'sosyal-sahne', 'yuzen'] },
 ];
 
 interface FooterTipGaleriProps {

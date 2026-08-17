@@ -156,6 +156,22 @@ export function FooterTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: FooterTipEk
           />
         </div>
       )}
+
+      {tip === 'yuzen' && (
+        <AdminAnahtarDugme
+          etiket="Koyu kart"
+          acik={tipEk.kompaktKoyuTema === true}
+          onDegistir={(kompaktKoyuTema) => guncelle({ kompaktKoyuTema })}
+        />
+      )}
+
+      {tip === 'cam-panel' && (
+        <AdminAnahtarDugme
+          etiket="Koyu cam"
+          acik={tipEk.kompaktKoyuTema === true}
+          onDegistir={(kompaktKoyuTema) => guncelle({ kompaktKoyuTema })}
+        />
+      )}
     </div>
   );
 }

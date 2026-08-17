@@ -135,6 +135,61 @@ export function FooterTipWireframe({ tip }: { tip: FooterTipi }) {
         </div>
       </div>
     ),
+    'split-vitrin': (
+      <div className="grid grid-cols-2 gap-1 p-2">
+        <div className="space-y-1">
+          <div className={`h-3 ${bar}`} />
+          <div className={`h-1.5 w-4/5 ${line}`} />
+          <div className={`h-1.5 w-3/5 ${muted}`} />
+        </div>
+        <div className="grid grid-cols-2 gap-0.5">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className={`h-4 ${i % 2 ? bar : line}`} />
+          ))}
+        </div>
+      </div>
+    ),
+    yuzen: (
+      <div className="p-2">
+        <div className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface)] p-1.5 shadow-sm">
+          <div className="flex items-center justify-between gap-1">
+            <div className={`h-2 w-6 ${bar}`} />
+            <div className="flex gap-0.5">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className={`h-0.5 w-3 ${line}`} />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+    masthead: (
+      <div className="space-y-1 p-2">
+        <div className="flex flex-col items-center gap-0.5">
+          <div className={`h-2.5 w-10 ${bar}`} />
+          <div className={`h-0.5 w-14 ${muted}`} />
+        </div>
+        <div className="grid grid-cols-4 gap-0.5">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className={`h-3 ${line}`} />
+          ))}
+        </div>
+      </div>
+    ),
+    'cam-panel': (
+      <div className="rounded bg-[var(--ap-accent)]/10 p-2 backdrop-blur-sm">
+        <div className="grid grid-cols-4 gap-1">
+          <div className={`h-4 rounded ${bar}`} />
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="space-y-0.5">
+              <div className={`h-1 w-5 ${bar}`} />
+              <div className={`h-0.5 w-full ${line}`} />
+              <div className={`h-0.5 w-3/4 ${muted}`} />
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
     'cta-serit': (
       <div className="flex h-full flex-col">
         <div className={`flex items-center justify-between gap-2 rounded-t-sm px-2 py-2 ${bar}`}>

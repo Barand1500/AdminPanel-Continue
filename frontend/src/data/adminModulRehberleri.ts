@@ -40,7 +40,7 @@ const sayfaKartlari: RehberKart[] = [
   {
     ikon: '🔍',
     baslik: 'SEO Ayarları',
-    aciklama: 'SEO sekmesinden sayfa başlığı ve meta açıklaması ekleyin. Boş bırakırsanız sayfa başlığı kullanılır.',
+    aciklama: 'SEO sekmesindeki başlık ve meta açıklama, İçerik sekmesindeki başlık ve yazıdan otomatik dolar. İsterseniz SEO’da ayrıca düzenleyebilirsiniz.',
     renk: 'camgobegi',
   },
 ];
@@ -242,7 +242,7 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
         ikon: '✏️',
         baslik: 'Düzenleme',
         aciklama:
-          'Tipi seçince Düzenleme açılır. Logo, üst bant, dil, ikon, para ve kategori ayarlarını hap sekmelerden doldurun.',
+          'Tipi seçince Düzenleme açılır. Logo, üst bant, dil, ikon, para ve menü ayarlarını hap sekmelerden doldurun.',
         renk: 'turuncu',
       },
       {
@@ -257,39 +257,39 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
   },
 
   kategoriler: {
-    baslik: 'Kategori Yönetimi Rehberi',
-    altBaslik: 'Header mega menü kategorileri',
-    bolumBaslik: 'Kategori Yönetimi',
+    baslik: 'Menü Yönetimi Rehberi',
+    altBaslik: 'Header mega menü öğeleri',
+    bolumBaslik: 'Menü Yönetimi',
     kartlar: [
       {
         ikon: '➕',
-        baslik: 'Yeni Kategori',
+        baslik: 'Yeni Menü',
         aciklama:
-          'Alt bardaki Yeni Ekle ile ana kategori oluşturun. Bir kategori seçip Alt Ekle ile alt ve alt-alt kategori ekleyebilirsiniz (en fazla 3 seviye).',
+          'Alt bardaki Yeni Ekle ile ana menü öğesi oluşturun. Bir öğe seçip Alt Ekle ile alt ve alt-alt menü ekleyebilirsiniz (en fazla 3 seviye).',
         renk: 'mor',
       },
       {
         ikon: '✏️',
         baslik: 'Düzenleme',
         aciklama:
-          'Listeden kategori seçip Düzenle ile açın. Ad, slug, link, sıra ve görseli değiştirip Kaydet ile güncelleyin. Slug boş bırakılırsa başlıktan otomatik üretilir.',
+          'Listeden öğe seçip Düzenle ile açın. Ad, slug, link, sıra ve görseli değiştirip Kaydet ile güncelleyin. Slug boş bırakılırsa başlıktan otomatik üretilir.',
         renk: 'turuncu',
       },
       {
         ikon: '👁️',
         baslik: 'Aktif / Pasif',
-        aciklama: 'Pasif kategoriler sitede görünmez; silmeden geçici olarak gizlemek için kullanın.',
+        aciklama: 'Pasif öğeler sitede görünmez; silmeden geçici olarak gizlemek için kullanın.',
         renk: 'mavi',
       },
       {
         ikon: '🔝',
         baslik: 'Header Bağlantısı',
         aciklama:
-          '“Tüm Kategoriler” buton metni ve menü açılış stili Header Yönetimi → Düzenleme → Kategori hapından ayarlanır.',
+          'Menü buton metni ve açılış stili Header Yönetimi → Düzenleme → Menü hapından ayarlanır.',
         renk: 'sari',
       },
     ],
-    ipucu: 'Kategoriler kaydedildikten sonra public sitede header altındaki menüde görünür.',
+    ipucu: 'Menü öğeleri kaydedildikten sonra public sitede header altındaki menüde görünür.',
   },
 
   hero: {

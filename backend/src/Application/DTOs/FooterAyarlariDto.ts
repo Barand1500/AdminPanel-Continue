@@ -66,6 +66,10 @@ export const footerAyarlariSchema = z.object({
       'cta-serit',
       'sosyal-sahne',
       'kartlar',
+      'split-vitrin',
+      'yuzen',
+      'masthead',
+      'cam-panel',
     ])
     .optional(),
   tipEk: z

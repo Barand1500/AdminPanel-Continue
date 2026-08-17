@@ -7,12 +7,14 @@ import { WidgetKabuk } from '../widgetKabuk';
 import { configOkuFromWidget, gridStyle, haritaEmbedUrl, medyaUrl } from '../widgetHelpers';
 import { havaDurumuGetir, type HavaDurumuYanit } from '@/features/site/havaApi';
 import { kriptoListesiGetir, type KriptoPiyasaVeri } from '@/features/site/kriptoApi';
+import { CizgiIkon } from '../CizgiIkonlari';
 import {
   HaberBolumBaslik,
   HaberKartGovde,
   WidgetSayfalama,
   haberVurguRengi,
 } from './haberWidgetOrtak';
+import { IletisimOverlayFormu } from './IletisimOverlayFormu';
 
 function cfgOku(widget: Widget) {
   return configOkuFromWidget(widget);
@@ -150,8 +152,8 @@ export function IletisimBlokWidget({ widget }: { widget: Widget }) {
 
   const IletisimKart = ({ k, kompakt = false }: { k: (typeof kartlar)[number]; kompakt?: boolean }) => (
     <div className={kompakt ? 'ib-kart ib-kart--kompakt' : 'ib-kart'} style={{ borderRadius: radius }}>
-      <span className="ib-kart-ikon" style={{ backgroundColor: `${vurgu}22`, color: vurgu }}>
-        {k.ikon || '📍'}
+      <span className="ib-kart-ikon" style={{ backgroundColor: `${vurgu}18`, color: vurgu }}>
+        <CizgiIkon deger={`${k.ikon ?? ''} ${k.etiket} ${k.deger}`} yedek="konum" boyut={22} />
       </span>
       <div>
         <p className="ib-kart-etiket" style={{ color: metinRenk }}>
@@ -222,18 +224,12 @@ export function IletisimBlokWidget({ widget }: { widget: Widget }) {
   if (gt === 'overlay-yuzen-kart') {
     return (
       <WidgetKabuk widget={widget}>
-        <div className="ib-overlay-wrap">
-          <HaritaFrame sinif="ib-harita ib-harita--overlay" />
-          <div className="ib-yuzen-kart" style={{ borderRadius: radius }}>
-            <BaslikAlani />
-            <div className="ib-yuzen-liste">
-              {kartlar.map((k) => (
-                <IletisimKart key={k.id} k={k} kompakt />
-              ))}
-            </div>
-            <CtaButon />
-          </div>
-        </div>
+        <IletisimOverlayFormu
+          baslik={widget.baslik}
+          butonMetni={widget.butonMetni}
+          vurgu={vurgu}
+          baslikRenk={baslikRenk}
+        />
       </WidgetKabuk>
     );
   }
@@ -242,25 +238,31 @@ export function IletisimBlokWidget({ widget }: { widget: Widget }) {
     return (
       <WidgetKabuk widget={widget}>
         <div className="ib-ikon-serit">
-          <BaslikAlani />
-          <div className="ib-serit">
-            {kartlar.map((k) => (
-              <div key={k.id} className="ib-serit-oge" style={{ borderRadius: radius }}>
-                <span className="ib-serit-ikon" style={{ color: vurgu }}>
-                  {k.ikon || '📍'}
-                </span>
-                <div>
-                  <p className="ib-serit-etiket" style={{ color: metinRenk }}>
-                    {k.etiket}
-                  </p>
-                  <p className="ib-serit-deger" style={{ color: baslikRenk }}>
-                    {k.deger}
-                  </p>
-                </div>
+          {(widget.baslik || widget.altBaslik) && (
+            <div className="ib-sube-baslik-satir">
+              <span className="ib-sube-baslik-ikon" style={{ color: vurgu }}>
+                <CizgiIkon deger={widget.altBaslik || 'kurumsal'} yedek="kurumsal" boyut={22} />
+              </span>
+              <div>
+                {widget.baslik && (
+                  <h2 className="ib-sube-baslik" style={{ color: baslikRenk }}>
+                    {widget.baslik}
+                  </h2>
+                )}
+                <span className="ib-yuzen-cizgi" style={{ backgroundColor: vurgu }} />
               </div>
-            ))}
+            </div>
+          )}
+          <div className="ib-sube-govde">
+            <div className="ib-kart-grid ib-kart-grid--2">
+              {kartlar.map((k) => (
+                <IletisimKart key={k.id} k={k} />
+              ))}
+            </div>
+            <div className="ib-harita-cerceve" style={{ borderRadius: radius }}>
+              <HaritaFrame sinif="ib-harita ib-harita--genis" />
+            </div>
           </div>
-          <HaritaFrame sinif="ib-harita ib-harita--genis" />
         </div>
       </WidgetKabuk>
     );

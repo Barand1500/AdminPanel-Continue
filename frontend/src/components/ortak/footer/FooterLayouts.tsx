@@ -184,6 +184,23 @@ function FooterLayoutSplit({ siteAdi, ayarlar, footer, cevir }: FooterLayoutProp
   );
 }
 
+function FooterLayoutSplitVitrin({ siteAdi, ayarlar, footer, cevir }: FooterLayoutProps) {
+  return (
+    <>
+      <div className="container-site py-10">
+        <div className="footer-split-vitrin">
+          <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} cevir={cevir} />
+          <div className="footer-kolonlar grid gap-8 sm:grid-cols-2">
+            <FooterKolonlar footer={footer} cevir={cevir} />
+          </div>
+        </div>
+      </div>
+      <FooterPazaryeriBand footer={footer} cevir={cevir} vurgulu />
+      <FooterTelifBand siteAdi={siteAdi} ayarlar={ayarlar} cevir={cevir} />
+    </>
+  );
+}
+
 function FooterLayoutCtaSerit({ siteAdi, ayarlar, footer, cevir }: FooterLayoutProps) {
   const ek = footer.tipEk;
   const baslik = ek?.ctaMetni?.trim() || 'Projenizi konuşalım';
@@ -223,6 +240,30 @@ function FooterLayoutCtaSerit({ siteAdi, ayarlar, footer, cevir }: FooterLayoutP
       </div>
       <FooterTelifBand siteAdi={siteAdi} ayarlar={ayarlar} cevir={cevir} />
     </>
+  );
+}
+
+function FooterLayoutYuzen({ siteAdi, ayarlar, footer, cevir }: FooterLayoutProps) {
+  const linkIkon = footerLinkIkonGoster(footer.linkIkon);
+  const linkler = footerDuzLinkler(footer).slice(0, 8);
+  const koyu = footer.tipEk?.kompaktKoyuTema === true;
+
+  return (
+    <div className="footer-yuzen-dis">
+      <div className={`footer-yuzen-kart${koyu ? ' footer-kompakt-koyu' : ''}`}>
+        <div className="flex flex-col items-center gap-6 px-6 py-8 lg:flex-row lg:justify-between">
+          <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} cevir={cevir} kompakt />
+          {linkler.length > 0 && (
+            <nav className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-sm">
+              {linkler.map((l) => (
+                <FooterNavLink key={l.id} link={l} ikon={linkIkon} cevir={cevir} />
+              ))}
+            </nav>
+          )}
+        </div>
+        <FooterTelifBand siteAdi={siteAdi} ayarlar={ayarlar} cevir={cevir} />
+      </div>
+    </div>
   );
 }
 
@@ -270,6 +311,36 @@ function FooterLayoutKartlar({ siteAdi, ayarlar, footer, cevir }: FooterLayoutPr
   );
 }
 
+function FooterLayoutMasthead({ siteAdi, ayarlar, footer, cevir }: FooterLayoutProps) {
+  return (
+    <>
+      <div className="footer-masthead">
+        <div className="container-site flex flex-col items-center gap-3 py-10 text-center">
+          <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} cevir={cevir} />
+        </div>
+      </div>
+      <div className="container-site py-10">
+        <div className="footer-kolonlar grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <FooterKolonlar footer={footer} cevir={cevir} />
+        </div>
+      </div>
+      <FooterGuvenBand footer={footer} cevir={cevir} ayarlar={ayarlar} />
+      <FooterTelifBand siteAdi={siteAdi} ayarlar={ayarlar} cevir={cevir} />
+    </>
+  );
+}
+
+function FooterLayoutCamPanel({ siteAdi, ayarlar, footer, cevir }: FooterLayoutProps) {
+  const koyu = footer.tipEk?.kompaktKoyuTema === true;
+  return (
+    <div className={`footer-cam-panel-ic${koyu ? ' footer-cam-panel-ic--koyu' : ''}`}>
+      {footerAnaIcerik({ siteAdi, ayarlar, footer, cevir })}
+      <FooterGuvenBand footer={footer} cevir={cevir} ayarlar={ayarlar} />
+      <FooterTelifBand siteAdi={siteAdi} ayarlar={ayarlar} cevir={cevir} />
+    </div>
+  );
+}
+
 export function FooterLayoutSec(props: FooterLayoutProps) {
   const tip = footerTipiNormalize(props.footer.footerTipi);
   switch (tip) {
@@ -295,6 +366,14 @@ export function FooterLayoutSec(props: FooterLayoutProps) {
       return <FooterLayoutSosyalSahne {...props} />;
     case 'kartlar':
       return <FooterLayoutKartlar {...props} />;
+    case 'split-vitrin':
+      return <FooterLayoutSplitVitrin {...props} />;
+    case 'yuzen':
+      return <FooterLayoutYuzen {...props} />;
+    case 'masthead':
+      return <FooterLayoutMasthead {...props} />;
+    case 'cam-panel':
+      return <FooterLayoutCamPanel {...props} />;
     default:
       return <FooterLayoutKlasik {...props} />;
   }

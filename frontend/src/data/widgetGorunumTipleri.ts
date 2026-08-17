@@ -324,8 +324,8 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
   ILETISIM_BLOK: [
     gt('split-kart-harita', 'Split Kart Harita', 'Sol kartlar, sağ harita', 'okyanus'),
     gt('harita-ust-kart-alt', 'Harita Üst Kart Alt', 'Üstte harita, altta kart grid', 'notr'),
-    gt('overlay-yuzen-kart', 'Overlay Yüzen Kart', 'Harita üzerinde yüzen iletişim kartı', 'gece'),
-    gt('ikon-serit-harita', 'İkon Şerit Harita', 'İkon şeridi + geniş harita', 'yesil'),
+    gt('overlay-yuzen-kart', 'Overlay Yüzen Kart', 'Haritasız iki sütunlu iletişim formu', 'gece'),
+    gt('ikon-serit-harita', 'İkon Şerit Harita', 'Kart grid + harita, başlıklı şube düzeni', 'yesil'),
     gt('cam-panel-harita', 'Cam Panel Harita', 'Cam efektli panel + harita', 'lavanta'),
     gt('sidebar-liste-harita', 'Sidebar Liste Harita', 'Dar liste, geniş harita', 'altin'),
   ],

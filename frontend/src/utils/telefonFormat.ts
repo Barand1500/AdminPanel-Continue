@@ -83,27 +83,29 @@ export function telefonFormatla(ham: string): string {
   return grupla3_3_2_2(rakamlar.slice(0, 10));
 }
 
-/** WhatsApp: uluslararasi format +90 532 100 20 30 */
+/** WhatsApp görünüm formatı: +90 532 100 20 30 (ülke kodu serbest). */
 export function whatsappFormatla(ham: string): string {
+  const artıYazildi = ham.trimStart().startsWith('+');
   let rakamlar = ham.replace(/\D/g, '');
-  if (!rakamlar) return '';
+  if (rakamlar.startsWith('00')) rakamlar = rakamlar.slice(2);
+  rakamlar = rakamlar.slice(0, 15);
+  if (!rakamlar) return artıYazildi ? '+' : '';
 
-  if (rakamlar.startsWith('90')) rakamlar = rakamlar.slice(2);
-  if (rakamlar.startsWith('0')) rakamlar = rakamlar.slice(1);
-  rakamlar = rakamlar.slice(0, 10);
-
-  if (rakamlar.length <= 3) return `+90 ${rakamlar}`;
-  if (rakamlar.length <= 6) return `+90 ${rakamlar.slice(0, 3)} ${rakamlar.slice(3)}`;
-  if (rakamlar.length <= 8) {
-    return `+90 ${rakamlar.slice(0, 3)} ${rakamlar.slice(3, 6)} ${rakamlar.slice(6)}`;
+  if (rakamlar.startsWith('90')) {
+    const ulusal = rakamlar.slice(2, 12);
+    return `+90${ulusal ? ` ${grupla3_3_2_2(ulusal)}` : ''}`;
   }
-  return `+90 ${rakamlar.slice(0, 3)} ${rakamlar.slice(3, 6)} ${rakamlar.slice(6, 8)} ${rakamlar.slice(8)}`;
+
+  if (rakamlar.startsWith('0')) {
+    const yerel = grupla4_3_2_2(rakamlar.slice(0, 11));
+    return artıYazildi ? `+${yerel}` : yerel;
+  }
+
+  const govde = grupla3_3_2_2(rakamlar.slice(0, 10));
+  const fazla = rakamlar.length > 10 ? ` ${rakamlar.slice(10)}` : '';
+  return `${artıYazildi ? '+' : ''}${govde}${fazla}`;
 }
 
 export function whatsappKayitDegeri(formatli: string): string {
-  const rakamlar = formatli.replace(/\D/g, '');
-  if (!rakamlar) return '';
-  if (rakamlar.startsWith('90')) return rakamlar;
-  const ulusal = rakamlar.startsWith('0') ? rakamlar.slice(1) : rakamlar;
-  return `90${ulusal}`;
+  return formatli.replace(/\D/g, '').slice(0, 15);
 }

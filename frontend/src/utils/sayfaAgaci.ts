@@ -5,8 +5,27 @@ import { idString } from '@/utils/idKarsilastir';
 import { sayfaDuzenEtiketiKaldir } from '@/utils/sayfaIcerikIsle';
 
 export function sayfaIcerikVar(icerik?: string | null): boolean {
-  const metin = sayfaDuzenEtiketiKaldir(icerik ?? '').replace(/<[^>]*>/g, '').trim();
-  return Boolean(metin);
+  return Boolean(sayfaIcerikOzeti(icerik));
+}
+
+export function sayfaIcerikOzeti(icerik?: string | null, limit = 160): string {
+  const metin = sayfaDuzenEtiketiKaldir(icerik ?? '')
+    .replace(/<style[\s\S]*?<\/style>/gi, ' ')
+    .replace(/<script[\s\S]*?<\/script>/gi, ' ')
+    .replace(/<[^>]*>/g, ' ')
+    .replace(/&nbsp;/gi, ' ')
+    .replace(/&amp;/gi, '&')
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&lt;/gi, '<')
+    .replace(/&gt;/gi, '>')
+    .replace(/\s+/g, ' ')
+    .trim();
+  if (!metin) return '';
+  if (metin.length <= limit) return metin;
+  const kes = metin.slice(0, limit);
+  const sonBosluk = kes.lastIndexOf(' ');
+  return (sonBosluk > 60 ? kes.slice(0, sonBosluk) : kes).trim();
 }
 
 export type AltMenuGorunum = 'dikey' | 'yatay';

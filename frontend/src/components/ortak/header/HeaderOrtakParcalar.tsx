@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import { useState, type CSSProperties, type ReactNode } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
-import { kullaniciAlaniGoster } from '@/types/header';
+import { kullaniciAlaniGoster, headerRenkCssVars } from '@/types/header';
 import type { HeaderVeri } from './useHeaderVeri';
 import { aramaSinifi, kurDegeri } from './useHeaderVeri';
 import { KategoriMenu } from '../KategoriMenu';
@@ -49,11 +49,12 @@ export function MenuOgeGoster({
 
 export function UstBant({ veri, ayarlar }: { veri: HeaderVeri; ayarlar?: SiteAyarlari | null }) {
   const ustBant = veri.header.ustBant!;
+  const renkler = headerRenkCssVars(veri.tipEk);
 
   if (!ustBant) return null;
 
   return (
-    <div className="bg-primary text-white">
+    <div className={renkler ? 'site-header-ust-ozel' : 'bg-primary text-white'} style={renkler}>
       <div className="container-site flex flex-wrap items-center justify-between gap-2 py-2 text-xs sm:text-sm">
         <p className="max-w-xl opacity-95">{veri.header.slogan}</p>
         <div className="flex flex-wrap items-center gap-4 text-[11px] sm:text-xs">
@@ -363,8 +364,13 @@ export function HeaderGovde({
   altSatir?: ReactNode;
   children: ReactNode;
 }) {
+  const renkler = headerRenkCssVars(veri.tipEk);
+  const sabit = veri.tipEk.sabit !== false;
   return (
-    <header className={`site-header sticky top-0 z-40 border-b shadow-sm ${veri.tipSinifi} ${className}`}>
+    <header
+      className={`site-header ${sabit ? 'sticky top-0 z-40' : 'relative z-40'} border-b shadow-sm ${veri.tipSinifi} ${className}${renkler ? ' site-header--ozel-renk' : ''}`}
+      style={renkler}
+    >
       {children}
       {altSatir}
     </header>

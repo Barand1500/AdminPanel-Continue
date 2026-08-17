@@ -1,7 +1,12 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import type { AdminModul, AdminSekme } from '@/types/admin';
 import { modulBul } from '@/data/adminMenuYapisi';
 import { sekmeAyarlariOku } from '@/utils/sekmePanelAyarlari';
+
+function sekmeBasliginiGuncelle(sekme: AdminSekme): AdminSekme {
+  const guncel = modulBul(sekme.modulId)?.baslik;
+  return guncel && guncel !== sekme.baslik ? { ...sekme, baslik: guncel } : sekme;
+}
 
 const VARSAYILAN_SEKMELER: AdminSekme[] = [
   { id: 'dashboard', modulId: 'dashboard', baslik: 'Dashboard' },
@@ -35,7 +40,9 @@ export function useAdminSekmeler() {
         if (mevcut) {
           return {
             aktifSekmeId: mevcut.id,
-            sekmeler: onceki.sekmeler,
+            sekmeler: onceki.sekmeler.map((s) =>
+              s.id === mevcut.id ? { ...s, baslik: modul.baslik } : s
+            ),
           };
         }
       }
@@ -145,8 +152,10 @@ export function useAdminSekmeler() {
     });
   }, []);
 
+  const sekmelerGuncel = useMemo(() => sekmeler.map(sekmeBasliginiGuncelle), [sekmeler]);
+
   const aktifModul = modulBul(
-    sekmeler.find((s) => s.id === aktifSekmeId)?.modulId ?? 'dashboard'
+    sekmelerGuncel.find((s) => s.id === aktifSekmeId)?.modulId ?? 'dashboard'
   );
 
   const kaydedilmediIsaretle = useCallback((sekmeId: string, kirli: boolean) => {
@@ -159,7 +168,7 @@ export function useAdminSekmeler() {
   }, []);
 
   return {
-    sekmeler,
+    sekmeler: sekmelerGuncel,
     aktifSekmeId,
     aktifModul,
     setAktifSekmeId: sekmeSec,

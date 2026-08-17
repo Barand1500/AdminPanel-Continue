@@ -17,28 +17,43 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
   const guncelle = (parcalar: Partial<HeaderTipEkAyarlari>) => {
     onGuncelle({ tipEk: { ...tipEk, ...parcalar } });
   };
-
-  if (!tanim.ekAyarlari) {
-    return <p className="ap-muted text-sm">Bu header tipi için ek alan gerekmez.</p>;
-  }
+  const imzaRenk = tip === 'imza-kurumsal';
 
   return (
     <div className="ap-header-ek-grid">
-      {tip === 'imza-kurumsal' && (
-        <>
-          <AdminAnahtarDugme
-            etiket="Kaydırırken sabit kalsın"
-            acik={tipEk.sabit !== false}
-            onDegistir={(sabit) => guncelle({ sabit })}
+      <AdminAnahtarDugme
+        etiket="Kaydırırken sabit kalsın"
+        acik={tipEk.sabit !== false}
+        onDegistir={(sabit) => guncelle({ sabit })}
+      />
+      <div className="ap-header-form-grid">
+        <RenkSecici
+          etiket="Ana header arka planı"
+          deger={tipEk.arkaPlanRengi ?? ''}
+          varsayilan={imzaRenk ? '#0b2a77' : '#ffffff'}
+          onChange={(arkaPlanRengi) => guncelle({ arkaPlanRengi })}
+        />
+        {tanim.ustBant && (
+          <RenkSecici
+            etiket="Üst iletişim bandı"
+            deger={tipEk.ustBantRengi ?? ''}
+            varsayilan={imzaRenk ? '#08245f' : '#ffffff'}
+            onChange={(ustBantRengi) => guncelle({ ustBantRengi })}
           />
-          <div className="ap-header-form-grid">
-            <RenkSecici etiket="Ana header arka planı" deger={tipEk.arkaPlanRengi ?? ''} varsayilan="#0b2a77" onChange={(arkaPlanRengi) => guncelle({ arkaPlanRengi })} />
-            <RenkSecici etiket="Üst iletişim bandı" deger={tipEk.ustBantRengi ?? ''} varsayilan="#08245f" onChange={(ustBantRengi) => guncelle({ ustBantRengi })} />
-            <RenkSecici etiket="Menü / metin rengi" deger={tipEk.metinRengi ?? ''} varsayilan="#ffffff" onChange={(metinRengi) => guncelle({ metinRengi })} />
-            <RenkSecici etiket="Katalog butonu" deger={tipEk.butonRengi ?? ''} varsayilan="#eef4ff" onChange={(butonRengi) => guncelle({ butonRengi })} />
-          </div>
-        </>
-      )}
+        )}
+        <RenkSecici
+          etiket="Menü / metin rengi"
+          deger={tipEk.metinRengi ?? ''}
+          varsayilan={imzaRenk ? '#ffffff' : '#111827'}
+          onChange={(metinRengi) => guncelle({ metinRengi })}
+        />
+        <RenkSecici
+          etiket="Katalog / buton rengi"
+          deger={tipEk.butonRengi ?? ''}
+          varsayilan={imzaRenk ? '#eef4ff' : '#111827'}
+          onChange={(butonRengi) => guncelle({ butonRengi })}
+        />
+      </div>
       {(tip === 'sade' || tip === 'kompakt' || tip === 'arama-odakli' || tip === 'imza-kurumsal' || tip === 'yuzen-hap') && (
         <>
           <AdminAnahtarDugme

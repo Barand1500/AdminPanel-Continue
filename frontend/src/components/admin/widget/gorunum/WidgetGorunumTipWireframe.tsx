@@ -107,6 +107,35 @@ export function WidgetGorunumTipWireframe({
         <div className="h-6 flex-1 rounded" style={{ background: renk.surface }} />
       </div>
     ),
+    'ILETISIM_BLOK:overlay-yuzen-kart': (
+      <div className="space-y-0.5 p-1" style={{ background: renk.bg }}>
+        <div className="h-0.5 w-3 rounded" style={{ background: renk.accent }} />
+        <div className="flex gap-0.5">
+          <div className="w-1/2 space-y-0.5">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-1 rounded border" style={{ borderColor: '#e2e8f0', background: '#fff' }} />
+            ))}
+          </div>
+          <div className="flex w-1/2 flex-col gap-0.5">
+            <div className="h-4 flex-1 rounded border" style={{ borderColor: '#e2e8f0', background: '#fff' }} />
+            <div className="h-1.5 rounded" style={{ background: renk.accent }} />
+          </div>
+        </div>
+      </div>
+    ),
+    'ILETISIM_BLOK:ikon-serit-harita': (
+      <div className="space-y-0.5 p-1" style={{ background: renk.bg }}>
+        <div className="h-0.5 w-4 rounded" style={{ background: renk.accent }} />
+        <div className="flex gap-0.5">
+          <div className="grid w-1/2 grid-cols-2 gap-0.5">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="h-2 rounded" style={{ background: `${renk.accent}18` }} />
+            ))}
+          </div>
+          <div className="h-5 flex-1 rounded bg-white shadow-sm" />
+        </div>
+      </div>
+    ),
     'HARITA:yan-ikon-liste': (
       <div className="flex gap-0.5 p-1" style={{ background: '#f8fafc' }}>
         <div className="grid w-3/5 grid-cols-2 gap-0.5">

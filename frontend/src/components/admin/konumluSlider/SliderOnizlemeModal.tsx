@@ -38,7 +38,7 @@ export function SliderOnizlemeModal({ acik, ad, config, onKapat }: SliderOnizlem
     id: 'onizleme',
     siteId: '',
     sayfaId: null,
-    ad: ad.trim() || 'Slider',
+    ad: ad.trim() || 'Banner',
     aktif: true,
     sira: 1,
     configJson: config,
@@ -51,7 +51,7 @@ export function SliderOnizlemeModal({ acik, ad, config, onKapat }: SliderOnizlem
         <header className="ap-admin-modal-header">
           <div>
             <h2 id="slider-onizleme-baslik" className="ap-admin-modal-baslik">
-              Slider önizleme
+              Banner önizleme
             </h2>
             <p className="ap-admin-modal-alt">
               {ad.trim() || 'Adsız'} · {konumSecimOzeti(config)} · {config.yon === 'yatay' ? 'Yatay' : 'Dikey'}

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FormAlani, formInputSinifi } from './FormAlani';
-import { ORNEK_WHATSAPP, whatsappFormatla } from '@/utils/telefonFormat';
+import { whatsappFormatla } from '@/utils/telefonFormat';
 
 interface WhatsAppInputProps {
   deger: string;
@@ -12,11 +12,10 @@ interface WhatsAppInputProps {
 export function WhatsAppInput({
   deger,
   onChange,
-  aciklama = ORNEK_WHATSAPP,
-  placeholder = ORNEK_WHATSAPP,
+  aciklama,
+  placeholder = '',
 }: WhatsAppInputProps) {
   const [odak, setOdak] = useState(false);
-  const gorunen = deger.includes('+') ? deger : whatsappFormatla(deger);
 
   return (
     <FormAlani etiket="WhatsApp" aciklama={aciklama}>
@@ -30,7 +29,7 @@ export function WhatsAppInput({
           type="tel"
           inputMode="tel"
           autoComplete="tel"
-          value={gorunen}
+          value={deger}
           onChange={(e) => onChange(whatsappFormatla(e.target.value))}
           onFocus={() => setOdak(true)}
           onBlur={() => setOdak(false)}

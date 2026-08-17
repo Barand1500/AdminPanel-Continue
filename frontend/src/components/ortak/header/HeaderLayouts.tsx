@@ -2,7 +2,7 @@ import type { CSSProperties, Dispatch, SetStateAction } from 'react';
 import { Link } from 'react-router-dom';
 import type { SiteAyarlari } from '@/types/site';
 import { headerMarkaKapSinifi, logoBoyutuNormalize } from '@/types/logo';
-import { kullaniciAlaniGoster } from '@/types/header';
+import { kullaniciAlaniGoster, headerRenkCssVars } from '@/types/header';
 import type { HeaderVeri } from './useHeaderVeri';
 import {
   UstBant,
@@ -383,6 +383,12 @@ export function HeaderImzaKurumsal({
     '--imza-ust': veri.tipEk.ustBantRengi || '#08245f',
     '--imza-metin': veri.tipEk.metinRengi || '#ffffff',
     '--imza-btn': veri.tipEk.butonRengi || '#eef4ff',
+    ...(headerRenkCssVars({
+      arkaPlanRengi: veri.tipEk.arkaPlanRengi || '#0b2a77',
+      ustBantRengi: veri.tipEk.ustBantRengi || '#08245f',
+      metinRengi: veri.tipEk.metinRengi || '#ffffff',
+      butonRengi: veri.tipEk.butonRengi || '#eef4ff',
+    }) ?? {}),
   } as CSSProperties;
 
   return (
@@ -459,11 +465,12 @@ export function HeaderImzaKurumsal({
 }
 
 export function HeaderYuzenHap({ veri, menuAcik, setMenuAcik }: HeaderLayoutProps) {
+  const renkler = headerRenkCssVars(veri.tipEk);
   return (
     <div className="site-header-yuzen-shell">
       <header className={`site-header site-header-yuzen-hap site-header-varyant-yuzen-hap ${veri.tipSinifi} border-0 bg-transparent shadow-none`}>
         <div className="container-site">
-          <div className="site-header-yuzen-hap-bar">
+          <div className={`site-header-yuzen-hap-bar${renkler ? ' site-header--ozel-renk' : ''}`} style={renkler}>
             <MarkaAlani veri={veri} className="max-w-[140px] shrink-0" />
             <DesktopMenu
               menu={veri.cevrilmisMenu}

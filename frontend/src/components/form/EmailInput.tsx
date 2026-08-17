@@ -65,7 +65,7 @@ export function EmailInput({
           onBlur={() => setTimeout(() => setOdak(false), 150)}
           onKeyDown={klavye}
           className={`${formInputSinifi} ap-input-ikonlu ${odak ? 'ap-input-odak' : ''}`}
-          placeholder="ornek@gmail.com"
+          placeholder=""
         />
         {goster && (
           <ul className="ap-email-oneriler">

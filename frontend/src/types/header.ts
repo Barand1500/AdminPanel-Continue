@@ -270,3 +270,40 @@ export function headerMarkaMetni(header: HeaderAyarlari): string {
 export function kullaniciAlaniGoster(tipEk?: HeaderTipEkAyarlari | null): boolean {
   return tipEk?.kullaniciGoster !== false;
 }
+
+function hexParlakMi(hex: string): boolean {
+  const h = hex.replace('#', '');
+  if (h.length !== 6) return true;
+  const r = Number.parseInt(h.slice(0, 2), 16);
+  const g = Number.parseInt(h.slice(2, 4), 16);
+  const b = Number.parseInt(h.slice(4, 6), 16);
+  return 0.299 * r + 0.587 * g + 0.114 * b > 160;
+}
+
+/** Admin renk seçicilerinin header CSS değişkenlerine dönüşümü. */
+export function headerRenkCssVars(tipEk?: HeaderTipEkAyarlari | null): Record<string, string> | undefined {
+  if (!tipEk) return undefined;
+  const ana = tipEk.arkaPlanRengi?.trim();
+  const ust = tipEk.ustBantRengi?.trim();
+  const metin = tipEk.metinRengi?.trim();
+  const btn = tipEk.butonRengi?.trim();
+  if (!ana && !ust && !metin && !btn) return undefined;
+  const btnHex = btn && /^#[0-9A-Fa-f]{6}$/.test(btn) ? btn : '#eef4ff';
+  const vars: Record<string, string> = {
+    '--imza-btn-text': hexParlakMi(btnHex) ? '#0f172a' : '#ffffff',
+  };
+  if (ana) {
+    vars['--imza-ana'] = ana;
+    vars['--header-bg'] = ana;
+  }
+  if (ust) {
+    vars['--imza-ust'] = ust;
+    vars['--header-ust'] = ust;
+  }
+  if (metin) {
+    vars['--imza-metin'] = metin;
+    vars['--header-text'] = metin;
+  }
+  if (btn) vars['--imza-btn'] = btn;
+  return vars;
+}

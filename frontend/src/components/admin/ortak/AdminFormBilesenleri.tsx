@@ -214,6 +214,30 @@ export function AdminAnahtarDugme({
   );
 }
 
+/** Tip galerisi ile düzenleme arasında kaydırmalı iki ekran. */
+export function AdminIkiEkranSlider({
+  aktif,
+  birinci,
+  ikinci,
+}: {
+  aktif: 'bir' | 'iki';
+  birinci: ReactNode;
+  ikinci: ReactNode;
+}) {
+  return (
+    <div className="ap-iki-ekran">
+      <div className={`ap-iki-ekran-ray${aktif === 'iki' ? ' ap-iki-ekran-ray--iki' : ''}`}>
+        <div className="ap-iki-ekran-sayfa" aria-hidden={aktif !== 'bir'} inert={aktif !== 'bir' ? true : undefined}>
+          {birinci}
+        </div>
+        <div className="ap-iki-ekran-sayfa" aria-hidden={aktif !== 'iki'} inert={aktif !== 'iki' ? true : undefined}>
+          {ikinci}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export function slugUret(baslik: string): string {
   const harita: Record<string, string> = {
     ç: 'c', Ç: 'c', ğ: 'g', Ğ: 'g', ı: 'i', İ: 'i', ö: 'o', Ö: 'o', ş: 's', Ş: 's', ü: 'u', Ü: 'u',

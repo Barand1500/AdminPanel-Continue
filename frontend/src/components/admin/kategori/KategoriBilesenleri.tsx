@@ -166,8 +166,8 @@ export function KategoriListesiPanel({
     <aside className="ap-sidebar-panel ap-sayfa-liste-panel ap-sayfa-liste-panel--tam">
       <div className="ap-sidebar-baslik">
         <div>
-          <h2 className="ap-heading text-sm font-semibold">Kategori Listesi</h2>
-          <p className="ap-muted text-xs">{kategoriler.length} kategori</p>
+          <h2 className="ap-heading text-sm font-semibold">Menü Listesi</h2>
+          <p className="ap-muted text-xs">{kategoriler.length} öğe</p>
         </div>
         <AdminAnahtarDugme
           etiket="Menüde göster"
@@ -181,9 +181,9 @@ export function KategoriListesiPanel({
         {filtreli.length === 0 ? (
           <AdminBosDurum
             ikon="📂"
-            baslik={arama ? 'Sonuç yok' : 'Henüz kategori yok'}
+            baslik={arama ? 'Sonuç yok' : 'Henüz menü öğesi yok'}
             aciklama={
-              arama ? 'Aramayı temizleyip tekrar deneyin' : 'Üstten Yeni Kategori sekmesine geçerek başlayın'
+              arama ? 'Aramayı temizleyip tekrar deneyin' : 'Üstten Yeni Menü sekmesine geçerek başlayın'
             }
           />
         ) : (
@@ -221,14 +221,14 @@ export function KategoriEditorPanel({
       <div className="ap-kategori-editor-ust">
         <div>
           <h2 className="ap-heading text-sm font-semibold">
-            {seciliId ? 'Kategori düzenle' : form.ustKategoriId ? 'Yeni alt kategori' : 'Yeni kategori'}
+            {seciliId ? 'Menü düzenle' : form.ustKategoriId ? 'Yeni alt menü' : 'Yeni menü'}
           </h2>
           <p className="ap-muted text-xs">
-            {ust ? `Üst: ${ust.baslik}` : 'Ana kategori · en fazla 3 seviye'}
+            {ust ? `Üst: ${ust.baslik}` : 'Ana menü · en fazla 3 seviye'}
           </p>
         </div>
         <div className="ap-kategori-editor-ust-sag">
-          {form.ustKategoriId && <AdminDurumEtiketi tur="bilgi">Alt kategori</AdminDurumEtiketi>}
+          {form.ustKategoriId && <AdminDurumEtiketi tur="bilgi">Alt menü</AdminDurumEtiketi>}
           <div className={`ap-kategori-aktif-anahtar${form.aktif ? ' ap-kategori-aktif-anahtar--acik' : ''}`}>
             <AdminAnahtarDugme
               etiket="Aktif"
@@ -240,7 +240,7 @@ export function KategoriEditorPanel({
       </div>
 
       <div className="ap-kategori-editor-govde">
-        <AdminFormBolumu baslik="Bilgiler" aciklama="Pasif kategoriler sitede görünmez.">
+        <AdminFormBolumu baslik="Bilgiler" aciklama="Pasif öğeler sitede görünmez.">
           <div className="ap-kategori-form-grid">
             <div className="ap-kategori-ad-satir">
               <label className="ap-kategori-ad-hucre">
@@ -253,7 +253,7 @@ export function KategoriEditorPanel({
                 />
               </label>
               <label className="ap-kategori-ad-hucre ap-kategori-ad-hucre--ad">
-                <span>Kategori adı</span>
+                <span>Menü adı</span>
                 <input
                   className={formInputSinifi}
                   value={form.baslik}
@@ -288,13 +288,13 @@ export function KategoriEditorPanel({
                 placeholder="Boşsa /kategori-slug kullanılır"
               />
             </FormAlani>
-            <FormAlani etiket="Üst kategori">
+            <FormAlani etiket="Üst menü">
               <select
                 className={formSelectSinifi}
                 value={form.ustKategoriId ?? ''}
                 onChange={(e) => onChange({ ...form, ustKategoriId: e.target.value || null })}
               >
-                <option value="">— Ana kategori (üst yok) —</option>
+                <option value="">— Ana menü (üst yok) —</option>
                 {ustSecenekleri.map((u) => (
                   <option key={u.id} value={u.id}>
                     {u.baslik}
@@ -306,8 +306,8 @@ export function KategoriEditorPanel({
         </AdminFormBolumu>
 
         <GorselAlan
-          etiket="Kategori görseli"
-          aciklama="Menü ve kategori kartlarında kullanılır"
+          etiket="Menü görseli"
+          aciklama="Menü ve kartlarda kullanılır"
           deger={form.gorselUrl}
           onChange={(v) => onChange({ ...form, gorselUrl: v })}
         />

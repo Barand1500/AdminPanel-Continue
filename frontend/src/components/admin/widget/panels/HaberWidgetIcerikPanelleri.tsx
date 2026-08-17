@@ -17,6 +17,7 @@ import type {
   WidgetAcilisKapanisSaati,
 } from '@/types/haberWidget';
 import { WidgetGorunumIcerikAlanlari } from './WidgetGorunumIcerikAlanlari';
+import { widgetGorunumTipiNormalize } from '@/data/widgetGorunumTipleri';
 import { ListeSiralayici } from './WidgetPanelOrtak';
 import type { WidgetPanelProps } from './types';
 import { useEffect, useState } from 'react';
@@ -132,9 +133,11 @@ export function KoseYazarlariIcerik({ form, onChange }: WidgetPanelProps) {
 export function IletisimBlokIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const kartlar = cfg.iletisimKartlari ?? [];
+  const formMod = widgetGorunumTipiNormalize(form.tip, cfg.gorunum?.gorunumTipi) === 'overlay-yuzen-kart';
   return (
     <>
       <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      {!formMod && (
       <AdminFormBolumu baslik="İletişim + Harita">
       <FormAlani etiket="Harita linki / adres"><input className={formInputSinifi} value={cfg.haritaUrl ?? ''} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, haritaUrl: e.target.value })))} /></FormAlani>
       <ListeSiralayici<WidgetIletisimKarti>
@@ -159,6 +162,7 @@ export function IletisimBlokIcerik({ form, onChange }: WidgetPanelProps) {
         )}
       />
     </AdminFormBolumu>
+      )}
     </>
   );
 }

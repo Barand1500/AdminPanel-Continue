@@ -28,6 +28,7 @@ import {
 import {
   AdminAnahtarDugme,
   AdminPilSekme,
+  AdminIkiEkranSlider,
 } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 
@@ -144,8 +145,8 @@ export function HeaderYonetimiFormu() {
     liste.push({ id: 'dil', etiket: 'Dil' });
     liste.push({ id: 'ikonlar', etiket: 'İkonlar' });
     liste.push({ id: 'para', etiket: 'Para' });
-    if (tipTanim.kategoriArama) liste.push({ id: 'kategori', etiket: 'Kategori' });
-    if (tipTanim.ekAyarlari) liste.push({ id: 'ek-ayarlar', etiket: 'Ek Ayarlar' });
+    if (tipTanim.kategoriArama) liste.push({ id: 'kategori', etiket: 'Menü' });
+    liste.push({ id: 'ek-ayarlar', etiket: 'Ek Ayarlar' });
     return liste;
   }, [tipTanim]);
 
@@ -223,10 +224,11 @@ export function HeaderYonetimiFormu() {
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
-      {gorunum === 'galeri' && <HeaderTipGaleri secili={aktifTip} onSec={tipSec} />}
-
-      {gorunum === 'editor' && (
-        <div className="ap-editor-panel ap-form-editor ap-header-editor">
+      <AdminIkiEkranSlider
+        aktif={gorunum === 'editor' ? 'iki' : 'bir'}
+        birinci={<HeaderTipGaleri secili={aktifTip} onSec={tipSec} />}
+        ikinci={
+          <div className="ap-editor-panel ap-form-editor ap-header-editor">
           <div className="ap-form-editor-ust">
             <div>
               <h2 className="ap-heading text-sm font-semibold">Header düzenle</h2>
@@ -396,10 +398,10 @@ export function HeaderYonetimiFormu() {
               {gecerliIcSekme === 'kategori' && (
                 <div className="space-y-3">
                   <Link to="/gt-admin/kategoriler" className="ap-widget-tip-degistir text-sm">
-                    Kategori listesini yönet →
+                    Menü listesini yönet →
                   </Link>
                   <div className="ap-header-form-grid">
-                    <FormAlani etiket="Kategori başlığı">
+                    <FormAlani etiket="Menü başlığı">
                       <input
                         className={formInputSinifi}
                         value={kategori.baslikMetni}
@@ -438,7 +440,8 @@ export function HeaderYonetimiFormu() {
             </div>
           </div>
         </div>
-      )}
+        }
+      />
 
       <HeaderOnizlemeModal
         acik={onizlemeAcik}
