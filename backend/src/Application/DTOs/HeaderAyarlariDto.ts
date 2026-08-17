@@ -43,6 +43,8 @@ export const headerAyarlariSchema = z.object({
         'mega-menu',
         'seffaf-hero',
         'imza-kurumsal',
+        'yuzen-hap',
+        'masthead',
       ])
       .optional()
   ),

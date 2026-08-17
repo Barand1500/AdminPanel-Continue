@@ -27,7 +27,8 @@ export const FOOTER_TIP_TANIMLARI: FooterTipTanimi[] = [
   {
     id: 'klasik',
     ad: 'Klasik',
-    aciklama: 'Marka + 3–4 link kolonu, güven bandı (e-ticaret)',
+    aciklama:
+      'Solda marka, yanında 3–4 link kolonu, altta güven bandı. Çok ürünlü e-ticaret sitelerinin alışılmış alt bilgisi.',
     ilham: 'Trendyol',
     semaGoster: true,
     kolonlar: true,
@@ -36,7 +37,8 @@ export const FOOTER_TIP_TANIMLARI: FooterTipTanimi[] = [
   {
     id: 'sade',
     ad: 'Sade',
-    aciklama: 'Tek satır linkler, minimal iletişim, ince telif',
+    aciklama:
+      'Tek satır linkler, az iletişim, ince telif. Sakin marka sitelerinde sayfayı ağırlaştırmadan kapatır.',
     ilham: 'Apple',
     semaGoster: false,
     kolonlar: false,
@@ -45,7 +47,8 @@ export const FOOTER_TIP_TANIMLARI: FooterTipTanimi[] = [
   {
     id: 'kurumsal',
     ad: 'Koyu Kurumsal',
-    aciklama: 'Güven rozetleri vurgulu, resmi kolon düzeni',
+    aciklama:
+      'Koyu zemin, güven rozetleri ve resmi kolonlar. Şirket ve B2B sitelerinde ağır ve net durur.',
     ilham: 'Kurumsal site',
     semaGoster: true,
     kolonlar: true,
@@ -54,7 +57,8 @@ export const FOOTER_TIP_TANIMLARI: FooterTipTanimi[] = [
   {
     id: 'magaza',
     ad: 'Mağaza / Pazaryeri',
-    aciklama: 'Pazaryeri logoları üst bantta belirgin',
+    aciklama:
+      'Pazaryeri logoları üstte belirgin; altında kolonlar. Çok satıcılı mağaza ve pazaryeri siteleri için.',
     ilham: 'Hepsiburada',
     semaGoster: true,
     kolonlar: true,
@@ -63,7 +67,8 @@ export const FOOTER_TIP_TANIMLARI: FooterTipTanimi[] = [
   {
     id: 'merkezi',
     ad: 'Merkezi',
-    aciklama: 'Ortalanmış marka ve linkler, dikey düzen',
+    aciklama:
+      'Marka ve linkler ortalanır, dikey akar. Butik ve moda sitelerinde sık kullanılan bir kapanış.',
     ilham: 'Zara',
     semaGoster: false,
     kolonlar: true,
@@ -72,7 +77,8 @@ export const FOOTER_TIP_TANIMLARI: FooterTipTanimi[] = [
   {
     id: 'newsletter',
     ad: 'Newsletter',
-    aciklama: 'E-posta abonelik CTA alanı + kolonlar',
+    aciklama:
+      'E-posta abonelik kutusu öne çıkar, altında kolonlar. Bülten ve içerik siteleri için.',
     ilham: 'Mailchimp',
     semaGoster: false,
     kolonlar: true,
@@ -81,7 +87,8 @@ export const FOOTER_TIP_TANIMLARI: FooterTipTanimi[] = [
   {
     id: 'kompakt',
     ad: 'Kompakt',
-    aciklama: 'İnce koyu tek satır — logo, linkler, telif',
+    aciklama:
+      'İnce koyu tek satır: logo, birkaç link ve telif. Az yer kaplar; spor ve marka sitelerine yakışır.',
     ilham: 'Nike',
     semaGoster: false,
     kolonlar: false,
@@ -90,7 +97,8 @@ export const FOOTER_TIP_TANIMLARI: FooterTipTanimi[] = [
   {
     id: 'detayli',
     ad: 'Detaylı',
-    aciklama: 'Tüm bantlar: kolon, pazaryeri, güven, kurlar',
+    aciklama:
+      'Kolon, pazaryeri, güven rozetleri ve kurlar birlikte durur. Katalog sitelerinde her şey altta toplanır.',
     ilham: 'Amazon',
     semaGoster: true,
     kolonlar: true,

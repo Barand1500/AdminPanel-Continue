@@ -233,6 +233,41 @@ export const HEADER_TIP_DEMO: Record<HeaderTipi, HeaderTipDemoPaket> = {
     ],
     kategoriler: [],
   },
+  'yuzen-hap': {
+    markaMetni: 'Orbit',
+    slogan: '',
+    telefon: '',
+    email: '',
+    anaRenk: '#5b4dff',
+    ikincilRenk: '#a5b4fc',
+    aramaPlaceholder: 'Ara',
+    ornekNotu: 'Yüzen hap menü örneği — sahte marka "Orbit"',
+    menu: menu([
+      { baslik: 'Ürün' },
+      { baslik: 'Müşteriler' },
+      { baslik: 'Kaynaklar' },
+      { baslik: 'Fiyat' },
+    ]),
+    kategoriler: [],
+  },
+  masthead: {
+    markaMetni: 'Günlük Haber',
+    slogan: '17 Ağustos 2026 · Pazartesi',
+    telefon: '',
+    email: '',
+    anaRenk: '#111111',
+    ikincilRenk: '#b45309',
+    aramaPlaceholder: 'Ara',
+    ornekNotu: 'Gazete masthead örneği — sahte yayın "Günlük Haber"',
+    menu: menu([
+      { baslik: 'Gündem' },
+      { baslik: 'Dünya' },
+      { baslik: 'Ekonomi' },
+      { baslik: 'Kültür' },
+      { baslik: 'Spor' },
+    ]),
+    kategoriler: [],
+  },
 };
 
 export function headerTipDemoPaketi(tip: HeaderTipi): HeaderTipDemoPaket {

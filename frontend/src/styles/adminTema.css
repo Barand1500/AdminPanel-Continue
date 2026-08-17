@@ -445,6 +445,59 @@ html:has(.admin-panel[data-tema='acik']) body {
   color: var(--ap-text);
 }
 
+.admin-panel .ap-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  border: 1px solid transparent;
+  border-radius: 0.65rem;
+  padding: 0.5rem 0.95rem;
+  font-size: 0.8125rem;
+  font-weight: 650;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: filter 0.15s, background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.admin-panel .ap-btn-birincil {
+  background: var(--ap-accent);
+  color: #fff;
+}
+
+.admin-panel .ap-btn-birincil:hover {
+  filter: brightness(1.07);
+}
+
+.admin-panel .ap-btn-ikincil {
+  background: var(--ap-surface);
+  border-color: var(--ap-border);
+  color: var(--ap-heading);
+}
+
+.admin-panel .ap-btn-ikincil:hover {
+  background: var(--ap-hover);
+}
+
+.admin-panel .ap-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: none;
+}
+
+.ap-dil-ekle-satir {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.ap-dil-ekle-btn {
+  min-height: 2.5rem;
+  padding-inline: 1.05rem;
+  white-space: nowrap;
+}
+
 .admin-panel .ap-btn-ghost {
   border-color: var(--ap-border);
   color: var(--ap-text);
@@ -6094,6 +6147,72 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 .ap-widget-galeri-kart:hover .ap-widget-galeri-sec {
   text-decoration: underline;
+}
+
+.ap-widget-galeri-kart--secili {
+  border-color: color-mix(in srgb, var(--ap-accent) 70%, var(--ap-border));
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ap-accent) 22%, transparent);
+}
+
+.ap-header-galeri-grid {
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+}
+
+.ap-header-galeri-oniz {
+  display: flex;
+  align-items: stretch;
+  height: 6.75rem;
+  overflow: hidden;
+  border-radius: 0.55rem;
+  border: 1px solid var(--ap-border);
+  background: var(--ap-surface-elevated);
+}
+
+.ap-header-galeri-oniz > * {
+  flex: 1;
+  width: 100%;
+}
+
+.ap-header-oniz-modal {
+  width: min(100%, 72rem);
+  max-width: min(72rem, calc(100vw - 2rem));
+  max-height: min(90vh, 42rem);
+}
+
+.ap-footer-oniz-modal {
+  max-height: min(90vh, 48rem);
+}
+
+.ap-header-oniz-govde {
+  padding: 1.15rem 1.25rem 1.35rem;
+  background: var(--ap-input-bg);
+}
+
+.ap-header-form-grid {
+  display: grid;
+  gap: 0.85rem;
+}
+
+@media (min-width: 720px) {
+  .ap-header-form-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  }
+}
+
+.ap-header-anahtar-liste {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+}
+
+.ap-header-ek-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.ap-header-ic-govde {
+  margin-top: 1rem;
 }
 
 .ap-widget-icerik-ust {

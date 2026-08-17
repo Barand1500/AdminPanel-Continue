@@ -228,18 +228,32 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
 
   header: {
     baslik: 'Header Rehberi',
-    altBaslik: 'Navbar site adı',
+    altBaslik: 'Üst menü tipi ve ayarları',
     bolumBaslik: 'Header Yönetimi',
     kartlar: [
       {
-        ikon: '🏷️',
-        baslik: 'Site Adı',
+        ikon: '🎨',
+        baslik: 'Tip Seçin',
         aciklama:
-          "Navbar'da görünen firma adını buradan değiştirin. Logo yoksa bu metin gösterilir; logo ve diğer marka ayarları için Site Ayarları modülünü kullanın.",
+          'Header Tipleri galerisinden bir düzen seçin. Kartın i ikonuna basınca tipin ne işe yaradığını okursunuz.',
         renk: 'mor',
       },
+      {
+        ikon: '✏️',
+        baslik: 'Düzenleme',
+        aciklama:
+          'Tipi seçince Düzenleme açılır. Logo, üst bant, dil, ikon, para ve kategori ayarlarını hap sekmelerden doldurun.',
+        renk: 'turuncu',
+      },
+      {
+        ikon: '👁️',
+        baslik: 'Önizle',
+        aciklama:
+          'Alttaki Önizle headerı modalda gösterir. Galerideyken örnek veri, düzenlemedeyken sizin ayarlarınız kullanılır.',
+        renk: 'mavi',
+      },
     ],
-    ipucu: 'Site adını kaydettikten sonra Önizle ile navbar görünümünü kontrol edin.',
+    ipucu: 'Kaydet ile public site güncellenir. Menüde hangi sayfaların görüneceği Menü Yönetimi’ndedir.',
   },
 
   kategoriler: {
@@ -271,7 +285,7 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
         ikon: '🔝',
         baslik: 'Header Bağlantısı',
         aciklama:
-          '“Tüm Kategoriler” buton metni ve menü açılış stili Header Yönetimi → Kategori & Arama sekmesinden ayarlanır.',
+          '“Tüm Kategoriler” buton metni ve menü açılış stili Header Yönetimi → Düzenleme → Kategori hapından ayarlanır.',
         renk: 'sari',
       },
     ],
@@ -307,34 +321,32 @@ export const ADMIN_MODUL_REHBERLERI: Record<string, ModulRehber> = {
 
   footer: {
     baslik: 'Footer Rehberi',
-    altBaslik: 'Alt bilgi alanı',
+    altBaslik: 'Alt bilgi tipi ve ayarları',
     bolumBaslik: 'Footer Yönetimi',
     kartlar: [
       {
-        ikon: '📱',
-        baslik: 'Sosyal Medya',
-        aciklama: 'Platform linklerini Marka & Görünüm sekmesinden ekleyin; footer ve header görünürlüğünü ayrı ayrı yönetin.',
-        renk: 'camgobegi',
+        ikon: '🎨',
+        baslik: 'Tip Seçin',
+        aciklama:
+          'Footer Tipleri galerisinden bir düzen seçin. Kartın i ikonuna basınca tipin ne işe yaradığını okursunuz.',
+        renk: 'mor',
       },
       {
-        ikon: '📍',
-        baslik: 'İletişim Görünürlüğü',
-        aciklama: "İletişim verileri Site Ayarları'ndan gelir; burada yalnızca footer'da göster/gizle ayarlanır.",
-        renk: 'yesil',
-      },
-      {
-        ikon: '🔗',
-        baslik: 'Link Kolonları',
-        aciklama: 'Footer menü kolonlarını ve linklerini bu modülden yönetin.',
-        renk: 'mavi',
+        ikon: '✏️',
+        baslik: 'Düzenleme',
+        aciklama:
+          'Tipi seçince Düzenleme açılır. Marka, şema, kolon, alt bant ve yüzen butonları hap sekmelerden doldurun.',
+        renk: 'turuncu',
       },
       {
         ikon: '👁️',
-        baslik: 'Önizleme',
-        aciklama: 'Sayfa altındaki footer önizlemesini kontrol edin.',
-        renk: 'mor',
+        baslik: 'Önizle',
+        aciklama:
+          'Alttaki Önizle footerı modalda gösterir. Galerideyken örnek veri, düzenlemedeyken sizin ayarlarınız kullanılır.',
+        renk: 'mavi',
       },
     ],
+    ipucu: 'Kaydet ile public site güncellenir. İletişim bilgileri Site Ayarları’ndadır; burada yalnızca görünürlük seçilir.',
   },
 
   blog: {

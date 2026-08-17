@@ -15,6 +15,8 @@ interface FooterOnizlemeProps {
   buyuk?: boolean;
   /** Footer Tipi sekmesinde sahte örnek verilerle önizleme */
   demoMod?: boolean;
+  /** Kart başlığı olmadan yalnızca sahne (modal içi) */
+  kabuksuz?: boolean;
 }
 
 export function FooterOnizleme({
@@ -23,6 +25,7 @@ export function FooterOnizleme({
   footer,
   buyuk = false,
   demoMod = false,
+  kabuksuz = false,
 }: FooterOnizlemeProps) {
   const tip = footerTipiNormalize(footer.footerTipi);
   const demo = footerTipDemoPaketi(tip);
@@ -83,18 +86,12 @@ export function FooterOnizleme({
     }) as CSSProperties;
   }, [demoMod, ayarlar, demo.anaRenk, demo.ikincilRenk]);
 
-  return (
-    <AdminPanelKarti
-      baslik="Canlı Önizleme"
-      altBaslik={
-        demoMod
-          ? `Örnek verilerle gösterim — ${demo.ornekNotu}. Kaydedince sitenizin gerçek içeriği görünür.`
-          : 'Form değişiklikleri anında yansır — Kaydet ile public site güncellenir'
-      }
-    >
+  const sahne = (
+    <>
       {demoMod && (
         <div className="ap-onizleme-uyari mb-3">
-          Bu önizleme sahte marka ve link verileri kullanır ({demo.siteAdi}). Gerçek logo, kolonlar ve iletişim bilgileriniz kayıttan sonra sitede görünür.
+          Bu önizleme sahte marka ve link verileri kullanır ({demo.siteAdi}). Gerçek logo, kolonlar ve
+          iletişim bilgileriniz kayıttan sonra sitede görünür.
         </div>
       )}
 
@@ -106,6 +103,21 @@ export function FooterOnizleme({
       >
         <SiteFooter siteAdi={gosterilecekSiteAdi} ayarlar={onizlemeAyarlar} />
       </div>
+    </>
+  );
+
+  if (kabuksuz) return <div className="ap-header-oniz-govde">{sahne}</div>;
+
+  return (
+    <AdminPanelKarti
+      baslik="Canlı Önizleme"
+      altBaslik={
+        demoMod
+          ? `Örnek verilerle gösterim — ${demo.ornekNotu}. Kaydedince sitenizin gerçek içeriği görünür.`
+          : 'Form değişiklikleri anında yansır — Kaydet ile public site güncellenir'
+      }
+    >
+      {sahne}
     </AdminPanelKarti>
   );
 }

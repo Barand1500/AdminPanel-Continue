@@ -14,6 +14,8 @@ interface SiteOnizlemePaneliProps {
   iletisim?: { telefon?: string | null; email?: string | null };
   /** Header yönetiminde tip bazlı sahte örnek verilerle önizleme */
   demoMod?: boolean;
+  /** Kart başlığı olmadan yalnızca sahne (modal içi) */
+  kabuksuz?: boolean;
 }
 
 export function SiteOnizlemePaneli({
@@ -22,6 +24,7 @@ export function SiteOnizlemePaneli({
   headerAyarlari,
   iletisim,
   demoMod = false,
+  kabuksuz = false,
 }: SiteOnizlemePaneliProps) {
   const { ayarlar, site, siteAd: ctxSiteAd, headerAyarlari: ctxHeader } = useSiteAyarlariYonetimi();
   const ad = siteAd ?? ctxSiteAd ?? site?.ad ?? 'Güzel Teknoloji';
@@ -34,18 +37,12 @@ export function SiteOnizlemePaneli({
     return siteOnizlemeCssStili({ ...ayarlar, anaRenk: demo.anaRenk, ikincilRenk: demo.ikincilRenk });
   }, [demoMod, tip, ayarlar, demo.anaRenk, demo.ikincilRenk]);
 
-  return (
-    <AdminPanelKarti
-      baslik="Canlı Önizleme"
-      altBaslik={
-        demoMod && tip === 'header'
-          ? `Örnek verilerle gösterim — ${demo.ornekNotu}. Kaydedince sitenizin gerçek içeriği görünür.`
-          : 'Form değişiklikleri anında yansır — Kaydet ile public site güncellenir'
-      }
-    >
+  const sahne = (
+    <>
       {demoMod && tip === 'header' && (
         <div className="ap-onizleme-uyari mb-3">
-          Bu önizleme sahte marka ve menü verileri kullanır ({demo.markaMetni}). Gerçek logo, menü ve iletişim bilgileriniz kayıttan sonra sitede görünür.
+          Bu önizleme sahte marka ve menü verileri kullanır ({demo.markaMetni}). Gerçek logo, menü ve
+          iletişim bilgileriniz kayıttan sonra sitede görünür.
         </div>
       )}
 
@@ -82,6 +79,21 @@ export function SiteOnizlemePaneli({
           <SiteFooterOnizleme siteAdi={ad} ayarlar={ayarlar} />
         )}
       </div>
+    </>
+  );
+
+  if (kabuksuz) return <div className="ap-header-oniz-govde">{sahne}</div>;
+
+  return (
+    <AdminPanelKarti
+      baslik="Canlı Önizleme"
+      altBaslik={
+        demoMod && tip === 'header'
+          ? `Örnek verilerle gösterim — ${demo.ornekNotu}. Kaydedince sitenizin gerçek içeriği görünür.`
+          : 'Form değişiklikleri anında yansır — Kaydet ile public site güncellenir'
+      }
+    >
+      {sahne}
     </AdminPanelKarti>
   );
 }

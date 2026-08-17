@@ -173,8 +173,12 @@ export function SiteAyarlariProvider({ children }: { children: ReactNode }) {
   );
 }
 
+export function useSiteAyarlariYonetimiOptional() {
+  return useContext(SiteAyarlariContext);
+}
+
 export function useSiteAyarlariYonetimi() {
-  const ctx = useContext(SiteAyarlariContext);
+  const ctx = useSiteAyarlariYonetimiOptional();
   if (!ctx) {
     throw new Error('useSiteAyarlariYonetimi SiteAyarlariProvider icinde kullanilmali');
   }

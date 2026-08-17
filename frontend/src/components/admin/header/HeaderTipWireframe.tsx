@@ -130,6 +130,37 @@ export function HeaderTipWireframe({ tip }: { tip: HeaderTipi }) {
         </div>
       </div>
     ),
+    'yuzen-hap': (
+      <div className="flex h-full items-center justify-center p-2">
+        <div className="flex w-[92%] items-center gap-1 rounded-full border border-[var(--ap-border)] bg-[var(--ap-surface)] px-1.5 py-1 shadow-sm">
+          <div className={`h-2.5 w-2.5 rounded-full ${bar}`} />
+          <div className="flex flex-1 justify-center gap-1">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className={`h-1 w-3 rounded-full ${line}`} />
+            ))}
+          </div>
+          <div className={`h-2 w-5 rounded-full ${bar}`} />
+        </div>
+      </div>
+    ),
+    masthead: (
+      <div className="flex h-full flex-col justify-center gap-1 p-2">
+        <div className="flex items-end justify-between">
+          <div className={`h-0.5 w-4 ${line}`} />
+          <div className={`h-3.5 w-16 ${bar}`} />
+          <div className="flex gap-0.5">
+            <div className={`h-1.5 w-1.5 rounded-full ${muted}`} />
+            <div className={`h-1.5 w-1.5 rounded-full ${muted}`} />
+          </div>
+        </div>
+        <div className={`h-px w-full bg-[var(--ap-heading)]/40`} />
+        <div className="flex justify-center gap-1.5">
+          {[1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className={`h-0.5 w-3 ${line}`} />
+          ))}
+        </div>
+      </div>
+    ),
   };
 
   return wireframes[tip] ?? null;

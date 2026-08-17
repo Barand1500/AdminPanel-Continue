@@ -435,6 +435,62 @@ export function HeaderImzaKurumsal({ veri, ayarlar, menuAcik, setMenuAcik }: Hea
   );
 }
 
+export function HeaderYuzenHap({ veri, menuAcik, setMenuAcik }: HeaderLayoutProps) {
+  return (
+    <div className="site-header-yuzen-shell">
+      <header className={`site-header site-header-yuzen-hap site-header-varyant-yuzen-hap ${veri.tipSinifi} border-0 bg-transparent shadow-none`}>
+        <div className="container-site">
+          <div className="site-header-yuzen-hap-bar">
+            <MarkaAlani veri={veri} className="max-w-[140px] shrink-0" />
+            <DesktopMenu
+              menu={veri.cevrilmisMenu}
+              className="flex-1 justify-center gap-6"
+              linkClassName="site-menu-nav-link text-[13px] font-semibold tracking-tight opacity-80 transition hover:opacity-100"
+            />
+            <div className="flex shrink-0 items-center gap-1">
+              <AramaAlani veri={veri} />
+              <CtaLink veri={veri} className="site-header-yuzen-cta hidden sm:inline-flex" />
+              <IkonGrubu
+                veri={veri}
+                menuAcik={menuAcik}
+                onMenuToggle={() => setMenuAcik((v) => !v)}
+                sadeceHamburger
+              />
+            </div>
+          </div>
+        </div>
+        <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
+      </header>
+    </div>
+  );
+}
+
+export function HeaderMasthead({ veri, menuAcik, setMenuAcik }: HeaderLayoutProps) {
+  const ustMetin = veri.tipEk.destekMetni?.trim() || veri.header.slogan?.trim() || '';
+
+  return (
+    <HeaderGovde veri={veri} className="site-header-varyant-masthead">
+      <div className="container-site py-4">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-3">
+          <p className="site-header-masthead-ust hidden min-w-0 truncate sm:block">{ustMetin}</p>
+          <p className="site-header-masthead-ust sm:hidden" aria-hidden />
+          <MarkaAlani veri={veri} className="site-header-masthead-marka justify-self-center" />
+          <div className="flex justify-end">
+            <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
+          </div>
+        </div>
+        <div className="site-header-masthead-cizgi" />
+        <DesktopMenu
+          menu={veri.cevrilmisMenu}
+          className="justify-center gap-7 pt-3"
+          linkClassName="site-header-masthead-link site-menu-nav-link"
+        />
+      </div>
+      <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
+    </HeaderGovde>
+  );
+}
+
 export function HeaderLayoutSec(props: HeaderLayoutProps) {
   switch (props.veri.headerTipi) {
     case 'sade':
@@ -455,6 +511,10 @@ export function HeaderLayoutSec(props: HeaderLayoutProps) {
       return <HeaderSeffafHero {...props} />;
     case 'imza-kurumsal':
       return <HeaderImzaKurumsal {...props} />;
+    case 'yuzen-hap':
+      return <HeaderYuzenHap {...props} />;
+    case 'masthead':
+      return <HeaderMasthead {...props} />;
     case 'klasik':
     default:
       return <HeaderKlasik {...props} />;

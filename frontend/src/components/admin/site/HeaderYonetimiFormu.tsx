@@ -1,7 +1,6 @@
-import { useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
-import { useSiteYonetimiAksiyonlari } from '@/hooks/useSiteYonetimiAksiyonlari';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
 import { LogoBoyutSecici } from '@/components/admin/site/LogoBoyutSecici';
@@ -12,7 +11,7 @@ import { AramaStilSecici } from '@/components/admin/header/AramaStilSecici';
 import { SiteOnizlemePaneli } from './SiteOnizlemePaneli';
 import type { HeaderAyarlari } from '@/types/header';
 import { HeaderDilYonetimi } from '@/components/admin/header/HeaderDilYonetimi';
-import { HeaderTipIcerik } from '@/components/admin/header/HeaderTipIcerik';
+import { HeaderTipGaleri } from '@/components/admin/header/HeaderTipGaleri';
 import { HeaderTipEkAyarlariFormu } from '@/components/admin/header/HeaderTipEkAyarlariFormu';
 import {
   headerTipiNormalize,
@@ -21,50 +20,100 @@ import {
   type HeaderTipi,
 } from '@/data/headerTipleri';
 import {
-  AdminPanelKarti,
+  AdminModulKabuk,
   BildirimKutusu,
   HataDurumu,
-  ModulBaslik,
   YukleniyorDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
+import {
+  AdminAnahtarDugme,
+  AdminPilSekme,
+} from '@/components/admin/ortak/AdminFormBilesenleri';
+import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 
-type SekmeId =
-  | 'header-tipi'
-  | 'ust-bant'
-  | 'dil'
-  | 'logo-gorunum'
-  | 'ek-ayarlar'
-  | 'para'
-  | 'ikonlar'
-  | 'kategori-arama';
+type Gorunum = 'galeri' | 'editor';
+type IcSekme = 'logo' | 'ust-bant' | 'dil' | 'ikonlar' | 'para' | 'kategori' | 'ek-ayarlar';
 
-function ToggleSatir({
-  etiket,
-  aciklama,
-  acik,
-  onDegistir,
-}: {
-  etiket: string;
-  aciklama?: string;
-  acik: boolean;
-  onDegistir: (v: boolean) => void;
-}) {
+function GaleriIkon() {
   return (
-    <label className={`ap-toggle-kart ${acik ? 'ap-toggle-aktif ap-toggle-yesil' : ''}`}>
-      <div>
-        <p className="ap-heading text-sm font-semibold">{etiket}</p>
-        {aciklama && <p className="ap-muted text-xs">{aciklama}</p>}
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <rect x="3" y="4" width="7" height="7" rx="1.5" />
+      <rect x="14" y="4" width="7" height="7" rx="1.5" />
+      <rect x="3" y="15" width="7" height="5" rx="1.5" />
+      <rect x="14" y="15" width="7" height="5" rx="1.5" />
+    </svg>
+  );
+}
+
+function DuzenlemeIkon() {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.85" strokeLinecap="round">
+      <path d="M12 20h9" />
+      <path d="M16.5 3.5a2.12 2.12 0 013 3L7 19l-4 1 1-4 12.5-12.5z" />
+    </svg>
+  );
+}
+
+function HeaderOnizlemeModal({
+  acik,
+  demoMod,
+  siteAd,
+  headerAyarlari,
+  iletisim,
+  onKapat,
+}: {
+  acik: boolean;
+  demoMod: boolean;
+  siteAd?: string;
+  headerAyarlari: HeaderAyarlari;
+  iletisim: { telefon?: string | null; email?: string | null };
+  onKapat: () => void;
+}) {
+  useEffect(() => {
+    if (!acik) return;
+    function tus(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        onKapat();
+      }
+    }
+    document.addEventListener('keydown', tus);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', tus);
+      document.body.style.overflow = '';
+    };
+  }, [acik, onKapat]);
+
+  if (!acik) return null;
+
+  return (
+    <div className="ap-admin-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="header-onizleme-baslik">
+      <button type="button" className="ap-admin-modal-backdrop" aria-label="Kapat" onClick={onKapat} />
+      <div className="ap-admin-modal ap-admin-modal-genis ap-header-oniz-modal">
+        <header className="ap-admin-modal-header">
+          <div>
+            <h2 id="header-onizleme-baslik" className="ap-admin-modal-baslik">
+              Header önizleme
+            </h2>
+            <p className="ap-admin-modal-alt">
+              {demoMod ? 'Örnek verilerle tip görünümü' : 'Mevcut ayarlarınızla üst menü'}
+            </p>
+          </div>
+          <button type="button" className="ap-admin-modal-kapat" onClick={onKapat}>
+            ✕ ESC
+          </button>
+        </header>
+        <SiteOnizlemePaneli
+          tip="header"
+          kabuksuz
+          demoMod={demoMod}
+          siteAd={siteAd}
+          headerAyarlari={headerAyarlari}
+          iletisim={iletisim}
+        />
       </div>
-      <button
-        type="button"
-        role="switch"
-        aria-checked={acik}
-        onClick={() => onDegistir(!acik)}
-        className={`ap-toggle ${acik ? 'ap-toggle-on' : ''}`}
-      >
-        <span className="ap-toggle-thumb" />
-      </button>
-    </label>
+    </div>
   );
 }
 
@@ -75,48 +124,80 @@ export function HeaderYonetimiFormu() {
     yukleniyor,
     hata,
     kaydediliyor,
+    kaydet,
     siteAd,
     headerGuncelle,
   } = useSiteAyarlariYonetimi();
-  useSiteYonetimiAksiyonlari();
+
+  const [gorunum, setGorunum] = useState<Gorunum>('galeri');
+  const [icSekme, setIcSekme] = useState<IcSekme>('logo');
+  const [onizlemeAcik, setOnizlemeAcik] = useState(false);
 
   const aktifTip = headerTipiNormalize(headerAyarlari.headerTipi);
   const tipTanim = headerTipTanimiBul(aktifTip);
   const tipEk = tipEkBirlestir(aktifTip, headerAyarlari.tipEk);
   const birlesikHeader = { ...headerAyarlari, headerTipi: aktifTip, tipEk };
 
-  const sekmeler = useMemo(() => {
-    const liste: { id: SekmeId; ad: string }[] = [{ id: 'header-tipi', ad: 'Header Tipi' }];
-    if (tipTanim.ustBant) liste.push({ id: 'ust-bant', ad: 'Üst Bant' });
-    liste.push({ id: 'dil', ad: 'Dil' });
-    liste.push({ id: 'logo-gorunum', ad: 'Logo Görünümü' });
-    if (tipTanim.ekAyarlari) liste.push({ id: 'ek-ayarlar', ad: 'Ek Ayarlar' });
-    liste.push({ id: 'para', ad: 'Para Birimi' });
-    liste.push({ id: 'ikonlar', ad: 'İkonlar' });
-    if (tipTanim.kategoriArama) liste.push({ id: 'kategori-arama', ad: 'Kategori & Arama' });
+  const icSekmeler = useMemo(() => {
+    const liste: { id: IcSekme; etiket: string }[] = [{ id: 'logo', etiket: 'Logo' }];
+    if (tipTanim.ustBant) liste.push({ id: 'ust-bant', etiket: 'Üst Bant' });
+    liste.push({ id: 'dil', etiket: 'Dil' });
+    liste.push({ id: 'ikonlar', etiket: 'İkonlar' });
+    liste.push({ id: 'para', etiket: 'Para' });
+    if (tipTanim.kategoriArama) liste.push({ id: 'kategori', etiket: 'Kategori' });
+    if (tipTanim.ekAyarlari) liste.push({ id: 'ek-ayarlar', etiket: 'Ek Ayarlar' });
     return liste;
   }, [tipTanim]);
 
-  const [sekme, setSekme] = useState<SekmeId>('header-tipi');
-  const gecerliSekme = sekmeler.some((s) => s.id === sekme) ? sekme : 'header-tipi';
+  const gecerliIcSekme = icSekmeler.some((s) => s.id === icSekme) ? icSekme : 'logo';
 
-  const headerGuncelleParcali = (parcalar: Partial<HeaderAyarlari>) => {
-    headerGuncelle({ ...headerAyarlari, ...parcalar });
-  };
+  const headerGuncelleParcali = useCallback(
+    (parcalar: Partial<HeaderAyarlari>) => {
+      headerGuncelle({ ...headerAyarlari, ...parcalar });
+    },
+    [headerAyarlari, headerGuncelle]
+  );
 
-  const tipDegistir = (tip: HeaderTipi) => {
-    headerGuncelle({
-      ...headerAyarlari,
-      headerTipi: tip,
-      tipEk: tipEkBirlestir(tip, headerAyarlari.tipEk),
-    });
-    const yeni = headerTipTanimiBul(tip);
-    if (!yeni.ustBant && gecerliSekme === 'ust-bant') setSekme('header-tipi');
-    if (!yeni.kategoriArama && gecerliSekme === 'kategori-arama') setSekme('header-tipi');
-    if (!yeni.ekAyarlari && gecerliSekme === 'ek-ayarlar') setSekme('header-tipi');
-  };
+  const tipSec = useCallback(
+    (tip: HeaderTipi) => {
+      headerGuncelle({
+        ...headerAyarlari,
+        headerTipi: tip,
+        tipEk: tipEkBirlestir(tip, headerAyarlari.tipEk),
+      });
+      const yeni = headerTipTanimiBul(tip);
+      if (!yeni.ustBant && icSekme === 'ust-bant') setIcSekme('logo');
+      if (!yeni.kategoriArama && icSekme === 'kategori') setIcSekme('logo');
+      if (!yeni.ekAyarlari && icSekme === 'ek-ayarlar') setIcSekme('logo');
+      setGorunum('editor');
+    },
+    [headerAyarlari, headerGuncelle, icSekme]
+  );
 
-  if (yukleniyor) return <YukleniyorDurumu mesaj="Header ayarları yükleniyor..." />;
+  const duzenlemeyeGit = useCallback(() => setGorunum('editor'), []);
+  const onizlemeyiAc = useCallback(() => setOnizlemeAcik(true), []);
+  const onizlemeyiKapat = useCallback(() => setOnizlemeAcik(false), []);
+
+  useModulAksiyonlari(
+    {
+      kaydet,
+      duzenle: duzenlemeyeGit,
+      onizle: onizlemeyiAc,
+    },
+    {
+      kaydet: !kaydediliyor,
+      duzenle: gorunum === 'galeri' && !kaydediliyor,
+      onizle: true,
+    }
+  );
+
+  if (yukleniyor) {
+    return (
+      <AdminModulKabuk onizleGoster={false}>
+        <YukleniyorDurumu mesaj="Header ayarları yükleniyor..." />
+      </AdminModulKabuk>
+    );
+  }
   if (!ayarlar) return <HataDurumu mesaj={hata ?? 'Ayarlar yüklenemedi'} />;
 
   const ustBant = headerAyarlari.ustBant!;
@@ -126,219 +207,247 @@ export function HeaderYonetimiFormu() {
   const dilDestegi = headerAyarlari.dilDestegi!;
 
   return (
-    <div className="space-y-6">
-      <div className="space-y-5">
-        <ModulBaslik
-          baslik="Header Yönetimi"
-          aciklama="Header tipi seçin, ardından tipinize özel ayarları düzenleyin."
-          onizleGoster
+    <AdminModulKabuk
+      onizleGoster={false}
+      ustIcerik={
+        <AdminPilSekme
+          sekmeler={[
+            { id: 'galeri', etiket: 'Header Tipleri', ikon: <GaleriIkon /> },
+            { id: 'editor', etiket: 'Düzenleme', ikon: <DuzenlemeIkon /> },
+          ]}
+          aktif={gorunum}
+          onDegistir={setGorunum}
         />
+      }
+    >
+      {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
+      {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
-        {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
-        {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
+      {gorunum === 'galeri' && <HeaderTipGaleri secili={aktifTip} onSec={tipSec} />}
 
-        <div className="flex flex-wrap gap-2 border-b border-[var(--ap-border)] pb-2">
-          {sekmeler.map((s) => (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => setSekme(s.id)}
-              className={`rounded-lg px-3 py-1.5 text-sm font-medium transition ${
-                gecerliSekme === s.id
-                  ? 'bg-[var(--ap-accent)] text-white'
-                  : 'text-[var(--ap-muted)] hover:bg-[var(--ap-hover)]'
-              }`}
-            >
-              {s.ad}
-            </button>
-          ))}
-        </div>
-
-        {gecerliSekme === 'header-tipi' && (
-          <HeaderTipIcerik secili={aktifTip} onSec={tipDegistir} />
-        )}
-
-        {gecerliSekme === 'ust-bant' && (
-          <AdminPanelKarti baslik="Üst Bant" altBaslik="Header marka metni ve kur görünürlüğü">
-            <div className="space-y-4">
-              <FormAlani
-                etiket="Header Marka Metni"
-                aciklama="Navbar'da logo yanında görünen yazı. Boş bırakırsanız marka metni gösterilmez."
-              >
-                <input
-                  type="text"
-                  value={headerAyarlari.markaMetni ?? ''}
-                  onChange={(e) =>
-                    headerGuncelleParcali({ markaMetni: e.target.value || null })
-                  }
-                  className={formInputSinifi}
-                  placeholder="Örn. Güzel Teknoloji"
-                />
-              </FormAlani>
-              <FormAlani etiket="Slogan" aciklama="Üst banttaki kısa metin">
-                <input
-                  className={formInputSinifi}
-                  value={headerAyarlari.slogan ?? ''}
-                  onChange={(e) => headerGuncelleParcali({ slogan: e.target.value || null })}
-                  placeholder="Teknolojinin en güzel hali..."
-                />
-              </FormAlani>
-              <p className="ap-muted text-xs leading-relaxed">
-                Telefon, e-posta ve sosyal medya Site Ayarları&apos;ndaki iletişim bilgilerinden gelir.
+      {gorunum === 'editor' && (
+        <div className="ap-editor-panel ap-form-editor ap-header-editor">
+          <div className="ap-form-editor-ust">
+            <div>
+              <h2 className="ap-heading text-sm font-semibold">Header düzenle</h2>
+              <p className="ap-widget-editor-tip">
+                <span>{tipTanim.ad}</span>
+                <button type="button" className="ap-widget-tip-degistir" onClick={() => setGorunum('galeri')}>
+                  Tipi değiştir
+                </button>
               </p>
-              <ToggleSatir
-                etiket="Telefonu göster"
-                acik={ustBant.telefonGoster}
-                onDegistir={(telefonGoster) =>
-                  headerGuncelleParcali({ ustBant: { ...ustBant, telefonGoster } })
-                }
-              />
-              <ToggleSatir
-                etiket="E-postayı göster"
-                acik={ustBant.emailGoster}
-                onDegistir={(emailGoster) =>
-                  headerGuncelleParcali({ ustBant: { ...ustBant, emailGoster } })
-                }
-              />
-              <ToggleSatir
-                etiket="Sosyal medya ikonları"
-                acik={ustBant.sosyalGoster}
-                onDegistir={(sosyalGoster) =>
-                  headerGuncelleParcali({ ustBant: { ...ustBant, sosyalGoster } })
-                }
-              />
-              <ToggleSatir
-                etiket="Kurları göster"
-                acik={ustBant.kurlarGoster}
-                onDegistir={(kurlarGoster) =>
-                  headerGuncelleParcali({ ustBant: { ...ustBant, kurlarGoster } })
-                }
-              />
             </div>
-          </AdminPanelKarti>
-        )}
+          </div>
 
-        {gecerliSekme === 'dil' && (
-          <HeaderDilYonetimi dilDestegi={dilDestegi} onGuncelle={headerGuncelleParcali} />
-        )}
-
-        {gecerliSekme === 'logo-gorunum' && (
-          <AdminPanelKarti baslik="Logo Görünümü" altBaslik="Header logosu ve boyutu">
-            <div className="space-y-4">
-              <GorselAlan
-                etiket="Header Logosu"
-                aciklama="Yalnızca header'da görünür"
-                deger={headerAyarlari.logoUrl ?? ''}
-                onChange={(v) => headerGuncelleParcali({ logoUrl: v || null })}
-                onizlemeSinifi="h-14 max-w-[180px] rounded-lg object-contain bg-[var(--ap-input-bg)] border border-[var(--ap-border)] p-1"
-              />
-              <LogoBoyutSecici
-                etiket="Header logo boyutu"
-                deger={logoBoyutuNormalize(headerAyarlari.logoBoyutu)}
-                onChange={(logoBoyutu) => headerGuncelleParcali({ logoBoyutu })}
-              />
-            </div>
-          </AdminPanelKarti>
-        )}
-
-        {gecerliSekme === 'ek-ayarlar' && (
-          <HeaderTipEkAyarlariFormu tip={aktifTip} tipEk={tipEk} onGuncelle={headerGuncelleParcali} />
-        )}
-
-        {gecerliSekme === 'para' && (
-          <AdminPanelKarti baslik="Para Birimi" altBaslik="TCMB veya manuel kur listesi">
-            <ParaBirimiYonetimi
-              kurlar={headerAyarlari.kurlar ?? []}
-              sonKurGuncelleme={headerAyarlari.sonKurGuncelleme}
-              onChange={(kurlar, sonKurGuncelleme) =>
-                headerGuncelleParcali({ kurlar, sonKurGuncelleme })
-              }
-            />
-          </AdminPanelKarti>
-        )}
-
-        {gecerliSekme === 'ikonlar' && (
-          <AdminPanelKarti baslik="İkonlar" altBaslik="Tema ve hesap ikonları">
-            <div className="space-y-4">
-              <IkonSecici
-                etiket="Gündüz ikonu"
-                grup="gunduz"
-                deger={ikonlar.tema.gunduz}
-                onChange={(gunduz) =>
-                  headerGuncelleParcali({ ikonlar: { ...ikonlar, tema: { ...ikonlar.tema, gunduz } } })
-                }
-              />
-              <IkonSecici
-                etiket="Gece ikonu"
-                grup="gece"
-                deger={ikonlar.tema.gece}
-                onChange={(gece) =>
-                  headerGuncelleParcali({ ikonlar: { ...ikonlar, tema: { ...ikonlar.tema, gece } } })
-                }
-              />
-              <IkonSecici
-                etiket="Hesap"
-                grup="hesap"
-                deger={ikonlar.hesap}
-                onChange={(hesap) => headerGuncelleParcali({ ikonlar: { ...ikonlar, hesap } })}
-              />
-            </div>
-          </AdminPanelKarti>
-        )}
-
-        {gecerliSekme === 'kategori-arama' && (
-          <AdminPanelKarti baslik="Kategori & Arama" altBaslik="Kategori menüsü ve arama alanı">
-            <div className="space-y-5">
-              <div className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface-elevated)] p-4">
-                <p className="ap-heading text-sm font-semibold">Kategori listesi</p>
-                <Link
-                  to="/gt-admin/kategoriler"
-                  className="mt-3 inline-flex text-sm font-semibold text-[var(--ap-accent)] hover:underline"
+          <div className="ap-form-editor-govde">
+            <div className="ap-form-ic-piller" role="tablist">
+              {icSekmeler.map((s) => (
+                <button
+                  key={s.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={gecerliIcSekme === s.id}
+                  className={`ap-form-ic-pil${gecerliIcSekme === s.id ? ' ap-form-ic-pil--aktif' : ''}`}
+                  onClick={() => setIcSekme(s.id)}
                 >
-                  Kategori Yönetimi&apos;ne git →
-                </Link>
-              </div>
-              <FormAlani etiket="Kategori başlığı">
-                <input
-                  className={formInputSinifi}
-                  value={kategori.baslikMetni}
-                  onChange={(e) =>
-                    headerGuncelleParcali({ kategori: { ...kategori, baslikMetni: e.target.value } })
+                  {s.etiket}
+                </button>
+              ))}
+            </div>
+
+            <div className="ap-form-ic-govde">
+              {gecerliIcSekme === 'logo' && (
+                <div className="ap-header-form-grid">
+                  <GorselAlan
+                    etiket="Header logosu"
+                    deger={headerAyarlari.logoUrl ?? ''}
+                    onChange={(v) => headerGuncelleParcali({ logoUrl: v || null })}
+                    onizlemeSinifi="h-14 max-w-[180px] rounded-lg object-contain bg-[var(--ap-input-bg)] border border-[var(--ap-border)] p-1"
+                  />
+                  <div className="space-y-3">
+                    <LogoBoyutSecici
+                      etiket="Logo boyutu"
+                      deger={logoBoyutuNormalize(headerAyarlari.logoBoyutu)}
+                      onChange={(logoBoyutu) => headerGuncelleParcali({ logoBoyutu })}
+                    />
+                    {!tipTanim.ustBant && (
+                      <>
+                        <FormAlani etiket="Marka metni">
+                          <input
+                            type="text"
+                            value={headerAyarlari.markaMetni ?? ''}
+                            onChange={(e) => headerGuncelleParcali({ markaMetni: e.target.value || null })}
+                            className={formInputSinifi}
+                            placeholder="Örn. Güzel Teknoloji"
+                          />
+                        </FormAlani>
+                        <FormAlani etiket="Slogan">
+                          <input
+                            className={formInputSinifi}
+                            value={headerAyarlari.slogan ?? ''}
+                            onChange={(e) => headerGuncelleParcali({ slogan: e.target.value || null })}
+                            placeholder="Kısa slogan"
+                          />
+                        </FormAlani>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {gecerliIcSekme === 'ust-bant' && (
+                <div className="space-y-3">
+                  <div className="ap-header-form-grid">
+                    <FormAlani etiket="Marka metni">
+                      <input
+                        type="text"
+                        value={headerAyarlari.markaMetni ?? ''}
+                        onChange={(e) => headerGuncelleParcali({ markaMetni: e.target.value || null })}
+                        className={formInputSinifi}
+                        placeholder="Örn. Güzel Teknoloji"
+                      />
+                    </FormAlani>
+                    <FormAlani etiket="Slogan">
+                      <input
+                        className={formInputSinifi}
+                        value={headerAyarlari.slogan ?? ''}
+                        onChange={(e) => headerGuncelleParcali({ slogan: e.target.value || null })}
+                        placeholder="Teknolojinin en güzel hali..."
+                      />
+                    </FormAlani>
+                  </div>
+                  <p className="ap-muted text-xs">
+                    Telefon, e-posta ve sosyal medya Site Ayarları iletişim bilgilerinden gelir.
+                  </p>
+                  <div className="ap-header-anahtar-liste">
+                    <AdminAnahtarDugme
+                      etiket="Telefon"
+                      acik={ustBant.telefonGoster}
+                      onDegistir={(telefonGoster) =>
+                        headerGuncelleParcali({ ustBant: { ...ustBant, telefonGoster } })
+                      }
+                    />
+                    <AdminAnahtarDugme
+                      etiket="E-posta"
+                      acik={ustBant.emailGoster}
+                      onDegistir={(emailGoster) =>
+                        headerGuncelleParcali({ ustBant: { ...ustBant, emailGoster } })
+                      }
+                    />
+                    <AdminAnahtarDugme
+                      etiket="Sosyal medya"
+                      acik={ustBant.sosyalGoster}
+                      onDegistir={(sosyalGoster) =>
+                        headerGuncelleParcali({ ustBant: { ...ustBant, sosyalGoster } })
+                      }
+                    />
+                    <AdminAnahtarDugme
+                      etiket="Kurlar"
+                      acik={ustBant.kurlarGoster}
+                      onDegistir={(kurlarGoster) =>
+                        headerGuncelleParcali({ ustBant: { ...ustBant, kurlarGoster } })
+                      }
+                    />
+                  </div>
+                </div>
+              )}
+
+              {gecerliIcSekme === 'dil' && (
+                <HeaderDilYonetimi dilDestegi={dilDestegi} onGuncelle={headerGuncelleParcali} />
+              )}
+
+              {gecerliIcSekme === 'ikonlar' && (
+                <div className="ap-header-form-grid">
+                  <IkonSecici
+                    etiket="Gündüz ikonu"
+                    grup="gunduz"
+                    deger={ikonlar.tema.gunduz}
+                    onChange={(gunduz) =>
+                      headerGuncelleParcali({ ikonlar: { ...ikonlar, tema: { ...ikonlar.tema, gunduz } } })
+                    }
+                  />
+                  <IkonSecici
+                    etiket="Gece ikonu"
+                    grup="gece"
+                    deger={ikonlar.tema.gece}
+                    onChange={(gece) =>
+                      headerGuncelleParcali({ ikonlar: { ...ikonlar, tema: { ...ikonlar.tema, gece } } })
+                    }
+                  />
+                  <IkonSecici
+                    etiket="Hesap"
+                    grup="hesap"
+                    deger={ikonlar.hesap}
+                    onChange={(hesap) => headerGuncelleParcali({ ikonlar: { ...ikonlar, hesap } })}
+                  />
+                </div>
+              )}
+
+              {gecerliIcSekme === 'para' && (
+                <ParaBirimiYonetimi
+                  kurlar={headerAyarlari.kurlar ?? []}
+                  sonKurGuncelleme={headerAyarlari.sonKurGuncelleme}
+                  onChange={(kurlar, sonKurGuncelleme) =>
+                    headerGuncelleParcali({ kurlar, sonKurGuncelleme })
                   }
                 />
-              </FormAlani>
-              <FormAlani etiket="Açılış modu">
-                <select
-                  className={formInputSinifi}
-                  value={kategori.acilisModu}
-                  onChange={(e) =>
-                    headerGuncelleParcali({
-                      kategori: { ...kategori, acilisModu: e.target.value as typeof kategori.acilisModu },
-                    })
-                  }
-                >
-                  <option value="dropdown">Dropdown (mega menü)</option>
-                  <option value="sidebar">Yan panel (sidebar)</option>
-                  <option value="liste">Liste (kompakt)</option>
-                </select>
-              </FormAlani>
-              <AramaStilSecici
-                arama={arama}
-                onChange={(yeniArama) => headerGuncelleParcali({ arama: yeniArama })}
-              />
-            </div>
-          </AdminPanelKarti>
-        )}
-      </div>
+              )}
 
-      <SiteOnizlemePaneli
-        tip="header"
+              {gecerliIcSekme === 'kategori' && (
+                <div className="space-y-3">
+                  <Link to="/gt-admin/kategoriler" className="ap-widget-tip-degistir text-sm">
+                    Kategori listesini yönet →
+                  </Link>
+                  <div className="ap-header-form-grid">
+                    <FormAlani etiket="Kategori başlığı">
+                      <input
+                        className={formInputSinifi}
+                        value={kategori.baslikMetni}
+                        onChange={(e) =>
+                          headerGuncelleParcali({ kategori: { ...kategori, baslikMetni: e.target.value } })
+                        }
+                        placeholder="Tüm Kategoriler"
+                      />
+                    </FormAlani>
+                    <FormAlani etiket="Açılış modu">
+                      <select
+                        className={formInputSinifi}
+                        value={kategori.acilisModu}
+                        onChange={(e) =>
+                          headerGuncelleParcali({
+                            kategori: { ...kategori, acilisModu: e.target.value as typeof kategori.acilisModu },
+                          })
+                        }
+                      >
+                        <option value="dropdown">Dropdown (mega menü)</option>
+                        <option value="sidebar">Yan panel</option>
+                        <option value="liste">Liste</option>
+                      </select>
+                    </FormAlani>
+                  </div>
+                  <AramaStilSecici
+                    arama={arama}
+                    onChange={(yeniArama) => headerGuncelleParcali({ arama: yeniArama })}
+                  />
+                </div>
+              )}
+
+              {gecerliIcSekme === 'ek-ayarlar' && (
+                <HeaderTipEkAyarlariFormu tip={aktifTip} tipEk={tipEk} onGuncelle={headerGuncelleParcali} />
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      <HeaderOnizlemeModal
+        acik={onizlemeAcik}
+        demoMod={gorunum === 'galeri'}
         siteAd={siteAd}
         headerAyarlari={birlesikHeader}
         iletisim={{ telefon: ayarlar.telefon, email: ayarlar.email }}
-        demoMod={gecerliSekme === 'header-tipi'}
+        onKapat={onizlemeyiKapat}
       />
-    </div>
+    </AdminModulKabuk>
   );
 }
-

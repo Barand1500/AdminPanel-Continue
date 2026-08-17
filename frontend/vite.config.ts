@@ -3,9 +3,9 @@ import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import path from 'path';
 
-// Backend'in yerel varsayılanı backend/.env.example ile aynı olmalı.
-// Gerekirse VITE_BACKEND_URL=http://localhost:PORT ile ayrıca değiştirilebilir.
-const backendUrl = process.env.VITE_BACKEND_URL ?? 'http://localhost:3003';
+// Backend varsayılanı backend/src/config/env.ts ile aynı (PORT ?? 4000).
+// Farklı port için: VITE_BACKEND_URL=http://127.0.0.1:PORT
+const backendUrl = process.env.VITE_BACKEND_URL ?? 'http://127.0.0.1:4000';
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],

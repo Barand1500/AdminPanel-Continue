@@ -934,6 +934,93 @@ html:has(.admin-panel) .site-header-imza-shell {
 
 html:has(.admin-panel) .site-header-imza-bosluk { display: none; }
 
+.site-header-yuzen-shell {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  padding: 0.7rem 0 0.35rem;
+  background: transparent;
+}
+
+.site-header-yuzen-hap,
+.site-header-varyant-yuzen-hap {
+  background: transparent;
+  border: none;
+  box-shadow: none;
+}
+
+.site-header-yuzen-hap-bar {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.15rem;
+  padding: 0.35rem 0.7rem 0.35rem 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 78%, transparent);
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--color-surface-elevated) 88%, transparent);
+  box-shadow: 0 10px 32px color-mix(in srgb, var(--color-text) 10%, transparent);
+  backdrop-filter: blur(16px) saturate(1.15);
+}
+
+.site-header-yuzen-cta {
+  padding-inline: 0.95rem;
+  font-size: 0.75rem;
+}
+
+.site-header-varyant-masthead {
+  box-shadow: none;
+  background: var(--color-surface-elevated);
+}
+
+.site-header-masthead-ust {
+  margin: 0;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+}
+
+.site-header-masthead-marka {
+  text-align: center;
+}
+
+.site-header-masthead-marka > div.rounded-xl {
+  display: none;
+}
+
+.site-header-masthead-marka span.font-black {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: clamp(1.35rem, 2.4vw, 2rem) !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.03em;
+  line-height: 1;
+  color: var(--color-text) !important;
+}
+
+.site-header-masthead-marka span.text-primary {
+  font-size: 0.62rem !important;
+  letter-spacing: 0.16em;
+}
+
+.site-header-masthead-cizgi {
+  height: 2px;
+  margin-top: 0.85rem;
+  background: var(--color-text);
+  opacity: 0.78;
+}
+
+.site-header-masthead-link {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-text) !important;
+}
+
+.site-header-masthead-link:hover {
+  color: var(--color-primary) !important;
+}
+
 .site-header-imza-arama .input-search {
   width: 15rem;
   border-color: rgb(255 255 255 / 0.16);

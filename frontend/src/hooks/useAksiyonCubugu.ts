@@ -76,8 +76,8 @@ const modulAksiyonlari: Record<string, AksiyonButonu[]> = {
     A('kaydet', 'Kaydet', true, true),
     A('ekle', 'Yeni Ekle', false),
     A('sil', 'Sil', false),
+    A('duzenle', 'Düzenle', false),
     A('onizle', 'Önizle', true),
-    A('yayinla', 'Yayınla', false),
   ],
   hero: [
     A('kaydet', 'Kaydet', true, true),
@@ -90,8 +90,8 @@ const modulAksiyonlari: Record<string, AksiyonButonu[]> = {
     A('kaydet', 'Kaydet', true, true),
     A('ekle', 'Yeni Ekle', false),
     A('sil', 'Sil', false),
+    A('duzenle', 'Düzenle', false),
     A('onizle', 'Önizle', true),
-    A('yayinla', 'Yayınla', false),
   ],
   kategoriler: [
     A('kaydet', 'Kaydet', true, true),

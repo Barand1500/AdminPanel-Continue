@@ -247,11 +247,7 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         okYonu: 'alt' as const,
         baslik: 'Header — Üst Menü',
         aciklama:
-          'Ziyaretçiler sitenize girdiğinde en üstte gördükleri alan. Logo, menü linkleri ve header tipi (kaç sütun, sabit/sticky vb.) buradan ayarlanır.',
-        ipuclari: [
-          'İlk sekme "Header Tipi" — farklı şablonlardan birini seçin',
-          'Önizleme sekmesinde canlı görünümü kontrol edin',
-        ],
+          'Ziyaretçilerin sitede en üstte gördüğü alan. Header Tipleri galerisinden bir düzen seçin, Düzenleme hapından logo ve bant ayarlarını yapın. Önizle üst menüyü modalda gösterir.',
       },
       {
         id: 'hero',
@@ -269,8 +265,7 @@ export const SISTEM_KESIF_TURLARI: SistemKesifTur[] = [
         okYonu: 'alt' as const,
         baslik: 'Footer — Alt Bilgi',
         aciklama:
-          'Sitenin en altındaki alan. Footer tipi seçin, link sütunları ekleyin, iletişim ve telif bilgilerini girin.',
-        ipuclari: ['Footer Tipi sekmesinden farklı düzenler deneyin'],
+          'Sitenin en altındaki alan. Footer Tipleri galerisinden bir düzen seçin, Düzenleme hapından marka ve kolonları ayarlayın. Önizle alt bilgiyi modalda gösterir.',
       },
       {
         id: 'kategoriler',

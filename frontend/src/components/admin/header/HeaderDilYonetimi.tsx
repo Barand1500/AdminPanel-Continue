@@ -225,7 +225,7 @@ export function HeaderDilYonetimi({ dilDestegi, onGuncelle }: HeaderDilYonetimiP
         </AdminPanelKarti>
 
         <AdminPanelKarti baslik="Yeni dil ekle">
-          <div className="flex flex-wrap items-end gap-3">
+          <div className="ap-dil-ekle-satir">
             <FormAlani etiket="Kod">
               <input
                 className={`${formInputSinifi} w-24 uppercase`}
@@ -251,7 +251,15 @@ export function HeaderDilYonetimi({ dilDestegi, onGuncelle }: HeaderDilYonetimiP
                 maxLength={4}
               />
             </FormAlani>
-            <button type="button" onClick={dilEkle} className="ap-btn ap-btn-birincil text-sm">
+            <button
+              type="button"
+              onClick={dilEkle}
+              className="ap-btn ap-btn-birincil ap-dil-ekle-btn"
+              disabled={!yeniKod.trim() || !yeniAd.trim()}
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="h-4 w-4" aria-hidden>
+                <path d="M12 5v14M5 12h14" strokeLinecap="round" />
+              </svg>
               Dil Ekle
             </button>
           </div>

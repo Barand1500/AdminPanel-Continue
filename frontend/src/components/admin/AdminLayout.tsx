@@ -3,10 +3,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useAdminSekmeler } from '@/hooks/useAdminSekmeler';
 import { useAksiyonCubugu } from '@/hooks/useAksiyonCubugu';
-import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
+import { SiteAyarlariProvider, useSiteAyarlariYonetimiOptional } from '@/contexts/SiteAyarlariContext';
 import { AdminAksiyonProvider, useAdminAksiyon } from '@/contexts/AdminAksiyonContext';
 import { AdminUyariBildirimProvider } from '@/contexts/AdminUyariBildirimContext';
-import { SiteAyarlariProvider } from '@/contexts/SiteAyarlariContext';
 import { AdminTemaProvider, useAdminTema } from '@/contexts/AdminTemaContext';
 import { AdminHeader } from './AdminHeader';
 import { AltAksiyonCubugu } from './AltAksiyonCubugu';
@@ -279,6 +278,7 @@ function AdminPanelGovde() {
   }
 
   return (
+    <SiteAyarlariProvider>
     <SistemKesifProvider onModulAc={modulSecHandler}>
     <div
       className={`admin-panel flex h-screen min-h-0 w-full flex-col overflow-hidden${kenarlikAyar.neon ? ' admin-panel--kenarlik-neon' : ''}`}
@@ -360,6 +360,7 @@ function AdminPanelGovde() {
       />
     </div>
     </SistemKesifProvider>
+    </SiteAyarlariProvider>
   );
 }
 
@@ -405,11 +406,9 @@ function AdminLayoutIcerik() {
   }
 
   return (
-    <SiteAyarlariProvider>
-      <SagTikPanelProvider>
-        <AdminPanelGovde />
-      </SagTikPanelProvider>
-    </SiteAyarlariProvider>
+    <SagTikPanelProvider>
+      <AdminPanelGovde />
+    </SagTikPanelProvider>
   );
 }
 
@@ -422,13 +421,15 @@ function SiteAyarlariKirliIzleyici({
   aktifModulId?: string;
   kaydedilmediIsaretle: (id: string, kirli: boolean) => void;
 }) {
-  const { kirli } = useSiteAyarlariYonetimi();
+  const ctx = useSiteAyarlariYonetimiOptional();
+  const kirli = ctx?.kirli ?? false;
+  const hazir = Boolean(ctx);
   const siteYonetimiAktif = Boolean(aktifModulId && SITE_YONETIMI_MODULLERI.has(aktifModulId));
 
   useEffect(() => {
-    if (!siteYonetimiAktif) return;
+    if (!hazir || !siteYonetimiAktif) return;
     kaydedilmediIsaretle(aktifSekmeId, kirli);
-  }, [siteYonetimiAktif, aktifSekmeId, kirli, kaydedilmediIsaretle]);
+  }, [hazir, siteYonetimiAktif, aktifSekmeId, kirli, kaydedilmediIsaretle]);
 
   return null;
 }
