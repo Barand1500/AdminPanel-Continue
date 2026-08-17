@@ -5,8 +5,11 @@ import type { WidgetIkonKart } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
+import { CizgiIkon, type CizgiIkonYedegi } from './CizgiIkonlari';
 
 type Cfg = ReturnType<typeof configOkuFromWidget>;
+
+const IKON_YEDEK: readonly CizgiIkonYedegi[] = ['guvenlik', 'hiz', 'hedef', 'basari'];
 
 function renkler(cfg: Cfg) {
   const g = cfg.gorunum ?? {};
@@ -48,14 +51,20 @@ function CtaButon({
   );
 }
 
+function KartIkon({ ikon, metin, i, boyut = 18 }: { ikon?: string; metin: string; i: number; boyut?: number }) {
+  return <CizgiIkon deger={ikon || metin} yedek={IKON_YEDEK[i % IKON_YEDEK.length]} boyut={boyut} />;
+}
+
 function IkonKartlar({
   kartlar,
   varyant = 'pill',
   renk,
+  acik = false,
 }: {
   kartlar: WidgetIkonKart[];
   varyant?: 'pill' | 'timeline' | 'bento' | 'kutu';
   renk: ReturnType<typeof renkler>;
+  acik?: boolean;
 }) {
   if (kartlar.length === 0) return null;
 
@@ -65,7 +74,7 @@ function IkonKartlar({
         {kartlar.map((k, i) => (
           <li key={k.id} className="bmg-timeline-oge">
             <span className="bmg-timeline-nokta" style={{ borderColor: renk.vurgu, color: renk.vurgu }}>
-              {k.ikon || i + 1}
+              <KartIkon ikon={k.ikon} metin={k.metin} i={i} boyut={16} />
             </span>
             <span className="bmg-timeline-metin" style={{ color: renk.metin }}>
               {k.metin}
@@ -79,10 +88,10 @@ function IkonKartlar({
   if (varyant === 'bento') {
     return (
       <div className="bmg-bento-ikonlar">
-        {kartlar.map((k) => (
+        {kartlar.map((k, i) => (
           <div key={k.id} className="bmg-bento-ikon-kart">
             <span className="bmg-bento-ikon-emoji" style={{ color: renk.vurgu }}>
-              {k.ikon}
+              <KartIkon ikon={k.ikon} metin={k.metin} i={i} boyut={22} />
             </span>
             <span className="bmg-bento-ikon-metin">{k.metin}</span>
           </div>
@@ -94,9 +103,11 @@ function IkonKartlar({
   if (varyant === 'kutu') {
     return (
       <div className="bmg-ikon-kutular">
-        {kartlar.map((k) => (
+        {kartlar.map((k, i) => (
           <div key={k.id} className="bmg-ikon-kutu">
-            <span style={{ color: renk.vurgu }}>{k.ikon}</span>
+            <span className="bmg-ikon-kutu-ikon" style={{ color: renk.vurgu }}>
+              <KartIkon ikon={k.ikon} metin={k.metin} i={i} boyut={18} />
+            </span>
             <span>{k.metin}</span>
           </div>
         ))}
@@ -105,10 +116,19 @@ function IkonKartlar({
   }
 
   return (
-    <div className="bmg-ikon-pills">
-      {kartlar.map((k) => (
-        <span key={k.id} className="bmg-ikon-pill" style={{ borderColor: `${renk.vurgu}33`, color: renk.metin }}>
-          <span style={{ color: renk.vurgu }}>{k.ikon}</span>
+    <div className={`bmg-ikon-pills${acik ? ' bmg-ikon-pills-acik' : ''}`}>
+      {kartlar.map((k, i) => (
+        <span
+          key={k.id}
+          className="bmg-ikon-pill"
+          style={{
+            borderColor: acik ? 'rgba(255,255,255,0.28)' : `${renk.vurgu}33`,
+            color: acik ? '#fff' : renk.metin,
+          }}
+        >
+          <span className="bmg-ikon-pill-ikon" style={{ color: acik ? '#fff' : renk.vurgu }}>
+            <KartIkon ikon={k.ikon} metin={k.metin} i={i} boyut={15} />
+          </span>
           {k.metin}
         </span>
       ))}
@@ -168,15 +188,15 @@ function SinematikHero({ widget, cfg, gorselUrl }: { widget: Widget; cfg: Cfg; g
       <div className="bmg-sinematik-gorsel-wrap">
         <img src={medyaUrl(gorselUrl)} alt="" className="bmg-sinematik-gorsel" />
         <div className="bmg-sinematik-overlay" />
-      </div>
-      <div className="bmg-sinematik-serit">
-        <div className="bmg-sinematik-serit-icerik">
-          <div className="bmg-sinematik-metin">
-            <BaslikAlani widget={widget} cfg={cfg} renk={renk} acik buyuk />
-            <MetinParagraf cfg={cfg} renk={renk} acik />
-            <CtaButon widget={widget} acik />
+        <div className="bmg-sinematik-serit">
+          <div className="bmg-sinematik-serit-icerik">
+            <div className="bmg-sinematik-metin">
+              <BaslikAlani widget={widget} cfg={cfg} renk={renk} acik buyuk />
+              <MetinParagraf cfg={cfg} renk={renk} acik />
+              <CtaButon widget={widget} acik />
+            </div>
+            {ikonKartlar.length > 0 && <IkonKartlar kartlar={ikonKartlar} renk={renk} acik />}
           </div>
-          {ikonKartlar.length > 0 && <IkonKartlar kartlar={ikonKartlar} renk={renk} />}
         </div>
       </div>
     </div>

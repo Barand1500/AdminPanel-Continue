@@ -1,8 +1,11 @@
-import { useMemo, useState, type MouseEvent } from 'react';
+import { useMemo, useState } from 'react';
 import { AdminAramaKutusu } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { GaleriKartAksiyonlar } from '@/components/admin/ortak/GaleriKartAksiyonlar';
 import { WidgetGaleriOnizleme } from './WidgetGaleriOnizleme';
+import { WidgetOnizlemeModal } from './WidgetOnizlemeModal';
 import {
   WIDGET_TIPLERI,
+  varsayilanWidgetForm,
   widgetTipleriKategoriyeGore,
   type WidgetTipKategoriId,
   type WidgetTipMeta,
@@ -45,16 +48,6 @@ interface WidgetTipGaleriProps {
   onSec: (tip: string) => void;
 }
 
-function InfoIkon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 11.2V16.5" />
-      <circle cx="12" cy="8" r="0.9" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
 function tipSirala(tipler: WidgetTipMeta[]) {
   return [...tipler].sort((a, b) => {
     const ia = ONERILEN_SIRALAMA.indexOf(a.id);
@@ -70,6 +63,7 @@ export function WidgetTipGaleri({ tipFiltre, onSec }: WidgetTipGaleriProps) {
   const [arama, setArama] = useState('');
   const [kategori, setKategori] = useState('tumu');
   const [infoTip, setInfoTip] = useState<string | null>(null);
+  const [onizlemeTip, setOnizlemeTip] = useState<string | null>(null);
 
   const kategorili = useMemo(() => widgetTipleriKategoriyeGore(tipFiltre), [tipFiltre]);
 
@@ -150,21 +144,13 @@ export function WidgetTipGaleri({ tipFiltre, onSec }: WidgetTipGaleriProps) {
                     <span aria-hidden>{tip.ikon}</span>
                     {tip.etiket}
                   </span>
-                  <button
-                    type="button"
-                    className={`ap-widget-galeri-info${infoTip === tip.id ? ' ap-widget-galeri-info--acik' : ''}`}
-                    aria-label={`${tip.etiket} nedir?`}
-                    aria-expanded={infoTip === tip.id}
-                    onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                      e.stopPropagation();
-                      setInfoTip((onceki) => (onceki === tip.id ? null : tip.id));
-                    }}
-                  >
-                    <InfoIkon />
-                    <span className="ap-widget-galeri-info-kutu" role="tooltip">
-                      {tip.aciklama}
-                    </span>
-                  </button>
+                  <GaleriKartAksiyonlar
+                    ad={tip.etiket}
+                    aciklama={tip.aciklama}
+                    infoAcik={infoTip === tip.id}
+                    onInfo={() => setInfoTip((onceki) => (onceki === tip.id ? null : tip.id))}
+                    onOnizle={() => setOnizlemeTip(tip.id)}
+                  />
                 </span>
                 <span className="ap-widget-galeri-sec">Bu tipi seç</span>
               </div>
@@ -172,6 +158,13 @@ export function WidgetTipGaleri({ tipFiltre, onSec }: WidgetTipGaleriProps) {
           </div>
         )}
       </div>
+
+      <WidgetOnizlemeModal
+        acik={Boolean(onizlemeTip)}
+        form={varsayilanWidgetForm(onizlemeTip ?? 'SLIDER')}
+        otomatikDoldur
+        onKapat={() => setOnizlemeTip(null)}
+      />
     </div>
   );
 }

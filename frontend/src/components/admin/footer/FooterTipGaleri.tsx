@@ -1,6 +1,9 @@
-import { useMemo, useState, type MouseEvent } from 'react';
+import { useMemo, useState } from 'react';
 import { AdminAramaKutusu } from '@/components/admin/ortak/AdminFormBilesenleri';
-import { FOOTER_TIP_TANIMLARI, type FooterTipi } from '@/data/footerTipleri';
+import { GaleriKartAksiyonlar, GaleriOnizlemeKabugu } from '@/components/admin/ortak/GaleriKartAksiyonlar';
+import { FOOTER_TIP_TANIMLARI, varsayilanFooterTipEk, type FooterTipi } from '@/data/footerTipleri';
+import { varsayilanFooterAyarlari } from '@/types/footer';
+import { FooterOnizleme } from './FooterOnizleme';
 import { FooterTipWireframe } from './FooterTipWireframe';
 
 const GALERI_KATEGORILER: { id: string; etiket: string; ids: FooterTipi[] | null }[] = [
@@ -15,20 +18,11 @@ interface FooterTipGaleriProps {
   onSec: (tip: FooterTipi) => void;
 }
 
-function InfoIkon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 11.2V16.5" />
-      <circle cx="12" cy="8" r="0.9" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
 export function FooterTipGaleri({ secili, onSec }: FooterTipGaleriProps) {
   const [arama, setArama] = useState('');
   const [kategori, setKategori] = useState('tumu');
   const [infoTip, setInfoTip] = useState<string | null>(null);
+  const [onizlemeTip, setOnizlemeTip] = useState<FooterTipi | null>(null);
 
   const tipler = useMemo(() => {
     const kaynak = GALERI_KATEGORILER.find((k) => k.id === kategori)?.ids;
@@ -96,21 +90,13 @@ export function FooterTipGaleri({ secili, onSec }: FooterTipGaleriProps) {
                   </div>
                   <span className="ap-widget-galeri-ad-satir">
                     <span className="ap-widget-galeri-ad">{tip.ad}</span>
-                    <button
-                      type="button"
-                      className={`ap-widget-galeri-info${infoTip === tip.id ? ' ap-widget-galeri-info--acik' : ''}`}
-                      aria-label={`${tip.ad} nedir?`}
-                      aria-expanded={infoTip === tip.id}
-                      onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                        e.stopPropagation();
-                        setInfoTip((onceki) => (onceki === tip.id ? null : tip.id));
-                      }}
-                    >
-                      <InfoIkon />
-                      <span className="ap-widget-galeri-info-kutu" role="tooltip">
-                        {tip.aciklama}
-                      </span>
-                    </button>
+                    <GaleriKartAksiyonlar
+                      ad={tip.ad}
+                      aciklama={tip.aciklama}
+                      infoAcik={infoTip === tip.id}
+                      onInfo={() => setInfoTip((onceki) => (onceki === tip.id ? null : tip.id))}
+                      onOnizle={() => setOnizlemeTip(tip.id)}
+                    />
                   </span>
                   <span className="ap-widget-galeri-sec">
                     {aktif ? 'Seçili — ayarlara git' : 'Bu tipi seç'}
@@ -121,6 +107,28 @@ export function FooterTipGaleri({ secili, onSec }: FooterTipGaleriProps) {
           </div>
         )}
       </div>
+
+      <GaleriOnizlemeKabugu
+        acik={Boolean(onizlemeTip)}
+        baslik="Footer önizleme"
+        alt={`${FOOTER_TIP_TANIMLARI.find((t) => t.id === onizlemeTip)?.ad ?? ''} · örnek verilerle tip görünümü`}
+        modalSinif="ap-header-oniz-modal ap-footer-oniz-modal"
+        onKapat={() => setOnizlemeTip(null)}
+      >
+        {onizlemeTip && (
+          <FooterOnizleme
+            siteAdi="Örnek Site"
+            footer={{
+              ...varsayilanFooterAyarlari(),
+              footerTipi: onizlemeTip,
+              tipEk: varsayilanFooterTipEk(onizlemeTip),
+            }}
+            buyuk
+            kabuksuz
+            demoMod
+          />
+        )}
+      </GaleriOnizlemeKabugu>
     </div>
   );
 }

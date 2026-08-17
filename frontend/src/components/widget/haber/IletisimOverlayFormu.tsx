@@ -122,7 +122,7 @@ function FormSatir({
     <label className={`ib-form-alan${textarea ? ' ib-form-alan--mesaj' : ''}`}>
       {ikonEl}
       {textarea ? (
-        <textarea {...ortak} rows={8} className="ib-form-input" />
+        <textarea {...ortak} rows={5} className="ib-form-input" />
       ) : (
         <input type={type} {...ortak} className="ib-form-input" />
       )}

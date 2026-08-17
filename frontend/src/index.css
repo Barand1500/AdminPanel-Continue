@@ -3589,7 +3589,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   border-radius: 0.55rem;
   background: #fff;
 }
-.ib-form-alan--mesaj { align-items: flex-start; flex: 1; min-height: 12.5rem; }
+.ib-form-alan--mesaj { align-items: flex-start; flex: 1; min-height: 0; }
 .ib-form-alan-ikon { display: flex; flex-shrink: 0; color: #94a3b8; margin-top: 0.1rem; }
 .ib-form-input {
   width: 100%;
@@ -3599,13 +3599,13 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   background: transparent;
   font-size: 0.9rem;
   color: #0f172a;
-  resize: vertical;
+  resize: none;
 }
 .ib-form-input::placeholder { color: #94a3b8; }
-.ib-form-alan--mesaj .ib-form-input { min-height: 11rem; }
+.ib-form-alan--mesaj .ib-form-input { min-height: 7.25rem; height: 100%; }
 .ib-form-gonder {
   width: 100%;
-  margin-top: auto;
+  flex-shrink: 0;
   border: none;
   border-radius: 0.55rem;
   padding: 0.95rem 1.25rem;
@@ -4946,6 +4946,19 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   font-weight: 600;
 }
 
+.bmg-ikon-pill-ikon,
+.bmg-ikon-kutu-ikon {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+.bmg-ikon-pills-acik .bmg-ikon-pill {
+  background: rgba(255, 255, 255, 0.14);
+  backdrop-filter: blur(8px);
+}
+
 .bmg-ikon-kutular {
   display: grid;
   gap: 0.5rem;
@@ -4974,6 +4987,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 
 .bmg-sinematik-gorsel-wrap {
   position: relative;
+  overflow: hidden;
   min-height: 340px;
 }
 
@@ -4994,39 +5008,50 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .bmg-sinematik-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(0, 0, 0, 0.92) 0%, rgba(0, 0, 0, 0.35) 45%, rgba(0, 0, 0, 0.15) 100%);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.28) 48%, rgba(0, 0, 0, 0.12) 100%);
+  pointer-events: none;
 }
 
 .bmg-sinematik-serit {
-  position: relative;
-  margin-top: -8rem;
+  position: absolute;
+  inset: auto 0 0;
   z-index: 2;
-  padding: 0 1.25rem 2rem;
+  padding: 4.5rem 1.25rem 1.35rem;
 }
 
 @media (min-width: 768px) {
   .bmg-sinematik-serit {
-    margin-top: -10rem;
-    padding: 0 2.5rem 2.5rem;
-  }
-
-  .bmg-sinematik-serit-icerik {
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
+    padding: 5.5rem 2.5rem 1.75rem;
   }
 }
 
 .bmg-sinematik-serit-icerik {
   display: flex;
   flex-direction: column;
-  gap: 1.25rem;
+  align-items: flex-start;
+  gap: 1rem;
+  width: 100%;
   max-width: 56rem;
 }
 
 .bmg-sinematik-metin {
-  flex: 1;
   min-width: 0;
+  max-width: 40rem;
+}
+
+.bmg-sinematik-serit .bmg-metin {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.bmg-sinematik-serit .bmg-cta {
+  margin-top: 0.85rem;
+}
+
+.bmg-sinematik-serit .bmg-ikon-pills {
+  margin-top: 0.15rem;
 }
 
 .widget-baslik-metin-gorsel--sinematik-hero.widget-bolum-tam-ekran .bmg-sinematik-hero {
@@ -5038,19 +5063,20 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .bmg-bento {
   display: grid;
   gap: 1rem;
+  align-items: stretch;
   grid-template-areas: 'metin' 'gorsel' 'ikonlar';
 }
 
 @media (min-width: 768px) {
   .bmg-bento {
-    grid-template-columns: 1.1fr 1.4fr;
-    grid-template-rows: auto auto;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.4fr);
+    grid-template-rows: auto 1fr;
     grid-template-areas: 'metin gorsel' 'ikonlar gorsel';
     gap: 1rem 1.25rem;
   }
 
   .bmg-bento-gorsel-sol {
-    grid-template-columns: 1.4fr 1.1fr;
+    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.1fr);
     grid-template-areas: 'gorsel metin' 'gorsel ikonlar';
   }
 }
@@ -5067,6 +5093,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .bmg-bento-gorsel-kutu {
   grid-area: gorsel;
   min-height: 260px;
+  height: 100%;
   overflow: hidden;
   border-radius: 1.5rem;
   background: #f1f5f9;
@@ -5104,8 +5131,10 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 
 .bmg-bento-ikon-emoji {
-  display: block;
-  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 1.75rem;
 }
 
 .bmg-bento-ikon-metin {
@@ -5117,11 +5146,11 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 
 .bmg-capraz {
-  position: relative;
+  display: grid;
   overflow: hidden;
   border-radius: 1.25rem;
   box-shadow: 0 20px 50px rgba(15, 23, 42, 0.1);
-  min-height: 380px;
+  min-height: 320px;
 }
 
 .bmg-capraz-metin {
@@ -5129,52 +5158,60 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   z-index: 2;
   display: flex;
   align-items: center;
-  padding: 2rem;
+  min-width: 0;
+  padding: 1.75rem;
+  background: #f8fafc;
+}
+
+.bmg-capraz-metin-icerik {
+  min-width: 0;
+  width: 100%;
 }
 
 @media (min-width: 768px) {
   .bmg-capraz {
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
     min-height: 420px;
+  }
+
+  .bmg-capraz-ters {
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+  }
+
+  .bmg-capraz-ters .bmg-capraz-gorsel {
+    order: -1;
   }
 
   .bmg-capraz-metin {
-    width: 62%;
     min-height: 420px;
-    clip-path: polygon(0 0, 100% 0, 82% 100%, 0 100%);
-    padding: 2.5rem 3rem 2.5rem 2rem;
+    clip-path: polygon(0 0, 100% 0, 88% 100%, 0 100%);
+    padding: 2.5rem 3.25rem 2.5rem 2rem;
   }
 
   .bmg-capraz-ters .bmg-capraz-metin {
-    margin-left: auto;
-    clip-path: polygon(18% 0, 100% 0, 100% 100%, 0 100%);
-    padding: 2.5rem 2rem 2.5rem 3rem;
+    clip-path: polygon(12% 0, 100% 0, 100% 100%, 0 100%);
+    padding: 2.5rem 2rem 2.5rem 3.25rem;
   }
 }
 
 .bmg-capraz-gorsel {
+  min-width: 0;
+  min-height: 220px;
   background: #e2e8f0;
-  min-height: 240px;
 }
 
 .bmg-capraz-gorsel img {
   display: block;
   width: 100%;
   height: 100%;
-  min-height: 240px;
+  min-height: 220px;
   object-fit: cover;
 }
 
 @media (min-width: 768px) {
-  .bmg-capraz-gorsel {
-    position: absolute;
-    inset: 0;
-    left: 38%;
-    min-height: 100%;
-  }
-
-  .bmg-capraz-ters .bmg-capraz-gorsel {
-    left: 0;
-    right: 38%;
+  .bmg-capraz-gorsel,
+  .bmg-capraz-gorsel img {
+    min-height: 420px;
   }
 }
 
@@ -5188,42 +5225,35 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 
 .bmg-dergi {
   display: grid;
-  gap: 2rem;
-  align-items: center;
+  gap: 1.5rem;
+  align-items: stretch;
 }
 
 @media (min-width: 768px) {
   .bmg-dergi {
-    grid-template-columns: 1.15fr 0.85fr;
-    gap: 0;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 0 1.5rem;
   }
 
   .bmg-dergi-metin-alan {
-    padding: 2rem 0 2rem 2.5rem;
-  }
-
-  .bmg-dergi-baslik-overlay {
-    position: absolute;
-    bottom: -1rem;
-    left: -2rem;
-    margin: 0 !important;
-    max-width: 75%;
-    background: rgba(255, 255, 255, 0.92);
-    padding: 0.5rem 1rem 0.75rem;
-    border-radius: 0.5rem;
-    box-shadow: 0 12px 40px rgba(15, 23, 42, 0.12);
-    text-shadow: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0.5rem 0 0.5rem 0.25rem;
   }
 }
 
 .bmg-dergi-gorsel-alan {
   position: relative;
+  min-width: 0;
+  overflow: hidden;
+  border-radius: 1rem;
 }
 
 .bmg-dergi-gorsel {
   display: block;
   width: 100%;
-  min-height: 320px;
+  min-height: 280px;
   border-radius: 1rem;
   object-fit: cover;
   box-shadow: 0 24px 60px rgba(15, 23, 42, 0.15);
@@ -5231,7 +5261,7 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 
 .bmg-dergi-gorsel-bos {
   display: flex;
-  min-height: 320px;
+  min-height: 280px;
   align-items: center;
   justify-content: center;
   border-radius: 1rem;
@@ -5240,12 +5270,19 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 
 .bmg-dergi-baslik-overlay {
-  position: relative;
+  position: absolute;
   z-index: 2;
-  margin: -2.5rem 0 0 1.5rem !important;
-  max-width: 90%;
-  font-size: clamp(2rem, 5vw, 3.25rem) !important;
-  line-height: 1.05 !important;
+  right: 1rem;
+  bottom: 1rem;
+  left: 1rem;
+  margin: 0 !important;
+  max-width: calc(100% - 2rem);
+  background: rgba(255, 255, 255, 0.94);
+  padding: 0.65rem 0.9rem;
+  border-radius: 0.65rem;
+  box-shadow: 0 12px 40px rgba(15, 23, 42, 0.12);
+  font-size: clamp(1.5rem, 3.6vw, 2.5rem) !important;
+  line-height: 1.12 !important;
 }
 
 .bmg-timeline-wrap {
@@ -5331,6 +5368,8 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   flex-direction: column;
   gap: 2rem;
   align-items: center;
+  overflow: visible;
+  padding: 0.75rem 0.25rem;
 }
 
 @media (min-width: 768px) {

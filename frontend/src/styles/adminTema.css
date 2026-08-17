@@ -5994,6 +5994,40 @@ html:has(.admin-panel[data-tema='acik']) body {
   color: var(--ap-heading);
 }
 
+.ap-widget-galeri-aksiyonlar {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 0.3rem;
+}
+
+.ap-widget-galeri-goz {
+  position: relative;
+  display: inline-flex;
+  flex-shrink: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--ap-border);
+  border-radius: 999px;
+  background: var(--ap-input-bg);
+  color: var(--ap-text-muted);
+  cursor: pointer;
+}
+
+.ap-widget-galeri-goz svg {
+  width: 0.78rem;
+  height: 0.78rem;
+}
+
+.ap-widget-galeri-goz:hover,
+.ap-widget-galeri-goz:focus-visible {
+  border-color: color-mix(in srgb, var(--ap-accent) 45%, var(--ap-border));
+  color: var(--ap-accent);
+  outline: none;
+}
+
 .ap-widget-galeri-info {
   position: relative;
   display: inline-flex;
@@ -6309,6 +6343,25 @@ html:has(.admin-panel[data-tema='acik']) body {
   height: 100%;
   min-height: 22rem;
   position: relative;
+}
+
+.ap-widget-oniz-olcek .widget-baslik-metin-gorsel--sinematik-hero .bmg-sinematik-hero {
+  margin-left: 0;
+  margin-right: 0;
+  width: 100%;
+  border-radius: 0.85rem;
+}
+
+.ap-widget-oniz-olcek .bmg-bento,
+.ap-widget-oniz-olcek .bmg-capraz,
+.ap-widget-oniz-olcek .bmg-dergi,
+.ap-widget-oniz-olcek .bmg-timeline-wrap {
+  width: 100%;
+  min-width: 0;
+}
+
+.ap-widget-oniz-olcek .bmg-polaroid {
+  padding: 1.25rem 0.5rem;
 }
 
 .ap-form-gonderim-veri {

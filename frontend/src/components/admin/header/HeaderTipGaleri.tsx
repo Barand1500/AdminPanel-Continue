@@ -1,6 +1,9 @@
-import { useMemo, useState, type MouseEvent } from 'react';
+import { useMemo, useState } from 'react';
 import { AdminAramaKutusu } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { GaleriKartAksiyonlar, GaleriOnizlemeKabugu } from '@/components/admin/ortak/GaleriKartAksiyonlar';
 import { HEADER_TIP_TANIMLARI, type HeaderTipi } from '@/data/headerTipleri';
+import { varsayilanHeaderAyarlari } from '@/types/header';
+import { SiteOnizlemePaneli } from '@/components/admin/site/SiteOnizlemePaneli';
 import { HeaderTipWireframe } from './HeaderTipWireframe';
 
 const GALERI_KATEGORILER: { id: string; etiket: string; ids: HeaderTipi[] | null }[] = [
@@ -15,20 +18,11 @@ interface HeaderTipGaleriProps {
   onSec: (tip: HeaderTipi) => void;
 }
 
-function InfoIkon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-      <circle cx="12" cy="12" r="9" />
-      <path d="M12 11.2V16.5" />
-      <circle cx="12" cy="8" r="0.9" fill="currentColor" stroke="none" />
-    </svg>
-  );
-}
-
 export function HeaderTipGaleri({ secili, onSec }: HeaderTipGaleriProps) {
   const [arama, setArama] = useState('');
   const [kategori, setKategori] = useState('tumu');
   const [infoTip, setInfoTip] = useState<string | null>(null);
+  const [onizlemeTip, setOnizlemeTip] = useState<HeaderTipi | null>(null);
 
   const tipler = useMemo(() => {
     const kaynak = GALERI_KATEGORILER.find((k) => k.id === kategori)?.ids;
@@ -96,21 +90,13 @@ export function HeaderTipGaleri({ secili, onSec }: HeaderTipGaleriProps) {
                   </div>
                   <span className="ap-widget-galeri-ad-satir">
                     <span className="ap-widget-galeri-ad">{tip.ad}</span>
-                    <button
-                      type="button"
-                      className={`ap-widget-galeri-info${infoTip === tip.id ? ' ap-widget-galeri-info--acik' : ''}`}
-                      aria-label={`${tip.ad} nedir?`}
-                      aria-expanded={infoTip === tip.id}
-                      onClick={(e: MouseEvent<HTMLButtonElement>) => {
-                        e.stopPropagation();
-                        setInfoTip((onceki) => (onceki === tip.id ? null : tip.id));
-                      }}
-                    >
-                      <InfoIkon />
-                      <span className="ap-widget-galeri-info-kutu" role="tooltip">
-                        {tip.aciklama}
-                      </span>
-                    </button>
+                    <GaleriKartAksiyonlar
+                      ad={tip.ad}
+                      aciklama={tip.aciklama}
+                      infoAcik={infoTip === tip.id}
+                      onInfo={() => setInfoTip((onceki) => (onceki === tip.id ? null : tip.id))}
+                      onOnizle={() => setOnizlemeTip(tip.id)}
+                    />
                   </span>
                   <span className="ap-widget-galeri-sec">
                     {aktif ? 'Seçili — ayarlara git' : 'Bu tipi seç'}
@@ -121,6 +107,23 @@ export function HeaderTipGaleri({ secili, onSec }: HeaderTipGaleriProps) {
           </div>
         )}
       </div>
+
+      <GaleriOnizlemeKabugu
+        acik={Boolean(onizlemeTip)}
+        baslik="Header önizleme"
+        alt={`${HEADER_TIP_TANIMLARI.find((t) => t.id === onizlemeTip)?.ad ?? ''} · örnek verilerle tip görünümü`}
+        modalSinif="ap-header-oniz-modal"
+        onKapat={() => setOnizlemeTip(null)}
+      >
+        {onizlemeTip && (
+          <SiteOnizlemePaneli
+            tip="header"
+            kabuksuz
+            demoMod
+            headerAyarlari={varsayilanHeaderAyarlari({ headerTipi: onizlemeTip })}
+          />
+        )}
+      </GaleriOnizlemeKabugu>
     </div>
   );
 }
