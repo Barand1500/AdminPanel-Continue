@@ -55,7 +55,7 @@ export function AksiyonCubuguUstCizgiSlot({ footerRef }: { footerRef: RefObject<
   );
 }
 
-/** Açık panel DOM'unu context'e kaydeder; callback ref kullanmaz (sonsuz döngüyü önler). */
+/** Açık panel DOM'unu context'e kaydeder. */
 export function useAksiyonCubuguPanelSync(acik: boolean, elRef: RefObject<HTMLElement | null>) {
   const ctx = useContext(AksiyonCubuguPanelContext);
   const panelKaydetRef = useRef(ctx?.panelKaydet);
@@ -67,13 +67,15 @@ export function useAksiyonCubuguPanelSync(acik: boolean, elRef: RefObject<HTMLEl
 
     if (acik) {
       kaydet(elRef.current);
-    } else {
-      kaydet(null);
+      const id = requestAnimationFrame(() => kaydet(elRef.current));
+      return () => {
+        cancelAnimationFrame(id);
+        kaydet(null);
+      };
     }
 
-    return () => {
-      kaydet(null);
-    };
+    kaydet(null);
+    return () => kaydet(null);
   }, [acik, elRef]);
 }
 

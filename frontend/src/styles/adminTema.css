@@ -89,11 +89,17 @@ html:has(.admin-panel[data-tema='acik']) body {
   z-index: 40;
   flex-shrink: 0;
   width: 100%;
+  overflow: visible;
   --ap-aksiyon-kenarlik-kalinlik: 2px;
 }
 
 .admin-panel .ap-footer.ap-gorev-cubugu {
+  overflow: visible;
   border-top: var(--ap-aksiyon-kenarlik-kalinlik) solid var(--ap-accent);
+}
+
+.admin-panel .ap-footer.ap-gorev-cubugu.ap-gorev-cubugu--panel-acik {
+  border-top-color: transparent;
 }
 
 /* Alt aksiyon cubugu — metin sekmeleri */
@@ -9861,7 +9867,7 @@ html:has(.admin-panel[data-tema='acik']) body {
   left: 0;
   width: 100%;
   pointer-events: none;
-  z-index: 6;
+  z-index: 55;
   overflow: visible;
 }
 
@@ -9886,6 +9892,7 @@ html:has(.admin-panel[data-tema='acik']) body {
 .ap-gorev-cubugu--panel-acik .ap-alt-panel--kenarlik-anim,
 .ap-gorev-cubugu--panel-acik .ap-takvim-panel--kenarlik-anim,
 .ap-gorev-cubugu--panel-acik .ap-cubuk-arama-oneri--kenarlik-anim {
+  bottom: 100%;
   border-color: transparent !important;
   border-radius: 0.625rem 0.625rem 0 0;
   box-shadow: 0 -6px 20px rgba(0, 0, 0, 0.1);
