@@ -55,7 +55,13 @@ export function AdminRehberModal({
       <div className="ap-rehber-modal">
         <header className="ap-rehber-header">
           <div className="ap-rehber-header-sol">
-            <span className="ap-rehber-ikon">?</span>
+            <span className="ap-rehber-ikon" aria-hidden>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75">
+                <circle cx="12" cy="12" r="9" />
+                <path strokeLinecap="round" d="M9.75 9.6a2.25 2.25 0 014.28.85c0 1.5-2.15 1.75-2.15 3.15" />
+                <circle cx="12" cy="16.55" r="0.85" fill="currentColor" stroke="none" />
+              </svg>
+            </span>
             <div>
               <h2 id="rehber-baslik" className="ap-rehber-baslik">
                 {baslik}
@@ -76,7 +82,7 @@ export function AdminRehberModal({
 
           <div className="space-y-3">
             {kartlar.map((kart) => (
-              <article key={kart.baslik} className={`ap-rehber-kart ap-rehber-kart-${kart.renk}`}>
+              <article key={kart.baslik} className="ap-rehber-kart">
                 <h4 className="ap-rehber-kart-baslik">
                   {kart.ikon && <span className="mr-1">{kart.ikon}</span>}
                   {kart.baslik}
@@ -88,7 +94,10 @@ export function AdminRehberModal({
 
           {ipucu && (
             <div className="ap-rehber-ipucu">
-              <span>💡</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" aria-hidden>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 18h6M10 21h4" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 3a6 6 0 00-3.5 10.8c.7.55 1.1 1.2 1.2 2.2h4.6c.1-1 .5-1.65 1.2-2.2A6 6 0 0012 3z" />
+              </svg>
               <p>
                 <strong>İpucu:</strong> {ipucu}
               </p>
