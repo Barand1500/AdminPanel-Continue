@@ -86,6 +86,12 @@ export interface HeaderTipEkAyarlari {
   butonRengi?: string;
   aramaGoster?: boolean;
   aramaModu?: 'tam' | 'ikon';
+  /** İkon aramanın açılış yönü: yandan genişler veya alttan panel. */
+  aramaAcilis?: 'yan' | 'alt';
+  /** Masaüstünde kaydırırken telefon/e-posta üst bandını gizle. */
+  ustBantKaydirincaGizlePc?: boolean;
+  /** Mobilde kaydırırken telefon/e-posta üst bandını gizle. */
+  ustBantKaydirincaGizleMobil?: boolean;
   /** false ise header sağındaki hesap / giriş ikonu gizlenir */
   kullaniciGoster?: boolean;
   kompaktYukseklik?: 40 | 48 | 56;

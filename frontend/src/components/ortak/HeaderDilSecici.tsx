@@ -1,7 +1,29 @@
 import { useEffect, useRef, useState } from 'react';
-import type { DilDestegiAyarlari } from '@/types/header';
+import type { DilDestegiAyarlari, SiteDilKaydi } from '@/types/header';
 import { aktifDiller, SITE_DIL_STORAGE } from '@/data/siteDilleri';
 import { useSiteDil } from '@/contexts/SiteDilContext';
+import { dilBayrakGorselUrl } from '@/utils/dilBayrak';
+
+function DilBayrak({ dil }: { dil: SiteDilKaydi }) {
+  const url = dilBayrakGorselUrl(dil);
+  if (url) {
+    return (
+      <img
+        className="header-dil-bayrak-gorsel"
+        src={url}
+        srcSet={`${dilBayrakGorselUrl(dil, 80) ?? url} 2x`}
+        alt=""
+        width={20}
+        height={14}
+      />
+    );
+  }
+  return (
+    <span className="header-dil-bayrak" aria-hidden>
+      {dil.bayrak || dil.kod}
+    </span>
+  );
+}
 
 interface HeaderDilSeciciProps {
   ayar: DilDestegiAyarlari;
@@ -50,9 +72,7 @@ export function HeaderDilSecici({ ayar, className = '', satir = false }: HeaderD
             className={`header-dil-satir-oge${d.kod === gecerliKod ? ' header-dil-satir-oge-aktif' : ''}`}
             onClick={() => dilSec(d.kod)}
           >
-            <span className="header-dil-bayrak" aria-hidden>
-              {d.bayrak}
-            </span>
+            <DilBayrak dil={d} />
           </button>
         ))}
       </div>
@@ -74,7 +94,7 @@ export function HeaderDilSecici({ ayar, className = '', satir = false }: HeaderD
             <path d="M3 12h18M12 3c2.5 2.8 4 6 4 9s-1.5 6.2-4 9M12 3c-2.5 2.8-4 6-4 9s1.5 6.2 4 9" />
           </svg>
         </span>
-        {bayrakli && <span className="header-dil-bayrak">{aktifDil.bayrak}</span>}
+        {bayrakli && <DilBayrak dil={aktifDil} />}
         <span className="header-dil-kod">{aktifDil.kod}</span>
       </button>
 
@@ -91,7 +111,7 @@ export function HeaderDilSecici({ ayar, className = '', satir = false }: HeaderD
               >
                 {bayrakli ? (
                   <>
-                    <span className="header-dil-bayrak">{d.bayrak}</span>
+                    <DilBayrak dil={d} />
                     <span>{d.kod}</span>
                   </>
                 ) : (

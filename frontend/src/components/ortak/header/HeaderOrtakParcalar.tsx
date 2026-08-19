@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
-import { useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { SiteAyarlari, MenuOgesi } from '@/types/site';
 import { kullaniciAlaniGoster, headerRenkCssVars } from '@/types/header';
 import type { HeaderVeri } from './useHeaderVeri';
 import { aramaSinifi, kurDegeri } from './useHeaderVeri';
+import { useSayfaKaydirildi } from './useSayfaKaydirildi';
 import { KategoriMenu } from '../KategoriMenu';
 import { TemaToggle } from '../TemaToggle';
 import { HeaderIkon } from '../HeaderIkon';
@@ -50,11 +51,22 @@ export function MenuOgeGoster({
 export function UstBant({ veri, ayarlar }: { veri: HeaderVeri; ayarlar?: SiteAyarlari | null }) {
   const ustBant = veri.header.ustBant!;
   const renkler = headerRenkCssVars(veri.tipEk);
+  const kaydi = useSayfaKaydirildi();
+  const ustSiniflari = [
+    kaydi ? 'is-kaydirildi' : '',
+    veri.tipEk.ustBantKaydirincaGizlePc ? 'ust-gizle-pc' : '',
+    veri.tipEk.ustBantKaydirincaGizleMobil ? 'ust-gizle-mobil' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   if (!ustBant) return null;
 
   return (
-    <div className={renkler ? 'site-header-ust-ozel' : 'bg-primary text-white'} style={renkler}>
+    <div
+      className={`${renkler ? 'site-header-ust-ozel' : 'bg-primary text-white'} site-header-ust-kaydir ${ustSiniflari}`}
+      style={renkler}
+    >
       <div className="container-site flex flex-wrap items-center justify-between gap-2 py-2 text-xs sm:text-sm">
         <p className="max-w-xl opacity-95">{veri.header.slogan}</p>
         <div className="flex flex-wrap items-center gap-4 text-[11px] sm:text-xs">
@@ -121,40 +133,89 @@ export function IkinciMarka({ veri }: { veri: HeaderVeri }) {
 
 export function AramaAlani({ veri, className = '' }: { veri: HeaderVeri; className?: string }) {
   const [acik, setAcik] = useState(false);
-  if (veri.tipEk.aramaGoster === false) return null;
+  const kokRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const aramaGoster = veri.tipEk.aramaGoster !== false;
+  const imzaArama = className.includes('site-header-imza-arama');
+  const tamKutu = aramaGoster && veri.tipEk.aramaModu === 'tam' && !imzaArama;
+  const alttan = (veri.tipEk.aramaAcilis ?? 'alt') === 'alt';
+
+  useEffect(() => {
+    if (!acik || tamKutu) return;
+    const disari = (e: MouseEvent) => {
+      if (!kokRef.current?.contains(e.target as Node)) setAcik(false);
+    };
+    const kac = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setAcik(false);
+    };
+    document.addEventListener('mousedown', disari);
+    document.addEventListener('keydown', kac);
+    return () => {
+      document.removeEventListener('mousedown', disari);
+      document.removeEventListener('keydown', kac);
+    };
+  }, [acik, tamKutu]);
+
+  useEffect(() => {
+    if (acik && !tamKutu) inputRef.current?.focus();
+  }, [acik, tamKutu]);
+
+  if (!aramaGoster) return null;
 
   const arama = veri.header.arama!;
-  const imzaArama = className.includes('site-header-imza-arama');
 
-  if (veri.tipEk.aramaModu === 'ikon' && !imzaArama) {
+  if (tamKutu) {
     return (
-      <div className={`site-header-arama-acilir relative ${className}`}>
-        <button
-          type="button"
-          className="site-header-arama-ikon rounded-full p-2 transition hover:opacity-80"
-          style={{ color: 'inherit' }}
-          aria-label="Ara"
-          aria-expanded={acik}
-          onClick={() => setAcik((onceki) => !onceki)}
-        >
+      <div className={`relative ${className}`}>
+        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary">
           <HeaderIkon ikon={arama.ikon} grup="arama" className="h-5 w-5" />
-        </button>
-        {acik && (
-          <form className="site-header-arama-panel" role="search" onSubmit={(e) => e.preventDefault()}>
-            <input autoFocus type="search" placeholder={arama.placeholder} aria-label="Site içinde ara" />
-            <button type="submit" aria-label="Aramayı gönder">→</button>
-          </form>
-        )}
+        </span>
+        <input type="search" placeholder={arama.placeholder} className={aramaSinifi(arama.stil)} />
       </div>
     );
   }
 
   return (
-    <div className={`relative ${className}`}>
-      <span className="absolute left-4 top-1/2 -translate-y-1/2 text-primary">
-        <HeaderIkon ikon={arama.ikon} grup="arama" className="h-5 w-5" />
-      </span>
-      <input type="search" placeholder={arama.placeholder} className={aramaSinifi(arama.stil)} />
+    <div
+      ref={kokRef}
+      className={`site-header-arama-acilir${acik ? ' site-header-arama-acilir--acik' : ''}${alttan ? ' site-header-arama-acilir--alt' : ''} ${className}`}
+    >
+      <form className="site-header-arama-satir" role="search" onSubmit={(e) => e.preventDefault()}>
+        {alttan ? (
+          acik && (
+            <div className="site-header-arama-panel">
+              <input
+                ref={inputRef}
+                type="search"
+                placeholder={arama.placeholder || 'Arama yap...'}
+                aria-label="Site içinde ara"
+              />
+              <button type="submit" aria-label="Aramayı gönder">
+                →
+              </button>
+            </div>
+          )
+        ) : (
+          <div className="site-header-arama-kutu">
+            <input
+              ref={inputRef}
+              type="search"
+              placeholder={arama.placeholder}
+              aria-label="Site içinde ara"
+              tabIndex={acik ? 0 : -1}
+            />
+          </div>
+        )}
+        <button
+          type="button"
+          className="site-header-arama-ikon"
+          aria-label={acik ? 'Aramayı kapat' : 'Ara'}
+          aria-expanded={acik}
+          onClick={() => setAcik((onceki) => !onceki)}
+        >
+          <HeaderIkon ikon={arama.ikon} grup="arama" className="h-5 w-5" />
+        </button>
+      </form>
     </div>
   );
 }

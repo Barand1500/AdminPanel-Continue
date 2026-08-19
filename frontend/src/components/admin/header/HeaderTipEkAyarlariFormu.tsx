@@ -54,6 +54,20 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
           onChange={(butonRengi) => guncelle({ butonRengi })}
         />
       </div>
+      {tanim.ustBant && (
+        <>
+          <AdminAnahtarDugme
+            etiket="Kaydırırken üst bant gizlensin (PC)"
+            acik={tipEk.ustBantKaydirincaGizlePc === true}
+            onDegistir={(ustBantKaydirincaGizlePc) => guncelle({ ustBantKaydirincaGizlePc })}
+          />
+          <AdminAnahtarDugme
+            etiket="Kaydırırken üst bant gizlensin (Mobil)"
+            acik={tipEk.ustBantKaydirincaGizleMobil === true}
+            onDegistir={(ustBantKaydirincaGizleMobil) => guncelle({ ustBantKaydirincaGizleMobil })}
+          />
+        </>
+      )}
       {(tip === 'sade' || tip === 'kompakt' || tip === 'arama-odakli' || tip === 'imza-kurumsal' || tip === 'yuzen-hap') && (
         <>
           <AdminAnahtarDugme
@@ -68,9 +82,21 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
               onChange={(e) => guncelle({ aramaModu: e.target.value as 'tam' | 'ikon' })}
             >
               <option value="tam">Tam genişlik kutu</option>
-              <option value="ikon">Yalnızca ikon</option>
+              <option value="ikon">Açılır / kapanır ikon</option>
             </select>
           </FormAlani>
+          {(tipEk.aramaModu === 'ikon' || tip === 'imza-kurumsal') && (
+            <FormAlani etiket="Arama açılışı">
+              <select
+                className={formInputSinifi}
+                value={tipEk.aramaAcilis ?? 'alt'}
+                onChange={(e) => guncelle({ aramaAcilis: e.target.value as 'yan' | 'alt' })}
+              >
+                <option value="yan">Yandan açılır</option>
+                <option value="alt">Alttan açılır</option>
+              </select>
+            </FormAlani>
+          )}
           <AdminAnahtarDugme
             etiket="Hesap ikonu"
             acik={tipEk.kullaniciGoster !== false}

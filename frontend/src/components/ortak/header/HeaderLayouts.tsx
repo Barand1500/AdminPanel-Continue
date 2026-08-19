@@ -21,6 +21,7 @@ import {
 import { HeaderIkon } from '../HeaderIkon';
 import { HeaderDilSecici } from '../HeaderDilSecici';
 import { SosyalMedyaIkonSatirlari } from '../SosyalMedyaIkon';
+import { useSayfaKaydirildi } from './useSayfaKaydirildi';
 
 interface HeaderLayoutProps {
   veri: HeaderVeri;
@@ -237,9 +238,17 @@ export function HeaderOverlayKurumsal({
   const ctaMetin = veri.tipEk.ctaMetni?.trim() || 'Katalog';
   const ctaLink = veri.tipEk.ctaLink?.trim() || '/iletisim';
   const konumSinifi = veri.tipEk.sabit !== false ? 'fixed' : 'absolute';
+  const kaydi = useSayfaKaydirildi();
+  const ustSiniflari = [
+    kaydi ? 'is-kaydirildi' : '',
+    veri.tipEk.ustBantKaydirincaGizlePc ? 'ust-gizle-pc' : '',
+    veri.tipEk.ustBantKaydirincaGizleMobil ? 'ust-gizle-mobil' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
 
   return (
-    <div className={`site-header-overlay-shell ${konumSinifi} inset-x-0 top-0 z-50`}>
+    <div className={`site-header-overlay-shell ${konumSinifi} inset-x-0 top-0 z-50 ${ustSiniflari}`}>
       {ustBantGoster && (
         <div className="site-header-overlay-ust">
           <div className="container-site flex flex-wrap items-center justify-between gap-2 py-2 text-xs">
@@ -373,11 +382,19 @@ export function HeaderImzaKurumsal({
   const ctaMetin = veri.tipEk.ctaMetni?.trim() || 'Katalog';
   const ctaLink = veri.tipEk.ctaLink?.trim() || '/katalog';
   const sabit = veri.tipEk.sabit !== false;
+  const kaydi = useSayfaKaydirildi();
   const sabitSinifi = sabit
     ? heroOverlay
       ? 'fixed inset-x-0 top-0 z-50'
       : 'fixed inset-x-0 top-0 z-40'
     : 'relative z-40';
+  const ustSiniflari = [
+    kaydi ? 'is-kaydirildi' : '',
+    veri.tipEk.ustBantKaydirincaGizlePc ? 'ust-gizle-pc' : '',
+    veri.tipEk.ustBantKaydirincaGizleMobil ? 'ust-gizle-mobil' : '',
+  ]
+    .filter(Boolean)
+    .join(' ');
   const renkler = {
     '--imza-ana': veri.tipEk.arkaPlanRengi || '#0b2a77',
     '--imza-ust': veri.tipEk.ustBantRengi || '#08245f',
@@ -394,10 +411,13 @@ export function HeaderImzaKurumsal({
   return (
     <>
       {sabit && !heroOverlay && (
-        <div className={`site-header-imza-bosluk ${ust ? 'h-[6.4rem]' : 'h-[4.5rem]'}`} aria-hidden />
+        <div
+          className={`site-header-imza-bosluk ${ust ? 'h-[6.4rem]' : 'h-[4.5rem]'} ${ustSiniflari}`}
+          aria-hidden
+        />
       )}
       <div
-        className={`site-header-imza-shell ${sabitSinifi}${heroOverlay ? ' site-header-imza-shell--hero-overlay' : ''}`}
+        className={`site-header-imza-shell ${sabitSinifi}${heroOverlay ? ' site-header-imza-shell--hero-overlay' : ''} ${ustSiniflari}`}
         style={renkler}
       >
         {ustBantGoster && (

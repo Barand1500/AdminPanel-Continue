@@ -165,6 +165,9 @@ export function varsayilanTipEk(tip: HeaderTipi): HeaderTipEkAyarlari {
   const ortak: HeaderTipEkAyarlari = {
     aramaGoster: true,
     aramaModu: 'tam',
+    aramaAcilis: 'alt',
+    ustBantKaydirincaGizlePc: false,
+    ustBantKaydirincaGizleMobil: false,
     kullaniciGoster: true,
     kompaktYukseklik: 48,
     ctaMetni: '',
