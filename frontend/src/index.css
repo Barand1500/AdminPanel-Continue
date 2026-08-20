@@ -191,6 +191,18 @@ body {
   background-color: var(--color-accent);
 }
 
+@media (min-width: 1024px) {
+  .tema-toggle.tema-gizle-pc {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  .tema-toggle.tema-gizle-mobil {
+    display: none !important;
+  }
+}
+
 .hesap-auth-kart {
   @apply rounded-2xl border p-8 shadow-sm;
   background-color: var(--color-surface-elevated);
@@ -1930,30 +1942,106 @@ html:has(.admin-panel) .site-header-imza-bosluk { display: none; }
   color: var(--color-text);
 }
 
-/* Gece modu ? kalan sabit slate s?n?flar? semantik renklere y?nlendir */
-html[data-site-tema='koyu'] .text-slate-900,
-html[data-site-tema='koyu'] .text-slate-800 {
+/* Gece modu: widget / sayfa sabit slate sınıflarını semantik renklere ezer */
+html[data-site-tema='koyu'] .site-public,
+html[data-site-tema='koyu'] .site-public main,
+html[data-site-tema='koyu'] body:has(.site-public) {
+  background-color: var(--color-surface);
   color: var(--color-text);
+}
+
+html[data-site-tema='koyu'] .text-slate-950,
+html[data-site-tema='koyu'] .text-slate-900,
+html[data-site-tema='koyu'] .text-slate-800,
+html[data-site-tema='koyu'] .text-gray-950,
+html[data-site-tema='koyu'] .text-gray-900,
+html[data-site-tema='koyu'] .text-gray-800,
+html[data-site-tema='koyu'] .text-zinc-900,
+html[data-site-tema='koyu'] .text-neutral-900,
+html[data-site-tema='koyu'] .text-black {
+  color: var(--color-text) !important;
 }
 
 html[data-site-tema='koyu'] .text-slate-700,
 html[data-site-tema='koyu'] .text-slate-600,
-html[data-site-tema='koyu'] .text-slate-500 {
-  color: var(--color-text-muted);
+html[data-site-tema='koyu'] .text-slate-500,
+html[data-site-tema='koyu'] .text-slate-400,
+html[data-site-tema='koyu'] .text-gray-700,
+html[data-site-tema='koyu'] .text-gray-600,
+html[data-site-tema='koyu'] .text-gray-500,
+html[data-site-tema='koyu'] .text-gray-400,
+html[data-site-tema='koyu'] .text-zinc-600,
+html[data-site-tema='koyu'] .text-zinc-500,
+html[data-site-tema='koyu'] .text-neutral-600 {
+  color: var(--color-text-muted) !important;
 }
 
-html[data-site-tema='koyu'] .bg-white {
-  background-color: var(--color-surface-elevated);
+html[data-site-tema='koyu'] .bg-white,
+html[data-site-tema='koyu'] .bg-white\/90,
+html[data-site-tema='koyu'] .bg-white\/80,
+html[data-site-tema='koyu'] .bg-white\/70,
+html[data-site-tema='koyu'] .bg-white\/60,
+html[data-site-tema='koyu'] .bg-white\/50,
+html[data-site-tema='koyu'] .bg-slate-50,
+html[data-site-tema='koyu'] .bg-slate-100,
+html[data-site-tema='koyu'] .bg-gray-50,
+html[data-site-tema='koyu'] .bg-gray-100,
+html[data-site-tema='koyu'] .bg-zinc-50,
+html[data-site-tema='koyu'] .bg-neutral-50 {
+  background-color: var(--color-surface-elevated) !important;
 }
 
+html[data-site-tema='koyu'] .hover\:bg-white:hover,
+html[data-site-tema='koyu'] .hover\:bg-slate-50:hover,
+html[data-site-tema='koyu'] .hover\:bg-slate-100:hover,
+html[data-site-tema='koyu'] .hover\:bg-gray-50:hover {
+  background-color: var(--color-surface-elevated) !important;
+}
+
+html[data-site-tema='koyu'] .border-slate-50,
 html[data-site-tema='koyu'] .border-slate-100,
-html[data-site-tema='koyu'] .border-slate-200 {
-  border-color: var(--color-border);
+html[data-site-tema='koyu'] .border-slate-200,
+html[data-site-tema='koyu'] .border-slate-300,
+html[data-site-tema='koyu'] .border-gray-100,
+html[data-site-tema='koyu'] .border-gray-200,
+html[data-site-tema='koyu'] .border-gray-300,
+html[data-site-tema='koyu'] .border-zinc-100,
+html[data-site-tema='koyu'] .border-zinc-200,
+html[data-site-tema='koyu'] .border-neutral-200,
+html[data-site-tema='koyu'] .divide-slate-100 > :not([hidden]) ~ :not([hidden]),
+html[data-site-tema='koyu'] .divide-slate-200 > :not([hidden]) ~ :not([hidden]) {
+  border-color: var(--color-border) !important;
+}
+
+html[data-site-tema='koyu'] .shadow-sm,
+html[data-site-tema='koyu'] .shadow,
+html[data-site-tema='koyu'] .shadow-md,
+html[data-site-tema='koyu'] .shadow-lg,
+html[data-site-tema='koyu'] .shadow-xl {
+  --tw-shadow-color: rgb(0 0 0 / 0.35);
+}
+
+html[data-site-tema='koyu'] .ring-slate-100,
+html[data-site-tema='koyu'] .ring-slate-200,
+html[data-site-tema='koyu'] .ring-gray-100,
+html[data-site-tema='koyu'] .ring-gray-200 {
+  --tw-ring-color: var(--color-border);
 }
 
 html[data-site-tema='koyu'] .guven-serit {
   background: linear-gradient(180deg, var(--color-surface-elevated) 0%, var(--color-surface) 100%);
   border-color: var(--color-border);
+}
+
+/* Widget kart / blok yüzeyleri — sabit açık renkleri gece paletine çek */
+html[data-site-tema='koyu'] .site-public [class*='widget'] .bg-white,
+html[data-site-tema='koyu'] .site-public section .bg-white,
+html[data-site-tema='koyu'] .site-public article.bg-white,
+html[data-site-tema='koyu'] .site-public .rounded-2xl.bg-white,
+html[data-site-tema='koyu'] .site-public .rounded-xl.bg-white,
+html[data-site-tema='koyu'] .site-public .rounded-lg.bg-white {
+  background-color: var(--color-surface-elevated) !important;
+  color: var(--color-text);
 }
 
 /* Hero ? tam ekran slider stili */

@@ -169,6 +169,8 @@ export function varsayilanTipEk(tip: HeaderTipi): HeaderTipEkAyarlari {
     ustBantKaydirincaGizlePc: false,
     ustBantKaydirincaGizleMobil: false,
     kullaniciGoster: true,
+    temaGosterPc: true,
+    temaGosterMobil: true,
     kompaktYukseklik: 48,
     ctaMetni: '',
     ctaLink: '',

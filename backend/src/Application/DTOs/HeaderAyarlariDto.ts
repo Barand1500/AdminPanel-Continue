@@ -61,6 +61,8 @@ export const headerAyarlariSchema = z.object({
       ustBantKaydirincaGizlePc: z.boolean().optional(),
       ustBantKaydirincaGizleMobil: z.boolean().optional(),
       kullaniciGoster: z.boolean().optional(),
+      temaGosterPc: z.boolean().optional(),
+      temaGosterMobil: z.boolean().optional(),
       kompaktYukseklik: z.union([z.literal(40), z.literal(48), z.literal(56)]).optional(),
       ctaMetni: z.string().max(120).optional(),
       ctaLink: z.string().max(500).optional(),
