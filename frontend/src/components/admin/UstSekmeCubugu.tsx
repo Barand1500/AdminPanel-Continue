@@ -1,12 +1,12 @@
 import { useEffect, useMemo, useRef, useState, useCallback, type DragEvent, type MouseEvent } from 'react';
 import type { AdminModul, AdminSekme } from '@/types/admin';
-import { modulBul } from '@/data/adminMenuYapisi';
 import {
   sekmeAyarlariOku,
   type SekmePanelAyarlari,
 } from '@/utils/sekmePanelAyarlari';
 import { SekmeCubuguArama } from './SekmeCubuguArama';
 import { AnimasyonluKenarlik } from './AnimasyonluKenarlik';
+import { AdminModulIkonu } from './AdminModulIkonu';
 
 interface UstSekmeCubuguProps {
   sekmeler: AdminSekme[];
@@ -103,8 +103,6 @@ function SekmeButonu({
 }) {
   const tasinan = surukleniyor === sekme.id;
   const hedef = dropHedef === sekme.id;
-  const modul = modulBul(sekme.modulId);
-  const ikon = modul?.ikon ?? '📄';
   const isimGoster = gorunumModu === 'isim' || gorunumModu === 'ikon-isim';
   const ikonGoster = gorunumModu === 'ikon' || gorunumModu === 'ikon-isim';
   const tabRef = useRef<HTMLDivElement>(null);
@@ -159,7 +157,11 @@ function SekmeButonu({
         {sekme.kaydedilmedi && (
           <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-400" title="Kaydedilmemiş değişiklik" />
         )}
-        {ikonGoster && <span className="shrink-0 text-sm leading-none">{ikon}</span>}
+        {ikonGoster && (
+          <span className="shrink-0 leading-none text-[var(--ap-text-muted)]">
+            <AdminModulIkonu modulId={sekme.modulId} boyut={15} />
+          </span>
+        )}
         {isimGoster && <span className="truncate">{sekme.baslik}</span>}
         {!isimGoster && !ikonGoster && <span className="truncate">{sekme.baslik}</span>}
       </button>

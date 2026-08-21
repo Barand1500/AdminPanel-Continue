@@ -2,9 +2,8 @@ import { useMemo, useState } from 'react';
 import { AdminAramaKutusu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { GaleriKartAksiyonlar, GaleriOnizlemeKabugu } from '@/components/admin/ortak/GaleriKartAksiyonlar';
 import { HEADER_TIP_TANIMLARI, type HeaderTipi } from '@/data/headerTipleri';
-import { varsayilanHeaderAyarlari } from '@/types/header';
+import type { HeaderAyarlari } from '@/types/header';
 import { SiteOnizlemePaneli } from '@/components/admin/site/SiteOnizlemePaneli';
-import { HeaderTipWireframe } from './HeaderTipWireframe';
 
 const GALERI_KATEGORILER: { id: string; etiket: string; ids: HeaderTipi[] | null }[] = [
   { id: 'tumu', etiket: 'Tümü', ids: null },
@@ -16,9 +15,12 @@ const GALERI_KATEGORILER: { id: string; etiket: string; ids: HeaderTipi[] | null
 interface HeaderTipGaleriProps {
   secili: HeaderTipi;
   onSec: (tip: HeaderTipi) => void;
+  siteAd?: string;
+  headerAyarlari: HeaderAyarlari;
+  iletisim: { telefon?: string | null; email?: string | null };
 }
 
-export function HeaderTipGaleri({ secili, onSec }: HeaderTipGaleriProps) {
+export function HeaderTipGaleri({ secili, onSec, siteAd, headerAyarlari, iletisim }: HeaderTipGaleriProps) {
   const [arama, setArama] = useState('');
   const [kategori, setKategori] = useState('tumu');
   const [infoTip, setInfoTip] = useState<string | null>(null);
@@ -86,7 +88,17 @@ export function HeaderTipGaleri({ secili, onSec }: HeaderTipGaleriProps) {
                   onClick={() => onSec(tip.id)}
                 >
                   <div className="ap-header-galeri-oniz">
-                    <HeaderTipWireframe tip={tip.id} />
+                    <div className="ap-galeri-canli-oniz ap-galeri-canli-oniz--header">
+                      <div className="ap-galeri-canli-oniz-olcek">
+                        <SiteOnizlemePaneli
+                          tip="header"
+                          kabuksuz
+                          siteAd={siteAd}
+                          headerAyarlari={{ ...headerAyarlari, headerTipi: tip.id, markaMetni: siteAd || headerAyarlari.markaMetni }}
+                          iletisim={iletisim}
+                        />
+                      </div>
+                    </div>
                   </div>
                   <span className="ap-widget-galeri-ad-satir">
                     <span className="ap-widget-galeri-ad">{tip.ad}</span>
@@ -119,8 +131,9 @@ export function HeaderTipGaleri({ secili, onSec }: HeaderTipGaleriProps) {
           <SiteOnizlemePaneli
             tip="header"
             kabuksuz
-            demoMod
-            headerAyarlari={varsayilanHeaderAyarlari({ headerTipi: onizlemeTip })}
+            siteAd={siteAd}
+            headerAyarlari={{ ...headerAyarlari, headerTipi: onizlemeTip, markaMetni: siteAd || headerAyarlari.markaMetni }}
+            iletisim={iletisim}
           />
         )}
       </GaleriOnizlemeKabugu>

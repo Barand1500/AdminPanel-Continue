@@ -226,7 +226,15 @@ export function HeaderYonetimiFormu() {
 
       <AdminIkiEkranSlider
         aktif={gorunum === 'editor' ? 'iki' : 'bir'}
-        birinci={<HeaderTipGaleri secili={aktifTip} onSec={tipSec} />}
+        birinci={
+          <HeaderTipGaleri
+            secili={aktifTip}
+            onSec={tipSec}
+            siteAd={siteAd}
+            headerAyarlari={birlesikHeader}
+            iletisim={{ telefon: ayarlar.telefon, email: ayarlar.email }}
+          />
+        }
         ikinci={
           <div className="ap-editor-panel ap-form-editor ap-header-editor">
           <div className="ap-form-editor-ust">
@@ -445,9 +453,9 @@ export function HeaderYonetimiFormu() {
 
       <HeaderOnizlemeModal
         acik={onizlemeAcik}
-        demoMod={gorunum === 'galeri'}
+        demoMod={false}
         siteAd={siteAd}
-        headerAyarlari={birlesikHeader}
+        headerAyarlari={{ ...birlesikHeader, markaMetni: siteAd || birlesikHeader.markaMetni }}
         iletisim={{ telefon: ayarlar.telefon, email: ayarlar.email }}
         onKapat={onizlemeyiKapat}
       />

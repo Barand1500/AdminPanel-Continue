@@ -57,6 +57,7 @@ interface SayfaListesiPanelProps {
   sayfalar: AdminSayfa[];
   seciliId: string | null;
   onSec: (sayfa: AdminSayfa) => void;
+  onDuzenle: (sayfa: AdminSayfa) => void;
   onSirala?: (sayfaId: string, yon: 'yukari' | 'asagi') => void;
   islemde?: boolean;
   tamGenislik?: boolean;
@@ -105,6 +106,7 @@ function SayfaListeSatiri({
   sayfa,
   seciliId,
   onSec,
+  onDuzenle,
   altSayfa = false,
   duzenlemeModu,
   ilk,
@@ -115,6 +117,7 @@ function SayfaListeSatiri({
   sayfa: AdminSayfa;
   seciliId: string | null;
   onSec: (sayfa: AdminSayfa) => void;
+  onDuzenle: (sayfa: AdminSayfa) => void;
   altSayfa?: boolean;
   duzenlemeModu: boolean;
   ilk: boolean;
@@ -137,6 +140,8 @@ function SayfaListeSatiri({
         <button
           type="button"
           onClick={() => onSec(sayfa)}
+          onDoubleClick={() => onDuzenle(sayfa)}
+          title="Düzenlemek için çift tıklayın"
           className={`ap-liste-oge mb-1 min-w-0 flex-1 text-left ${seciliId === sayfa.id ? 'ap-liste-oge-secili' : ''} ${
             altSayfa ? 'ap-sayfa-alt-oge' : ''
           }`}
@@ -170,6 +175,7 @@ function SayfaAgacDallari({
   dugumler,
   seciliId,
   onSec,
+  onDuzenle,
   daraltildi,
   onToggle,
   girinti = 0,
@@ -180,6 +186,7 @@ function SayfaAgacDallari({
   dugumler: SayfaAgacDugumu[];
   seciliId: string | null;
   onSec: (sayfa: AdminSayfa) => void;
+  onDuzenle: (sayfa: AdminSayfa) => void;
   daraltildi: Record<string, boolean>;
   onToggle: (id: string) => void;
   girinti?: number;
@@ -212,6 +219,7 @@ function SayfaAgacDallari({
                 sayfa={dugum.sayfa}
                 seciliId={seciliId}
                 onSec={onSec}
+                onDuzenle={onDuzenle}
                 altSayfa={girinti > 0}
                 duzenlemeModu={duzenlemeModu}
                 ilk={index === 0}
@@ -226,6 +234,7 @@ function SayfaAgacDallari({
                   dugumler={dugum.altSayfalar}
                   seciliId={seciliId}
                   onSec={onSec}
+                  onDuzenle={onDuzenle}
                   daraltildi={daraltildi}
                   onToggle={onToggle}
                   girinti={girinti + 1}
@@ -262,6 +271,7 @@ export function SayfaListesiPanel({
   sayfalar,
   seciliId,
   onSec,
+  onDuzenle,
   onSirala,
   islemde,
   tamGenislik,
@@ -312,6 +322,7 @@ export function SayfaListesiPanel({
             dugumler={filtreliAgac}
             seciliId={seciliId}
             onSec={onSec}
+            onDuzenle={onDuzenle}
             daraltildi={daraltildi}
             onToggle={toggleDugum}
             duzenlemeModu={siralaAktif}

@@ -6,6 +6,7 @@ import {
   kurumsalHeroConfigOku,
   type KurumsalHeroSlayt,
 } from '@/types/kurumsalHero';
+import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 
 interface KurumsalHeroWidgetProps {
   widget: Widget;
@@ -70,10 +71,15 @@ function SlaytIcerik({ slayt }: { slayt: KurumsalHeroSlayt }) {
 export function KurumsalHeroWidget({ widget, onizleme }: KurumsalHeroWidgetProps) {
   const cfg = configOkuFromWidget(widget);
   const kh = kurumsalHeroConfigOku(cfg);
+  const gorunumTipi = widgetGorunumTipiAl(widget);
   const slaytlar = kh.slaytlar.filter((s) => s.aktif && s.arkaPlanUrl?.trim());
   const [aktif, setAktif] = useState(0);
   const sureMs = Math.max(2000, (kh.gecisSuresiSn ?? 6) * 1000);
-  const yukseklik = kh.gorunum.yukseklik ?? '85vh';
+  const yukseklik = gorunumTipi === 'vetahsilat-yarim-kapak'
+    ? 'clamp(22rem, 34vw, 29rem)'
+    : gorunumTipi === 'vetahsilat-klasik'
+      ? 'calc(100svh - 2rem)'
+      : '100svh';
 
   useEffect(() => {
     setAktif(0);
@@ -110,11 +116,29 @@ export function KurumsalHeroWidget({ widget, onizleme }: KurumsalHeroWidgetProps
   const r = parseInt(hex.slice(0, 2), 16) || 30;
   const g = parseInt(hex.slice(2, 4), 16) || 64;
   const b = parseInt(hex.slice(4, 6), 16) || 175;
-  const overlayGradient = `linear-gradient(105deg, rgba(${r},${g},${b},${overlayOpaklik}) 0%, rgba(${r},${g},${b},${overlayOpaklik * 0.92}) 50%, rgba(${r},${g},${b},${overlayOpaklik * 0.75}) 100%)`;
+  const sol = `rgba(${r},${g},${b},${overlayOpaklik})`;
+  const orta = `rgba(${r},${g},${b},${overlayOpaklik * 0.82})`;
+  const saydam = `rgba(${r},${g},${b},${overlayOpaklik * 0.38})`;
+  const overlayGradient = (() => {
+    switch (gorunumTipi) {
+      case 'vetahsilat-yarim-kapak':
+        return `linear-gradient(105deg, ${sol} 0%, ${orta} 50%, ${saydam} 100%)`;
+      case 'vetahsilat-acik':
+        return `radial-gradient(circle at 50% 45%, ${saydam} 0%, ${orta} 52%, ${sol} 100%)`;
+      case 'vetahsilat-mor':
+        return `linear-gradient(270deg, ${sol} 0%, ${orta} 43%, ${saydam} 100%)`;
+      case 'vetahsilat-yesil':
+        return `linear-gradient(0deg, ${sol} 0%, ${orta} 42%, ${saydam} 100%)`;
+      case 'vetahsilat-lavanta':
+        return `linear-gradient(90deg, ${sol} 0%, ${orta} 46%, ${saydam} 100%)`;
+      default:
+        return `linear-gradient(105deg, ${sol} 0%, rgba(${r},${g},${b},${overlayOpaklik * 0.92}) 50%, rgba(${r},${g},${b},${overlayOpaklik * 0.75}) 100%)`;
+    }
+  })();
 
   return (
     <section
-      className={`kurumsal-hero${kh.headerOverlay && !onizleme ? ' kurumsal-hero--overlay' : ''}`}
+      className={`kurumsal-hero kurumsal-hero--${gorunumTipi}${kh.headerOverlay && !onizleme ? ' kurumsal-hero--overlay' : ''}`}
       style={{ minHeight: yukseklik }}
       aria-label={widget.ad || 'Kurumsal hero'}
     >

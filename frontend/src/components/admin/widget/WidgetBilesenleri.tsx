@@ -49,6 +49,7 @@ interface WidgetListesiPanelProps {
   tipFiltre?: string;
   sayfalar?: AdminSayfa[];
   onSec: (widget: AdminWidget) => void;
+  onDuzenle: (widget: AdminWidget) => void;
 }
 
 export function WidgetListesiPanel({
@@ -57,6 +58,7 @@ export function WidgetListesiPanel({
   tipFiltre,
   sayfalar = [],
   onSec,
+  onDuzenle,
 }: WidgetListesiPanelProps) {
   const [arama, setArama] = useState('');
   const [durumFiltre, setDurumFiltre] = useState<'tumu' | 'aktif' | 'pasif'>('tumu');
@@ -111,6 +113,8 @@ export function WidgetListesiPanel({
         key={w.id}
         type="button"
         onClick={() => onSec(w)}
+        onDoubleClick={() => onDuzenle(w)}
+        title="Düzenlemek için çift tıklayın"
         className={`ap-liste-oge ap-form-liste-oge${seciliId === w.id ? ' ap-liste-oge-secili' : ''}`}
       >
         <span className="ap-form-liste-ikon" aria-hidden>

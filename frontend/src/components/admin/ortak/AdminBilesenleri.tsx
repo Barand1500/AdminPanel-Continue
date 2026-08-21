@@ -48,14 +48,16 @@ export function AdminPanelKarti({
   baslik,
   altBaslik,
   ustAksiyon,
+  tasmaIzinli = false,
 }: {
   children: ReactNode;
   baslik?: string;
   altBaslik?: string;
   ustAksiyon?: ReactNode;
+  tasmaIzinli?: boolean;
 }) {
   return (
-    <div className="ap-panel-kart">
+    <div className={`ap-panel-kart${tasmaIzinli ? ' ap-panel-kart--tasma-izinli' : ''}`}>
       {(baslik || altBaslik || ustAksiyon) && (
         <div className="ap-panel-kart-baslik ap-panel-kart-baslik--aksiyonlu">
           <div className="min-w-0">

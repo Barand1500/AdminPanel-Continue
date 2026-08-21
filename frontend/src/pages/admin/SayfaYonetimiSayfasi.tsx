@@ -290,6 +290,7 @@ export function SayfaYonetimiSayfasi() {
           sayfalar={sayfalar}
           seciliId={seciliId}
           onSec={sayfaSec}
+          onDuzenle={sayfaDuzenleAc}
           onSirala={sayfaSirala}
           islemde={kaydediliyor}
           tamGenislik

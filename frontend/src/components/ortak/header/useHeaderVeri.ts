@@ -72,9 +72,10 @@ interface UseHeaderVeriArgs {
   ayarlar?: SiteAyarlari | null;
   menuOgeleri: MenuOgesi[];
   kategoriler?: Kategori[];
+  siteAdi?: string;
 }
 
-export function useHeaderVeri({ ayarlar, menuOgeleri, kategoriler }: UseHeaderVeriArgs): HeaderVeri {
+export function useHeaderVeri({ ayarlar, menuOgeleri, kategoriler, siteAdi }: UseHeaderVeriArgs): HeaderVeri {
   const { dilKodu, sayfaBaslik, cevir } = useSiteDil();
 
   const cevrilmisMenu = useMemo(
@@ -113,6 +114,6 @@ export function useHeaderVeri({ ayarlar, menuOgeleri, kategoriler }: UseHeaderVe
     anaRenk: ayarlar?.anaRenk ?? '#7c3aed',
     ikincilRenk: ayarlar?.ikincilRenk ?? '#a78bfa',
     logoUrl: headerLogoUrl(ayarlar),
-    markaMetni: headerMarkaMetni(header),
+    markaMetni: headerMarkaMetni(header) || siteAdi?.trim() || '',
   };
 }

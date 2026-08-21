@@ -156,7 +156,11 @@ export function SiteAyarlariSayfasi() {
       </div>
 
       <div className="mt-6">
-        <AdminPanelKarti baslik="İletişim Bilgileri" altBaslik="Footer, header üst bant ve iletişim sayfasında kullanılır">
+        <AdminPanelKarti
+          baslik="İletişim Bilgileri"
+          altBaslik="Footer, header üst bant ve iletişim sayfasında kullanılır"
+          tasmaIzinli
+        >
           <div className="ap-site-ayarlari-iletisim">
             <div className="ap-site-ayarlari-iletisim-satir ap-site-ayarlari-iletisim-satir--uc">
               <TelefonInput

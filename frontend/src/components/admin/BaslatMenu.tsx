@@ -1,9 +1,18 @@
 import { useLayoutEffect, useRef, useState, type CSSProperties, type RefObject } from 'react';
+import {
+  IconApps,
+  IconBolt,
+  IconBuilding,
+  IconNotes,
+  IconSettings,
+  IconUsersGroup,
+} from '@tabler/icons-react';
 import { modulAra, adminKategoriler, adminModulleri } from '@/data/adminMenuYapisi';
 import { usePanelDil } from '@/contexts/PanelDilContext';
 import type { AdminModul } from '@/types/admin';
 import { BaslatMenuArama } from './BaslatMenuArama';
 import { BaslatMenuKenarlikAnimasyon } from './BaslatMenuKenarlikAnimasyon';
+import { AdminModulIkonu } from './AdminModulIkonu';
 
 const KATEGORI_IKON: Record<string, string> = {
   'Hızlı Erişim': '⚡',
@@ -12,6 +21,14 @@ const KATEGORI_IKON: Record<string, string> = {
   'Müşteri / Ajans': '👥',
   Sistem: '⚙️',
 };
+
+const KATEGORI_FLAT_IKONLARI = {
+  'Hızlı Erişim': IconBolt,
+  'Site Yönetimi': IconBuilding,
+  'İçerik Yönetimi': IconNotes,
+  'Müşteri / Ajans': IconUsersGroup,
+  Sistem: IconSettings,
+} as const;
 
 interface BaslatMenuProps {
   acik: boolean;
@@ -140,11 +157,20 @@ function ModulListesi({
   onSec: (modul: AdminModul) => void;
 }) {
   const { t } = usePanelDil();
+  const KategoriIkonu = kategori
+    ? KATEGORI_FLAT_IKONLARI[kategori as keyof typeof KATEGORI_FLAT_IKONLARI] ?? IconApps
+    : null;
+
   if (moduller.length === 0) return null;
 
   return (
     <div className="ap-menu-kategori">
       <p className="ap-menu-kategori-baslik">
+        {KategoriIkonu && (
+          <span className="ap-menu-kategori-ikon">
+            <KategoriIkonu size={14} stroke={1.9} aria-hidden="true" />
+          </span>
+        )}
         {kategori && <span>{KATEGORI_IKON[kategori] ?? '•'}</span>}
         {baslik}
       </p>
@@ -152,7 +178,9 @@ function ModulListesi({
         {moduller.map((modul) => (
           <li key={modul.id}>
             <button type="button" onClick={() => onSec(modul)} className="ap-menu-oge">
-              <span className="ap-menu-oge-ikon">{modul.ikon}</span>
+              <span className="ap-menu-oge-ikon">
+                <AdminModulIkonu modulId={modul.id} />
+              </span>
               <span className="font-medium">{t(`modul.${modul.id}`, modul.baslik)}</span>
             </button>
           </li>

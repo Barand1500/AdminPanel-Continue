@@ -225,7 +225,7 @@ export function FooterYonetimiFormu() {
 
       <AdminIkiEkranSlider
         aktif={gorunum === 'editor' ? 'iki' : 'bir'}
-        birinci={<FooterTipGaleri secili={aktifTip} onSec={tipSec} />}
+        birinci={<FooterTipGaleri secili={aktifTip} onSec={tipSec} siteAd={siteAd} ayarlar={ayarlar} footer={footer} />}
         ikinci={
           <div className="ap-editor-panel ap-form-editor ap-header-editor">
           <div className="ap-form-editor-ust">
@@ -459,7 +459,7 @@ export function FooterYonetimiFormu() {
 
       <FooterOnizlemeModal
         acik={onizlemeAcik}
-        demoMod={gorunum === 'galeri'}
+        demoMod={false}
         siteAd={siteAd}
         ayarlar={ayarlar}
         footer={footer}

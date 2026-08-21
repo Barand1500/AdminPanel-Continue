@@ -58,12 +58,12 @@ export const WIDGET_GORUNUM_TIP_TANIMLARI: Record<AktifWidgetTipi, WidgetGorunum
     gt('gradient-split', 'Gradient Split', 'Gradient zemin bölünmüş hero', 'mor'),
   ],
   KURUMSAL_HERO: [
-    gt('vetahsilat-klasik', 'Vetahsilat Klasik', 'Tam genişlik mavi overlay, dikey nokta navigasyon', 'okyanus', 'Vetahsilat'),
-    gt('vetahsilat-koyu', 'Koyu Gradient', 'Koyu gradient overlay hero', 'gece'),
-    gt('vetahsilat-acik', 'Açık Overlay', 'Açık mavi ton overlay', 'okyanus'),
-    gt('vetahsilat-mor', 'Mor Kurumsal', 'Mor kurumsal ton', 'mor'),
-    gt('vetahsilat-yesil', 'Yeşil Kurumsal', 'Yeşil kurumsal ton', 'yesil'),
-    gt('vetahsilat-lavanta', 'Lavanta', 'Lavanta ton hero', 'lavanta'),
+    gt('vetahsilat-klasik', 'Klasik Tam Ekran', 'Tam ekran; başlık ve çağrılar solda, görsel tüm alanı kaplar', 'okyanus', 'Vetahsilat'),
+    gt('vetahsilat-yarim-kapak', 'Yarım Mavi Kapak', 'Referanstaki gibi kompakt, tam genişlik mavi sayfa kapağı', 'gece'),
+    gt('vetahsilat-acik', 'Merkez Sahne Tam Ekran', 'Tam ekran; metin ve çağrılar ortada toplanır', 'okyanus'),
+    gt('vetahsilat-mor', 'Sağ Panel Tam Ekran', 'Tam ekran; metin sağdaki yarı saydam kurumsal panelde', 'mor'),
+    gt('vetahsilat-yesil', 'Alt Bilgi Tam Ekran', 'Tam ekran; başlık ve çağrılar alt kısımda öne çıkar', 'yesil'),
+    gt('vetahsilat-lavanta', 'Bölünmüş Vitrin Tam Ekran', 'Tam ekran; ön görsel solda, metin sağda iki kolonlu vitrin', 'lavanta'),
   ],
   HIZMET_KARTLARI: [
     gt('masonry-duvar', 'Dengeli Hizmet Kartları', 'Eşit kartlar, çizgi ikon ve metinsel bağlantı', 'notr'),
@@ -497,8 +497,10 @@ const LEGACY_GORUNUM_TIPI: Partial<Record<AktifWidgetTipi, Record<string, string
   },
   KURUMSAL_HERO: {
     klasik: 'vetahsilat-klasik',
-    sinematik: 'vetahsilat-koyu',
+    sinematik: 'vetahsilat-klasik',
     'gradient-hero': 'vetahsilat-acik',
+    // Eski "Koyu Gradient" görünümü de klasik tam ekran yerleşim kullanıyordu.
+    'vetahsilat-koyu': 'vetahsilat-klasik',
   },
   GALERI: {
     'klasik-grid': 'hover-zoom-etiket',

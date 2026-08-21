@@ -1,3 +1,5 @@
+import { AsYouType } from 'libphonenumber-js/min';
+
 /** Örnek (sahte) numaralar — placeholder ve yardım metinlerinde kullanılır */
 export const ORNEK_TELEFON_SIFIRLI = '0532 100 20 30';
 export const ORNEK_TELEFON_SIFIRSIZ = '532 100 20 30';
@@ -38,12 +40,47 @@ function kisaKodMu(rakamlar: string): boolean {
 }
 
 /**
+ * Uluslararası telefon girişlerini korur. Özellikle mevcut kayıtlardan gelen
+ * `+90` değerinin yerel telefon formatı tarafından bozulmasını engeller.
+ */
+function uluslararasiTelefonFormatla(ham: string): string | null {
+  const kirpilmis = ham.trimStart();
+  const basindaArti = kirpilmis.startsWith('+');
+  const basindaCiftSifir = kirpilmis.startsWith('00');
+  let rakamlar = ham.replace(/\D/g, '');
+
+  if (basindaCiftSifir) rakamlar = rakamlar.slice(2);
+  if (!rakamlar) return basindaArti || basindaCiftSifir ? '+' : null;
+
+  // Eski panel sürümünün '+' işaretini sildiği 90... kayıtlarını da düzelt.
+  const turkiyeUluslararasi =
+    rakamlar.startsWith('90') && (basindaArti || basindaCiftSifir || rakamlar.length > 10);
+
+  if (turkiyeUluslararasi) {
+    const ulusal = rakamlar.slice(2, 12);
+    return `+90${ulusal ? ` ${grupla3_3_2_2(ulusal)}` : ''}`;
+  }
+
+  // Diğer ülke kodlarında numarayı o ülkenin kendi yazım kuralıyla biçimle.
+  if (basindaArti || basindaCiftSifir) {
+    const e164 = `+${rakamlar.slice(0, 15)}`;
+    return new AsYouType().input(e164) || e164;
+  }
+
+  return null;
+}
+
+/**
  * Telefon görünüm formatı.
  * - 0 ile başlıyorsa: 0532 100 20 30 / 0850 100 20 30 (4-3-2-2)
  * - 0 olmadan mobil: 532 100 20 30 (3-3-2-2)
  * - Kısa kod: 404 6 334 (3-1-3)
+ * - Uluslararası Türkiye numarası: +90 532 100 20 30
  */
 export function telefonFormatla(ham: string): string {
+  const uluslararasi = uluslararasiTelefonFormatla(ham);
+  if (uluslararasi !== null) return uluslararasi;
+
   const basindaSifir = ham.trimStart().startsWith('0');
   let rakamlar = ham.replace(/\D/g, '');
   if (!rakamlar) return '';
@@ -85,6 +122,9 @@ export function telefonFormatla(ham: string): string {
 
 /** WhatsApp görünüm formatı: +90 532 100 20 30 (ülke kodu serbest). */
 export function whatsappFormatla(ham: string): string {
+  const uluslararasi = uluslararasiTelefonFormatla(ham);
+  if (uluslararasi !== null) return uluslararasi;
+
   const artıYazildi = ham.trimStart().startsWith('+');
   let rakamlar = ham.replace(/\D/g, '');
   if (rakamlar.startsWith('00')) rakamlar = rakamlar.slice(2);
@@ -107,5 +147,8 @@ export function whatsappFormatla(ham: string): string {
 }
 
 export function whatsappKayitDegeri(formatli: string): string {
-  return formatli.replace(/\D/g, '').slice(0, 15);
+  const basindaArti = formatli.trimStart().startsWith('+');
+  const rakamlar = formatli.replace(/\D/g, '').slice(0, 15);
+  if (!rakamlar) return basindaArti ? '+' : '';
+  return `${basindaArti ? '+' : ''}${rakamlar}`;
 }

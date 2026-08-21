@@ -211,6 +211,10 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
     setTipOnaylandi(true);
     setBasari('');
     setHata('');
+  }
+
+  function widgetDuzenleAc(widget: AdminWidget) {
+    widgetSec(widget);
     setGorunum('editor');
   }
 
@@ -283,6 +287,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
           tipFiltre={varsayilanTip}
           sayfalar={sayfalar}
           onSec={widgetSec}
+          onDuzenle={widgetDuzenleAc}
         />
       )}
       {gorunum === 'editor' && yeniMod && !tipOnaylandi && (

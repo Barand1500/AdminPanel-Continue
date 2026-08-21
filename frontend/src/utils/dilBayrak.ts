@@ -38,3 +38,10 @@ export function dilBayrakGorselUrl(dil: Pick<SiteDilKaydi, 'kod' | 'bayrak'>, ge
   if (!iso) return null;
   return `https://flagcdn.com/w${genislik}/${iso}.png`;
 }
+
+/** ISO 3166-1 alpha-2 ülke kodu için gerçek bayrak görseli adresi. */
+export function ulkeBayrakGorselUrl(ulkeKodu: string, genislik = 40): string | null {
+  const iso = ulkeKodu.trim().toLowerCase();
+  if (!/^[a-z]{2}$/.test(iso)) return null;
+  return `https://flagcdn.com/w${genislik}/${iso}.png`;
+}

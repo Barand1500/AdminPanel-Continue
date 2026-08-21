@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react';
 import { AdminAramaKutusu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { GaleriKartAksiyonlar, GaleriOnizlemeKabugu } from '@/components/admin/ortak/GaleriKartAksiyonlar';
-import { FOOTER_TIP_TANIMLARI, varsayilanFooterTipEk, type FooterTipi } from '@/data/footerTipleri';
-import { varsayilanFooterAyarlari } from '@/types/footer';
+import { FOOTER_TIP_TANIMLARI, type FooterTipi } from '@/data/footerTipleri';
+import type { FooterAyarlari } from '@/types/footer';
+import type { SiteAyarlari } from '@/types/site';
 import { FooterOnizleme } from './FooterOnizleme';
-import { FooterTipWireframe } from './FooterTipWireframe';
 
 const GALERI_KATEGORILER: { id: string; etiket: string; ids: FooterTipi[] | null }[] = [
   { id: 'tumu', etiket: 'Tümü', ids: null },
@@ -16,9 +16,12 @@ const GALERI_KATEGORILER: { id: string; etiket: string; ids: FooterTipi[] | null
 interface FooterTipGaleriProps {
   secili: FooterTipi;
   onSec: (tip: FooterTipi) => void;
+  siteAd: string;
+  ayarlar?: SiteAyarlari | null;
+  footer: FooterAyarlari;
 }
 
-export function FooterTipGaleri({ secili, onSec }: FooterTipGaleriProps) {
+export function FooterTipGaleri({ secili, onSec, siteAd, ayarlar, footer }: FooterTipGaleriProps) {
   const [arama, setArama] = useState('');
   const [kategori, setKategori] = useState('tumu');
   const [infoTip, setInfoTip] = useState<string | null>(null);
@@ -86,7 +89,16 @@ export function FooterTipGaleri({ secili, onSec }: FooterTipGaleriProps) {
                   onClick={() => onSec(tip.id)}
                 >
                   <div className="ap-header-galeri-oniz">
-                    <FooterTipWireframe tip={tip.id} />
+                    <div className="ap-galeri-canli-oniz ap-galeri-canli-oniz--footer">
+                      <div className="ap-galeri-canli-oniz-olcek">
+                        <FooterOnizleme
+                          siteAdi={siteAd}
+                          ayarlar={ayarlar}
+                          footer={{ ...footer, footerTipi: tip.id }}
+                          kabuksuz
+                        />
+                      </div>
+                    </div>
                   </div>
                   <span className="ap-widget-galeri-ad-satir">
                     <span className="ap-widget-galeri-ad">{tip.ad}</span>
@@ -117,15 +129,11 @@ export function FooterTipGaleri({ secili, onSec }: FooterTipGaleriProps) {
       >
         {onizlemeTip && (
           <FooterOnizleme
-            siteAdi="Örnek Site"
-            footer={{
-              ...varsayilanFooterAyarlari(),
-              footerTipi: onizlemeTip,
-              tipEk: varsayilanFooterTipEk(onizlemeTip),
-            }}
+            siteAdi={siteAd}
+            ayarlar={ayarlar}
+            footer={{ ...footer, footerTipi: onizlemeTip }}
             buyuk
             kabuksuz
-            demoMod
           />
         )}
       </GaleriOnizlemeKabugu>

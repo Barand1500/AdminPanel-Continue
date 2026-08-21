@@ -2287,9 +2287,107 @@ html[data-site-tema='koyu'] .guven-serit {
   gap: 2rem;
 }
 
+/* Referanstaki mavi alan: içerik sayfanın üstünde kompakt bir kapak gibi kalır. */
+.kurumsal-hero--vetahsilat-yarim-kapak .kurumsal-hero-icerik {
+  align-items: flex-end;
+  padding: 8rem 0 3.5rem;
+}
+
+.kurumsal-hero--vetahsilat-yarim-kapak .kurumsal-hero-icerik-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.kurumsal-hero--vetahsilat-yarim-kapak .kurumsal-hero-metin {
+  max-width: 52rem;
+}
+
+.kurumsal-hero--vetahsilat-yarim-kapak .kurumsal-hero-baslik {
+  font-size: clamp(2.25rem, 4.4vw, 4rem);
+  font-weight: 400;
+}
+
+.kurumsal-hero--vetahsilat-yarim-kapak .kurumsal-hero-on-gorsel {
+  display: none;
+}
+
+/* Tam ekran varyantları: aynı görseli farklı hiyerarşi ve metin konumlarıyla sunar. */
+.kurumsal-hero--vetahsilat-acik .kurumsal-hero-icerik-grid {
+  grid-template-columns: minmax(0, 1fr);
+  justify-items: center;
+}
+
+.kurumsal-hero--vetahsilat-acik .kurumsal-hero-metin {
+  max-width: 49rem;
+  text-align: center;
+}
+
+.kurumsal-hero--vetahsilat-acik .kurumsal-hero-aciklama {
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.kurumsal-hero--vetahsilat-acik .kurumsal-hero-butonlar {
+  justify-content: center;
+}
+
+.kurumsal-hero--vetahsilat-acik .kurumsal-hero-on-gorsel {
+  display: none;
+}
+
+.kurumsal-hero--vetahsilat-mor .kurumsal-hero-icerik-grid {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.kurumsal-hero--vetahsilat-mor .kurumsal-hero-metin {
+  max-width: 39rem;
+  margin-left: auto;
+  padding: clamp(1.5rem, 3vw, 3rem);
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-right: 0;
+  background: rgb(15 23 42 / 0.3);
+  box-shadow: -1.5rem 1.5rem 4rem rgb(15 23 42 / 0.2);
+  backdrop-filter: blur(10px);
+}
+
+.kurumsal-hero--vetahsilat-mor .kurumsal-hero-on-gorsel {
+  display: none;
+}
+
+.kurumsal-hero--vetahsilat-yesil .kurumsal-hero-icerik {
+  align-items: flex-end;
+  padding-bottom: clamp(4.5rem, 10vh, 8rem);
+}
+
+.kurumsal-hero--vetahsilat-yesil .kurumsal-hero-metin {
+  max-width: 48rem;
+  padding: 1.5rem 1.75rem;
+  border-left: 3px solid #38bdf8;
+  background: linear-gradient(90deg, rgb(15 23 42 / 0.6), transparent);
+}
+
+.kurumsal-hero--vetahsilat-yesil .kurumsal-hero-on-gorsel {
+  display: none;
+}
+
 @media (min-width: 1024px) {
   .kurumsal-hero-icerik-grid {
     grid-template-columns: 1fr 1fr;
+  }
+
+  .kurumsal-hero--vetahsilat-lavanta .kurumsal-hero-icerik-grid {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  }
+
+  .kurumsal-hero--vetahsilat-lavanta .kurumsal-hero-metin {
+    grid-column: 2;
+    max-width: 42rem;
+    margin-left: auto;
+  }
+
+  .kurumsal-hero--vetahsilat-lavanta .kurumsal-hero-on-gorsel {
+    grid-row: 1;
+    grid-column: 1;
+    justify-content: flex-start;
   }
 }
 

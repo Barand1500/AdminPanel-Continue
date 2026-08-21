@@ -12,9 +12,9 @@ interface SiteHeaderProps {
   kategoriler?: Kategori[];
 }
 
-export function SiteHeader({ siteAdi: _siteAdi, ayarlar, menuOgeleri, kategoriler }: SiteHeaderProps) {
+export function SiteHeader({ siteAdi, ayarlar, menuOgeleri, kategoriler }: SiteHeaderProps) {
   const [menuAcik, setMenuAcik] = useState(false);
-  const veri = useHeaderVeri({ ayarlar, menuOgeleri, kategoriler });
+  const veri = useHeaderVeri({ ayarlar, menuOgeleri, kategoriler, siteAdi });
   const overlay = useKurumsalHeroOverlay();
 
   return (
