@@ -13461,6 +13461,83 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .ib-kart-ikon { border: 1px solid color-mix(in srgb, currentColor 16%, transparent); }
 .ib-harita--split { border: 1px solid #e8edf3; border-radius: 0.5rem; }
 
+/* Modern başlat menüsü: Sade Panel yerleşimi */
+.ap-baslat-menu-modern {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--ap-surface) 92%, var(--ap-accent) 8%) 0%, var(--ap-surface) 28%);
+}
+.ap-baslat-modern-ust { padding: 1rem 1rem .75rem; border-bottom: 1px solid color-mix(in srgb, var(--ap-border) 80%, transparent); background: color-mix(in srgb, var(--ap-header-bg) 70%, transparent); }
+.ap-baslat-modern-ust-icerik { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; margin-bottom: .875rem; }
+.ap-baslat-modern-baslik { font-size: .9375rem; font-weight: 700; color: var(--ap-heading); line-height: 1.2; }
+.ap-baslat-modern-ust-aksiyonlar { display: inline-flex; align-items: center; gap: .35rem; flex-shrink: 0; }
+.ap-baslat-modern-favori, .ap-baslat-modern-profil, .ap-baslat-modern-kapat { display: flex; width: 2rem; height: 2rem; align-items: center; justify-content: center; border: 1px solid var(--ap-border); border-radius: .5rem; background: var(--ap-input-bg); color: var(--ap-text-muted); transition: background-color .15s, color .15s, border-color .15s; }
+.ap-baslat-modern-favori:hover, .ap-baslat-modern-profil:hover, .ap-baslat-modern-kapat:hover { background: var(--ap-hover); color: var(--ap-heading); }
+.ap-baslat-modern-favori--aktif { border-color: color-mix(in srgb, var(--ap-accent) 55%, var(--ap-border)); background: color-mix(in srgb, var(--ap-accent) 14%, var(--ap-surface)); color: var(--ap-accent); }
+.ap-baslat-modern-arama { position: relative; }
+.ap-baslat-modern-arama-ikon { position: absolute; left: .7rem; top: 50%; z-index: 1; transform: translateY(-50%); color: var(--ap-text-muted); font-size: 1.2rem; pointer-events: none; }
+.ap-baslat-modern-arama-input { width: 100%; border: 1px solid var(--ap-border); border-radius: .625rem; background: var(--ap-input-bg); padding: .625rem .75rem .625rem 2.25rem; color: var(--ap-text); font-size: .8125rem; outline: none; transition: border-color .15s, box-shadow .15s; }
+.ap-baslat-modern-arama-input:focus { border-color: color-mix(in srgb, var(--ap-accent) 65%, var(--ap-border)); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ap-accent) 18%, transparent); }
+.ap-baslat-modern-govde { min-height: 0; border-top: 1px solid color-mix(in srgb, var(--ap-border) 60%, transparent); }
+.ap-baslat-modern-kategori-sutun { width: 9.5rem; flex-shrink: 0; overflow-y: auto; padding: .625rem; border-right: 1px solid var(--ap-border); background: color-mix(in srgb, var(--ap-header-bg) 45%, transparent); }
+.ap-baslat-modern-modul-sutun, .ap-baslat-modern-icerik { padding: .625rem .75rem; background: color-mix(in srgb, var(--ap-surface) 95%, transparent); }
+.ap-baslat-modern-sutun-baslik, .ap-baslat-modern-arama-etiket { display: flex; align-items: center; margin-bottom: .625rem; padding: 0 .15rem; color: var(--ap-text-muted); font-size: .6875rem; font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.ap-baslat-modern-sayi { display: inline-flex; min-width: 1.25rem; align-items: center; justify-content: center; margin-left: .35rem; border-radius: 999px; background: var(--ap-hover); padding: 0 .35rem; font-size: .625rem; }
+.ap-baslat-modern-bos { padding: 1.5rem .75rem; color: var(--ap-text-muted); font-size: .8125rem; text-align: center; }
+.ap-baslat-modern-kategori-kutular { display: flex; flex-direction: column; gap: .5rem; }
+.ap-baslat-modern-kategori-kutu { display: flex; width: 100%; aspect-ratio: 1; flex-direction: column; align-items: center; justify-content: center; gap: .3rem; border: 1px solid var(--ap-border); border-radius: .75rem; background: var(--ap-surface); padding: .45rem .35rem; text-align: center; transition: border-color .15s, background-color .15s; }
+.ap-baslat-modern-kategori-kutu:hover { border-color: color-mix(in srgb, var(--ap-accent) 35%, var(--ap-border)); background: var(--ap-hover); }
+.ap-baslat-modern-kategori-kutu-aktif { border-color: var(--ap-accent); background: color-mix(in srgb, var(--ap-accent) 12%, var(--ap-surface)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ap-accent) 25%, transparent); }
+.ap-baslat-modern-kategori-kutu-ikon { display: inline-flex; color: var(--ap-text-muted); }
+.ap-baslat-modern-kategori-kutu-aktif .ap-baslat-modern-kategori-kutu-ikon { color: var(--ap-accent); }
+.ap-baslat-modern-kategori-kutu-ad { display: -webkit-box; overflow: hidden; color: var(--ap-heading); font-size: .625rem; font-weight: 600; line-height: 1.15; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.ap-baslat-modern-kategori-kutu-sayi { border-radius: 999px; background: var(--ap-hover); padding: .05rem .35rem; color: var(--ap-text-muted); font-size: .5625rem; font-weight: 600; }
+.ap-baslat-modern-modul-kutular { display: grid; grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr)); gap: .5rem; align-content: start; }
+.ap-baslat-modern-modul-kutu { display: flex; aspect-ratio: 1; flex-direction: column; align-items: center; justify-content: center; gap: .35rem; border: 1px solid var(--ap-border); border-radius: .75rem; background: var(--ap-surface); padding: .5rem .35rem; text-align: center; transition: border-color .15s, background-color .15s, transform .12s; }
+.ap-baslat-modern-modul-kutu:hover { border-color: color-mix(in srgb, var(--ap-accent) 40%, var(--ap-border)); background: var(--ap-hover); }
+.ap-baslat-modern-modul-kutu:active { transform: scale(.97); }
+.ap-baslat-modern-modul-kutu-ikon { display: flex; width: 2rem; height: 2rem; align-items: center; justify-content: center; border-radius: .5rem; background: color-mix(in srgb, var(--ap-hover) 75%, var(--ap-surface)); color: var(--ap-heading); }
+.ap-baslat-modern-modul-kutu-ad { display: -webkit-box; overflow: hidden; color: var(--ap-text); font-size: .625rem; font-weight: 500; line-height: 1.2; word-break: break-word; -webkit-box-orient: vertical; -webkit-line-clamp: 3; }
+.ap-baslat-modern-kategori-dikdortgen .ap-baslat-modern-kategori-sutun { width: 13.5rem; }
+.ap-baslat-modern-kategori-dikdortgen .ap-baslat-modern-kategori-kutu { min-height: 2.75rem; aspect-ratio: auto; flex-direction: row; justify-content: flex-start; gap: .5rem; padding: .5rem .625rem; text-align: left; }
+.ap-baslat-modern-kategori-dikdortgen .ap-baslat-modern-kategori-kutu-ad { flex: 1; text-align: left; }
+.ap-baslat-modern-kategori-dikdortgen .ap-baslat-modern-kategori-kutu-sayi { margin-left: auto; }
+.ap-baslat-modern-kutu-kucuk .ap-baslat-modern-modul-kutular { grid-template-columns: repeat(auto-fill, minmax(4.25rem, 1fr)); gap: .375rem; }
+.ap-baslat-modern-kutu-kucuk .ap-baslat-modern-modul-kutu { padding: .35rem .25rem; border-radius: .55rem; }
+.ap-baslat-modern-kutu-kucuk .ap-baslat-modern-modul-kutu-ikon { width: 1.75rem; height: 1.75rem; border-radius: .4rem; }
+.ap-baslat-modern-tam-ekran { border-right: 0; }
+.ap-baslat-modern-tam-ekran .ap-baslat-modern-ust { padding: 1.25rem 1.5rem 1rem; }
+.ap-baslat-modern-tam-ekran .ap-baslat-modern-kategori-sutun { width: 17rem; padding: 1rem; }
+.ap-baslat-modern-tam-ekran .ap-baslat-modern-modul-sutun, .ap-baslat-modern-tam-ekran .ap-baslat-modern-icerik { padding: 1rem 1.25rem; }
+.ap-baslat-modern-kutu-buyuk .ap-baslat-modern-modul-kutular { grid-template-columns: repeat(auto-fill, minmax(7.5rem, 1fr)); gap: .75rem; }
+.ap-baslat-modern-kutu-buyuk .ap-baslat-modern-modul-kutu { padding: .75rem .5rem; border-radius: .875rem; }
+.ap-baslat-modern-kutu-buyuk .ap-baslat-modern-modul-kutu-ikon { width: 2.75rem; height: 2.75rem; border-radius: .75rem; }
+.ap-baslat-modern-alt-cubuk { display: flex; align-items: center; justify-content: space-between; gap: .5rem; border-top: 1px solid var(--ap-border); background: color-mix(in srgb, var(--ap-header-bg) 60%, transparent); padding: .5rem .875rem; color: var(--ap-text-muted); font-size: .625rem; }
+
+/* Sistem ayarları — Sade Panel'deki yatay sekme düzeni */
+.ap-sistem-yonetimi .ap-sistem-layout { display: block; }
+.ap-sistem-yonetimi .ap-sistem-sol { width: auto; }
+.ap-sistem-yonetimi .ap-sistem-sol > .mt-4 { display: none; }
+.ap-sistem-yonetimi .ap-sistem-icerik { margin-top: .85rem; }
+.ap-ayarlar-tur-sarmal { overflow-x: auto; padding-bottom: .15rem; }
+.ap-ayarlar-tur-cubugu { position: relative; display: inline-flex; gap: .2rem; min-width: max-content; padding: .3rem; border: 1px solid color-mix(in srgb, var(--ap-accent) 20%, var(--ap-border)); border-radius: .85rem; background: var(--ap-surface-2); }
+.ap-ayarlar-tur-gosterge { position: absolute; top: .3rem; bottom: .3rem; left: 0; z-index: 0; border-radius: .6rem; background: var(--ap-accent); transition: transform .3s ease, width .3s ease; }
+.ap-ayarlar-tur-sekme { position: relative; z-index: 1; display: inline-flex; align-items: center; gap: .4rem; border-radius: .6rem; padding: .48rem .72rem; color: var(--ap-text-muted); font-size: .75rem; font-weight: 600; white-space: nowrap; }
+.ap-ayarlar-tur-sekme:hover { background: var(--ap-hover); color: var(--ap-heading); }
+.ap-ayarlar-tur-sekme--aktif { color: #fff; }
+.ap-ayarlar-tur-ikon { display: inline-flex; }
+
+/* Başlat menüsünden açılan profil modalı */
+.ap-profil-modal-arka { position: fixed; inset: 0; z-index: 90; display: grid; place-items: center; padding: 1rem; background: rgba(3, 8, 18, .78); backdrop-filter: blur(5px); }
+.erp-donen-cerceve { --cerceve-kalinlik: 2px; position: relative; overflow: hidden; border-radius: 1rem; padding: var(--cerceve-kalinlik); isolation: isolate; background: var(--ap-border); }.erp-donen-cerceve::before { position: absolute; z-index: 0; width: 175%; height: 175%; left: -37.5%; top: -37.5%; content: ''; background: conic-gradient(transparent 0 202deg, color-mix(in srgb, var(--ap-accent) 35%, transparent) 234deg, var(--ap-accent) 278deg, color-mix(in srgb, var(--ap-accent) 45%, white) 316deg, transparent 355deg); animation: erp-donen-cerceve-don 2.4s linear infinite; }.erp-donen-cerceve-iz { display: none; }.erp-donen-cerceve-icerik { position: relative; z-index: 1; width: 100%; border-radius: calc(1rem - var(--cerceve-kalinlik)); overflow: hidden; background: var(--ap-surface); }
+@keyframes erp-donen-cerceve-don { to { transform: rotate(360deg); } }
+.ap-profil-modal { width: min(calc(100vw - 2rem), 27.5rem); overflow: hidden; border: 0; border-radius: calc(1rem - 2px); background: var(--ap-surface); box-shadow: 0 24px 70px rgba(0,0,0,.5); }
+.ap-profil-modal-baslik { display: flex; align-items: center; justify-content: space-between; padding: 1.45rem 1.35rem 1rem; }.ap-profil-modal-baslik h2 { margin: 0; color: var(--ap-heading); font-size: 1rem; font-weight: 700; }
+.ap-profil-modal-kapat { display: inline-flex; align-items: center; gap: .25rem; border: 1px solid var(--ap-border); border-radius: .4rem; background: var(--ap-hover); padding: .28rem .5rem; color: var(--ap-text-muted); font-size: .67rem; font-weight: 700; }
+.ap-profil-modal-sekmeler { display: grid; grid-template-columns: 1fr 1fr; border-bottom: 1px solid var(--ap-border); padding: 0 1.25rem; }.ap-profil-modal-sekmeler button { display: flex; align-items: center; justify-content: center; gap: .4rem; border-bottom: 2px solid transparent; padding: .75rem .3rem; color: var(--ap-text-muted); font-size: .8rem; font-weight: 700; }.ap-profil-modal-sekmeler button.aktif { border-color: var(--ap-accent); color: var(--ap-accent); }
+.ap-profil-modal-icerik { min-height: 13rem; padding: 1.1rem 1.25rem 1.35rem; }.ap-profil-alan { display: block; }.ap-profil-alan span { display: block; margin: 0 0 .35rem .55rem; color: var(--ap-text-muted); font-size: .7rem; font-weight: 600; }.ap-profil-alan input { width: 100%; border: 1px solid var(--ap-border); border-radius: .55rem; background: var(--ap-input-bg); padding: .72rem .85rem; color: var(--ap-text); outline: none; }.ap-profil-alan input:focus { border-color: var(--ap-accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--ap-accent) 16%, transparent); }.ap-profil-alan input:disabled { opacity: .65; }
+.ap-profil-sifre-wrap { position: relative; display: block; margin: 0 !important; }.ap-profil-sifre-wrap input { padding-right: 2.8rem; }.ap-profil-sifre-goz { position: absolute; right: .45rem; top: 50%; display: inline-flex; height: 1.8rem; width: 1.8rem; align-items: center; justify-content: center; transform: translateY(-50%); border-radius: .4rem; color: var(--ap-text-muted); }.ap-profil-sifre-goz:hover { background: var(--ap-hover); color: var(--ap-heading); }.ap-profil-kod-gonder { width: 100%; margin-top: .7rem; border: 1px solid var(--ap-border); border-radius: .55rem; background: var(--ap-input-bg); padding: .68rem 1rem; color: var(--ap-heading); font-size: .8rem; font-weight: 700; }.ap-profil-kod-gonder:hover { background: var(--ap-hover); border-color: var(--ap-accent); }
+.ap-profil-modal-hata,.ap-profil-modal-basari { margin: 0 0 .8rem; border-radius: .45rem; padding: .55rem .7rem; font-size: .75rem; }.ap-profil-modal-hata { background: #ef444422; color: #fca5a5; }.ap-profil-modal-basari { background: #22c55e22; color: #86efac; }
+.ap-profil-modal-alt { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--ap-border); }.ap-profil-modal-alt button { min-height: 3.85rem; font-weight: 800; }.ap-profil-modal-cikis { color: #fb7185; }.ap-profil-modal-kaydet { background: var(--ap-accent); color: #fff; }.ap-profil-modal-kaydet:disabled { opacity: .6; }.ap-profil-modal-kaydet small { display: block; font-size: .62rem; opacity: .85; }
+
 @media (min-width: 960px) {
   .ib-split-grid { grid-template-columns: minmax(0, 0.82fr) minmax(0, 1.18fr); align-items: center; }
 }

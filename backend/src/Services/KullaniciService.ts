@@ -89,13 +89,15 @@ export class KullaniciService {
   async olustur(cagiran: JwtPayload, dto: KullaniciOlusturDto) {
     await this.yetkiKontrol(cagiran);
 
-    const siteId =
+    let siteId =
       cagiran.rol === 'AJANS_ADMIN'
         ? cagiran.siteId
         : opsiyonelSayisalId(dto.siteId ?? undefined);
 
     if (!siteId && dto.rol !== 'SUPER_ADMIN' && dto.rol !== 'AJANS_ADMIN') {
-      throw new Error('Site secimi gerekli');
+      // Kullanıcı ekranında site seçimi yapılmıyor; oturumdaki ya da varsayılan
+      // siteyi kullanarak yeni hesabı bağla.
+      siteId = await cozulenSiteIdFromKullanici(cagiran);
     }
 
     const cozumSiteId = siteId ?? (await cozulenSiteIdFromKullanici(cagiran));

@@ -23,13 +23,13 @@ interface RolMatrisiProps {
 
 export function RolMatrisi({ roller, yetkiler, duzenlenebilir, onYetkiToggle }: RolMatrisiProps) {
   return (
-    <div className="overflow-x-auto rounded-lg border border-slate-700 bg-slate-800">
-      <table className="w-full min-w-[560px] text-left text-sm">
+    <div className="min-w-[620px] overflow-x-auto bg-[var(--ap-surface)]">
+      <table className="w-full text-left text-sm">
         <thead>
-          <tr className="border-b border-slate-700 bg-slate-900/50">
-            <th className="px-4 py-3 font-semibold text-white">Rol</th>
+          <tr className="border-b border-[var(--ap-border)] bg-[var(--ap-surface-2)]">
+            <th className="px-4 py-3 text-xs font-semibold uppercase tracking-wide text-[var(--ap-muted)]">Rol</th>
             {yetkiler.map((y) => (
-              <th key={y.kod} className="px-3 py-3 text-center text-xs font-medium text-slate-400">
+              <th key={y.kod} className="px-3 py-3 text-center text-[11px] font-semibold uppercase tracking-wide text-[var(--ap-muted)]">
                 {y.etiket}
               </th>
             ))}
@@ -40,10 +40,15 @@ export function RolMatrisi({ roller, yetkiler, duzenlenebilir, onYetkiToggle }: 
             const superAdmin = rol.kod === 'SUPER_ADMIN';
             const hucreDuzenlenebilir = duzenlenebilir && !superAdmin;
             return (
-              <tr key={rol.kod} className="border-b border-slate-700/60 hover:bg-slate-750/50">
+              <tr key={rol.kod} className="border-b border-[var(--ap-border)] last:border-b-0 hover:bg-[var(--ap-hover)]">
                 <td className="px-4 py-3">
-                  <div className="font-medium text-white">{rol.baslik}</div>
-                  <div className="mt-0.5 text-xs text-slate-500">{rol.aciklama}</div>
+                  <div className="ap-heading font-semibold">{rol.baslik}</div>
+                  <div className="ap-muted mt-1 text-[10px] uppercase tracking-wide">{rol.kod}</div>
+                  {(rol.sistemRolu || !rolSilinebilirMi(rol)) && (
+                    <span className="mt-2 inline-flex rounded-full border border-[color-mix(in_srgb,var(--ap-accent)_38%,var(--ap-border))] px-2 py-0.5 text-[9px] font-semibold uppercase tracking-wide text-[var(--ap-accent)]">
+                      Sistem rolü
+                    </span>
+                  )}
                 </td>
                 {yetkiler.map((y) => {
                   const varMi = rol.yetkiler.includes(y.kod);
@@ -53,10 +58,10 @@ export function RolMatrisi({ roller, yetkiler, duzenlenebilir, onYetkiToggle }: 
                         <button
                           type="button"
                           onClick={() => onYetkiToggle?.(rol.kod, y.kod)}
-                          className={`inline-flex h-7 w-7 items-center justify-center rounded-full transition-colors ${
+                          className={`inline-flex h-8 w-8 items-center justify-center rounded-lg border text-sm font-semibold transition-colors ${
                             varMi
-                              ? 'bg-green-500/25 text-green-400 hover:bg-green-500/35'
-                              : 'text-slate-600 hover:bg-slate-700/80 hover:text-slate-400'
+                              ? 'border-[var(--ap-accent)] bg-[var(--ap-accent)] text-white shadow-[0_3px_12px_color-mix(in_srgb,var(--ap-accent)_40%,transparent)]'
+                              : 'border-[var(--ap-border)] text-[var(--ap-muted)] hover:bg-[var(--ap-hover)]'
                           }`}
                           title={varMi ? 'Yetkiyi kaldır' : 'Yetki ver'}
                           aria-pressed={varMi}
@@ -64,11 +69,11 @@ export function RolMatrisi({ roller, yetkiler, duzenlenebilir, onYetkiToggle }: 
                           {varMi ? '✓' : '—'}
                         </button>
                       ) : varMi ? (
-                        <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-green-500/20 text-green-400">
+                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-[var(--ap-accent)] text-sm font-semibold text-white">
                           ✓
                         </span>
                       ) : (
-                        <span className="inline-flex h-6 w-6 items-center justify-center text-slate-600">—</span>
+                        <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--ap-border)] text-[var(--ap-muted)]">—</span>
                       )}
                     </td>
                   );

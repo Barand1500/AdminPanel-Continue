@@ -1,8 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import { AdminModulKabuk, AdminPanelKarti } from '@/components/admin/ortak/AdminBilesenleri';
-import { UstSekmeCubugu } from '@/components/admin/UstSekmeCubugu';
-import type { AdminSekme } from '@/types/admin';
 import {
   VARSAYILAN_SEKME_AYARLARI,
   sekmeAyarlariKaydet,
@@ -10,292 +8,404 @@ import {
   type SekmePanelAyarlari,
 } from '@/utils/sekmePanelAyarlari';
 
-const ORNEK_SEKMELER_BASLANGIC: AdminSekme[] = [
-  { id: 'o1', modulId: 'dashboard', baslik: 'Dashboard' },
-  { id: 'o2', modulId: 'sayfalar', baslik: 'Sayfalar' },
-  { id: 'o3', modulId: 'hero', baslik: 'Hero Yönetimi' },
-];
+const SECILI_BUTON_STILI = {
+  borderColor: 'var(--ap-accent)',
+  backgroundColor: 'color-mix(in srgb, var(--ap-accent) 16%, transparent)',
+  color: 'var(--ap-accent)',
+} as const;
+
+function SecimButonu({
+  children,
+  secili,
+  onClick,
+  aciklama,
+}: {
+  children: React.ReactNode;
+  secili: boolean;
+  onClick: () => void;
+  aciklama?: string;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      style={secili ? SECILI_BUTON_STILI : undefined}
+      className="rounded-lg border border-[var(--ap-border)] px-3 py-1.5 text-left text-sm transition-colors hover:bg-[var(--ap-hover)]"
+    >
+      <span className="block font-medium">{children}</span>
+      {aciklama && <span className="ap-muted mt-0.5 block text-[11px] font-normal">{aciklama}</span>}
+    </button>
+  );
+}
 
 function ToggleSatir({
   etiket,
   aciklama,
   acik,
+  devreDisi = false,
+  yakinda = false,
   onDegistir,
 }: {
   etiket: string;
   aciklama?: string;
   acik: boolean;
+  devreDisi?: boolean;
+  yakinda?: boolean;
   onDegistir: (v: boolean) => void;
 }) {
   return (
-    <label className="flex items-center justify-between gap-3 rounded-lg border border-[var(--ap-border)] p-3">
+    <div
+      className={`flex items-center justify-between gap-3 rounded-lg border border-[var(--ap-border)] p-3 ${
+        devreDisi ? 'opacity-55' : ''
+      }`}
+    >
       <div>
-        <p className="ap-heading text-sm font-medium">{etiket}</p>
+        <p className="ap-heading flex items-center gap-2 text-sm font-medium">
+          {etiket}
+          {yakinda && (
+            <span className="rounded-full bg-[var(--ap-hover)] px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-[var(--ap-text-muted)]">
+              Yakında
+            </span>
+          )}
+        </p>
         {aciklama && <p className="ap-muted text-xs">{aciklama}</p>}
       </div>
       <button
         type="button"
         role="switch"
         aria-checked={acik}
+        disabled={devreDisi}
         onClick={() => onDegistir(!acik)}
-        className={`ap-toggle ${acik ? 'ap-toggle-on' : ''}`}
+        className={`ap-toggle shrink-0 ${acik ? 'ap-toggle-on' : ''}`}
       >
         <span className="ap-toggle-thumb" />
       </button>
-    </label>
+    </div>
   );
 }
 
-function ornekSekmeTasi(
-  liste: AdminSekme[],
-  kaynakId: string,
-  hedefId: string,
-  mod: 'once' | 'sonra'
-): AdminSekme[] {
-  if (kaynakId === hedefId) return liste;
-  let yeni = [...liste];
-  const kaynakIdx = yeni.findIndex((s) => s.id === kaynakId);
-  const hedefIdx = yeni.findIndex((s) => s.id === hedefId);
-  if (kaynakIdx < 0 || hedefIdx < 0) return liste;
-
-  const kaynak = yeni[kaynakIdx];
-  const hedef = yeni[hedefIdx];
-  if (kaynak.grupId && kaynak.grupId !== hedef.grupId) {
-    yeni[kaynakIdx] = { ...kaynak, grupId: undefined };
-  }
-
-  const guncelIdx = yeni.findIndex((s) => s.id === kaynakId);
-  const [tasinan] = yeni.splice(guncelIdx, 1);
-  let insertIdx = yeni.findIndex((s) => s.id === hedefId);
-  if (mod === 'sonra') insertIdx += 1;
-  yeni.splice(insertIdx, 0, tasinan);
-
-  if (tasinan.grupId) {
-    const kalan = yeni.filter((s) => s.grupId === tasinan.grupId);
-    if (kalan.length === 1) {
-      yeni = yeni.map((s) => (s.grupId === tasinan.grupId ? { ...s, grupId: undefined } : s));
-    }
-  }
-  return yeni;
-}
-
-function ornekSekmeBirlestir(liste: AdminSekme[], kaynakId: string, hedefId: string): AdminSekme[] {
-  if (kaynakId === hedefId) return liste;
-  const kaynak = liste.find((s) => s.id === kaynakId);
-  const hedef = liste.find((s) => s.id === hedefId);
-  if (!kaynak || !hedef) return liste;
-
-  const grupId = hedef.grupId ?? `grup-onizleme-${Date.now()}`;
-  let guncel = liste.map((s) =>
-    s.id === kaynakId || s.id === hedefId ? { ...s, grupId } : s
+function BaslatMenuOnizleme({ tasarim }: { tasarim: 'klasik' | 'modern' }) {
+  const modern = tasarim === 'modern';
+  return (
+    <span
+      aria-hidden="true"
+      className={`mb-3 flex h-[72px] overflow-hidden rounded-lg border border-[var(--ap-border)] ${
+        modern ? 'bg-[var(--ap-surface-2)]' : 'bg-[var(--ap-header-bg)]'
+      }`}
+    >
+      {modern ? (
+        <>
+          <span className="w-1/3 border-r border-[var(--ap-border)] p-2">
+            <i className="mb-1.5 block h-2 w-3 rounded bg-[var(--ap-text-muted)]/50" />
+            <i className="mb-1.5 block h-2 w-7 rounded bg-[var(--ap-text-muted)]/30" />
+            <i className="block h-2 w-5 rounded bg-[var(--ap-text-muted)]/30" />
+          </span>
+          <span className="flex flex-1 items-center gap-2 bg-[var(--ap-input-bg)] p-3">
+            <i className="h-6 w-6 rounded bg-[var(--ap-text-muted)]/35" />
+            <i className="h-6 w-6 rounded bg-[var(--ap-text-muted)]/35" />
+            <i className="h-6 w-6 rounded bg-[var(--ap-text-muted)]/35" />
+          </span>
+        </>
+      ) : (
+        <>
+          <span className="w-[43%] border-r border-[var(--ap-border)] p-2">
+            <i className="mb-1.5 block h-2 w-full rounded bg-[var(--ap-text-muted)]/40" />
+            <i className="mb-1.5 block h-2 w-4/5 rounded bg-[var(--ap-text-muted)]/30" />
+            <i className="mb-1.5 block h-2 w-3/5 rounded bg-[var(--ap-text-muted)]/30" />
+            <i className="block h-2 w-4/5 rounded bg-[var(--ap-text-muted)]/30" />
+          </span>
+          <span className="flex-1 bg-[var(--ap-input-bg)]" />
+        </>
+      )}
+    </span>
   );
-  const kaynakIdx = guncel.findIndex((s) => s.id === kaynakId);
-  const [tasinan] = guncel.splice(kaynakIdx, 1);
-  const hedefIdx = guncel.findIndex((s) => s.id === hedefId);
-  guncel.splice(hedefIdx + 1, 0, tasinan);
-  return guncel;
 }
 
 export function SekmeYonetimiSayfasi() {
   const [ayarlar, setAyarlar] = useState<SekmePanelAyarlari>(() => sekmeAyarlariOku());
-  const [ornekSekmeler, setOrnekSekmeler] = useState<AdminSekme[]>(ORNEK_SEKMELER_BASLANGIC);
-  const [ornekAktif, setOrnekAktif] = useState('o1');
 
   const kaydet = useCallback(() => {
     sekmeAyarlariKaydet(ayarlar);
     window.dispatchEvent(new CustomEvent('ap-sekme-ayarlari-guncellendi'));
+    if (ayarlar.websiteTamEkran && !document.fullscreenElement) {
+      void document.documentElement.requestFullscreen().catch(() => {});
+    }
+    if (!ayarlar.websiteTamEkran && document.fullscreenElement) {
+      void document.exitFullscreen().catch(() => {});
+    }
   }, [ayarlar]);
 
   useModulAksiyonlari({ kaydet }, { kaydet: true });
 
   useEffect(() => {
-    const handler = () => setAyarlar(sekmeAyarlariOku());
-    window.addEventListener('ap-sekme-ayarlari-guncellendi', handler);
-    return () => window.removeEventListener('ap-sekme-ayarlari-guncellendi', handler);
+    const ayarlariYukle = () => {
+      const gelen = sekmeAyarlariOku();
+      setAyarlar((onceki) => (JSON.stringify(onceki) === JSON.stringify(gelen) ? onceki : gelen));
+    };
+    window.addEventListener('ap-sekme-ayarlari-guncellendi', ayarlariYukle);
+    return () => window.removeEventListener('ap-sekme-ayarlari-guncellendi', ayarlariYukle);
   }, []);
+
+  useEffect(() => {
+    sekmeAyarlariKaydet(ayarlar);
+    window.dispatchEvent(new CustomEvent('ap-sekme-ayarlari-guncellendi'));
+  }, [ayarlar]);
 
   return (
     <AdminModulKabuk
       baslik="Sekme Yönetimi"
-      aciklama="Üst sekme çubuğunun boyutunu ve davranışını ayarlayın."
+      aciklama="Üst sekme çubuğunun görünümünü ve davranışını ayarlayın."
       onizleGoster={false}
     >
-      <div className="mt-6 grid gap-6 xl:grid-cols-2">
-        <AdminPanelKarti baslik="Sekme Ayarları" altBaslik="Değişiklikler Kaydet ile uygulanır">
-          <div className="space-y-4">
-            <p className="ap-muted rounded-lg border border-dashed border-[var(--ap-border)] px-3 py-2 text-xs leading-relaxed">
-              İki sekmeyi birleştirmek için birini diğerinin <strong>ortasına</strong> sürükleyin — Chrome
-              gibi yan yana split açılır. Kenarına bırakırsanız yalnızca sıralama değişir; dışarı sürükleyerek
-              ayırabilirsiniz.
+      <AdminPanelKarti baslik="Sekme Ayarları" altBaslik="Değişiklikler, Kaydet ile uygulanır">
+        <div className="space-y-5">
+          <div className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface-2)]/35 p-3">
+            <p className="ap-heading text-sm font-medium">Hızlı Bilgi</p>
+            <p className="ap-muted mt-1 text-xs">
+              Sekmeleri ortadan sürükleyip bırakınca yan yana açılır; kenara bırakırsanız sırası değişir.
             </p>
+          </div>
 
-            <div>
-              <p className="ap-heading mb-2 text-sm font-medium">Sekme görünümü</p>
-              <div className="flex flex-wrap gap-2">
-                {(
-                  [
-                    { id: 'ikon-isim', ad: 'İkon + İsim' },
-                    { id: 'isim', ad: 'Sadece İsim' },
-                    { id: 'ikon', ad: 'Sadece İkon' },
-                  ] as const
-                ).map((m) => (
-                  <button
-                    key={m.id}
-                    type="button"
-                    onClick={() => setAyarlar((a) => ({ ...a, sekmeGorunumModu: m.id }))}
-                    className={`rounded-lg border px-3 py-1.5 text-sm ${
-                      ayarlar.sekmeGorunumModu === m.id
-                        ? 'border-blue-500 bg-blue-600/20 text-blue-400'
-                        : 'border-[var(--ap-border)] hover:bg-[var(--ap-hover)]'
-                    }`}
-                  >
-                    {m.ad}
-                  </button>
-                ))}
-              </div>
-            </div>
+          <div className="grid gap-4 xl:grid-cols-2">
+            <section className="rounded-xl border border-[var(--ap-border)] p-4">
+              <h2 className="ap-heading mb-4 text-base font-semibold">Görünüm</h2>
 
-            <div>
-              <p className="ap-heading mb-2 text-sm font-medium">Varsayılan açılış</p>
-              <select
-                className="w-full rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] px-3 py-2 text-sm"
-                value={ayarlar.varsayilanAcilis}
-                onChange={(e) =>
-                  setAyarlar((a) => ({
-                    ...a,
-                    varsayilanAcilis: e.target.value as SekmePanelAyarlari['varsayilanAcilis'],
-                  }))
-                }
-              >
-                <option value="tek-sekme">Aynı modül için mevcut sekmeyi kullan</option>
-                <option value="yeni-sekme">Her seferinde yeni sekme aç</option>
-              </select>
-            </div>
+              <div className="grid gap-5 md:grid-cols-2">
+                <div>
+                  <p className="ap-muted mb-2 text-xs">Sekme Görünümü</p>
+                  <div className="flex flex-wrap gap-2">
+                    {(
+                      [
+                        { id: 'ikon-isim', ad: 'İkon + isim' },
+                        { id: 'isim', ad: 'Sadece isim' },
+                        { id: 'ikon', ad: 'Sadece ikon' },
+                      ] as const
+                    ).map((secim) => (
+                      <SecimButonu
+                        key={secim.id}
+                        secili={ayarlar.sekmeGorunumModu === secim.id}
+                        onClick={() => setAyarlar((onceki) => ({ ...onceki, sekmeGorunumModu: secim.id }))}
+                      >
+                        {secim.ad}
+                      </SecimButonu>
+                    ))}
+                  </div>
+                </div>
 
-            <div>
-              <p className="ap-heading mb-2 text-sm font-medium">Sekme boyutu</p>
-              <div className="flex flex-wrap gap-2">
-                {(['kucuk', 'orta', 'buyuk'] as const).map((b) => (
-                  <button
-                    key={b}
-                    type="button"
-                    onClick={() => setAyarlar((a) => ({ ...a, sekmeYukseklik: b }))}
-                    className={`rounded-lg border px-3 py-1.5 text-sm capitalize ${
-                      ayarlar.sekmeYukseklik === b
-                        ? 'border-blue-500 bg-blue-600/20 text-blue-400'
-                        : 'border-[var(--ap-border)] hover:bg-[var(--ap-hover)]'
-                    }`}
-                  >
-                    {b === 'kucuk' ? 'Küçük' : b === 'buyuk' ? 'Büyük' : 'Orta'}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <ToggleSatir
-              etiket="Üzerine gelince önizleme"
-              aciklama="Sekme üzerine gelindiğinde modül adı ipucu gösterilir"
-              acik={ayarlar.hoverOnizleme}
-              onDegistir={(hoverOnizleme) => setAyarlar((a) => ({ ...a, hoverOnizleme }))}
-            />
-            <ToggleSatir
-              etiket="Yan yana split (Chrome)"
-              aciklama="İki sekmeyi birleştirince içerik alanı ikiye bölünür"
-              acik={ayarlar.yanYanaAcilabilir}
-              onDegistir={(yanYanaAcilabilir) => setAyarlar((a) => ({ ...a, yanYanaAcilabilir }))}
-            />
-            <ToggleSatir
-              etiket="Sürükleyerek pencereye ayır"
-              aciklama="Sekmeyi aşağı sürükleyerek yüzen pencere olarak açar"
-              acik={ayarlar.surukleAyirPencere}
-              onDegistir={(surukleAyirPencere) => setAyarlar((a) => ({ ...a, surukleAyirPencere }))}
-            />
-
-            <ToggleSatir
-              etiket="Sekmelerde arama"
-              aciklama="Üst sekme çubuğunda modül arama alanı gösterilir"
-              acik={ayarlar.sekmeAramaAktif}
-              onDegistir={(sekmeAramaAktif) => setAyarlar((a) => ({ ...a, sekmeAramaAktif }))}
-            />
-
-            {ayarlar.sekmeAramaAktif && (
-              <div>
-                <p className="ap-heading mb-2 text-sm font-medium">Arama görünümü</p>
-                <div className="flex flex-wrap gap-2">
-                  {(
-                    [
-                      { id: 'ikon', ad: 'Sadece ikon (Windows tarzı)' },
-                      { id: 'input', ad: 'Arama kutusu' },
-                    ] as const
-                  ).map((m) => (
-                    <button
-                      key={m.id}
-                      type="button"
-                      onClick={() => setAyarlar((a) => ({ ...a, sekmeAramaGorunum: m.id }))}
-                      className={`rounded-lg border px-3 py-1.5 text-sm ${
-                        ayarlar.sekmeAramaGorunum === m.id
-                          ? 'border-blue-500 bg-blue-600/20 text-blue-400'
-                          : 'border-[var(--ap-border)] hover:bg-[var(--ap-hover)]'
-                      }`}
+                <div>
+                  <p className="ap-muted mb-2 text-xs">WebSite Görünümü Ayarı</p>
+                  <div className="flex flex-wrap gap-2">
+                    <SecimButonu
+                      secili={ayarlar.websiteTamEkran}
+                      onClick={() => setAyarlar((onceki) => ({ ...onceki, websiteTamEkran: true }))}
+                      aciklama="F11 gibi — her açılışta"
                     >
-                      {m.ad}
-                    </button>
+                      Tam ekran
+                    </SecimButonu>
+                    <SecimButonu
+                      secili={!ayarlar.websiteTamEkran}
+                      onClick={() => setAyarlar((onceki) => ({ ...onceki, websiteTamEkran: false }))}
+                      aciklama="Tarayıcı penceresi"
+                    >
+                      Normal
+                    </SecimButonu>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-5">
+                <p className="ap-muted mb-2 text-xs">Sekme Yerleşimi</p>
+                <div className="flex flex-wrap gap-2">
+                  <SecimButonu
+                    secili={ayarlar.sekmeYerlesim === 'dikdortgen'}
+                    onClick={() => setAyarlar((onceki) => ({ ...onceki, sekmeYerlesim: 'dikdortgen' }))}
+                    aciklama="Üst çubukta yatay"
+                  >
+                    Dikdörtgen
+                  </SecimButonu>
+                  <SecimButonu
+                    secili={ayarlar.sekmeYerlesim === 'kare'}
+                    onClick={() => setAyarlar((onceki) => ({ ...onceki, sekmeYerlesim: 'kare' }))}
+                    aciklama="Çoklu kutucuk kartı"
+                  >
+                    Kare
+                  </SecimButonu>
+                </div>
+              </div>
+
+              <div className="mt-4">
+                <p className="ap-muted mb-2 text-xs">Sekme Boyutu</p>
+                <div className="flex flex-wrap gap-2">
+                  {(['kucuk', 'orta', 'buyuk'] as const).map((boyut) => (
+                    <SecimButonu
+                      key={boyut}
+                      secili={ayarlar.sekmeYukseklik === boyut}
+                      onClick={() => setAyarlar((onceki) => ({ ...onceki, sekmeYukseklik: boyut }))}
+                    >
+                      {boyut === 'kucuk' ? 'Küçük' : boyut === 'orta' ? 'Orta' : 'Büyük'}
+                    </SecimButonu>
                   ))}
                 </div>
               </div>
-            )}
 
-            <button
-              type="button"
-              onClick={() => {
-                setAyarlar({ ...VARSAYILAN_SEKME_AYARLARI });
-                setOrnekSekmeler(ORNEK_SEKMELER_BASLANGIC);
-                setOrnekAktif('o1');
-              }}
-              className="text-xs text-blue-400 hover:underline"
-            >
-              Varsayılana sıfırla
-            </button>
-          </div>
-        </AdminPanelKarti>
+              <div className="mt-4 rounded-lg border border-[var(--ap-border)] p-3">
+                <p className="ap-muted mb-2 text-xs">Arama Görünümü</p>
+                <div className="flex flex-wrap gap-2">
+                  <SecimButonu
+                    secili={ayarlar.sekmeAramaGorunum === 'ikon'}
+                    onClick={() => setAyarlar((onceki) => ({ ...onceki, sekmeAramaGorunum: 'ikon' }))}
+                  >
+                    Sadece ikon (Windows tarzı)
+                  </SecimButonu>
+                  <SecimButonu
+                    secili={ayarlar.sekmeAramaGorunum === 'input'}
+                    onClick={() => setAyarlar((onceki) => ({ ...onceki, sekmeAramaGorunum: 'input' }))}
+                  >
+                    Arama kutusu
+                  </SecimButonu>
+                </div>
+              </div>
 
-        <AdminPanelKarti baslik="Canlı Önizleme" altBaslik="Sürükleyerek deneyin — ortaya bırak birleştirir">
-          <div
-            className="ap-sekme-onizleme-alan rounded-lg border border-[var(--ap-border)] bg-[var(--ap-header-bg)] p-2"
-            style={{
-              ['--ap-tab-height' as string]:
-                ayarlar.sekmeYukseklik === 'kucuk' ? '1.75rem' : ayarlar.sekmeYukseklik === 'buyuk' ? '2.5rem' : '2rem',
-              ['--ap-tab-font-size' as string]:
-                ayarlar.sekmeYukseklik === 'kucuk' ? '0.6875rem' : ayarlar.sekmeYukseklik === 'buyuk' ? '0.875rem' : '0.75rem',
-            }}
-          >
-            <UstSekmeCubugu
-              sekmeler={ornekSekmeler}
-              aktifSekmeId={ornekAktif}
-              onSekmeSec={setOrnekAktif}
-              onSekmeKapat={(id) => {
-                setOrnekSekmeler((s) => {
-                  const kalan = s.filter((x) => x.id !== id);
-                  if (ornekAktif === id) {
-                    setOrnekAktif(kalan[0]?.id ?? '');
+              {ayarlar.baslatMenuTasarim === 'modern' && (
+                <div className="mt-4 rounded-lg border border-dashed border-[var(--ap-border)] p-3">
+                  <div className="mb-3 flex items-center justify-between gap-2">
+                    <p className="ap-heading text-sm font-medium">Modern Başlat Menüsü</p>
+                    <span style={SECILI_BUTON_STILI} className="rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase">
+                      Modern mod
+                    </span>
+                  </div>
+                  <div className="grid gap-4 sm:grid-cols-2">
+                    <div>
+                      <p className="ap-muted mb-2 text-xs">Kategori Görünümü</p>
+                      <div className="flex flex-wrap gap-2">
+                        <SecimButonu
+                          secili={ayarlar.baslatMenuKategoriGorunum === 'kare'}
+                          onClick={() => setAyarlar((onceki) => ({ ...onceki, baslatMenuKategoriGorunum: 'kare' }))}
+                        >
+                          Kare kutular
+                        </SecimButonu>
+                        <SecimButonu
+                          secili={ayarlar.baslatMenuKategoriGorunum === 'dikdortgen'}
+                          onClick={() => setAyarlar((onceki) => ({ ...onceki, baslatMenuKategoriGorunum: 'dikdortgen' }))}
+                        >
+                          Uzun dikdörtgen
+                        </SecimButonu>
+                      </div>
+                    </div>
+                    <div>
+                      <p className="ap-muted mb-2 text-xs">Modül Kutusu Boyutu</p>
+                      <div className="flex flex-wrap gap-2">
+                        {(['kucuk', 'orta', 'buyuk'] as const).map((boyut) => (
+                          <SecimButonu
+                            key={boyut}
+                            secili={ayarlar.baslatMenuKutuBoyutu === boyut}
+                            onClick={() => setAyarlar((onceki) => ({ ...onceki, baslatMenuKutuBoyutu: boyut }))}
+                          >
+                            {boyut === 'kucuk' ? 'Küçük' : boyut === 'orta' ? 'Orta' : 'Büyük (tam ekran)'}
+                          </SecimButonu>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </section>
+
+            <section className="rounded-xl border border-[var(--ap-border)] p-4">
+              <h2 className="ap-heading mb-4 text-base font-semibold">Davranış</h2>
+              <label className="ap-muted block text-xs">
+                Varsayılan açılış
+                <select
+                  className="ap-heading mt-2 w-full rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] px-3 py-2 text-sm"
+                  value={ayarlar.varsayilanAcilis}
+                  onChange={(event) =>
+                    setAyarlar((onceki) => ({
+                      ...onceki,
+                      varsayilanAcilis: event.target.value as SekmePanelAyarlari['varsayilanAcilis'],
+                    }))
                   }
-                  return kalan;
-                });
-              }}
-              onSekmeTasi={(k, h, mod) => setOrnekSekmeler((s) => ornekSekmeTasi(s, k, h, mod))}
-              onSekmeBirlestir={(k, h) => setOrnekSekmeler((s) => ornekSekmeBirlestir(s, k, h))}
-              sekmeAyarlari={ayarlar}
-              onModulSec={() => {}}
-            />
+                >
+                  <option value="tek-sekme">Aynı modül için mevcut sekmeyi kullan</option>
+                  <option value="yeni-sekme">Her seferinde yeni sekme aç</option>
+                </select>
+              </label>
+
+              <div className="mt-3 space-y-3">
+                <ToggleSatir
+                  etiket="Üzerine gelince önizleme"
+                  aciklama="Sekme üzerinde ekran görüntüsü önizlemesi"
+                  acik={false}
+                  devreDisi
+                  yakinda
+                  onDegistir={() => {}}
+                />
+                <ToggleSatir
+                  etiket="Yan yana bölme (Chrome)"
+                  aciklama="Birleştirilen sekmeleri iki panelde açar"
+                  acik={ayarlar.yanYanaAcilabilir}
+                  onDegistir={(yanYanaAcilabilir) => setAyarlar((onceki) => ({ ...onceki, yanYanaAcilabilir }))}
+                />
+                <ToggleSatir
+                  etiket="Sürükleyerek pencereye ayır"
+                  aciklama="Sekmeyi ayırıp pencereye taşır"
+                  acik={ayarlar.surukleAyirPencere}
+                  onDegistir={(surukleAyirPencere) => setAyarlar((onceki) => ({ ...onceki, surukleAyirPencere }))}
+                />
+                <ToggleSatir
+                  etiket="Sekmelerde arama"
+                  aciklama="Alt çubukta modül arama gösterir"
+                  acik={ayarlar.sekmeAramaAktif}
+                  onDegistir={(sekmeAramaAktif) => setAyarlar((onceki) => ({ ...onceki, sekmeAramaAktif }))}
+                />
+                <ToggleSatir
+                  etiket="Sekme değiştirince otomatik kaydet"
+                  aciklama="Geçişte aktif sekmedeki değişiklikleri kaydeder"
+                  acik={ayarlar.sekmeGecisindeOtomatikKaydet}
+                  onDegistir={(sekmeGecisindeOtomatikKaydet) =>
+                    setAyarlar((onceki) => ({ ...onceki, sekmeGecisindeOtomatikKaydet }))
+                  }
+                />
+              </div>
+            </section>
           </div>
-          <p className="ap-muted mt-3 text-xs">
-            Boyut: <strong>{ayarlar.sekmeYukseklik}</strong> · Görünüm:{' '}
-            <strong>{ayarlar.sekmeGorunumModu}</strong> · Önizleme:{' '}
-            <strong>{ayarlar.hoverOnizleme ? 'Açık' : 'Kapalı'}</strong> · Split:{' '}
-            <strong>{ayarlar.yanYanaAcilabilir ? 'Açık' : 'Kapalı'}</strong>
-          </p>
-        </AdminPanelKarti>
-      </div>
+
+          <section className="rounded-xl border border-[var(--ap-border)] p-4">
+            <h2 className="ap-heading mb-4 text-base font-semibold">Başlat Menüsü</h2>
+            <div className="grid gap-3 md:grid-cols-2">
+              {(
+                [
+                  { id: 'klasik', baslik: 'Klasik', aciklama: 'Mevcut sol panel tasarımı' },
+                  { id: 'modern', baslik: 'Modern', aciklama: 'Yenilenmiş kart ve arama düzeni' },
+                ] as const
+              ).map((tasarim) => {
+                const secili = ayarlar.baslatMenuTasarim === tasarim.id;
+                return (
+                  <button
+                    key={tasarim.id}
+                    type="button"
+                    onClick={() => setAyarlar((onceki) => ({ ...onceki, baslatMenuTasarim: tasarim.id }))}
+                    style={secili ? SECILI_BUTON_STILI : undefined}
+                    className="rounded-lg border border-[var(--ap-border)] p-3 text-left transition-colors hover:bg-[var(--ap-hover)]"
+                  >
+                    <BaslatMenuOnizleme tasarim={tasarim.id} />
+                    <span className="ap-heading block text-sm font-semibold">{tasarim.baslik}</span>
+                    <span className="ap-muted mt-0.5 block text-xs">{tasarim.aciklama}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div className="mt-4 flex justify-end">
+              <button
+                type="button"
+                onClick={() => setAyarlar({ ...VARSAYILAN_SEKME_AYARLARI })}
+                className="rounded-lg border border-[var(--ap-border)] px-3 py-1.5 text-xs text-[var(--ap-accent)] transition-colors hover:bg-[var(--ap-hover)]"
+              >
+                Varsayılana sıfırla
+              </button>
+            </div>
+          </section>
+        </div>
+      </AdminPanelKarti>
     </AdminModulKabuk>
   );
 }

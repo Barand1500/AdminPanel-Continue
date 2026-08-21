@@ -67,6 +67,7 @@ function SekmeButonu({
   dropMod,
   hoverOnizleme,
   gorunumModu,
+  kareYerlesim,
   baslatMenuAcik,
   kenarlikAnimKey,
   onSekmeSec,
@@ -88,6 +89,7 @@ function SekmeButonu({
   dropMod: DropMod | null;
   hoverOnizleme: boolean;
   gorunumModu: SekmePanelAyarlari['sekmeGorunumModu'];
+  kareYerlesim: boolean;
   baslatMenuAcik: boolean;
   kenarlikAnimKey: number;
   onSekmeSec: (id: string) => void;
@@ -126,7 +128,7 @@ function SekmeButonu({
       onMouseMove={onPointerMove}
       onMouseUp={onPointerUp}
       title={hoverOnizleme ? sekme.baslik : undefined}
-      className={`ap-sekme-tab group relative flex max-w-[200px] shrink-0 cursor-grab items-center rounded-t-md border border-b-0 active:cursor-grabbing ${
+      className={`ap-sekme-tab group relative flex max-w-[200px] shrink-0 cursor-grab items-center rounded-t-md border border-b-0 active:cursor-grabbing ${kareYerlesim ? 'aspect-square !max-w-none !rounded-md border' : ''} ${
         gruplu ? 'rounded-none first:rounded-tl-md last:rounded-tr-md' : ''
       } ${
         sekmeVurgulu
@@ -151,7 +153,7 @@ function SekmeButonu({
       <button
         type="button"
         draggable={false}
-        className="ap-sekme-tab-sec flex min-h-[inherit] min-w-0 flex-1 cursor-pointer items-center gap-1 truncate px-3 py-1.5"
+        className={`ap-sekme-tab-sec flex min-h-[inherit] min-w-0 flex-1 cursor-pointer items-center gap-1 truncate px-3 py-1.5 ${kareYerlesim ? 'justify-center !px-1' : ''}`}
         onMouseDown={sekmeSecTikla}
       >
         {sekme.kaydedilmedi && (
@@ -314,6 +316,7 @@ export function UstSekmeCubugu({
     dropMod,
     hoverOnizleme: ayarlar.hoverOnizleme,
     gorunumModu: ayarlar.sekmeGorunumModu,
+    kareYerlesim: ayarlar.sekmeYerlesim === 'kare',
     baslatMenuAcik,
     kenarlikAnimKey,
     onSekmeSec: sekmeSecAnim,

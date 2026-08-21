@@ -1,9 +1,26 @@
 interface BaslatMenuAramaProps {
   deger: string;
   onDegistir: (deger: string) => void;
+  variant?: 'klasik' | 'modern';
 }
 
-export function BaslatMenuArama({ deger, onDegistir }: BaslatMenuAramaProps) {
+export function BaslatMenuArama({ deger, onDegistir, variant = 'klasik' }: BaslatMenuAramaProps) {
+  if (variant === 'modern') {
+    return (
+      <div className="ap-baslat-modern-arama">
+        <span className="ap-baslat-modern-arama-ikon" aria-hidden>⌕</span>
+        <input
+          type="search"
+          value={deger}
+          onChange={(e) => onDegistir(e.target.value)}
+          placeholder="Modül veya Ayar Ara..."
+          className="ap-baslat-modern-arama-input"
+          autoFocus
+        />
+      </div>
+    );
+  }
+
   return (
     <div className="px-4 pt-4">
       <input

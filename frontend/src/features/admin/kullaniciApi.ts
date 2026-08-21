@@ -85,8 +85,10 @@ function payloadHazirla(form: KullaniciFormDegeri, sifreDahil: boolean) {
     ad: form.ad.trim(),
     rol: form.rol,
     aktif: form.aktif,
-    siteId: form.siteId || null,
   };
+  // Site seçimi artık arayüzde yapılmıyor. Var olan kullanıcıda bağlı siteyi koru;
+  // yeni kullanıcı için sunucu aktif/varsayılan siteyi çözer.
+  if (form.siteId) payload.siteId = form.siteId;
   if (sifreDahil && form.sifre.trim()) {
     payload.sifre = form.sifre;
   }

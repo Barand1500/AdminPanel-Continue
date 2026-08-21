@@ -68,9 +68,10 @@ export interface SistemAyarlariForm {
   kenarlikNeon: boolean;
 }
 
-export type SistemSekmeId = 'genel' | 'bakim' | 'sayfa404' | 'dil' | 'guvenlik' | 'script' | 'sagTik' | 'eklentiler';
+export type SistemSekmeId = 'genel' | 'gorunum' | 'bakim' | 'sayfa404' | 'dil' | 'guvenlik' | 'script' | 'sagTik' | 'eklentiler';
 
 export const SISTEM_SEKMELER: { id: SistemSekmeId; ad: string; ikon: string }[] = [
+  { id: 'gorunum', ad: 'Görünüm', ikon: '◐' },
   { id: 'genel', ad: 'Genel', ikon: '⚡' },
   { id: 'bakim', ad: 'Bakım Modu', ikon: '🔧' },
   { id: 'sayfa404', ad: '404 Sayfası', ikon: '🚫' },

@@ -176,6 +176,18 @@ export function SistemAyarlariSayfasi() {
                   siteAktifIslemde={kaydediliyor}
                 />
               )}
+              {sekme === 'gorunum' && (
+                <div className="space-y-4">
+                  <div className="rounded-xl border border-[var(--ap-border)] bg-[var(--ap-surface-2)]/45 p-4">
+                    <p className="ap-heading text-sm font-semibold">Panel görünümü</p>
+                    <p className="ap-muted mt-1 text-xs">Sekme ve başlat menüsü görünümü Sekme Yönetimi sayfasından düzenlenir.</p>
+                  </div>
+                  <div className="rounded-xl border border-[var(--ap-border)] p-4">
+                    <p className="ap-heading text-sm font-semibold">Vurgu rengi</p>
+                    <p className="ap-muted mt-1 text-xs">Renk tercihi Genel Ayarlar sekmesinden değiştirilir.</p>
+                  </div>
+                </div>
+              )}
               {sekme === 'bakim' && <SistemBakimSekme form={form} onChange={setForm} siteAdi={siteAdi} />}
               {sekme === 'sayfa404' && <Sistem404Sekme form={form} sayfalar={sayfalar} onChange={setForm} />}
               {sekme === 'dil' && <PanelDilSekme form={form} onChange={setForm} />}
@@ -192,6 +204,7 @@ export function SistemAyarlariSayfasi() {
 }
 
 const SEKME_BASLIK: Record<SistemSekmeId, string> = {
+  gorunum: 'Görünüm',
   genel: 'Genel Ayarlar',
   bakim: 'Bakım Modu',
   sayfa404: '404 Sayfası',
@@ -203,6 +216,7 @@ const SEKME_BASLIK: Record<SistemSekmeId, string> = {
 };
 
 const SEKME_ALT: Record<SistemSekmeId, string> = {
+  gorunum: 'Panel stili ve görünüm tercihleri',
   genel: 'Yayın durumu ve domain',
   bakim: 'Bakım ekranı ve görsel',
   sayfa404: 'Menü ve içerik yapılandırması',

@@ -3,6 +3,10 @@ export type VarsayilanAcilis = 'tek-sekme' | 'yeni-sekme';
 export type SekmeGorunumModu = 'isim' | 'ikon' | 'ikon-isim';
 
 export type SekmeAramaGorunum = 'ikon' | 'input';
+export type SekmeYerlesim = 'dikdortgen' | 'kare';
+export type BaslatMenuTasarim = 'klasik' | 'modern';
+export type BaslatMenuKategoriGorunum = 'kare' | 'dikdortgen';
+export type BaslatMenuKutuBoyutu = 'kucuk' | 'orta' | 'buyuk';
 
 export interface SekmePanelAyarlari {
   sekmeYukseklik: SekmeYukseklik;
@@ -11,8 +15,14 @@ export interface SekmePanelAyarlari {
   yanYanaAcilabilir: boolean;
   surukleAyirPencere: boolean;
   sekmeGorunumModu: SekmeGorunumModu;
+  sekmeYerlesim: SekmeYerlesim;
   sekmeAramaAktif: boolean;
   sekmeAramaGorunum: SekmeAramaGorunum;
+  baslatMenuTasarim: BaslatMenuTasarim;
+  baslatMenuKategoriGorunum: BaslatMenuKategoriGorunum;
+  baslatMenuKutuBoyutu: BaslatMenuKutuBoyutu;
+  sekmeGecisindeOtomatikKaydet: boolean;
+  websiteTamEkran: boolean;
 }
 
 export const VARSAYILAN_SEKME_AYARLARI: SekmePanelAyarlari = {
@@ -22,8 +32,14 @@ export const VARSAYILAN_SEKME_AYARLARI: SekmePanelAyarlari = {
   yanYanaAcilabilir: true,
   surukleAyirPencere: true,
   sekmeGorunumModu: 'ikon-isim',
+  sekmeYerlesim: 'dikdortgen',
   sekmeAramaAktif: false,
   sekmeAramaGorunum: 'ikon',
+  baslatMenuTasarim: 'modern',
+  baslatMenuKategoriGorunum: 'dikdortgen',
+  baslatMenuKutuBoyutu: 'orta',
+  sekmeGecisindeOtomatikKaydet: true,
+  websiteTamEkran: false,
 };
 
 const STORAGE_KEY = 'ap-sekme-panel-ayarlari';

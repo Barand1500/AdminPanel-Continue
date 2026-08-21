@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import { SistemKesifButonu } from '@/components/admin/kesif/SistemKesifButonu';
-import { AdminSiteOnizleLink } from '@/components/admin/AdminHeader';
 import { YukleniyorDurumu } from '@/components/admin/ortak/AdminBilesenleri';
 import { AdminDurumEtiketi } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { DashboardHizliErisim } from '@/components/admin/dashboard/DashboardHizliErisim';
@@ -155,10 +154,7 @@ export function DashboardSayfasi({ onModulAc }: DashboardSayfasiProps) {
           </h1>
           <p className="ap-home-tarih">{bugununTarihi()}</p>
         </div>
-        <div className="ap-home-ust-sag">
-          <SistemKesifButonu />
-          <AdminSiteOnizleLink />
-        </div>
+        <div className="ap-home-ust-sag"><SistemKesifButonu /></div>
       </header>
 
       {hata && <p className="ap-home-hata">{hata}</p>}

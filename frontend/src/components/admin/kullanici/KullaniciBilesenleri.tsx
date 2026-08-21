@@ -1,5 +1,4 @@
 import type { AdminKullanici, KullaniciFormDegeri } from '@/features/admin/kullaniciApi';
-import type { AdminSiteOzet } from '@/features/admin/kullaniciApi';
 import { formInputSinifi } from '@/components/form/FormAlani';
 import { AdminAnahtarDugme } from '@/components/admin/ortak/AdminFormBilesenleri';
 
@@ -12,133 +11,128 @@ interface KullaniciListesiProps {
   kullanicilar: AdminKullanici[];
   seciliId: string | null;
   rolBasliklari: Record<string, string>;
-  onSec: (k: AdminKullanici) => void;
+  onSec: (kullanici: AdminKullanici) => void;
 }
 
 export function KullaniciListesi({ kullanicilar, seciliId, rolBasliklari, onSec }: KullaniciListesiProps) {
+  if (kullanicilar.length === 0) {
+    return <p className="ap-muted py-4 text-sm">Henüz kullanıcı yok.</p>;
+  }
+
   return (
-    <aside className="ap-sidebar-panel">
-      <div className="ap-sidebar-baslik">
-        <h2 className="ap-heading text-sm font-semibold">Kullanıcılar ({kullanicilar.length})</h2>
-      </div>
-      <ul className="ap-scroll ap-sidebar-icerik max-h-[520px] overflow-y-auto p-2">
-        {kullanicilar.length === 0 ? (
-          <li className="ap-muted px-2 py-4 text-center text-sm">Henüz kullanıcı yok</li>
-        ) : (
-          kullanicilar.map((k) => (
-            <li key={k.id}>
-              <button
-                type="button"
-                onClick={() => onSec(k)}
-                className={`ap-liste-oge ${seciliId === k.id ? 'ap-liste-oge-secili' : ''}`}
-              >
-                <span className="ap-heading font-medium">{k.ad}</span>
-                <span className="ap-muted mt-0.5 block text-xs">{k.email}</span>
-                <span className="mt-1 flex flex-wrap gap-2 text-[10px]">
-                  <span className="ap-etiket ap-etiket-gri">{rolBasliklari[k.rol] ?? k.rol}</span>
-                  {!k.aktif && <span className="text-red-400">Pasif</span>}
-                  {k.siteAd && <span className="ap-muted">{k.siteAd}</span>}
-                </span>
-              </button>
-            </li>
-          ))
-        )}
-      </ul>
-    </aside>
+    <ul className="grid grid-cols-[repeat(auto-fill,minmax(132px,1fr))] gap-3" aria-label="Kullanıcılar">
+      {kullanicilar.map((kullanici) => {
+        const secili = seciliId === kullanici.id;
+        const ilkHarf = (kullanici.ad || kullanici.email || '?').trim().charAt(0).toUpperCase();
+
+        return (
+          <li key={kullanici.id}>
+            <button
+              type="button"
+              onClick={() => onSec(kullanici)}
+              className={`flex aspect-square w-full flex-col items-center justify-center gap-1.5 rounded-xl border p-3 text-center transition ${
+                secili
+                  ? 'border-[var(--ap-accent)] bg-[color-mix(in_srgb,var(--ap-accent)_12%,var(--ap-surface))] shadow-[0_0_0_1px_color-mix(in_srgb,var(--ap-accent)_28%,transparent)_inset]'
+                  : 'border-[var(--ap-border)] bg-[var(--ap-surface)] hover:border-[color-mix(in_srgb,var(--ap-accent)_48%,var(--ap-border))]'
+              } ${!kullanici.aktif ? 'opacity-60' : ''}`}
+              aria-pressed={secili}
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--ap-accent)] text-sm font-bold text-white shadow-sm">
+                {ilkHarf}
+              </span>
+              <span className="ap-heading line-clamp-2 max-w-full text-xs font-semibold">{kullanici.ad}</span>
+              <span className="ap-muted max-w-full truncate text-[10px]">{kullanici.email}</span>
+              <span className="max-w-full truncate rounded-full bg-[color-mix(in_srgb,var(--ap-accent)_14%,var(--ap-surface))] px-2 py-0.5 text-[9px] font-semibold uppercase text-[color-mix(in_srgb,var(--ap-accent)_82%,var(--ap-heading))]">
+                {rolBasliklari[kullanici.rol] ?? kullanici.rol}
+              </span>
+            </button>
+          </li>
+        );
+      })}
+    </ul>
   );
 }
 
 interface KullaniciDuzenleFormuProps {
   form: KullaniciFormDegeri;
   seciliId: string | null;
-  siteler: AdminSiteOzet[];
-  cagiranRol: string;
   atanabilirRoller: AtanabilirRol[];
-  onSifreDegisti: (v: boolean) => void;
+  onSifreDegisti: (degisti: boolean) => void;
   onChange: (form: KullaniciFormDegeri) => void;
 }
 
 export function KullaniciDuzenleFormu({
   form,
   seciliId,
-  siteler,
-  cagiranRol,
   atanabilirRoller,
   onSifreDegisti,
   onChange,
 }: KullaniciDuzenleFormuProps) {
-  const siteGerekli = form.rol !== 'SUPER_ADMIN' && form.rol !== 'AJANS_ADMIN';
-
   return (
-    <div className="ap-editor-panel">
-      <div className="ap-editor-baslik">
-        <h2 className="ap-heading text-base font-semibold">{seciliId ? 'Kullanıcı Düzenle' : 'Yeni Kullanıcı'}</h2>
-      </div>
-      <div className="ap-editor-icerik space-y-3">
+    <div className="flex flex-wrap items-end gap-3">
+      <label className="flex min-w-[180px] flex-[1.35] flex-col gap-1">
+        <span className="ap-muted text-xs font-medium">Ad Soyad <span className="text-red-400">*</span></span>
         <input
           className={formInputSinifi}
-          placeholder="Ad Soyad"
           value={form.ad}
-          onChange={(e) => onChange({ ...form, ad: e.target.value })}
+          onChange={(event) => onChange({ ...form, ad: event.target.value })}
           required
           autoComplete="name"
         />
+      </label>
+
+      <label className="flex min-w-[190px] flex-[1.1] flex-col gap-1">
+        <span className="ap-muted text-xs font-medium">E-posta <span className="text-red-400">*</span></span>
         <input
           className={formInputSinifi}
           type="email"
-          placeholder="E-posta"
           value={form.email}
-          onChange={(e) => onChange({ ...form, email: e.target.value })}
+          onChange={(event) => onChange({ ...form, email: event.target.value })}
           required
           autoComplete="email"
         />
+      </label>
+
+      <label className="flex min-w-[170px] flex-1 flex-col gap-1">
+        <span className="ap-muted text-xs font-medium">{seciliId ? 'Yeni Şifre' : 'Şifre'} {!seciliId && <span className="text-red-400">*</span>}</span>
         <input
           className={formInputSinifi}
           type="password"
-          placeholder={seciliId ? 'Yeni şifre (boş bırak = değişmez)' : 'Şifre (min 6 karakter)'}
           value={form.sifre}
-          onChange={(e) => {
-            onChange({ ...form, sifre: e.target.value });
+          placeholder={seciliId ? 'Boş bırak = değişmez' : ''}
+          onChange={(event) => {
+            onChange({ ...form, sifre: event.target.value });
             onSifreDegisti(true);
           }}
           required={!seciliId}
           minLength={seciliId ? undefined : 6}
-          autoComplete={seciliId ? 'new-password' : 'new-password'}
+          autoComplete="new-password"
         />
+      </label>
 
+      <label className="flex min-w-[160px] flex-1 flex-col gap-1">
+        <span className="ap-muted text-xs font-medium">Rol <span className="text-red-400">*</span></span>
         <select
           className={formInputSinifi}
           value={form.rol}
-          onChange={(e) => onChange({ ...form, rol: e.target.value })}
+          onChange={(event) => onChange({ ...form, rol: event.target.value })}
         >
-          {atanabilirRoller.map((r) => (
-            <option key={r.kod} value={r.kod}>
-              {r.baslik}
-            </option>
+          <option value="">Seçiniz</option>
+          {atanabilirRoller.map((rol) => (
+            <option key={rol.kod} value={rol.kod}>{rol.baslik}</option>
           ))}
         </select>
+      </label>
 
-        {cagiranRol === 'SUPER_ADMIN' && siteler.length > 0 && (
-          <select
-            className={formInputSinifi}
-            value={form.siteId}
-            onChange={(e) => onChange({ ...form, siteId: e.target.value })}
-            required={siteGerekli}
-          >
-            <option value="">{siteGerekli ? 'Site seçin' : 'Site yok (global admin)'}</option>
-            {siteler.map((s) => (
-              <option key={s.id} value={s.id}>
-                {s.ad} ({s.slug})
-              </option>
-            ))}
-          </select>
-        )}
-
-        <AdminAnahtarDugme
-          etiket="Aktif kullanıcı"
-          acik={form.aktif}
-          onDegistir={(aktif) => onChange({ ...form, aktif })}
-        />
+      <div className="flex min-w-[118px] flex-col gap-1">
+        <span className="ap-muted text-xs font-medium">Durum</span>
+        <div className="flex h-10 items-center justify-between rounded-lg border border-[var(--ap-border)] px-2">
+          <AdminAnahtarDugme
+            etiket={form.aktif ? 'Aktif' : 'Pasif'}
+            acik={form.aktif}
+            onDegistir={(aktif) => onChange({ ...form, aktif })}
+          />
+        </div>
       </div>
     </div>
   );

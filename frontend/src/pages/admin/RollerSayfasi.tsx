@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { IconKey, IconLayoutGrid } from '@tabler/icons-react';
 import { RolKartlari, RolMatrisi, rolSilinebilirMi } from '@/components/admin/rol/RolBilesenleri';
 import { RolDuzenleModal } from '@/components/admin/rol/RolDuzenleModal';
 import { RolEkleModal } from '@/components/admin/rol/RolEkleModal';
@@ -6,6 +7,7 @@ import { RolSilModal } from '@/components/admin/rol/RolSilModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { useKaydedilmemisBildirim } from '@/contexts/AdminUyariBildirimContext';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
+import { AdminModulKabuk, AdminPanelKarti, BildirimKutusu } from '@/components/admin/ortak/AdminBilesenleri';
 import {
   adminRolleriGetir,
   adminRolleriKaydet,
@@ -40,6 +42,9 @@ export function RollerSayfasi() {
   const [duzenleRol, setDuzenleRol] = useState<RolTanimi | null>(null);
   const [silModalAcik, setSilModalAcik] = useState(false);
   const [seciliRolKod, setSeciliRolKod] = useState<string | null>(null);
+  const [matrisFiltreKod, setMatrisFiltreKod] = useState<string | null>(null);
+  const [rolArama, setRolArama] = useState('');
+  const [aktifGorunum, setAktifGorunum] = useState<'matris' | 'tanimlar'>('matris');
   const kayitliRef = useRef<RolTanimi[]>([]);
 
   const yetkili = kullanici?.rol === 'SUPER_ADMIN' || kullanici?.rol === 'AJANS_ADMIN';
@@ -55,6 +60,14 @@ export function RollerSayfasi() {
 
   const seciliRol = taslakRoller.find((r) => r.kod === seciliRolKod) ?? null;
   const silAktif = superAdminMi && !!seciliRol && rolSilinebilirMi(seciliRol);
+  const gorunenRoller = taslakRoller.filter((rol) => {
+    const arama = rolArama.trim().toLocaleLowerCase('tr-TR');
+    if (!arama) return true;
+    return `${rol.baslik} ${rol.kod}`.toLocaleLowerCase('tr-TR').includes(arama);
+  });
+  const matrisRolleri = matrisFiltreKod
+    ? taslakRoller.filter((rol) => rol.kod === matrisFiltreKod)
+    : taslakRoller;
 
   async function yukle() {
     setYukleniyor(true);
@@ -174,45 +187,98 @@ export function RollerSayfasi() {
   }
 
   return (
-    <div>
-      <h1 className="text-xl font-bold text-white">Roller ve Yetkiler</h1>
-      <p className="mt-1 text-sm text-slate-400">
-        Sistemdeki roller ve her role ait yetki matrisi. Kullanıcılara rol atamak için{' '}
-        <strong className="text-slate-300">Kullanıcılar</strong> modülünü kullanın.
-      </p>
-      {hata && <p className="mt-4 text-sm text-red-400">{hata}</p>}
-      {kaydediliyor && <p className="mt-4 text-sm text-slate-400">Kaydediliyor...</p>}
+    <AdminModulKabuk onizleGoster={false}>
+      {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
+      {kaydediliyor && <p className="ap-muted mb-3 text-sm">Kaydediliyor...</p>}
 
-      {yukleniyor ? (
-        <p className="mt-6 text-sm text-slate-400">Yükleniyor...</p>
-      ) : (
-        <div className="mt-6 space-y-8">
-          <section>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
-              Yetki Matrisi
-            </h2>
-            <RolMatrisi
-              roller={taslakRoller}
-              yetkiler={yetkiler}
-              duzenlenebilir={superAdminMi}
-              onYetkiToggle={yetkiToggle}
-            />
-          </section>
+      <AdminPanelKarti
+        baslik={aktifGorunum === 'matris' ? 'Yetki Matrisi' : 'Rol Tanımları'}
+        altBaslik={
+          aktifGorunum === 'matris'
+            ? 'Soldan rol seçin; seçili rolün panel yetkilerini görüntüleyin veya düzenleyin.'
+            : 'Sistemde kullanılan rolleri ve yetki kapsamlarını yönetin.'
+        }
+        ustAksiyon={
+          <div className="flex rounded-xl border border-[var(--ap-border)] p-1">
+            <button
+              type="button"
+              onClick={() => setAktifGorunum('matris')}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                aktifGorunum === 'matris' ? 'bg-[var(--ap-accent)] text-white shadow-sm' : 'ap-muted hover:bg-[var(--ap-hover)]'
+              }`}
+            >
+              <IconLayoutGrid size={15} stroke={1.9} aria-hidden /> Yetki Matrisi
+            </button>
+            <button
+              type="button"
+              onClick={() => setAktifGorunum('tanimlar')}
+              className={`flex items-center gap-1.5 rounded-lg px-3 py-2 text-xs font-semibold transition ${
+                aktifGorunum === 'tanimlar' ? 'bg-[var(--ap-accent)] text-white shadow-sm' : 'ap-muted hover:bg-[var(--ap-hover)]'
+              }`}
+            >
+              <IconKey size={15} stroke={1.9} aria-hidden /> Rol Tanımları
+            </button>
+          </div>
+        }
+      >
+        {yukleniyor ? (
+          <p className="ap-muted py-8 text-sm">Roller yükleniyor...</p>
+        ) : aktifGorunum === 'matris' ? (
+          <div className="grid min-h-[520px] gap-3 lg:grid-cols-[205px_1fr]">
+            <aside className="rounded-xl border border-[var(--ap-border)] bg-[var(--ap-surface-2)] p-2">
+              <input
+                type="search"
+                value={rolArama}
+                onChange={(event) => setRolArama(event.target.value)}
+                placeholder="Rol ara..."
+                className="mb-2 w-full rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] px-3 py-2 text-xs outline-none focus:border-[var(--ap-accent)]"
+              />
+              <button
+                type="button"
+                onClick={() => setMatrisFiltreKod(null)}
+                className={`mb-1 w-full rounded-lg px-3 py-2 text-left text-xs font-semibold transition ${
+                  matrisFiltreKod === null ? 'bg-[var(--ap-accent)] text-white' : 'ap-muted hover:bg-[var(--ap-hover)]'
+                }`}
+              >
+                Tüm roller
+              </button>
+              <ul className="space-y-1" aria-label="Rol filtresi">
+                {gorunenRoller.map((rol) => (
+                  <li key={rol.kod}>
+                    <button
+                      type="button"
+                      onClick={() => setMatrisFiltreKod(rol.kod)}
+                      className={`w-full rounded-lg px-3 py-2 text-left transition ${
+                        matrisFiltreKod === rol.kod ? 'bg-[var(--ap-accent)] text-white' : 'hover:bg-[var(--ap-hover)]'
+                      }`}
+                    >
+                      <span className="block text-xs font-semibold">{rol.baslik}</span>
+                      <span className={`block text-[10px] ${matrisFiltreKod === rol.kod ? 'text-white/75' : 'ap-muted'}`}>{rol.kod}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </aside>
 
-          <section>
-            <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-slate-400">
-              Rol Tanımları
-            </h2>
-            <RolKartlari
-              roller={taslakRoller}
-              seciliKod={seciliRolKod}
-              duzenlenebilir={superAdminMi}
-              onSec={rolSec}
-              onDuzenle={setDuzenleRol}
-            />
-          </section>
-        </div>
-      )}
+            <div className="min-w-0 overflow-auto rounded-xl border border-[var(--ap-border)]">
+              <RolMatrisi
+                roller={matrisRolleri}
+                yetkiler={yetkiler}
+                duzenlenebilir={superAdminMi}
+                onYetkiToggle={yetkiToggle}
+              />
+            </div>
+          </div>
+        ) : (
+          <RolKartlari
+            roller={taslakRoller}
+            seciliKod={seciliRolKod}
+            duzenlenebilir={superAdminMi}
+            onSec={rolSec}
+            onDuzenle={setDuzenleRol}
+          />
+        )}
+      </AdminPanelKarti>
 
       <RolEkleModal
         acik={ekleModalAcik}
@@ -231,6 +297,6 @@ export function RollerSayfasi() {
         onKapat={() => setSilModalAcik(false)}
         onOnayla={rolSilOnayla}
       />
-    </div>
+    </AdminModulKabuk>
   );
 }

@@ -105,6 +105,11 @@ function AdminPanelGovde() {
         setRehberAcik(true);
         return;
       }
+      if (klavyeOlayiEslesir(e, harita.baslatMenu)) {
+        e.preventDefault();
+        setBaslatMenuAcik((acik) => !acik);
+        return;
+      }
       if (klavyeOlayiEslesir(e, harita.kaydet)) {
         e.preventDefault();
         void aksiyonCalistir('kaydet');
@@ -113,11 +118,6 @@ function AdminPanelGovde() {
       if (klavyeOlayiEslesir(e, harita.ekle)) {
         e.preventDefault();
         void aksiyonCalistir('ekle');
-        return;
-      }
-      if (klavyeOlayiEslesir(e, harita.onizle)) {
-        e.preventDefault();
-        void aksiyonCalistir('onizle');
         return;
       }
       if (klavyeOlayiEslesir(e, harita.sil)) {

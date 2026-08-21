@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { KullaniciDuzenleFormu, KullaniciListesi, type AtanabilirRol } from '@/components/admin/kullanici/KullaniciBilesenleri';
+import { AdminModulKabuk, AdminPanelKarti, BildirimKutusu } from '@/components/admin/ortak/AdminBilesenleri';
 import { useAuth } from '@/contexts/AuthContext';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import { useYetkiler } from '@/hooks/useYetkiler';
@@ -8,11 +9,9 @@ import {
   adminKullaniciGuncelle,
   adminKullaniciOlustur,
   adminKullaniciSil,
-  adminKullaniciSiteleriGetir,
   adminKullanicilariGetir,
   VARSAYILAN_ROL_ETIKETLERI,
   type AdminKullanici,
-  type AdminSiteOzet,
   type KullaniciFormDegeri,
 } from '@/features/admin/kullaniciApi';
 
@@ -25,14 +24,14 @@ const bosForm: KullaniciFormDegeri = {
   aktif: true,
 };
 
-function kullanicidanForm(k: AdminKullanici): KullaniciFormDegeri {
+function kullanicidanForm(kullanici: AdminKullanici): KullaniciFormDegeri {
   return {
-    email: k.email,
-    ad: k.ad,
+    email: kullanici.email,
+    ad: kullanici.ad,
     sifre: '',
-    rol: k.rol,
-    siteId: k.siteId ?? '',
-    aktif: k.aktif,
+    rol: kullanici.rol,
+    siteId: kullanici.siteId ?? '',
+    aktif: kullanici.aktif,
   };
 }
 
@@ -40,7 +39,6 @@ export function KullanicilarSayfasi() {
   const { kullanici: oturum } = useAuth();
   const { kullaniciYonetimiVar } = useYetkiler();
   const [kullanicilar, setKullanicilar] = useState<AdminKullanici[]>([]);
-  const [siteler, setSiteler] = useState<AdminSiteOzet[]>([]);
   const [form, setForm] = useState<KullaniciFormDegeri>(bosForm);
   const [seciliId, setSeciliId] = useState<string | null>(null);
   const [sifreDegisti, setSifreDegisti] = useState(false);
@@ -50,69 +48,69 @@ export function KullanicilarSayfasi() {
   const [tumRoller, setTumRoller] = useState<AtanabilirRol[]>([]);
   const [rolBasliklari, setRolBasliklari] = useState<Record<string, string>>(VARSAYILAN_ROL_ETIKETLERI);
 
-  const yetkili = kullaniciYonetimiVar;
-
-  const atanabilirRoller = tumRoller.filter((r) => {
+  const atanabilirRoller = tumRoller.filter((rol) => {
     if (oturum?.rol === 'SUPER_ADMIN') return true;
-    return r.kod !== 'SUPER_ADMIN' && r.kod !== 'AJANS_ADMIN';
+    return rol.kod !== 'SUPER_ADMIN' && rol.kod !== 'AJANS_ADMIN';
   });
 
-  async function yukle() {
+  const yukle = useCallback(async () => {
     setYukleniyor(true);
     setHata('');
     try {
-      const [liste, siteListesi, rolVeri] = await Promise.all([
-        adminKullanicilariGetir(),
-        adminKullaniciSiteleriGetir(),
-        adminRolleriGetir(),
-      ]);
+      const [liste, rolVeri] = await Promise.all([adminKullanicilariGetir(), adminRolleriGetir()]);
       setKullanicilar(liste);
-      setSiteler(siteListesi);
-      const roller = rolVeri.roller.map((r) => ({ kod: r.kod, baslik: r.baslik }));
+      const roller = rolVeri.roller.map((rol) => ({ kod: rol.kod, baslik: rol.baslik }));
       setTumRoller(roller);
-      setRolBasliklari(
-        Object.fromEntries(rolVeri.roller.map((r) => [r.kod, r.baslik]))
-      );
+      setRolBasliklari(Object.fromEntries(roller.map((rol) => [rol.kod, rol.baslik])));
     } catch (err) {
-      setHata(err instanceof Error ? err.message : 'Kullanıcılar alınamadı');
+      setHata(err instanceof Error ? err.message : 'Kullanıcılar alınamadı.');
     } finally {
       setYukleniyor(false);
     }
-  }
+  }, []);
 
   useEffect(() => {
-    if (yetkili) void yukle();
+    if (kullaniciYonetimiVar) void yukle();
     else setYukleniyor(false);
-  }, [yetkili]);
+  }, [kullaniciYonetimiVar, yukle]);
 
   const yeniBaslat = useCallback(() => {
     setSeciliId(null);
-    const varsayilanRol = atanabilirRoller[0]?.kod ?? 'MUSTERI_ADMIN';
-    setForm({ ...bosForm, rol: varsayilanRol, siteId: siteler[0]?.id ?? '' });
+    setForm({ ...bosForm, rol: atanabilirRoller[0]?.kod ?? 'MUSTERI_ADMIN' });
     setSifreDegisti(false);
-  }, [siteler, atanabilirRoller]);
+    setHata('');
+  }, [atanabilirRoller]);
+
+  const kullaniciSec = useCallback((kullanici: AdminKullanici) => {
+    setSeciliId(kullanici.id);
+    setForm(kullanicidanForm(kullanici));
+    setSifreDegisti(false);
+    setHata('');
+  }, []);
 
   const kaydet = useCallback(async () => {
     if (!form.ad.trim() || !form.email.trim()) {
-      setHata('Ad ve e-posta zorunludur');
+      setHata('Ad ve e-posta zorunludur.');
       return;
     }
+    if (!seciliId && !form.sifre.trim()) {
+      setHata('Yeni kullanıcı için şifre zorunludur.');
+      return;
+    }
+
     setKaydediliyor(true);
     setHata('');
     try {
-      if (seciliId) {
-        await adminKullaniciGuncelle(seciliId, form, sifreDegisti);
-      } else {
-        await adminKullaniciOlustur(form);
-      }
+      if (seciliId) await adminKullaniciGuncelle(seciliId, form, sifreDegisti);
+      else await adminKullaniciOlustur(form);
       yeniBaslat();
       await yukle();
     } catch (err) {
-      setHata(err instanceof Error ? err.message : 'Kayıt başarısız');
+      setHata(err instanceof Error ? err.message : 'Kayıt başarısız.');
     } finally {
       setKaydediliyor(false);
     }
-  }, [form, seciliId, sifreDegisti, yeniBaslat]);
+  }, [form, seciliId, sifreDegisti, yeniBaslat, yukle]);
 
   const sil = useCallback(async () => {
     if (!seciliId || !confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) return;
@@ -122,67 +120,56 @@ export function KullanicilarSayfasi() {
       yeniBaslat();
       await yukle();
     } catch (err) {
-      setHata(err instanceof Error ? err.message : 'Silme başarısız');
+      setHata(err instanceof Error ? err.message : 'Silme başarısız.');
     } finally {
       setKaydediliyor(false);
     }
-  }, [seciliId, yeniBaslat]);
+  }, [seciliId, yeniBaslat, yukle]);
 
   useModulAksiyonlari(
     { kaydet, ekle: yeniBaslat, sil },
-    {
-      kaydet: !kaydediliyor,
-      ekle: true,
-      sil: !!seciliId && !kaydediliyor,
-    }
+    { kaydet: !kaydediliyor, ekle: !kaydediliyor, sil: Boolean(seciliId) && !kaydediliyor }
   );
 
-  if (!yetkili) {
+  if (!kullaniciYonetimiVar) {
     return (
       <div className="py-16 text-center">
-        <p className="text-4xl">🔒</p>
         <h1 className="mt-4 text-xl font-bold text-white">Yetkisiz Erişim</h1>
-        <p className="mt-2 text-sm text-slate-400">
-          Kullanıcı yönetimi için Kullanıcı Yönetimi yetkisi gerekir.
-        </p>
+        <p className="mt-2 text-sm text-slate-400">Kullanıcı yönetimi için Kullanıcı Yönetimi yetkisi gerekir.</p>
       </div>
     );
   }
 
   return (
-    <div>
-      <h1 className="text-xl font-bold text-white">Kullanıcılar</h1>
-      <p className="mt-1 text-sm text-slate-400">
-        Site kullanıcılarını oluşturun, rollerini atayın ve erişimlerini yönetin.
-      </p>
-      {hata && <p className="mt-4 text-sm text-red-400">{hata}</p>}
-      {kaydediliyor && <p className="mt-4 text-sm text-slate-400">İşlem yapılıyor...</p>}
+    <AdminModulKabuk onizleGoster={false}>
+      {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
+      {kaydediliyor && <p className="ap-muted mb-3 text-sm">İşlem yapılıyor...</p>}
 
       {yukleniyor ? (
-        <p className="mt-6 text-sm text-slate-400">Yükleniyor...</p>
+        <p className="ap-muted mt-6 text-sm">Kullanıcılar yükleniyor...</p>
       ) : (
-        <div className="mt-6 grid gap-4 lg:grid-cols-[320px_1fr]">
+        <div className="space-y-5">
+          <AdminPanelKarti
+            baslik={seciliId ? 'Kullanıcı düzenle' : 'Yeni kullanıcı'}
+            altBaslik={seciliId ? 'Bilgileri düzenleyip Kaydet ile güncelleyin.' : 'Formu doldurup Kaydet ile oluşturun.'}
+          >
+            <KullaniciDuzenleFormu
+              form={form}
+              seciliId={seciliId}
+              atanabilirRoller={atanabilirRoller}
+              onSifreDegisti={setSifreDegisti}
+              onChange={setForm}
+            />
+          </AdminPanelKarti>
+
           <KullaniciListesi
             kullanicilar={kullanicilar}
             seciliId={seciliId}
             rolBasliklari={rolBasliklari}
-            onSec={(k) => {
-              setSeciliId(k.id);
-              setForm(kullanicidanForm(k));
-              setSifreDegisti(false);
-            }}
-          />
-          <KullaniciDuzenleFormu
-            form={form}
-            seciliId={seciliId}
-            siteler={siteler}
-            cagiranRol={oturum?.rol ?? ''}
-            atanabilirRoller={atanabilirRoller}
-            onSifreDegisti={setSifreDegisti}
-            onChange={setForm}
+            onSec={kullaniciSec}
           />
         </div>
       )}
-    </div>
+    </AdminModulKabuk>
   );
 }
