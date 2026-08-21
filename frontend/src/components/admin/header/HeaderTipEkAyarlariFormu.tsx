@@ -26,6 +26,16 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
         acik={tipEk.sabit !== false}
         onDegistir={(sabit) => guncelle({ sabit })}
       />
+      <AdminAnahtarDugme
+        etiket="Gece / gündüz butonu (PC)"
+        acik={tipEk.temaGosterPc !== false}
+        onDegistir={(temaGosterPc) => guncelle({ temaGosterPc })}
+      />
+      <AdminAnahtarDugme
+        etiket="Gece / gündüz butonu (Mobil)"
+        acik={tipEk.temaGosterMobil !== false}
+        onDegistir={(temaGosterMobil) => guncelle({ temaGosterMobil })}
+      />
       <div className="ap-header-form-grid">
         <RenkSecici
           etiket="Ana header arka planı"

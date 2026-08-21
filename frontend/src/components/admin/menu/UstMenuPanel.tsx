@@ -5,6 +5,7 @@ import {
   AdminBosDurum,
   AdminDurumEtiketi,
 } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 import {
   UstMenuEkleModal,
   yeniUstMenuOgesi,
@@ -119,7 +120,7 @@ export function UstMenuPanel({ ustMenu, sayfalar, kirli, onChange, onSil }: UstM
 
         {sirali.length === 0 ? (
           <AdminBosDurum
-            ikon="🔗"
+            ikon={<AdminFlatIkon ad="menu" boyut={28} />}
             baslik="Üst menü boş"
             aciklama="Link ekleyin veya mevcut sayfa menüsünü aktarın. Boşken sayfa menüsü kullanılır."
           />

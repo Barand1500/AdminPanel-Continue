@@ -3,6 +3,7 @@ import type { AdminMedya } from '@/features/admin/medyaApi';
 import { medyaTamUrl } from '@/features/admin/medyaApi';
 import { MEDYA_MAX_DOSYA_MB } from '@/constants/medya';
 import { AdminAramaKutusu, AdminBosDurum, AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
 import { adminIslemBildirimi } from '@/utils/adminBildirimOlaylari';
 
@@ -76,7 +77,7 @@ export function MedyaGrid({
 
       {medyalar.length === 0 ? (
         <AdminBosDurum
-          ikon="🖼️"
+          ikon={<AdminFlatIkon ad="galeri" boyut={28} />}
           baslik={arama ? 'Sonuç yok' : 'Henüz görsel yok'}
           aciklama={arama ? 'Farklı bir arama deneyin' : 'Yukarıdan dosya bırakın veya seçin'}
         />
@@ -188,9 +189,7 @@ export function MedyaYukleyici({
         }}
         onDrop={surukleBirak}
       >
-        <span className="ap-medya-toplu-ikon" aria-hidden>
-          📤
-        </span>
+        <span className="ap-medya-toplu-ikon" aria-hidden><AdminFlatIkon ad="medya" boyut={25} /></span>
         <div className="ap-medya-toplu-metin">
           <p className="ap-medya-toplu-baslik">
             {surukleniyor ? 'Dosyaları buraya bırakın' : kompakt ? 'Görsel ekle' : 'Görselleri buraya bırakın'}

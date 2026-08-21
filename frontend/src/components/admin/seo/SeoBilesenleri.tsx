@@ -9,6 +9,7 @@ import {
   AdminDurumEtiketi,
   AdminFormBolumu,
 } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 
 export type SeoSekmeId = 'genel' | 'kategori' | 'sabit-sayfa';
 
@@ -180,7 +181,7 @@ export function SeoUrlListesiPanel({
       <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
         {filtreli.length === 0 ? (
           <AdminBosDurum
-            ikon="🔍"
+            ikon={<AdminFlatIkon ad="arama" boyut={28} />}
             baslik={arama ? 'Sonuç yok' : 'Kayıt yok'}
             aciklama={arama ? 'Aramayı temizleyip tekrar deneyin' : 'Bu sekmede düzenlenecek URL yok'}
           />

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import type { AdminForm } from '@/features/admin/formApi';
 import { GORUNUM_TIPLERI } from '@/types/formYonetimi';
 import {
@@ -6,6 +6,7 @@ import {
   AdminBosDurum,
   AdminDurumEtiketi,
 } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 
 type ListeFiltre = 'tumu' | 'yayinda' | 'taslak';
 
@@ -21,10 +22,10 @@ interface FormListePanelProps {
   onSec: (form: AdminForm) => void;
 }
 
-function formIkonu(f: AdminForm): string {
+function formIkonu(f: AdminForm): ReactNode {
   const tip = f.ayarlarJson?.gorunumTipi;
-  if (tip === 'yuzucu' || tip === 'modal' || tip === 'sabit-alt') return '💬';
-  return '📋';
+  if (tip === 'yuzucu' || tip === 'modal' || tip === 'sabit-alt') return <AdminFlatIkon ad="mesaj" boyut={20} />;
+  return <AdminFlatIkon ad="belge" boyut={20} />;
 }
 
 export function FormListePanel({ formlar, seciliId, onSec }: FormListePanelProps) {
@@ -75,13 +76,13 @@ export function FormListePanel({ formlar, seciliId, onSec }: FormListePanelProps
       <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
         {formlar.length === 0 ? (
           <AdminBosDurum
-            ikon="📝"
+            ikon={<AdminFlatIkon ad="belge" boyut={28} />}
             baslik="Henüz form yok"
             aciklama="Üstten Yeni Form ile başlayın"
           />
         ) : filtreli.length === 0 ? (
           <AdminBosDurum
-            ikon="🔎"
+            ikon={<AdminFlatIkon ad="arama" boyut={28} />}
             baslik="Sonuç yok"
             aciklama="Filtreyi veya aramayı temizleyip tekrar deneyin"
           />

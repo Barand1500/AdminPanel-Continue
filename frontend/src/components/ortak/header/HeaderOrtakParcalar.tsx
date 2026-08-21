@@ -236,7 +236,7 @@ export function IkonGrubu({
       {!sadeceHamburger && veri.header.dilDestegi?.aktif && (
         <HeaderDilSecici ayar={veri.header.dilDestegi} />
       )}
-      {!sadeceHamburger && <TemaToggle tema={veri.header.ikonlar?.tema} />}
+      {!sadeceHamburger && <TemaToggle tema={veri.header.ikonlar?.tema} tipEk={veri.tipEk} />}
       {!sadeceHamburger && kullaniciAlaniGoster(veri.tipEk) && (
         <Link
           to="/hesabim"
@@ -389,7 +389,7 @@ export function MobilMenuPanel({
         <div className="site-mobil-menu-footer">
           <CtaLink veri={veri} className="site-mobil-menu-cta" />
           <div className="site-mobil-menu-alt flex flex-wrap items-center gap-3 text-sm font-medium">
-            <TemaToggle tema={veri.header.ikonlar?.tema} />
+            <TemaToggle tema={veri.header.ikonlar?.tema} tipEk={veri.tipEk} />
             {kullaniciAlaniGoster(veri.tipEk) && (
               <Link to="/hesabim" onClick={onMenuKapat} className="text-primary">
                 Hesabım

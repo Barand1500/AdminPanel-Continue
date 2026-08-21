@@ -1,5 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { formInputSinifi } from '@/components/form/FormAlani';
+import { AdminFlatIkon } from './AdminFlatIkon';
 
 export function AdminIstatistikKarti({
   etiket,
@@ -35,7 +36,7 @@ export function AdminSekmeler<T extends string>({
   aktif,
   onDegistir,
 }: {
-  sekmeler: { id: T; etiket: string; ikon?: string }[];
+  sekmeler: { id: T; etiket: string; ikon?: ReactNode }[];
   aktif: T;
   onDegistir: (id: T) => void;
 }) {
@@ -109,7 +110,7 @@ export function AdminAramaKutusu({
   return (
     <div className="ap-arama">
       <div className="ap-arama-input-wrap">
-        <span className="ap-arama-ikon">🔍</span>
+        <span className="ap-arama-ikon"><AdminFlatIkon ad="arama" boyut={16} /></span>
         <input
           type="search"
           value={deger}
@@ -127,7 +128,7 @@ export function AdminBosDurum({
   baslik,
   aciklama,
 }: {
-  ikon: string;
+  ikon: ReactNode;
   baslik: string;
   aciklama: string;
 }) {

@@ -1,4 +1,5 @@
 import { useSistemKesif } from '@/contexts/SistemKesifContext';
+import { IconSparkles } from '@tabler/icons-react';
 
 export function SistemKesifButonu() {
   const { modalAc, turAktif } = useSistemKesif();
@@ -12,7 +13,8 @@ export function SistemKesifButonu() {
       data-ap-kesif="kesif-buton"
     >
       <span className="ap-kesif-baslat-parilti" aria-hidden="true" />
-      ✨ Sistemi Keşfet
+      <IconSparkles size={16} stroke={1.9} aria-hidden />
+      Sistemi Keşfet
     </button>
   );
 }

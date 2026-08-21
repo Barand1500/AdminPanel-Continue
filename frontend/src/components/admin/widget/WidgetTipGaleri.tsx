@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
 import { AdminAramaKutusu } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
+import { WidgetTipIkonu } from './WidgetTipIkonu';
 import { GaleriKartAksiyonlar } from '@/components/admin/ortak/GaleriKartAksiyonlar';
 import { WidgetGaleriOnizleme } from './WidgetGaleriOnizleme';
 import { WidgetOnizlemeModal } from './WidgetOnizlemeModal';
@@ -141,7 +143,7 @@ export function WidgetTipGaleri({ tipFiltre, onSec }: WidgetTipGaleriProps) {
                 <WidgetGaleriOnizleme tip={tip.id} etiket={tip.etiket} />
                 <span className="ap-widget-galeri-ad-satir">
                   <span className="ap-widget-galeri-ad">
-                    <span aria-hidden>{tip.ikon}</span>
+                    <span aria-hidden><WidgetTipIkonu tip={tip.id} boyut={16} /></span>
                     {tip.etiket}
                   </span>
                   <GaleriKartAksiyonlar

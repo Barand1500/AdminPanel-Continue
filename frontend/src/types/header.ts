@@ -94,6 +94,10 @@ export interface HeaderTipEkAyarlari {
   ustBantKaydirincaGizleMobil?: boolean;
   /** false ise header sağındaki hesap / giriş ikonu gizlenir */
   kullaniciGoster?: boolean;
+  /** false ise masaüstünde gece/gündüz butonu gizlenir */
+  temaGosterPc?: boolean;
+  /** false ise mobilde gece/gündüz butonu gizlenir */
+  temaGosterMobil?: boolean;
   kompaktYukseklik?: 40 | 48 | 56;
   ctaMetni?: string;
   ctaLink?: string;

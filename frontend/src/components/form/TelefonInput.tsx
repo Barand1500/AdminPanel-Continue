@@ -18,12 +18,7 @@ export function TelefonInput({
 }: TelefonInputProps) {
   return (
     <FormAlani etiket={etiket} aciklama={aciklama}>
-      <UlkeKodluNumaraInput
-        deger={deger}
-        onChange={onChange}
-        placeholder={placeholder}
-        otomatikDoldur="tel-national"
-      />
+      <UlkeKodluNumaraInput deger={deger} onChange={onChange} placeholder={placeholder} otomatikDoldur="tel-national" />
     </FormAlani>
   );
 }

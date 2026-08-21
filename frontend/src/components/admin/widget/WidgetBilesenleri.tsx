@@ -2,6 +2,8 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
 import { widgetFormMockUygula } from '@/types/widget';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
+import { WidgetTipIkonu } from './WidgetTipIkonu';
 import {
   AdminAnahtarDugme,
   AdminAramaKutusu,
@@ -118,7 +120,7 @@ export function WidgetListesiPanel({
         className={`ap-liste-oge ap-form-liste-oge${seciliId === w.id ? ' ap-liste-oge-secili' : ''}`}
       >
         <span className="ap-form-liste-ikon" aria-hidden>
-          {tipIkon(w.tip)}
+          <WidgetTipIkonu tip={w.tip} />
         </span>
         <span className="min-w-0 flex-1">
           <span className="ap-liste-oge-baslik">{w.ad}</span>
@@ -201,9 +203,9 @@ export function WidgetListesiPanel({
       )}
       <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
         {widgetlar.length === 0 ? (
-          <AdminBosDurum ikon="🧩" baslik="Henüz widget yok" aciklama="Üstten Yeni Widget ile başlayın" />
+          <AdminBosDurum ikon={<AdminFlatIkon ad="puzzle" boyut={28} />} baslik="Henüz widget yok" aciklama="Üstten Yeni Widget ile başlayın" />
         ) : listeGorunumu.gruplar.length === 0 ? (
-          <AdminBosDurum ikon="🔎" baslik="Sonuç yok" aciklama="Filtreyi veya aramayı temizleyip tekrar deneyin" />
+          <AdminBosDurum ikon={<AdminFlatIkon ad="arama" boyut={28} />} baslik="Sonuç yok" aciklama="Filtreyi veya aramayı temizleyip tekrar deneyin" />
         ) : (
           listeGorunumu.gruplar.map(([grup, liste]) => (
             <div key={grup} className="mb-3">
@@ -415,7 +417,7 @@ export function WidgetEditorPanel({
               {IcerikPanel ? (
                 <IcerikPanel form={form} onChange={onChange} />
               ) : (
-                <AdminBosDurum ikon="📝" baslik="İçerik paneli yok" aciklama="Bu widget tipi için özel içerik editörü tanımlı değil." />
+                <AdminBosDurum ikon={<AdminFlatIkon ad="belge" boyut={28} />} baslik="İçerik paneli yok" aciklama="Bu widget tipi için özel içerik editörü tanımlı değil." />
               )}
             </>
           )}

@@ -2085,6 +2085,9 @@ html:has(.admin-panel[data-tema='acik']) body {
 .ap-bos-durum {
   padding: 2.5rem 1.5rem;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .ap-bos-ikon {
@@ -6474,6 +6477,15 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 .ap-widget-oniz-olcek-sarici {
   overflow: clip;
+}
+
+.ap-bos-ikon svg {
+  display: block;
+}
+
+.ap-hero-liste-kapak--bos,
+.ap-slider-liste-kapak--bos {
+  font-size: 0 !important;
 }
 
 .ap-widget-oniz-olcek {

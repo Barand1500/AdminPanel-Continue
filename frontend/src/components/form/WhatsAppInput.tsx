@@ -16,12 +16,7 @@ export function WhatsAppInput({
 }: WhatsAppInputProps) {
   return (
     <FormAlani etiket="WhatsApp" aciklama={aciklama}>
-      <UlkeKodluNumaraInput
-        deger={deger}
-        onChange={onChange}
-        placeholder={placeholder}
-        otomatikDoldur="tel-national"
-      />
+      <UlkeKodluNumaraInput deger={deger} onChange={onChange} placeholder={placeholder} otomatikDoldur="tel-national" />
     </FormAlani>
   );
 }

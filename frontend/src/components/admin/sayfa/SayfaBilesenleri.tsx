@@ -23,6 +23,7 @@ import type { AdminWidget } from '@/types/admin';
 import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
 import { IcerikHtmlEditoru } from '@/components/form/IcerikHtmlEditoru';
 import { SayfaIkonSecici } from '@/components/admin/sayfa/SayfaIkonSecici';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 import {
   AdminAnahtarDugme,
   AdminAramaKutusu,
@@ -313,7 +314,7 @@ export function SayfaListesiPanel({
       <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
         {filtreliAgac.length === 0 ? (
           <AdminBosDurum
-            ikon="📄"
+            ikon={<AdminFlatIkon ad="belge" boyut={28} />}
             baslik={arama ? 'Sonuç yok' : 'Henüz sayfa yok'}
             aciklama={arama ? 'Farklı bir arama deneyin' : 'Üstten Yeni Sayfa sekmesine geçerek başlayın'}
           />
@@ -377,14 +378,14 @@ export function SayfaEditorPanel({
     [sayfalar, form.sira, form.ustSayfaId, seciliId]
   );
 
-  const sekmeler = useMemo((): { id: EditorSekme; etiket: string; ikon: string }[] => {
-    const liste: { id: EditorSekme; etiket: string; ikon: string }[] = [
-      { id: 'icerik', etiket: 'İçerik', ikon: '📝' },
-      { id: 'seo', etiket: 'SEO', ikon: '🔍' },
-      { id: 'ayarlar', etiket: 'Ayarlar', ikon: '⚙️' },
+  const sekmeler = useMemo(() => {
+    const liste = [
+      { id: 'icerik' as const, etiket: 'İçerik', ikon: <AdminFlatIkon ad="belge" boyut={15} /> },
+      { id: 'seo' as const, etiket: 'SEO', ikon: <AdminFlatIkon ad="arama" boyut={15} /> },
+      { id: 'ayarlar' as const, etiket: 'Ayarlar', ikon: <AdminFlatIkon ad="ayarlar" boyut={15} /> },
     ];
     if (seciliId) {
-      liste.push({ id: 'alt-sayfa', etiket: `Alt Sayfalar${altSayi ? ` (${altSayi})` : ''}`, ikon: '📂' });
+      liste.push({ id: 'alt-sayfa', etiket: `Alt Sayfalar${altSayi ? ` (${altSayi})` : ''}`, ikon: <AdminFlatIkon ad="klasor" boyut={15} /> });
     }
     return liste;
   }, [seciliId, altSayi]);

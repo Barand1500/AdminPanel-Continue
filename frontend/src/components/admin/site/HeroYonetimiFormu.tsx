@@ -16,6 +16,8 @@ import {
   AdminFormBolumu,
   AdminPilSekme,
 } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
+import { SayfaIkonSecici } from '@/components/admin/sayfa/SayfaIkonSecici';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import {
   HERO_BUTON_AKSIYONLARI,
@@ -673,7 +675,7 @@ export function HeroYonetimiFormu() {
           <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
             {hero.sliderlar.length === 0 ? (
               <AdminBosDurum
-                ikon="🏠"
+                ikon={<AdminFlatIkon ad="hero" boyut={28} />}
                 baslik="Henüz slider yok"
                 aciklama="Üstten Yeni Slider ile başlayın"
               />
@@ -684,11 +686,17 @@ export function HeroYonetimiFormu() {
                   type="button"
                   className={`ap-liste-oge ap-hero-liste-oge${seciliSlideId === s.id ? ' ap-liste-oge-secili' : ''}`}
                   onClick={() => setSeciliSlideId(s.id)}
+                  onDoubleClick={() => {
+                    setSeciliSlideId(s.id);
+                    setGorunum('editor');
+                  }}
+                  title="Düzenlemek için çift tıklayın"
                 >
                   {s.gorselUrl ? (
                     <img src={medyaTamUrl(s.gorselUrl)} alt="" className="ap-hero-liste-kapak" />
                   ) : (
-                    <span className="ap-hero-liste-kapak ap-hero-liste-kapak--bos" aria-hidden>
+                    <span className="ap-hero-liste-kapak ap-hero-liste-kapak--bos text-[0px]" aria-hidden>
+                      <AdminFlatIkon ad="hero" boyut={20} />
                       🏠
                     </span>
                   )}
@@ -737,13 +745,7 @@ export function HeroYonetimiFormu() {
             <div className="ap-hero-kart-liste">
               {hero.kartlar.map((kart) => (
                 <div key={kart.id} className="ap-hero-kart-satir">
-                  <input
-                    className={`${formInputSinifi} ap-hero-kart-ikon`}
-                    value={kart.ikon}
-                    onChange={(e) => kartGuncelle(kart.id, { ikon: e.target.value })}
-                    title="İkon"
-                    maxLength={4}
-                  />
+                  <SayfaIkonSecici ikon={kart.ikon} onChange={(ikon) => kartGuncelle(kart.id, { ikon })} />
                   <input
                     className={formInputSinifi}
                     value={kart.baslik}

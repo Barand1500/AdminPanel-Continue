@@ -6,6 +6,7 @@ import {
   type FormKosul,
 } from '@/types/formYonetimi';
 import { FormAlani as FormAlaniBilesen, formInputSinifi } from '@/components/form/FormAlani';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 
 interface FormAlanlarSekmeProps {
   form: FormFormDegeri;
@@ -105,7 +106,7 @@ export function FormAlanlarSekme({ form, onChange }: FormAlanlarSekmeProps) {
 
       {form.alanlarJson.length === 0 ? (
         <div className="ap-form-bos-durum">
-          <p className="text-3xl">📋</p>
+          <p className="text-3xl"><AdminFlatIkon ad="belge" boyut={30} /></p>
           <p className="ap-heading mt-2 font-semibold">Henüz alan yok</p>
           <p className="ap-muted mt-1 text-sm">Şablon seçin veya boş alan ekleyin</p>
         </div>

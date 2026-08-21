@@ -40,7 +40,9 @@ export function WidgetOnizlemeModal({ acik, form, otomatikDoldur = false, onKapa
     if (!govde) return;
 
     function olc() {
-      const kutuGenislik = govde.clientWidth;
+      const kutu = govdeRef.current;
+      if (!kutu) return;
+      const kutuGenislik = kutu.clientWidth;
       setOlcek(kutuGenislik > 0 ? Math.min(1, kutuGenislik / ONIZLEME_TUVAL_GENISLIK) : 1);
     }
 

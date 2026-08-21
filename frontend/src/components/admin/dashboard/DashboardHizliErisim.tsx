@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { HizliErisimAyarlariModal } from '@/components/admin/ortak/HizliErisimAyarlariModal';
+import { AdminModulIkonu } from '@/components/admin/AdminModulIkonu';
 import type { AdminModul } from '@/types/admin';
 
 export function DashboardHizliErisim({
@@ -26,7 +27,7 @@ export function DashboardHizliErisim({
           {moduller.map((modul) => (
             <button key={modul.id} type="button" className="ap-home-modul" onClick={() => onModulAc(modul.id)}>
               <span className="ap-home-modul-ikon" aria-hidden>
-                {modul.ikon}
+                <AdminModulIkonu modulId={modul.id} boyut={21} />
               </span>
               <span className="ap-home-modul-ad">{modul.baslik}</span>
             </button>

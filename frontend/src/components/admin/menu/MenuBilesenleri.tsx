@@ -7,6 +7,7 @@ import {
   AdminBosDurum,
   AdminDurumEtiketi,
 } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 import { ustMenuOgeleriOlustur, pendingSayfaMi } from '@/utils/menuYardimci';
 import { sayfaYolunuBul } from '@/data/bosSiteVerisi';
 
@@ -93,7 +94,7 @@ export function MenuDuzenlemePanel({
   if (sirali.length === 0) {
     return (
       <AdminBosDurum
-        ikon="📋"
+        ikon={<AdminFlatIkon ad="menu" boyut={28} />}
         baslik="Menü için sayfa yok"
         aciklama="Önce Sayfalar modülünden sayfa oluşturun"
       />

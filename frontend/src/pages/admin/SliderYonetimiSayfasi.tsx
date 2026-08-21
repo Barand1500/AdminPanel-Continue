@@ -333,6 +333,10 @@ export function SliderYonetimiSayfasi() {
           sayfaAdlari={sayfaAdlari}
           seciliId={seciliSliderId}
           onSec={sliderSec}
+          onDuzenle={(slider) => {
+            sliderSec(slider);
+            setGorunum('editor');
+          }}
         />
       ) : (
         <SliderEditorPanel

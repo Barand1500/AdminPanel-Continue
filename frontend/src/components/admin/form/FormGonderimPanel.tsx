@@ -1,5 +1,6 @@
 import type { AdminForm, FormGonderim } from '@/features/admin/formApi';
 import { AdminBosDurum } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 import { formSelectSinifi } from '@/components/form/FormAlani';
 
 interface FormGonderimPanelProps {
@@ -56,13 +57,13 @@ export function FormGonderimPanel({
       <div className="ap-form-gonderim-icerik ap-scroll">
         {!seciliId ? (
           <AdminBosDurum
-            ikon="📬"
+            ikon={<AdminFlatIkon ad="gelen" boyut={28} />}
             baslik="Form seçilmedi"
             aciklama="Üstten bir form seçerek gelen başvuruları görün"
           />
         ) : gonderimler.length === 0 ? (
           <AdminBosDurum
-            ikon="📭"
+            ikon={<AdminFlatIkon ad="giden" boyut={28} />}
             baslik="Henüz gönderim yok"
             aciklama="Bu forma henüz ziyaretçi başvurusu gelmedi"
           />

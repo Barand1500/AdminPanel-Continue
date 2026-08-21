@@ -14,6 +14,7 @@ import {
   AdminFormBolumu,
   AdminSekmeler,
 } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 import { medyaTamUrl } from '@/features/admin/medyaApi';
 import type { AdminSayfa } from '@/features/admin/sayfaApi';
 import {
@@ -39,11 +40,13 @@ export function SliderListesiPanel({
   sayfaAdlari,
   seciliId,
   onSec,
+  onDuzenle,
 }: {
   sliderlar: KonumluSliderKayit[];
   sayfaAdlari: Map<string, string>;
   seciliId: string | null;
   onSec: (slider: KonumluSliderKayit) => void;
+  onDuzenle: (slider: KonumluSliderKayit) => void;
 }) {
   const [arama, setArama] = useState('');
   const [sayfaFiltre, setSayfaFiltre] = useState('hepsi');
@@ -108,7 +111,7 @@ export function SliderListesiPanel({
       <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
         {filtreli.length === 0 ? (
           <AdminBosDurum
-            ikon="🎠"
+            ikon={<AdminFlatIkon ad="slider" boyut={28} />}
             baslik={arama || sayfaFiltre !== 'hepsi' ? 'Sonuç yok' : 'Henüz banner yok'}
             aciklama={
               arama || sayfaFiltre !== 'hepsi'
@@ -130,11 +133,14 @@ export function SliderListesiPanel({
                     type="button"
                     className={`ap-liste-oge ap-slider-liste-oge${seciliId === s.id ? ' ap-liste-oge-secili' : ''}`}
                     onClick={() => onSec(s)}
+                    onDoubleClick={() => onDuzenle(s)}
+                    title="Düzenlemek için çift tıklayın"
                   >
                     {kapak ? (
                       <img src={medyaTamUrl(kapak)} alt="" className="ap-slider-liste-kapak" />
                     ) : (
-                      <span className="ap-slider-liste-kapak ap-slider-liste-kapak--bos" aria-hidden>
+                      <span className="ap-slider-liste-kapak ap-slider-liste-kapak--bos text-[0px]" aria-hidden>
+                        <AdminFlatIkon ad="slider" boyut={20} />
                         🎠
                       </span>
                     )}
@@ -213,9 +219,9 @@ export function SliderEditorPanel({
         aktif={sekme}
         onDegistir={setSekme}
         sekmeler={[
-          { id: 'slaytlar', etiket: 'Slaytlar', ikon: '🖼️' },
-          { id: 'konum', etiket: 'Konum', ikon: '📍' },
-          { id: 'gorunum', etiket: 'Görünüm', ikon: '🎛️' },
+          { id: 'slaytlar', etiket: 'Slaytlar', ikon: <AdminFlatIkon ad="galeri" boyut={15} /> },
+          { id: 'konum', etiket: 'Konum', ikon: <AdminFlatIkon ad="harita" boyut={15} /> },
+          { id: 'gorunum', etiket: 'Görünüm', ikon: <AdminFlatIkon ad="ayar" boyut={15} /> },
         ]}
       />
 
