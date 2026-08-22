@@ -79,7 +79,7 @@ export function KurumsalHeroWidget({ widget, onizleme }: KurumsalHeroWidgetProps
     ? 'clamp(22rem, 34vw, 29rem)'
     : gorunumTipi === 'vetahsilat-klasik'
       ? 'calc(100svh - 2rem)'
-      : '100svh';
+      : kh.gorunum.yukseklik;
 
   useEffect(() => {
     setAktif(0);

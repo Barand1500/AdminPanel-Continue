@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { AdminAramaKutusu } from '@/components/admin/ortak/AdminFormBilesenleri';
-import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 import { WidgetTipIkonu } from './WidgetTipIkonu';
 import { GaleriKartAksiyonlar } from '@/components/admin/ortak/GaleriKartAksiyonlar';
 import { WidgetGaleriOnizleme } from './WidgetGaleriOnizleme';

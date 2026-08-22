@@ -7,9 +7,9 @@ import { SiteOnizlemePaneli } from '@/components/admin/site/SiteOnizlemePaneli';
 
 const GALERI_KATEGORILER: { id: string; etiket: string; ids: HeaderTipi[] | null }[] = [
   { id: 'tumu', etiket: 'Tümü', ids: null },
-  { id: 'eticaret', etiket: 'E-ticaret', ids: ['klasik', 'arama-odakli', 'mega-menu', 'kompakt'] },
-  { id: 'kurumsal', etiket: 'Kurumsal', ids: ['kurumsal', 'imza-kurumsal', 'modern', 'masthead'] },
-  { id: 'minimal', etiket: 'Minimal', ids: ['sade', 'merkez-logo', 'seffaf-hero', 'yuzen-hap'] },
+  { id: 'eticaret', etiket: 'E-ticaret', ids: ['klasik', 'arama-odakli', 'mega-menu', 'kompakt', 'split'] },
+  { id: 'kurumsal', etiket: 'Kurumsal', ids: ['kurumsal', 'imza-kurumsal', 'modern', 'masthead', 'cta-serit'] },
+  { id: 'minimal', etiket: 'Minimal', ids: ['sade', 'merkez-logo', 'seffaf-hero', 'yuzen-hap', 'sosyal-sahne', 'kartlar'] },
 ];
 
 interface HeaderTipGaleriProps {
@@ -94,7 +94,7 @@ export function HeaderTipGaleri({ secili, onSec, siteAd, headerAyarlari, iletisi
                           tip="header"
                           kabuksuz
                           siteAd={siteAd}
-                          headerAyarlari={{ ...headerAyarlari, headerTipi: tip.id, markaMetni: siteAd || headerAyarlari.markaMetni }}
+                          headerAyarlari={{ ...headerAyarlari, headerTipi: tip.id }}
                           iletisim={iletisim}
                         />
                       </div>
@@ -132,7 +132,7 @@ export function HeaderTipGaleri({ secili, onSec, siteAd, headerAyarlari, iletisi
             tip="header"
             kabuksuz
             siteAd={siteAd}
-            headerAyarlari={{ ...headerAyarlari, headerTipi: onizlemeTip, markaMetni: siteAd || headerAyarlari.markaMetni }}
+            headerAyarlari={{ ...headerAyarlari, headerTipi: onizlemeTip }}
             iletisim={iletisim}
           />
         )}

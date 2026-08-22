@@ -21,7 +21,9 @@ import {
 import { HeaderIkon } from '../HeaderIkon';
 import { HeaderDilSecici } from '../HeaderDilSecici';
 import { SosyalMedyaIkonSatirlari } from '../SosyalMedyaIkon';
+import { KategoriMenu } from '../KategoriMenu';
 import { useSayfaKaydirildi } from './useSayfaKaydirildi';
+import { CizgiIkon } from '@/components/widget/CizgiIkonlari';
 
 interface HeaderLayoutProps {
   veri: HeaderVeri;
@@ -255,13 +257,13 @@ export function HeaderOverlayKurumsal({
             <div className="flex flex-wrap items-center gap-4">
               {ust?.telefonGoster !== false && telefon && (
                 <a href={`tel:${telefon.replace(/\s/g, '')}`} className="site-header-overlay-iletisim">
-                  <span aria-hidden>📞</span>
+                  <CizgiIkon deger="telefon" yedek="telefon" boyut={14} stroke={1.8} />
                   <span>{telefon}</span>
                 </a>
               )}
               {ust?.emailGoster !== false && email && (
                 <a href={`mailto:${email}`} className="site-header-overlay-iletisim">
-                  <span aria-hidden>✉️</span>
+                  <CizgiIkon deger="eposta" yedek="eposta" boyut={14} stroke={1.8} />
                   <span>{email}</span>
                 </a>
               )}
@@ -426,13 +428,13 @@ export function HeaderImzaKurumsal({
               <div className="flex flex-wrap items-center gap-4">
                 {ust?.telefonGoster !== false && telefon && (
                   <a href={`tel:${telefon.replace(/\s/g, '')}`} className="site-header-imza-iletisim">
-                    <span aria-hidden>📞</span>
+                    <CizgiIkon deger="telefon" yedek="telefon" boyut={14} stroke={1.8} />
                     <span>{telefon}</span>
                   </a>
                 )}
                 {ust?.emailGoster !== false && email && (
                   <a href={`mailto:${email}`} className="site-header-imza-iletisim">
-                    <span aria-hidden>✉️</span>
+                    <CizgiIkon deger="eposta" yedek="eposta" boyut={14} stroke={1.8} />
                     <span>{email}</span>
                   </a>
                 )}
@@ -541,6 +543,139 @@ export function HeaderMasthead({ veri, menuAcik, setMenuAcik }: HeaderLayoutProp
   );
 }
 
+/**
+ * Kategori, arama ve menuyu ayni satirda bir araya getiren magaza odakli duzen.
+ * Eski "Split" tipinin islevsel karsiligidir; kategori paneli mevcut kategori
+ * ayarlarini ve mega-menu tercihlerini kullanmaya devam eder.
+ */
+export function HeaderSplit({ veri, ayarlar, menuAcik, setMenuAcik }: HeaderLayoutProps) {
+  return (
+    <>
+      <UstBant veri={veri} ayarlar={ayarlar} />
+      <HeaderGovde veri={veri} className="site-header-varyant-split">
+        <div className="container-site flex min-h-16 items-center gap-3 py-2">
+          <div className="flex min-w-0 shrink-0 items-center gap-3">
+            <MarkaAlani veri={veri} className="max-w-[150px] xl:max-w-[190px]" />
+            {veri.kategoriMenuGoster && (
+              <KategoriMenu
+                baslikMetni={veri.kategoriBaslikMetni}
+                acilisModu={veri.header.kategori?.acilisModu}
+                kategoriler={veri.cevrilmisKategoriler}
+                mega={veri.varsayilanMenuStil.mega}
+                kolonSayisi={veri.varsayilanMenuStil.kolonSayisi}
+              />
+            )}
+          </div>
+          <div className="hidden min-w-[13rem] flex-1 lg:block xl:min-w-[17rem]">
+            <AramaAlani veri={veri} />
+          </div>
+          <DesktopMenu
+            menu={veri.cevrilmisMenu}
+            className="site-header-split-nav flex-[1.15] justify-center gap-3 xl:gap-5"
+          />
+          <div className="ml-auto shrink-0">
+            <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
+          </div>
+        </div>
+        <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
+      </HeaderGovde>
+    </>
+  );
+}
+
+/** Ustte tek bir mesaj/CTA seridi, altta sade kurumsal navigasyon. */
+export function HeaderCtaSerit({ veri, menuAcik, setMenuAcik }: HeaderLayoutProps) {
+  const mesaj = veri.tipEk.destekMetni?.trim() || veri.header.slogan?.trim();
+
+  return (
+    <HeaderGovde veri={veri} className="site-header-varyant-cta-serit">
+      <div className="site-header-cta-serit-bant">
+        <div className="container-site flex min-h-9 items-center justify-between gap-3 py-1.5">
+          {mesaj ? <p className="site-header-cta-serit-mesaj">{mesaj}</p> : <span />}
+          <CtaLink veri={veri} className="site-header-cta-serit-link hidden shrink-0 sm:inline-flex" />
+        </div>
+      </div>
+      <div className="container-site flex min-h-16 items-center justify-between gap-4 py-2">
+        <MarkaAlani veri={veri} className="max-w-[220px] shrink-0" />
+        <DesktopMenu
+          menu={veri.cevrilmisMenu}
+          className="site-header-cta-serit-nav flex-1 justify-center gap-5 xl:gap-7"
+          linkClassName="site-header-cta-serit-nav-link site-menu-nav-link"
+        />
+        <div className="flex shrink-0 items-center gap-1">
+          <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
+        </div>
+      </div>
+      <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
+    </HeaderGovde>
+  );
+}
+
+/** Merkezde marka, iki yanda sosyal kanallar ve aksiyonlar bulunan editoriyal duzen. */
+export function HeaderSosyalSahne({ veri, ayarlar, menuAcik, setMenuAcik }: HeaderLayoutProps) {
+  const destekMetni = veri.tipEk.destekMetni?.trim() || veri.header.slogan?.trim();
+
+  return (
+    <HeaderGovde veri={veri} className="site-header-varyant-sosyal-sahne">
+      <div className="container-site py-2">
+        <div className="grid min-h-14 grid-cols-[1fr_auto_1fr] items-center gap-3">
+          <div className="hidden min-w-0 items-center gap-3 lg:flex">
+            {ayarlar?.sosyalMedyaJson && (
+              <SosyalMedyaIkonSatirlari
+                sosyal={ayarlar.sosyalMedyaJson}
+                className="site-header-sosyal-sahne-ikonlar"
+                ikonSinifi="h-3.5 w-3.5"
+              />
+            )}
+            {destekMetni && <p className="site-header-sosyal-sahne-mesaj">{destekMetni}</p>}
+          </div>
+          <MarkaAlani veri={veri} className="site-header-sosyal-sahne-marka max-w-[180px] justify-self-center" />
+          <div className="ml-auto flex shrink-0 items-center gap-2">
+            <CtaLink veri={veri} className="site-header-sosyal-sahne-cta hidden sm:inline-flex" />
+            <IkonGrubu veri={veri} menuAcik={menuAcik} onMenuToggle={() => setMenuAcik((v) => !v)} />
+          </div>
+        </div>
+      </div>
+      <div className="site-header-sosyal-sahne-nav-sarmal">
+        <div className="container-site">
+          <DesktopMenu
+            menu={veri.cevrilmisMenu}
+            className="site-header-sosyal-sahne-nav justify-center gap-6 py-2.5"
+            linkClassName="site-header-sosyal-sahne-nav-link site-menu-nav-link"
+          />
+        </div>
+      </div>
+      <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
+    </HeaderGovde>
+  );
+}
+
+/** Menu ogelerini hafif kartlara donusturen, CTA ve aramayi ayni satirda tutan duzen. */
+export function HeaderKartlar({ veri, menuAcik, setMenuAcik }: HeaderLayoutProps) {
+  return (
+    <HeaderGovde veri={veri} className="site-header-varyant-kartlar">
+      <div className="container-site flex min-h-[4.5rem] items-center gap-3 py-2">
+        <MarkaAlani veri={veri} className="max-w-[180px] shrink-0" />
+        <DesktopMenu
+          menu={veri.cevrilmisMenu}
+          className="site-header-kartlar-nav flex-1 justify-center gap-1.5"
+          linkClassName="site-header-kartlar-nav-link site-menu-nav-link"
+        />
+        <div className="ml-auto flex shrink-0 items-center gap-1.5">
+          <AramaAlani veri={veri} className="site-header-kartlar-arama" />
+          <CtaLink veri={veri} className="site-header-kartlar-cta hidden xl:inline-flex" />
+          <IkonGrubu
+            veri={veri}
+            menuAcik={menuAcik}
+            onMenuToggle={() => setMenuAcik((v) => !v)}
+          />
+        </div>
+      </div>
+      <MobilMenuPanel veri={veri} menuAcik={menuAcik} onMenuKapat={() => setMenuAcik(false)} />
+    </HeaderGovde>
+  );
+}
+
 export function HeaderLayoutSec(props: HeaderLayoutProps) {
   switch (props.veri.headerTipi) {
     case 'sade':
@@ -559,6 +694,14 @@ export function HeaderLayoutSec(props: HeaderLayoutProps) {
       return <HeaderMegaMenu {...props} />;
     case 'seffaf-hero':
       return <HeaderSeffafHero {...props} />;
+    case 'split':
+      return <HeaderSplit {...props} />;
+    case 'cta-serit':
+      return <HeaderCtaSerit {...props} />;
+    case 'sosyal-sahne':
+      return <HeaderSosyalSahne {...props} />;
+    case 'kartlar':
+      return <HeaderKartlar {...props} />;
     case 'imza-kurumsal':
       return (
         <HeaderImzaKurumsal

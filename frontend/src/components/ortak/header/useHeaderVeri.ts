@@ -90,6 +90,8 @@ export function useHeaderVeri({ ayarlar, menuOgeleri, kategoriler, siteAdi }: Us
   const header = headerAyarlariBirlestir(ayarlar);
   const headerTipi = headerTipiNormalize(header.headerTipi);
   const tipEk = tipEkBirlestir(headerTipi, header.tipEk);
+  const logoUrl = headerLogoUrl(ayarlar);
+  const markaMetni = headerMarkaMetni(header);
   const menuStili = {
     mega: headerTipi === 'mega-menu',
     kolonSayisi: tipEk.megaMenuKolon ?? varsayilanMenuStil.kolonSayisi,
@@ -113,7 +115,11 @@ export function useHeaderVeri({ ayarlar, menuOgeleri, kategoriler, siteAdi }: Us
     kurlar: (header.kurlar ?? []).filter((k) => k.kod !== 'TRY').sort((a, b) => a.sira - b.sira),
     anaRenk: ayarlar?.anaRenk ?? '#7c3aed',
     ikincilRenk: ayarlar?.ikincilRenk ?? '#a78bfa',
-    logoUrl: headerLogoUrl(ayarlar),
-    markaMetni: headerMarkaMetni(header) || siteAdi?.trim() || '',
+    logoUrl,
+    // Yüklenmiş logo zaten markayı taşıyorsa, boş bırakılan "Marka metni"
+    // alanı site adını ikinci kez header'a eklememelidir. Metin özellikle
+    // girilmişse logo + metin düzeni korunur; logosuz sitelerde eski fallback
+    // (site adı / monogram) aynen çalışır.
+    markaMetni: markaMetni || (logoUrl ? '' : siteAdi?.trim() || ''),
   };
 }

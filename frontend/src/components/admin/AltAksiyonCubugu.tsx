@@ -129,7 +129,10 @@ function AltAksiyonCubuguGovde({
                         : 'ap-aksiyon-aktif'
               }`}
             >
-              <span className="ap-aksiyon-harf" data-etiket={etiket}>{etiket}</span>
+              <span className="ap-aksiyon-harf">
+                <span className="ap-aksiyon-harf-normal">{etiket}</span>
+                <span className="ap-aksiyon-harf-vurgu" aria-hidden>{etiket}</span>
+              </span>
             </button>
           );
         })}

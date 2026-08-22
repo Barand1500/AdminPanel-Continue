@@ -152,6 +152,11 @@ export function kurumsalHeroFormdanYerelWidget(
 
 /** API widget listesine yerel Kurumsal Hero kayitlarini birlestirir (yedek). */
 export function kurumsalHeroYerelWidgetlariBirlestir(widgetlar: AdminWidget[]): AdminWidget[] {
+  // Yerel taslaklar yalnızca açıkça etkinleştirilen geliştirme modunda
+  // kullanılmalı. Production'da tarayıcıdaki geçici kayıtların API verisini
+  // ezmesi, local ve sunucu görünümünün birbirinden kopmasına yol açıyordu.
+  if (!kurumsalHeroYerelMod()) return widgetlar;
+
   const apiKhHaric = widgetlar.filter((w) => w.tip !== 'KURUMSAL_HERO');
   const yerel = kurumsalHeroYerelWidgetlariGetir();
   if (yerel.length === 0) return widgetlar;
@@ -160,6 +165,8 @@ export function kurumsalHeroYerelWidgetlariBirlestir(widgetlar: AdminWidget[]): 
 
 /** Site verisine yerel Kurumsal Hero widgetlarini ekler (yedek). */
 export function kurumsalHeroYerelSiteWidgetlariBirlestir(widgetlar: Widget[]): Widget[] {
+  if (!kurumsalHeroYerelMod()) return widgetlar;
+
   const apiKhHaric = widgetlar.filter((w) => w.tip !== 'KURUMSAL_HERO');
   const yerel = kurumsalHeroYerelSiteWidgetlariGetir();
   if (yerel.length === 0) return widgetlar;

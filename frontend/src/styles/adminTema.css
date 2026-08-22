@@ -108,6 +108,8 @@ html:has(.admin-panel[data-tema='acik']) body {
 }
 
 .ap-aksiyon-btn {
+  --ap-aksiyon-metin-gecis-suresi: 0.65s;
+  --ap-aksiyon-metin-gecis-easing: cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   display: inline-flex;
   min-width: 2.75rem;
@@ -127,26 +129,32 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 .ap-aksiyon-harf {
   position: relative;
-  display: inline-block;
+  display: inline-grid;
   z-index: 1;
 }
 
-.ap-aksiyon-btn:not(:disabled):not(.ap-aksiyon-basari):not(.ap-aksiyon-hata) .ap-aksiyon-harf::after {
-  position: absolute;
-  inset: 0;
-  content: attr(data-etiket);
-  color: var(--ap-accent);
-  clip-path: inset(0 100% 0 0);
+.ap-aksiyon-harf-normal,
+.ap-aksiyon-harf-vurgu {
+  grid-area: 1 / 1;
   white-space: nowrap;
-  transition: clip-path 0.72s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: clip-path var(--ap-aksiyon-metin-gecis-suresi) var(--ap-aksiyon-metin-gecis-easing);
 }
 
-.ap-aksiyon-btn:not(:disabled):not(.ap-aksiyon-basari):not(.ap-aksiyon-hata):is(:hover, :focus-visible) .ap-aksiyon-harf::after {
+.ap-aksiyon-harf-normal {
   clip-path: inset(0);
 }
 
-.ap-aksiyon-btn:not(:disabled):not(.ap-aksiyon-basari):not(.ap-aksiyon-hata):is(:hover, :focus-visible) .ap-aksiyon-harf {
-  color: transparent;
+.ap-aksiyon-harf-vurgu {
+  color: var(--ap-accent);
+  clip-path: inset(0 100% 0 0);
+}
+
+.ap-aksiyon-btn:not(:disabled):not(.ap-aksiyon-basari):not(.ap-aksiyon-hata):is(:hover, :focus-visible) .ap-aksiyon-harf-normal {
+  clip-path: inset(0 0 0 100%);
+}
+
+.ap-aksiyon-btn:not(:disabled):not(.ap-aksiyon-basari):not(.ap-aksiyon-hata):is(:hover, :focus-visible) .ap-aksiyon-harf-vurgu {
+  clip-path: inset(0);
 }
 
 .ap-aksiyon-btn:focus-visible {
@@ -182,7 +190,8 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 @media (prefers-reduced-motion: reduce) {
   .ap-aksiyon-btn,
-  .ap-aksiyon-harf::after,
+  .ap-aksiyon-harf-normal,
+  .ap-aksiyon-harf-vurgu,
   .ap-aksiyon-basari,
   .ap-aksiyon-hata {
     animation: none;
@@ -5108,9 +5117,20 @@ html:has(.admin-panel[data-tema='acik']) body {
   background: var(--ap-hover);
 }
 
+.ap-hizli-erisim-modul-ikon,
+.ap-hizli-erisim-sira-ikon {
+  display: inline-flex;
+  flex: none;
+  color: var(--ap-text-muted);
+}
+
 .ap-hizli-erisim-secim-aktif {
   border-color: color-mix(in srgb, #8b5cf6 40%, var(--ap-border));
   background: color-mix(in srgb, #8b5cf6 8%, var(--ap-surface));
+}
+
+.ap-hizli-erisim-secim-aktif .ap-hizli-erisim-modul-ikon {
+  color: #8b5cf6;
 }
 
 .ap-hizli-erisim-tik {
@@ -10585,8 +10605,11 @@ html:has(.admin-panel[data-tema='acik']) body {
 }
 
 .admin-panel--kenarlik-neon .ap-alt-panel-link,
-.admin-panel--kenarlik-neon .ap-sekme-aktif,
-.admin-panel--kenarlik-neon .ap-aksiyon-btn:not(:disabled):hover .ap-aksiyon-harf {
+.admin-panel--kenarlik-neon .ap-sekme-aktif {
+  text-shadow: 0 0 10px color-mix(in srgb, var(--ap-accent) 85%, transparent);
+}
+
+.admin-panel--kenarlik-neon .ap-aksiyon-btn:not(:disabled):is(:hover, :focus-visible) .ap-aksiyon-harf-vurgu {
   text-shadow: 0 0 10px color-mix(in srgb, var(--ap-accent) 85%, transparent);
 }
 

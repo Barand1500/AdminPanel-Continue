@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { AdminModulIkonu } from '@/components/admin/AdminModulIkonu';
 import {
   VARSAYILAN_HIZLI_ERISIM,
   hizliErisimKategoriler,
@@ -134,7 +135,9 @@ export function HizliErisimAyarlariModal({ acik, onKapat }: HizliErisimAyarlariM
                               onChange={() => toggle(modul.id)}
                               className="sr-only"
                             />
-                            <span className="text-base">{modul.ikon}</span>
+                            <span className="ap-hizli-erisim-modul-ikon">
+                              <AdminModulIkonu modulId={modul.id} boyut={17} />
+                            </span>
                             <span className="min-w-0 flex-1 truncate text-sm font-medium">{modul.baslik}</span>
                             <span className="ap-hizli-erisim-tik">{aktif ? '✓' : ''}</span>
                           </label>
@@ -156,7 +159,9 @@ export function HizliErisimAyarlariModal({ acik, onKapat }: HizliErisimAyarlariM
                 <ul className="space-y-1.5">
                   {seciliModuller.map((modul, i) => (
                     <li key={modul.id} className="ap-hizli-erisim-sira-satir">
-                      <span className="text-sm">{modul.ikon}</span>
+                      <span className="ap-hizli-erisim-sira-ikon">
+                        <AdminModulIkonu modulId={modul.id} boyut={15} />
+                      </span>
                       <span className="min-w-0 flex-1 truncate text-xs font-medium">{modul.baslik}</span>
                       <div className="flex gap-0.5">
                         <button

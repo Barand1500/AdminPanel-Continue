@@ -928,6 +928,180 @@ body:has(.site-public)::-webkit-scrollbar,
   font-weight: 600;
 }
 
+/* Split: kategori, arama ve ana navigasyonun tek satirdaki magaza duzeni. */
+.site-header-varyant-split {
+  box-shadow: 0 1px 0 color-mix(in srgb, var(--color-border) 72%, transparent);
+}
+
+.site-header-split-nav .site-menu-nav-link,
+.site-header-split-nav .site-menu-dropdown-tetik {
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.site-header-varyant-split .input-search {
+  min-height: 2.65rem;
+  padding-top: 0.58rem;
+  padding-bottom: 0.58rem;
+}
+
+/* Cagri seridi: mesaj ve aksiyonu ayirirken header'in renk ayarlarini korur. */
+.site-header-varyant-cta-serit {
+  border-bottom-width: 1px;
+  box-shadow: none;
+}
+
+.site-header-cta-serit-bant {
+  border-bottom: 1px solid color-mix(in srgb, var(--color-primary) 14%, var(--color-border));
+  background: color-mix(in srgb, var(--color-primary) 7%, var(--color-surface-elevated));
+}
+
+.site-header--ozel-renk .site-header-cta-serit-bant {
+  border-bottom-color: color-mix(in srgb, var(--header-text, #fff) 16%, transparent);
+  background: color-mix(in srgb, var(--header-text, #fff) 10%, transparent);
+}
+
+.site-header-cta-serit-mesaj {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0.01em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.site-header-cta-serit-link {
+  min-height: 1.7rem;
+  padding: 0.32rem 0.7rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+}
+
+.site-header-cta-serit-nav-link,
+.site-header-cta-serit-nav .site-menu-dropdown-tetik {
+  font-size: 0.77rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+.site-header-cta-serit-nav-link[aria-current='page'],
+.site-header-cta-serit-nav .site-menu-dropdown-acik > .site-menu-dropdown-tetik,
+.site-header-cta-serit-nav .site-menu-dropdown:hover > .site-menu-dropdown-tetik {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary) !important;
+}
+
+/* Sosyal Sahne: marka merkezde, sosyal kanallar ve menu ince cizgilerle ayrilir. */
+.site-header-varyant-sosyal-sahne {
+  border-bottom: 0;
+  box-shadow: none;
+}
+
+.site-header-sosyal-sahne-marka {
+  text-align: center;
+}
+
+.site-header-sosyal-sahne-ikonlar.site-sosyal-medya-satir {
+  flex-wrap: nowrap;
+  gap: 0.35rem;
+}
+
+.site-header-sosyal-sahne-ikonlar .site-sosyal-medya-link {
+  width: 1.55rem;
+  height: 1.55rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 78%, transparent);
+  border-radius: 999px;
+  color: var(--color-text-muted);
+}
+
+.site-header-sosyal-sahne-mesaj {
+  min-width: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--color-text-muted);
+  font-size: 0.7rem;
+  letter-spacing: 0.04em;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.site-header-sosyal-sahne-cta {
+  padding-inline: 0.85rem;
+  font-size: 0.7rem;
+}
+
+.site-header-sosyal-sahne-nav-sarmal {
+  border-top: 1px solid color-mix(in srgb, var(--color-border) 74%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--color-border) 74%, transparent);
+}
+
+.site-header-sosyal-sahne-nav-link,
+.site-header-sosyal-sahne-nav .site-menu-dropdown-tetik {
+  min-height: 1.35rem;
+  padding-bottom: 0;
+  border-bottom-width: 1px;
+  color: var(--color-text-muted) !important;
+  font-size: 0.68rem;
+  font-weight: 750;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.site-header-sosyal-sahne-nav-link:hover,
+.site-header-sosyal-sahne-nav-link[aria-current='page'],
+.site-header-sosyal-sahne-nav .site-menu-dropdown-acik > .site-menu-dropdown-tetik,
+.site-header-sosyal-sahne-nav .site-menu-dropdown:hover > .site-menu-dropdown-tetik {
+  border-bottom-color: var(--color-primary);
+  color: var(--color-primary) !important;
+}
+
+/* Kartlar: menu ogeleri hafif, birbirinden ayrik kartlar olarak okunur. */
+.site-header-varyant-kartlar {
+  border-bottom: 0;
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--color-text) 5%, transparent);
+}
+
+.site-header-kartlar-nav-link,
+.site-header-kartlar-nav .site-menu-dropdown-tetik {
+  min-height: 2.15rem;
+  padding: 0.42rem 0.62rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
+  border-radius: 0.58rem;
+  background: color-mix(in srgb, var(--color-surface-elevated) 72%, var(--color-primary) 2%);
+  color: var(--header-text, var(--color-text-muted)) !important;
+  font-size: 0.72rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.site-header-kartlar-nav-link:hover,
+.site-header-kartlar-nav-link[aria-current='page'],
+.site-header-kartlar-nav .site-menu-dropdown-acik > .site-menu-dropdown-tetik,
+.site-header-kartlar-nav .site-menu-dropdown:hover > .site-menu-dropdown-tetik {
+  border-color: color-mix(in srgb, var(--color-primary) 45%, var(--color-border));
+  background: color-mix(in srgb, var(--color-primary) 11%, var(--color-surface-elevated));
+  color: var(--color-primary) !important;
+}
+
+.site-header-kartlar-arama .site-header-arama-ikon {
+  width: 2.15rem;
+  height: 2.15rem;
+  border: 1px solid color-mix(in srgb, var(--color-border) 82%, transparent);
+  border-radius: 0.58rem;
+  background: color-mix(in srgb, var(--color-surface-elevated) 72%, var(--color-primary) 2%);
+}
+
+.site-header-kartlar-cta {
+  min-height: 2.15rem;
+  padding-inline: 0.75rem;
+  font-size: 0.7rem;
+}
+
 .site-header-kurumsal,
 .site-header-varyant-kurumsal {
   border-bottom-width: 2px;
@@ -13286,13 +13460,13 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 
 .gek-onecikan-urun-gezinme button:hover {
-  border-color: var(--gek-urun-vurgu);
-  background: var(--gek-urun-vurgu);
-  color: #fff;
+  border-color: #94a3b8;
+  background: #f8fafc;
+  color: #334155;
 }
 
 .gek-onecikan-urun-gezinme button:focus-visible {
-  outline: 3px solid var(--gek-urun-vurgu);
+  outline: 3px solid #64748b;
   outline-offset: 3px;
 }
 

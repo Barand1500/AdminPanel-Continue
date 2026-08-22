@@ -38,6 +38,7 @@ export function KisayolAyarlariSayfasi() {
 
   useEffect(() => {
     if (!dinlenen) return;
+    const islem = dinlenen;
 
     function tusDinle(e: KeyboardEvent) {
       e.preventDefault();
@@ -46,7 +47,6 @@ export function KisayolAyarlariSayfasi() {
       const kombinasyon = tusKombinasyonuYakala(e);
       if (!kombinasyon || ['Ctrl', 'Alt', 'Shift'].includes(kombinasyon)) return;
 
-      const islem = dinlenen;
       const cakisma = kisayolCakismaBul(harita, islem, kombinasyon);
       if (cakisma) {
         const digerIslem = KISAYOL_ISLEMLERI.find((item) => item.id === cakisma);

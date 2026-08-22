@@ -13,6 +13,7 @@ import { siteLogoUrl } from '@/types/logo';
 import { whatsappFormatla } from '@/utils/telefonFormat';
 import { aktifMagazaBadgeleri, FooterMagazaBadgeGoster } from '@/components/ortak/FooterMagazaBadge';
 import { metinCevir } from '@/utils/menuYardimci';
+import { CizgiIkon } from '@/components/widget/CizgiIkonlari';
 
 export function kurDegeri(k: ParaBirimiKaydi): string {
   if (k.kod === 'TRY') return '1,0000';
@@ -57,14 +58,14 @@ export function FooterMarka({
         <ul className="mt-5 space-y-3 text-sm" style={{ color: 'var(--color-footer-text)' }}>
           {footer.marka.adresGoster && ayarlar?.adres && (
             <li className="flex gap-2">
-              <span className="text-primary">{ikonlar.adres}</span>
+              <span className="inline-flex shrink-0 items-center text-primary"><CizgiIkon deger={ikonlar.adres} yedek="konum" boyut={17} /></span>
               <span>{ayarlar.adres}</span>
             </li>
           )}
           {footer.marka.emailGoster && ayarlar?.email && (
             <li>
               <a href={`mailto:${ayarlar.email}`} className="site-footer-link flex gap-2">
-                <span className="text-primary">{ikonlar.email}</span>
+                <span className="inline-flex shrink-0 items-center text-primary"><CizgiIkon deger={ikonlar.email} yedek="eposta" boyut={17} /></span>
                 {ayarlar.email}
               </a>
             </li>
@@ -72,7 +73,7 @@ export function FooterMarka({
           {footer.marka.telefonGoster && ayarlar?.telefon && (
             <li>
               <a href={`tel:${ayarlar.telefon.replace(/\s/g, '')}`} className="site-footer-link flex gap-2">
-                <span className="text-primary">{ikonlar.telefon}</span>
+                <span className="inline-flex shrink-0 items-center text-primary"><CizgiIkon deger={ikonlar.telefon} yedek="telefon" boyut={17} /></span>
                 {ayarlar.telefon}
               </a>
             </li>
@@ -85,25 +86,25 @@ export function FooterMarka({
                 rel="noreferrer"
                 className="site-footer-link flex gap-2"
               >
-                <span className="text-green-600">{ikonlar.whatsapp}</span>
+                <span className="inline-flex shrink-0 items-center text-green-600"><CizgiIkon deger="whatsapp" yedek="whatsapp" boyut={17} /></span>
                 {whatsappFormatla(ayarlar.whatsapp)}
               </a>
             </li>
           )}
           {banka.aktif && banka.ad && (
-            <li>
+            <li className={banka.link ? undefined : 'flex gap-2'}>
               {banka.link ? (
                 <FooterNavLink
                   link={{ id: 'banka', ad: banka.ad, link: banka.link, yeniSekme: false, aktif: true, sira: 0 }}
-                  ikon={banka.ikon}
+                  ikon={<CizgiIkon deger={banka.ikon} yedek="kurumsal" boyut={17} />}
                   className="site-footer-link flex gap-2"
                   cevir={cevir}
                 />
               ) : (
-                <span className="flex gap-2">
-                  <span className="text-primary">{banka.ikon}</span>
-                  {metinCevir(cevir, banka.ad)}
-                </span>
+                <>
+                  <span className="inline-flex shrink-0 items-center text-primary"><CizgiIkon deger={banka.ikon} yedek="kurumsal" boyut={17} /></span>
+                  <span>{metinCevir(cevir, banka.ad)}</span>
+                </>
               )}
             </li>
           )}

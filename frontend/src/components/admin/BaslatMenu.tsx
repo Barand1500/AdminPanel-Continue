@@ -39,6 +39,7 @@ export function BaslatMenu({ acik, onKapat, onModulSec, baslatButonRef, onProfil
   const menuRef = useRef<HTMLDivElement>(null);
   const [dockStil, setDockStil] = useState<CSSProperties>();
   const [tasarim, setTasarim] = useState(() => sekmeAyarlariOku().baslatMenuTasarim);
+  const [seciliKategori, setSeciliKategori] = useState(() => adminKategoriler[0] ?? '');
   const dockAktif = Boolean(baslatButonRef);
 
   useLayoutEffect(() => {
@@ -79,6 +80,8 @@ export function BaslatMenu({ acik, onKapat, onModulSec, baslatButonRef, onProfil
           onKapat={onKapat}
           onModulSec={onModulSec}
           onProfilAc={onProfilAc}
+          seciliKategori={seciliKategori}
+          onKategoriSec={setSeciliKategori}
         />
       ) : (
         <KlasikBaslatMenu
@@ -103,6 +106,11 @@ interface MenuIcerikProps {
   onKapat: () => void;
   onModulSec: (modul: AdminModul) => void;
   onProfilAc?: () => void;
+}
+
+interface ModernBaslatMenuProps extends MenuIcerikProps {
+  seciliKategori: string;
+  onKategoriSec: (kategori: string) => void;
 }
 
 function KlasikBaslatMenu({ menuRef, dockStil, kenarlikAnim, onKapat, onModulSec }: MenuIcerikProps) {
@@ -140,9 +148,8 @@ function KlasikBaslatMenu({ menuRef, dockStil, kenarlikAnim, onKapat, onModulSec
   );
 }
 
-function ModernBaslatMenu({ menuRef, dockStil, kenarlikAnim, onKapat, onModulSec, onProfilAc }: MenuIcerikProps) {
+function ModernBaslatMenu({ menuRef, dockStil, kenarlikAnim, onKapat, onModulSec, onProfilAc, seciliKategori, onKategoriSec }: ModernBaslatMenuProps) {
   const [arama, setArama] = useState('');
-  const [seciliKategori, setSeciliKategori] = useState(adminKategoriler[0] ?? '');
   const [sadeceFavoriler, setSadeceFavoriler] = useState(false);
   const [modernAyar, setModernAyar] = useState(() => sekmeAyarlariOku());
   const { t } = usePanelDil();
@@ -206,7 +213,7 @@ function ModernBaslatMenu({ menuRef, dockStil, kenarlikAnim, onKapat, onModulSec
                   const aktif = seciliKategori === kategori;
                   const adet = aktifHavuz.filter((modul) => modul.kategori === kategori).length;
                   return (
-                    <button key={kategori} type="button" className={`ap-baslat-modern-kategori-kutu ${aktif ? 'ap-baslat-modern-kategori-kutu-aktif' : ''}`} onClick={() => setSeciliKategori(kategori)} aria-pressed={aktif}>
+                    <button key={kategori} type="button" className={`ap-baslat-modern-kategori-kutu ${aktif ? 'ap-baslat-modern-kategori-kutu-aktif' : ''}`} onClick={() => onKategoriSec(kategori)} aria-pressed={aktif}>
                       <span className="ap-baslat-modern-kategori-kutu-ikon"><Ikon size={16} stroke={1.8} /></span>
                       <span className="ap-baslat-modern-kategori-kutu-ad">{t(`kategori.${kategori}`, kategori)}</span>
                       <span className="ap-baslat-modern-kategori-kutu-sayi">{adet}</span>

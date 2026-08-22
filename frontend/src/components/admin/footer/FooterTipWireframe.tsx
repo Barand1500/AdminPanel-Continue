@@ -115,6 +115,72 @@ export function FooterTipWireframe({ tip }: { tip: FooterTipi }) {
         <div className={`h-0.5 w-full ${muted}`} />
       </div>
     ),
+    split: (
+      <div className="grid grid-cols-[0.85fr_1.15fr] overflow-hidden rounded bg-[#0f172a]">
+        <div className="space-y-1 bg-[var(--ap-accent)]/75 p-2">
+          <div className="h-2 w-7 rounded-sm bg-white/85" />
+          <div className="h-0.5 w-full rounded-sm bg-white/45" />
+          <div className="h-0.5 w-4/5 rounded-sm bg-white/30" />
+        </div>
+        <div className="grid grid-cols-3 gap-1 p-2">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="space-y-0.5">
+              <div className="h-1 w-4 rounded-sm bg-white/75" />
+              <div className="h-0.5 w-full rounded-sm bg-white/30" />
+              <div className="h-0.5 w-4/5 rounded-sm bg-white/20" />
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
+    'cta-serit': (
+      <div className="space-y-1 p-2">
+        <div className="flex items-center justify-between gap-1 rounded bg-[var(--ap-accent)]/80 p-1.5">
+          <div className="space-y-0.5">
+            <div className="h-1 w-10 rounded-sm bg-white/85" />
+            <div className="h-0.5 w-7 rounded-sm bg-white/45" />
+          </div>
+          <div className="h-2 w-7 rounded-sm bg-white/85" />
+        </div>
+        <div className="flex items-center justify-center gap-1">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className={`h-0.5 w-4 ${line}`} />
+          ))}
+        </div>
+        <div className={`h-px w-full ${muted}`} />
+      </div>
+    ),
+    'sosyal-sahne': (
+      <div className="flex flex-col items-center gap-1 rounded bg-[#111] p-2">
+        <div className="h-0.5 w-8 rounded-sm bg-white/35" />
+        <div className="flex gap-1">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-3 w-3 rounded-full bg-[var(--ap-accent)]/80" />
+          ))}
+        </div>
+        <div className="h-1.5 w-10 rounded-sm bg-white/80" />
+        <div className="flex gap-0.5">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="h-0.5 w-4 rounded-sm bg-white/30" />
+          ))}
+        </div>
+      </div>
+    ),
+    kartlar: (
+      <div className="grid grid-cols-4 gap-1 p-2">
+        <div className="space-y-1 rounded border border-[var(--ap-border)] bg-[var(--ap-surface)] p-1">
+          <div className={`h-2.5 w-full ${bar}`} />
+          <div className={`h-0.5 w-4/5 ${line}`} />
+        </div>
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="space-y-0.5 rounded border border-[var(--ap-border)] bg-[var(--ap-surface)] p-1">
+            <div className={`h-1 w-4 ${bar}`} />
+            <div className={`h-0.5 w-full ${line}`} />
+            <div className={`h-0.5 w-3/4 ${muted}`} />
+          </div>
+        ))}
+      </div>
+    ),
     'split-vitrin': (
       <div className="grid grid-cols-2 gap-1 p-2">
         <div className="space-y-1">

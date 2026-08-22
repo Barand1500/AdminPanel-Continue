@@ -135,7 +135,7 @@ const IKON_KELIMELERI: Array<{ anahtarlar: string[]; ikon: CizgiIkonYedegi }> = 
   { anahtarlar: ['yildiz', 'yıldız', 'star', '⭐'], ikon: 'yildiz' },
   { anahtarlar: ['guvenlik', 'güvenlik', 'kalkan', 'shield', 'security', '🛡️', '🔒'], ikon: 'guvenlik' },
   { anahtarlar: ['kod', 'code', 'yazilim', 'yazılım', 'developer', '💻'], ikon: 'kod' },
-  { anahtarlar: ['kurumsal', 'sirket', 'şirket', 'bina', 'building', '🏢'], ikon: 'kurumsal' },
+  { anahtarlar: ['kurumsal', 'sirket', 'şirket', 'bina', 'building', 'banka', 'bank', '🏢', '🏦'], ikon: 'kurumsal' },
 ];
 
 /** Saklanan anahtarı çözer; eski serbest metin/emoji kayıtları için anahtar sözcük eşlemesi de yapar. */

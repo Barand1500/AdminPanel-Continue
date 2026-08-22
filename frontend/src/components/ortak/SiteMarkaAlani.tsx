@@ -117,7 +117,7 @@ export function SiteMarkaAlani({
   return (
     <Link
       to={to}
-      className={`flex min-w-0 max-w-full shrink-0 items-center gap-2 overflow-hidden ${className}`}
+      className={`site-marka-alani flex min-w-0 max-w-full shrink-0 items-center gap-2 overflow-hidden ${className}`}
     >
       {icerik}
     </Link>

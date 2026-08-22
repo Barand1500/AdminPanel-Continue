@@ -78,7 +78,13 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
           />
         </>
       )}
-      {(tip === 'sade' || tip === 'kompakt' || tip === 'arama-odakli' || tip === 'imza-kurumsal' || tip === 'yuzen-hap') && (
+      {(tip === 'sade' ||
+        tip === 'kompakt' ||
+        tip === 'arama-odakli' ||
+        tip === 'imza-kurumsal' ||
+        tip === 'yuzen-hap' ||
+        tip === 'split' ||
+        tip === 'kartlar') && (
         <>
           <AdminAnahtarDugme
             etiket="Arama kutusu"
@@ -129,7 +135,13 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
         </FormAlani>
       )}
 
-      {(tip === 'modern' || tip === 'kurumsal' || tip === 'imza-kurumsal' || tip === 'yuzen-hap') && (
+      {(tip === 'modern' ||
+        tip === 'kurumsal' ||
+        tip === 'imza-kurumsal' ||
+        tip === 'yuzen-hap' ||
+        tip === 'cta-serit' ||
+        tip === 'sosyal-sahne' ||
+        tip === 'kartlar') && (
         <div className="ap-header-form-grid">
           <FormAlani etiket={tip === 'imza-kurumsal' || tip === 'kurumsal' ? 'Katalog buton metni' : 'Buton metni'}>
             <input
@@ -182,13 +194,31 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
         </>
       )}
 
-      {(tip === 'kurumsal' || tip === 'masthead') && (
-        <FormAlani etiket={tip === 'masthead' ? 'Üst satır metni' : 'Destek metni'}>
+      {(tip === 'kurumsal' || tip === 'masthead' || tip === 'cta-serit' || tip === 'sosyal-sahne') && (
+        <FormAlani
+          etiket={
+            tip === 'masthead'
+              ? 'Üst satır metni'
+              : tip === 'cta-serit'
+                ? 'Duyuru metni'
+                : tip === 'sosyal-sahne'
+                  ? 'Kısa mesaj'
+                  : 'Destek metni'
+          }
+        >
           <input
             className={formInputSinifi}
             value={tipEk.destekMetni ?? ''}
             onChange={(e) => guncelle({ destekMetni: e.target.value })}
-            placeholder={tip === 'masthead' ? '17 Ağustos 2026 · Pazartesi' : '7/24 destek hattı'}
+            placeholder={
+              tip === 'masthead'
+                ? '17 Ağustos 2026 · Pazartesi'
+                : tip === 'cta-serit'
+                  ? 'Yeni koleksiyon ve özel teklifleri keşfedin'
+                  : tip === 'sosyal-sahne'
+                    ? 'Fikirleri görünür deneyimlere dönüştürüyoruz'
+                    : '7/24 destek hattı'
+            }
           />
         </FormAlani>
       )}
@@ -233,7 +263,9 @@ export function HeaderTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: HeaderTipEk
         tip !== 'arama-odakli' &&
         tip !== 'imza-kurumsal' &&
         tip !== 'modern' &&
-        tip !== 'yuzen-hap' && (
+        tip !== 'yuzen-hap' &&
+        tip !== 'split' &&
+        tip !== 'kartlar' && (
           <AdminAnahtarDugme
             etiket="Hesap ikonu"
             acik={tipEk.kullaniciGoster !== false}

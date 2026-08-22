@@ -1,10 +1,11 @@
 import { Link } from 'react-router-dom';
+import type { ReactNode } from 'react';
 import { anchorLinkMi, hariciLinkMi, metinCevir } from '@/utils/menuYardimci';
 import type { FooterLink } from '@/types/footer';
 
 interface FooterNavLinkProps {
   link: FooterLink;
-  ikon: string | null;
+  ikon: ReactNode;
   className?: string;
   cevir?: (anahtar: string, varsayilan?: string) => string;
 }

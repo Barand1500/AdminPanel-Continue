@@ -13,6 +13,7 @@ import { MenuDropdown } from '../MenuDropdown';
 import { SiteMarkaAlani } from '../SiteMarkaAlani';
 import { HeaderDilSecici } from '../HeaderDilSecici';
 import { SosyalMedyaIkonSatirlari } from '../SosyalMedyaIkon';
+import { CizgiIkon } from '@/components/widget/CizgiIkonlari';
 
 export function MenuOgeGoster({
   oge,
@@ -71,13 +72,15 @@ export function UstBant({ veri, ayarlar }: { veri: HeaderVeri; ayarlar?: SiteAya
         <p className="max-w-xl opacity-95">{veri.header.slogan}</p>
         <div className="flex flex-wrap items-center gap-4 text-[11px] sm:text-xs">
           {ustBant.telefonGoster && ayarlar?.telefon && (
-            <a href={`tel:${ayarlar.telefon.replace(/\s/g, '')}`} className="opacity-90 hover:opacity-100">
-              📞 {ayarlar.telefon}
+            <a href={`tel:${ayarlar.telefon.replace(/\s/g, '')}`} className="inline-flex items-center gap-1.5 opacity-90 hover:opacity-100">
+              <CizgiIkon deger="telefon" yedek="telefon" boyut={14} stroke={1.8} />
+              <span>{ayarlar.telefon}</span>
             </a>
           )}
           {ustBant.emailGoster && ayarlar?.email && (
-            <a href={`mailto:${ayarlar.email}`} className="opacity-90 hover:opacity-100">
-              ✉️ {ayarlar.email}
+            <a href={`mailto:${ayarlar.email}`} className="inline-flex items-center gap-1.5 opacity-90 hover:opacity-100">
+              <CizgiIkon deger="eposta" yedek="eposta" boyut={14} stroke={1.8} />
+              <span>{ayarlar.email}</span>
             </a>
           )}
           {ustBant.sosyalGoster && ayarlar?.sosyalMedyaJson && (

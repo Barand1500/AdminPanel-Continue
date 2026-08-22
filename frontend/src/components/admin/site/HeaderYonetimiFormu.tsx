@@ -455,7 +455,7 @@ export function HeaderYonetimiFormu() {
         acik={onizlemeAcik}
         demoMod={false}
         siteAd={siteAd}
-        headerAyarlari={{ ...birlesikHeader, markaMetni: siteAd || birlesikHeader.markaMetni }}
+        headerAyarlari={birlesikHeader}
         iletisim={{ telefon: ayarlar.telefon, email: ayarlar.email }}
         onKapat={onizlemeyiKapat}
       />

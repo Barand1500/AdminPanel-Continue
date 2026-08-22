@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import type { AltMenuGorunum, AltMenuTetikleyici, SayfaAcilisModu } from '@/types/site';
 import { SayfaMenuOnizleme } from '@/components/admin/sayfa/SayfaMenuOnizleme';
 
@@ -379,7 +379,7 @@ export function SayfaEditorPanel({
   );
 
   const sekmeler = useMemo(() => {
-    const liste = [
+    const liste: { id: EditorSekme; etiket: string; ikon: ReactNode }[] = [
       { id: 'icerik' as const, etiket: 'İçerik', ikon: <AdminFlatIkon ad="belge" boyut={15} /> },
       { id: 'seo' as const, etiket: 'SEO', ikon: <AdminFlatIkon ad="arama" boyut={15} /> },
       { id: 'ayarlar' as const, etiket: 'Ayarlar', ikon: <AdminFlatIkon ad="ayarlar" boyut={15} /> },

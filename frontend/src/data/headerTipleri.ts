@@ -10,7 +10,11 @@ export const HEADER_TIPLERI = [
   'kurumsal',
   'mega-menu',
   'seffaf-hero',
+  'split',
   'imza-kurumsal',
+  'cta-serit',
+  'sosyal-sahne',
+  'kartlar',
   'yuzen-hap',
   'masthead',
 ] as const;
@@ -119,12 +123,53 @@ export const HEADER_TIP_TANIMLARI: HeaderTipTanimi[] = [
     ekAyarlari: true,
   },
   {
+    id: 'split',
+    ad: 'Split',
+    aciklama:
+      'Solda logo ve kategori, sağda geniş arama ile ikonlar. E-ticaret gezinmesini tek satırda toplayan düzen.',
+    ilham: 'IKEA',
+    ustBant: true,
+    kategoriArama: true,
+    ekAyarlari: true,
+  },
+  {
     id: 'imza-kurumsal',
     ad: 'İmza Kurumsal',
     aciklama:
       'Üstte iletişim bandı, altında ikonlu menü, katalog butonu ve arama. Kurumsal imza görünümü.',
     ilham: 'Kurumsal site',
     ustBant: true,
+    kategoriArama: false,
+    ekAyarlari: true,
+  },
+  {
+    id: 'cta-serit',
+    ad: 'Çağrı Şeridi',
+    aciklama:
+      'Üstte kampanya veya duyuru şeridi, altında sade kurumsal menü. Tek bir aksiyonu öne çıkarmak için tasarlandı.',
+    ilham: 'Webflow',
+    // Bu tip kendi duyuru şeridini render eder; genel iletişim bandını kullanmaz.
+    ustBant: false,
+    kategoriArama: false,
+    ekAyarlari: true,
+  },
+  {
+    id: 'sosyal-sahne',
+    ad: 'Sosyal Sahne',
+    aciklama:
+      'Marka ortada, sosyal bağlantılar ve iletişim aksiyonu yanlarda. Stüdyo, ajans ve yaratıcı ekipler için dengeli görünüm.',
+    ilham: 'Awwwards',
+    ustBant: false,
+    kategoriArama: false,
+    ekAyarlari: true,
+  },
+  {
+    id: 'kartlar',
+    ad: 'Kartlar',
+    aciklama:
+      'Menü bağlantıları ayrı kartlar gibi görünür; logo, arama ve çağrı butonu aynı hizada kalır. Modern ürün vitrinleri için.',
+    ilham: 'Notion',
+    ustBant: false,
     kategoriArama: false,
     ekAyarlari: true,
   },
@@ -151,7 +196,6 @@ export const HEADER_TIP_TANIMLARI: HeaderTipTanimi[] = [
 ];
 
 export function headerTipiNormalize(tip?: string | null): HeaderTipi {
-  if (tip === 'split') return 'imza-kurumsal';
   if (tip && HEADER_TIPLERI.includes(tip as HeaderTipi)) return tip as HeaderTipi;
   return 'klasik';
 }
@@ -187,6 +231,14 @@ export function varsayilanTipEk(tip: HeaderTipi): HeaderTipEkAyarlari {
     case 'kompakt': return { ...ortak, kompaktYukseklik: 40, aramaModu: 'ikon' };
     case 'modern': return { ...ortak, ctaMetni: 'İletişim', ctaLink: '/iletisim', aramaGoster: false };
     case 'seffaf-hero': return { ...ortak, seffafBaslangic: true, aramaModu: 'ikon', ctaMetni: 'Sipariş Ver', ctaLink: '/siparis' };
+    case 'split':
+      return { ...ortak, aramaGoster: true, aramaModu: 'tam', ikinciLogoUrl: null };
+    case 'cta-serit':
+      return { ...ortak, aramaGoster: false, ctaMetni: 'Teklif Al', ctaLink: '/iletisim' };
+    case 'sosyal-sahne':
+      return { ...ortak, aramaGoster: false, ctaMetni: 'Bize Ulaşın', ctaLink: '/iletisim' };
+    case 'kartlar':
+      return { ...ortak, aramaGoster: true, aramaModu: 'ikon', ctaMetni: 'Başla', ctaLink: '/iletisim' };
     case 'yuzen-hap':
       return { ...ortak, aramaModu: 'ikon', aramaGoster: true, ctaMetni: 'Başla', ctaLink: '/iletisim' };
     case 'masthead':

@@ -141,7 +141,10 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
     try {
       if (seciliId) {
         const guncel = await widgetGuncelle(seciliId, kayitDegeri);
-        setWidgetlar((onceki) => onceki.map((w) => (w.id === guncel.id ? guncel : w)));
+        // Yerel Kurumsal Hero ilk kayıtta sunucuya aktarılınca ID değişir.
+        // Güncel kaydı eski seçili ID üzerinden değiştirip seçimi yeni ID'ye taşırız.
+        setWidgetlar((onceki) => onceki.map((w) => (w.id === seciliId ? guncel : w)));
+        setSeciliId(guncel.id);
         setForm(widgettenForma(guncel));
         setBasari('Widget güncellendi.');
       } else {

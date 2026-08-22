@@ -9,11 +9,13 @@ import {
 import { AKTIF_WIDGET_TIPLERI, DEPRECATED_WIDGET_TIPLERI } from '@/types/widget';
 import { tipEtiketi } from '@/components/admin/widget/widgetRegistry';
 import {
+  KURUMSAL_HERO_YEREL_ID_ONEKI,
   kurumsalHeroFormdanYerelWidget,
   kurumsalHeroYerelGuncelle,
   kurumsalHeroYerelIdMi,
   kurumsalHeroYerelKayitId,
   kurumsalHeroYerelKayitVarMi,
+  kurumsalHeroYerelMod,
   kurumsalHeroYerelOlustur,
   kurumsalHeroYerelSil,
   kurumsalHeroYerelWidgetlariBirlestir,
@@ -157,7 +159,7 @@ export async function widgetOlustur(form: WidgetFormDegeri): Promise<AdminWidget
   });
   const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widget?: AdminWidget }>(yanit);
   if (!yanit.ok) {
-    if (form.tip === 'KURUMSAL_HERO') {
+    if (form.tip === 'KURUMSAL_HERO' && kurumsalHeroYerelMod()) {
       return kurumsalHeroYerelKaydet(form, payload);
     }
     throw new Error(apiHataMesaji(veri, 'Widget olusturulamadi'));
@@ -170,7 +172,39 @@ export async function widgetGuncelle(id: string, form: WidgetFormDegeri): Promis
   const apiPayload = apiPayloadHazirla(form, true);
 
   if (kurumsalHeroYerelIdMi(id)) {
-    return kurumsalHeroYerelGuncelle(id, kurumsalHeroFormdanYerelWidget(form, payload, id));
+    // Eski geliştirme kayıtları "Kaydet" dendiğinde önce API'ye aktarılır.
+    // Bağlantı yoksa yalnızca açık geliştirme modunda yerelde kalırlar.
+    const eskiSunucuId = id.slice(KURUMSAL_HERO_YEREL_ID_ONEKI.length);
+    const eskiSunucuKaydiVar = /^\d{1,10}$/.test(eskiSunucuId);
+    const aktar = async (method: 'POST' | 'PUT', url: string) => {
+      const yanit = await fetch(url, {
+        method,
+        headers: authHeaders(),
+        body: JSON.stringify(apiPayload),
+      });
+      const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widget?: AdminWidget }>(yanit);
+      return { yanit, veri };
+    };
+
+    let { yanit, veri } = await aktar(
+      eskiSunucuKaydiVar ? 'PUT' : 'POST',
+      eskiSunucuKaydiVar ? `${API_URL}/admin/widgetlar/${eskiSunucuId}` : `${API_URL}/admin/widgetlar`,
+    );
+
+    // Yerel kayıt silinmiş eski bir sunucu ID'sinden türediyorsa yeni kayıt
+    // oluşturup aktarımı tamamlarız.
+    if (!yanit.ok && eskiSunucuKaydiVar && yanit.status === 404) {
+      ({ yanit, veri } = await aktar('POST', `${API_URL}/admin/widgetlar`));
+    }
+
+    if (yanit.ok) {
+      kurumsalHeroYerelSil(id);
+      return adminWidgetApiNormalize(veri.widget as AdminWidget);
+    }
+    if (form.tip === 'KURUMSAL_HERO' && kurumsalHeroYerelMod()) {
+      return kurumsalHeroYerelGuncelle(id, kurumsalHeroFormdanYerelWidget(form, payload, id));
+    }
+    throw new Error(apiHataMesaji(veri, 'Kurumsal Hero sunucuya aktarılamadı'));
   }
 
   const yanit = await fetch(`${API_URL}/admin/widgetlar/${id}`, {
@@ -180,7 +214,7 @@ export async function widgetGuncelle(id: string, form: WidgetFormDegeri): Promis
   });
   const veri = await jsonYanitOku<{ mesaj?: string; hatalar?: Record<string, string[] | undefined>; widget?: AdminWidget }>(yanit);
   if (!yanit.ok) {
-    if (form.tip === 'KURUMSAL_HERO') {
+    if (form.tip === 'KURUMSAL_HERO' && kurumsalHeroYerelMod()) {
       return kurumsalHeroYerelKaydet(form, payload, id);
     }
     throw new Error(apiHataMesaji(veri, 'Widget guncellenemedi'));
