@@ -2,6 +2,7 @@ import {
   IconAdjustments, IconBox, IconCode, IconDatabase, IconFileText, IconFolder, IconHome, IconInbox,
   IconLayoutDashboard, IconLink, IconMapPin, IconMessage, IconPhoto, IconPuzzle, IconRobot,
   IconSearch, IconSend, IconSettings, IconShield, IconSlideshow, IconTool, IconUpload, IconWorld, IconMouse, IconLanguage,
+  IconDeviceFloppy, IconPlus, IconTrash, IconRefresh, IconClipboardList,
 } from '@tabler/icons-react';
 
 const IKONLAR = {
@@ -11,6 +12,7 @@ const IKONLAR = {
   puzzle: IconPuzzle, robot: IconRobot, slider: IconSlideshow, arama: IconSearch,
   araclar: IconTool, ayar: IconAdjustments, guvenlik: IconShield, veri: IconDatabase, web: IconWorld,
   kod: IconCode, fare: IconMouse, dil: IconLanguage,
+  kaydet: IconDeviceFloppy, ekle: IconPlus, sil: IconTrash, guncelle: IconRefresh, liste: IconClipboardList,
 };
 
 export type AdminFlatIkonAdi = keyof typeof IKONLAR;

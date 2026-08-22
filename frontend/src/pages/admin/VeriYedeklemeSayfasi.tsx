@@ -1,6 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useYedekleme } from '@/hooks/useYedekleme';
 import { adminYedekApi } from '@/features/admin/adminSistemApi';
+import { sistemAyarlariGetir, sistemAyarlariGuncelle } from '@/features/admin/sistemAyarlariApi';
+import { bosSistemForm, sistemdenForm, type SistemAyarlariForm } from '@/types/sistemAyarlari';
+import { DurumAnahtari } from '@/components/admin/sistem/SistemSekmeCubugu';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 
 function tarihFormat(iso: string) {
   return new Date(iso).toLocaleString('tr-TR', {
@@ -23,6 +27,10 @@ export function VeriYedeklemeSayfasi() {
   const [seciliDosya, setSeciliDosya] = useState<File | null>(null);
   const [indiriliyor, setIndiriliyor] = useState(false);
   const [yukleniyorGeri, setYukleniyorGeri] = useState(false);
+  const [ayarlar, setAyarlar] = useState<SistemAyarlariForm>(bosSistemForm);
+  const [ayarlarYukleniyor, setAyarlarYukleniyor] = useState(true);
+  const [ayarKaydediliyor, setAyarKaydediliyor] = useState(false);
+  const [ayarMesaji, setAyarMesaji] = useState('');
 
   useEffect(() => {
     if (varsayilanDosyaAdi) {
@@ -30,6 +38,39 @@ export function VeriYedeklemeSayfasi() {
       setGeriDosyaAdi(varsayilanDosyaAdi);
     }
   }, [varsayilanDosyaAdi]);
+
+  useEffect(() => {
+    void (async () => {
+      try {
+        const veri = await sistemAyarlariGetir();
+        setAyarlar(sistemdenForm(veri.site, veri.sistem));
+      } catch {
+        setAyarMesaji('Otomatik yedekleme ayarları yüklenemedi.');
+      } finally {
+        setAyarlarYukleniyor(false);
+      }
+    })();
+  }, []);
+
+  const ayarlariKaydet = useCallback(async (guncel: SistemAyarlariForm) => {
+    setAyarKaydediliyor(true);
+    setAyarMesaji('');
+    try {
+      const veri = await sistemAyarlariGuncelle(guncel);
+      setAyarlar(sistemdenForm(veri.site, { ...guncel, ...veri.sistem }));
+      setAyarMesaji('Otomatik yedekleme ayarları kaydedildi.');
+    } catch (err) {
+      setAyarMesaji(err instanceof Error ? err.message : 'Ayarlar kaydedilemedi.');
+    } finally {
+      setAyarKaydediliyor(false);
+    }
+  }, []);
+
+  function otomatikYedeklemeDegistir(acik: boolean) {
+    const guncel = { ...ayarlar, otomatikYedekleme: acik };
+    setAyarlar(guncel);
+    void ayarlariKaydet(guncel);
+  }
 
   async function indirHandler() {
     setIndiriliyor(true);
@@ -93,6 +134,35 @@ export function VeriYedeklemeSayfasi() {
         </div>
       )}
 
+      <section className="ap-card space-y-4 rounded-xl border p-5">
+        <div className="flex items-start gap-3">
+          <span className="ap-sistem-toggle-ikon"><AdminFlatIkon ad="veri" boyut={18} /></span>
+          <div>
+            <h2 className="ap-heading text-lg font-semibold">Otomatik Yedekleme</h2>
+            <p className="ap-muted mt-1 text-sm">Belirlediğiniz aralıkla site verisinin JSON yedeğini oluşturur.</p>
+          </div>
+        </div>
+        {ayarlarYukleniyor ? <p className="ap-muted text-sm">Ayarlar yükleniyor...</p> : <>
+          <DurumAnahtari
+            etiket="Otomatik yedekleme"
+            aciklama="Belirlediğiniz aralıkla düzenli yedek oluştur"
+            acik={ayarlar.otomatikYedekleme}
+            onChange={otomatikYedeklemeDegistir}
+            renk="mavi"
+            ikon={<AdminFlatIkon ad="veri" boyut={18} />}
+            devreDisi={ayarKaydediliyor}
+          />
+          {ayarlar.otomatikYedekleme && <label className="block max-w-xs">
+            <span className="ap-heading mb-1 block text-sm font-semibold">Yedekleme aralığı (gün)</span>
+            <input type="number" min={1} max={30} disabled={ayarKaydediliyor} value={ayarlar.otomatikYedeklemeGun}
+              onChange={(e) => setAyarlar({ ...ayarlar, otomatikYedeklemeGun: Number(e.target.value) || 7 })}
+              onBlur={() => void ayarlariKaydet(ayarlar)}
+              className="ap-input w-full rounded border px-3 py-2 text-sm outline-none focus:border-[var(--ap-accent)]" />
+          </label>}
+          {ayarMesaji && <p className="ap-muted text-xs">{ayarMesaji}</p>}
+        </>}
+      </section>
+
       <div className="grid gap-6 lg:grid-cols-2">
         <section className="ap-card space-y-4 rounded-xl border p-5">
           <div>
@@ -116,7 +186,7 @@ export function VeriYedeklemeSayfasi() {
             type="button"
             disabled={indiriliyor || yukleniyor}
             onClick={() => void indirHandler()}
-            className="rounded bg-emerald-600 px-4 py-2 text-sm font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
+            className="rounded bg-[var(--ap-accent)] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
           >
             {indiriliyor ? 'İndiriliyor...' : 'JSON İndir'}
           </button>
@@ -157,7 +227,7 @@ export function VeriYedeklemeSayfasi() {
             type="button"
             disabled={yukleniyorGeri || !seciliDosya}
             onClick={() => void geriYukleHandler()}
-            className="rounded bg-amber-600 px-4 py-2 text-sm font-medium text-white hover:bg-amber-500 disabled:opacity-50"
+            className="rounded bg-[var(--ap-accent)] px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
           >
             {yukleniyorGeri ? 'Yükleniyor...' : 'Geri Yükle'}
           </button>

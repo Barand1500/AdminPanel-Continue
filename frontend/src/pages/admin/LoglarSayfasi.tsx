@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
 import { adminLogApi, type AdminLogKayit } from '@/features/admin/adminSistemApi';
+import { AdminFlatIkon, type AdminFlatIkonAdi } from '@/components/admin/ortak/AdminFlatIkon';
 import {
   logAramaEslesir,
   logGoreliZaman,
   logIslemEtiket,
-  logIslemIkon,
   logIslemSinif,
   logIslemTuruBul,
   logKullaniciAdi,
@@ -17,6 +17,10 @@ import {
   loglariGrupla,
   type LogIslemTuru,
 } from '@/utils/logYardimci';
+
+const LOG_IKONLARI: Record<LogIslemTuru, AdminFlatIkonAdi> = {
+  kaydet: 'kaydet', ekle: 'ekle', sil: 'sil', guncelle: 'guncelle', diger: 'liste',
+};
 
 const ISLEM_FILTRELERI: { id: LogIslemTuru | 'tumu'; ad: string }[] = [
   { id: 'tumu', ad: 'Tümü' },
@@ -143,9 +147,7 @@ export function LoglarSayfasi() {
         <section className="ap-card ap-log-filtre-kart rounded-xl border p-4">
           <div className="grid gap-3 lg:grid-cols-[1fr_auto_auto]">
             <div className="ap-log-arama-wrap">
-              <span className="ap-log-arama-ikon" aria-hidden>
-                ⌕
-              </span>
+              <span className="ap-log-arama-ikon" aria-hidden><AdminFlatIkon ad="arama" boyut={16} /></span>
               <input
                 type="search"
                 value={arama}
@@ -193,9 +195,7 @@ export function LoglarSayfasi() {
           </div>
         ) : filtrelenmis.length === 0 ? (
           <div className="ap-log-bos-durum ap-log-bos-durum-tam ap-card rounded-xl border">
-            <span className="text-4xl" aria-hidden>
-              📜
-            </span>
+            <span className="ap-log-bos-ikon" aria-hidden><AdminFlatIkon ad="belge" boyut={32} /></span>
             <p className="ap-heading mt-3 font-medium">
               {loglar.length === 0 ? 'Henüz log kaydı yok' : 'Filtreye uygun kayıt bulunamadı'}
             </p>
@@ -234,7 +234,7 @@ function LogKayitSatiri({ log }: { log: AdminLogKayit }) {
   return (
     <article className="ap-log-kayit">
       <div className={`ap-log-kayit-ikon ${logIslemSinif(tur)}`} aria-hidden>
-        {logIslemIkon(tur)}
+        <AdminFlatIkon ad={LOG_IKONLARI[tur]} boyut={20} />
       </div>
 
       <div className="ap-log-kayit-govde">

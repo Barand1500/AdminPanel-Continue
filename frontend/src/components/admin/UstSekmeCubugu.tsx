@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState, useCallback, type DragEvent, type MouseEvent } from 'react';
-import type { AdminModul, AdminSekme } from '@/types/admin';
+import type { AdminSekme } from '@/types/admin';
 import {
   sekmeAyarlariOku,
   type SekmePanelAyarlari,
 } from '@/utils/sekmePanelAyarlari';
-import { SekmeCubuguArama } from './SekmeCubuguArama';
 import { AnimasyonluKenarlik } from './AnimasyonluKenarlik';
 import { AdminModulIkonu } from './AdminModulIkonu';
 
@@ -13,11 +12,11 @@ interface UstSekmeCubuguProps {
   aktifSekmeId: string;
   onSekmeSec: (id: string) => void;
   onSekmeKapat: (id: string) => void;
+  onSekmeleriKapat: (idleri: string[]) => void;
   onSekmeTasi: (kaynakId: string, hedefId: string, mod: 'once' | 'sonra') => void;
   onSekmeBirlestir: (kaynakId: string, hedefId: string) => void;
   sekmeAyarlari?: SekmePanelAyarlari;
   onSekmeAyir?: (sekmeId: string) => void;
-  onModulSec?: (modul: AdminModul) => void;
   baslatMenuAcik?: boolean;
 }
 
@@ -72,6 +71,7 @@ function SekmeButonu({
   kenarlikAnimKey,
   onSekmeSec,
   onSekmeKapat,
+  onSekmeBaglamMenu,
   sekmelerUzunluk,
   onDragStart,
   onDragOver,
@@ -94,6 +94,7 @@ function SekmeButonu({
   kenarlikAnimKey: number;
   onSekmeSec: (id: string) => void;
   onSekmeKapat: (id: string) => void;
+  onSekmeBaglamMenu: (event: MouseEvent, id: string) => void;
   sekmelerUzunluk: number;
   onDragStart: (e: DragEvent, id: string) => void;
   onDragOver: (e: DragEvent, id: string) => void;
@@ -127,6 +128,7 @@ function SekmeButonu({
       onMouseDown={(e) => onPointerDown(e, sekme.id)}
       onMouseMove={onPointerMove}
       onMouseUp={onPointerUp}
+      onContextMenu={(e) => onSekmeBaglamMenu(e, sekme.id)}
       title={hoverOnizleme ? sekme.baslik : undefined}
       className={`ap-sekme-tab group relative flex max-w-[200px] shrink-0 cursor-grab items-center rounded-t-md border border-b-0 active:cursor-grabbing ${kareYerlesim ? 'aspect-square !max-w-none !rounded-md border' : ''} ${
         gruplu ? 'rounded-none first:rounded-tl-md last:rounded-tr-md' : ''
@@ -192,11 +194,11 @@ export function UstSekmeCubugu({
   aktifSekmeId,
   onSekmeSec,
   onSekmeKapat,
+  onSekmeleriKapat,
   onSekmeTasi,
   onSekmeBirlestir,
   sekmeAyarlari: disAyarlari,
   onSekmeAyir,
-  onModulSec,
   baslatMenuAcik = false,
 }: UstSekmeCubuguProps) {
   const [ayarlar, setAyarlar] = useState<SekmePanelAyarlari>(() => disAyarlari ?? sekmeAyarlariOku());
@@ -206,6 +208,7 @@ export function UstSekmeCubugu({
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollTrackRef = useRef<HTMLDivElement>(null);
   const [kenarlikAnimKey, setKenarlikAnimKey] = useState(0);
+  const [baglamMenu, setBaglamMenu] = useState<{ x: number; y: number; sekmeId: string } | null>(null);
   const surukleBaslangic = useRef<{ x: number; y: number; id: string } | null>(null);
 
   useEffect(() => {
@@ -247,6 +250,12 @@ export function UstSekmeCubugu({
     return () => alan.removeEventListener('wheel', tekerlekKaydir);
   }, [ogeler]);
 
+  useEffect(() => {
+    const kapat = () => setBaglamMenu(null);
+    window.addEventListener('pointerdown', kapat);
+    return () => window.removeEventListener('pointerdown', kapat);
+  }, []);
+
   function onDragStart(e: DragEvent, id: string) {
     setSurukleniyor(id);
     e.dataTransfer.effectAllowed = 'move';
@@ -269,6 +278,25 @@ export function UstSekmeCubugu({
 
   function onPointerUp() {
     surukleBaslangic.current = null;
+  }
+
+  function sekmeBaglamMenuAc(e: MouseEvent, sekmeId: string) {
+    e.preventDefault();
+    e.stopPropagation();
+    setBaglamMenu({ x: e.clientX, y: e.clientY, sekmeId });
+  }
+
+  function baglamIslem(islem: 'tek' | 'digerleri' | 'sol' | 'sag' | 'tumu') {
+    if (!baglamMenu) return;
+    const index = sekmeler.findIndex((sekme) => sekme.id === baglamMenu.sekmeId);
+    if (index < 0) return;
+    const idler = islem === 'tek' ? [baglamMenu.sekmeId]
+      : islem === 'digerleri' ? sekmeler.filter((_, i) => i !== index).map((sekme) => sekme.id)
+      : islem === 'sol' ? sekmeler.slice(0, index).map((sekme) => sekme.id)
+      : islem === 'sag' ? sekmeler.slice(index + 1).map((sekme) => sekme.id)
+      : sekmeler.map((sekme) => sekme.id);
+    if (idler.length) onSekmeleriKapat(idler);
+    setBaglamMenu(null);
   }
 
   function onDragOver(e: DragEvent, hedefId: string) {
@@ -321,6 +349,7 @@ export function UstSekmeCubugu({
     kenarlikAnimKey,
     onSekmeSec: sekmeSecAnim,
     onSekmeKapat,
+    onSekmeBaglamMenu: sekmeBaglamMenuAc,
     sekmelerUzunluk: sekmeler.length,
     onDragStart,
     onDragOver,
@@ -333,6 +362,7 @@ export function UstSekmeCubugu({
 
   return (
     <div className="ap-sekme-scroll-wrap" style={tabCss} data-ap-kesif="sekme-cubugu">
+      <button type="button" className="ap-sekme-gezin" aria-label="Önceki sekmelere git" onClick={() => scrollRef.current?.scrollBy({ left: -220, behavior: 'smooth' })}>‹</button>
       <div ref={scrollTrackRef} className="ap-sekme-scroll-rail">
         <div ref={scrollRef} className="ap-sekme-scroll ap-sekme-scroll--ortada">
           {ogeler.map((oge) => {
@@ -366,10 +396,14 @@ export function UstSekmeCubugu({
           })}
         </div>
       </div>
-
-      {ayarlar.sekmeAramaAktif && onModulSec && (
-        <SekmeCubuguArama gorunum={ayarlar.sekmeAramaGorunum} onModulSec={onModulSec} />
-      )}
+      <button type="button" className="ap-sekme-gezin" aria-label="Sonraki sekmelere git" onClick={() => scrollRef.current?.scrollBy({ left: 220, behavior: 'smooth' })}>›</button>
+      {baglamMenu && <div className="ap-sekme-baglam-menu" style={{ left: baglamMenu.x, top: baglamMenu.y }} onPointerDown={(e) => e.stopPropagation()}>
+        <button type="button" onClick={() => baglamIslem('tek')}>Sekmeyi Kapat</button>
+        <button type="button" onClick={() => baglamIslem('digerleri')}>Diğerlerini Kapat</button>
+        <button type="button" onClick={() => baglamIslem('sol')}>Solundakileri Kapat</button>
+        <button type="button" onClick={() => baglamIslem('sag')}>Sağındakileri Kapat</button>
+        <button type="button" onClick={() => baglamIslem('tumu')}>Tümünü Kapat</button>
+      </div>}
     </div>
   );
 }

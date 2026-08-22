@@ -12,6 +12,7 @@ import {
 } from '@tabler/icons-react';
 import { modulAra, adminKategoriler, adminModulleri } from '@/data/adminMenuYapisi';
 import { usePanelDil } from '@/contexts/PanelDilContext';
+import { useAuth } from '@/contexts/AuthContext';
 import type { AdminModul } from '@/types/admin';
 import { BaslatMenuArama } from './BaslatMenuArama';
 import { BaslatMenuKenarlikAnimasyon } from './BaslatMenuKenarlikAnimasyon';
@@ -145,6 +146,7 @@ function ModernBaslatMenu({ menuRef, dockStil, kenarlikAnim, onKapat, onModulSec
   const [sadeceFavoriler, setSadeceFavoriler] = useState(false);
   const [modernAyar, setModernAyar] = useState(() => sekmeAyarlariOku());
   const { t } = usePanelDil();
+  const { kullanici } = useAuth();
 
   useEffect(() => {
     const guncelle = () => setModernAyar(sekmeAyarlariOku());
@@ -153,11 +155,12 @@ function ModernBaslatMenu({ menuRef, dockStil, kenarlikAnim, onKapat, onModulSec
   }, []);
 
   const gorunurModuller = adminModulleri;
-  const sonuc = arama ? modulAra(arama) : [];
-  const seciliModuller = gorunurModuller.filter((modul) => modul.kategori === seciliKategori);
+  const favoriIds = kullanici?.tercihler?.dashboardHizliErisim ?? [];
+  const aktifHavuz = sadeceFavoriler ? gorunurModuller.filter((modul) => favoriIds.includes(modul.id)) : gorunurModuller;
+  const sonuc = arama ? modulAra(arama).filter((modul) => !sadeceFavoriler || favoriIds.includes(modul.id)) : [];
+  const seciliModuller = sadeceFavoriler ? aktifHavuz : aktifHavuz.filter((modul) => modul.kategori === seciliKategori);
   const liste = arama ? sonuc : seciliModuller;
   const tamEkran = modernAyar.baslatMenuKutuBoyutu === 'buyuk';
-  const ayarlarModulu = adminModulleri.find((modul) => modul.id === 'ayarlar');
 
   return (
     <div
@@ -176,11 +179,6 @@ function ModernBaslatMenu({ menuRef, dockStil, kenarlikAnim, onKapat, onModulSec
             <button type="button" className={`ap-baslat-modern-favori ${sadeceFavoriler ? 'ap-baslat-modern-favori--aktif' : ''}`} onClick={() => setSadeceFavoriler((onceki) => !onceki)} aria-label="Favorileri göster">
               <IconStar size={15} fill={sadeceFavoriler ? 'currentColor' : 'none'} />
             </button>
-            {ayarlarModulu && (
-              <button type="button" className="ap-baslat-modern-favori" onClick={() => { onModulSec(ayarlarModulu); onKapat(); }} aria-label="Ayarları aç">
-                <IconSettings size={15} />
-              </button>
-            )}
             <button type="button" className="ap-baslat-modern-profil" onClick={() => { onProfilAc?.(); onKapat(); }} aria-label="Profil">
               <IconUser size={15} />
             </button>
@@ -206,7 +204,7 @@ function ModernBaslatMenu({ menuRef, dockStil, kenarlikAnim, onKapat, onModulSec
                 {adminKategoriler.map((kategori) => {
                   const Ikon = KATEGORI_FLAT_IKONLARI[kategori as keyof typeof KATEGORI_FLAT_IKONLARI] ?? IconApps;
                   const aktif = seciliKategori === kategori;
-                  const adet = gorunurModuller.filter((modul) => modul.kategori === kategori).length;
+                  const adet = aktifHavuz.filter((modul) => modul.kategori === kategori).length;
                   return (
                     <button key={kategori} type="button" className={`ap-baslat-modern-kategori-kutu ${aktif ? 'ap-baslat-modern-kategori-kutu-aktif' : ''}`} onClick={() => setSeciliKategori(kategori)} aria-pressed={aktif}>
                       <span className="ap-baslat-modern-kategori-kutu-ikon"><Ikon size={16} stroke={1.8} /></span>
@@ -218,6 +216,7 @@ function ModernBaslatMenu({ menuRef, dockStil, kenarlikAnim, onKapat, onModulSec
               </div>
             </aside>
             <div className="ap-baslat-modern-modul-sutun ap-scroll flex min-w-0 flex-1 flex-col overflow-y-auto">
+              {sadeceFavoriler && liste.length > 0 && <ModernModulGrid moduller={liste} onSec={(modul) => { onModulSec(modul); onKapat(); }} />}
               <p className="ap-baslat-modern-sutun-baslik">{t(`kategori.${seciliKategori}`, seciliKategori)}<span className="ap-baslat-modern-sayi">{liste.length}</span></p>
               {sadeceFavoriler ? <p className="ap-baslat-modern-bos">Henüz favori yok.</p> : <ModernModulGrid moduller={liste} onSec={(modul) => { onModulSec(modul); onKapat(); }} />}
             </div>

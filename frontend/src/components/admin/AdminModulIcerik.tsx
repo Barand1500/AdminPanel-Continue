@@ -18,6 +18,7 @@ import { RollerSayfasi } from '@/pages/admin/RollerSayfasi';
 import { SekmeYonetimiSayfasi } from '@/pages/admin/SekmeYonetimiSayfasi';
 import { KategoriYonetimiSayfasi } from '@/pages/admin/KategoriYonetimiSayfasi';
 import { KisayolAyarlariSayfasi } from '@/pages/admin/KisayolAyarlariSayfasi';
+import { YapilacaklarSayfasi } from '@/pages/admin/YapilacaklarSayfasi';
 import { ModulKabuk } from '@/contexts/ModulKabukContext';
 
 interface AdminModulIcerikProps {
@@ -75,6 +76,8 @@ function AdminModulGovde({ modulId, onModulAc }: AdminModulIcerikProps) {
       return <SekmeYonetimiSayfasi />;
     case 'kisayol-ayarlari':
       return <KisayolAyarlariSayfasi />;
+    case 'yapilacaklar':
+      return <YapilacaklarSayfasi />;
     default:
       return (
         <div className="flex flex-col items-center justify-center py-20 text-center">

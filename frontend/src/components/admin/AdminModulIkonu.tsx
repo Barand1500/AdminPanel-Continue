@@ -37,6 +37,7 @@ const MODUL_IKONLARI = {
   ayarlar: IconSettings,
   'sekme-yonetimi': IconBrowser,
   'kisayol-ayarlari': IconKeyboard,
+  yapilacaklar: IconArticle,
 } as const;
 
 interface AdminModulIkonuProps {

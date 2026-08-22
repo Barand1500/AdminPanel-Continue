@@ -48,7 +48,7 @@ export const adminProfilGuncelleSchema = z
   });
 
 export const tercihlerGuncelleSchema = z.object({
-  dashboardHizliErisim: z.array(z.string()).min(1, 'En az bir modül seçin').max(16),
+  dashboardHizliErisim: z.array(z.string()).max(16),
 });
 
 export type GirisDto = z.infer<typeof girisSchema>;

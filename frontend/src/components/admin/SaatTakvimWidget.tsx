@@ -1,71 +1,23 @@
 import { useEffect, useRef, useState } from 'react';
-import { useAksiyonCubuguPanelSync } from '@/components/admin/aksiyon-cubugu/AksiyonCubuguPanelContext';
+import { IconChevronLeft, IconChevronRight, IconX } from '@tabler/icons-react';
+import { useAksiyonCubuguPanelSync } from './aksiyon-cubugu/AksiyonCubuguPanelContext';
+import { tarihAnahtari, tarihEtiketi, takvimNotlariOku, takvimNotuKaydet, takvimNotuSil, type TakvimNotu } from './takvimNotlari';
 
 const GUNLER = ['Pt', 'Sa', 'Ça', 'Pe', 'Cu', 'Ct', 'Pz'];
 const AYLAR = ['Ocak', 'Şubat', 'Mart', 'Nisan', 'Mayıs', 'Haziran', 'Temmuz', 'Ağustos', 'Eylül', 'Ekim', 'Kasım', 'Aralık'];
-
-function takvimHucreleri(yil: number, ay: number) {
-  const ilkGun = new Date(yil, ay, 1).getDay();
-  const baslangic = ilkGun === 0 ? 6 : ilkGun - 1;
-  const gunSayisi = new Date(yil, ay + 1, 0).getDate();
-  const hucreler: (number | null)[] = [];
-  for (let i = 0; i < baslangic; i++) hucreler.push(null);
-  for (let g = 1; g <= gunSayisi; g++) hucreler.push(g);
-  return hucreler;
-}
+function hucreler(yil: number, ay: number) { const bas = (new Date(yil, ay, 1).getDay() + 6) % 7; const toplam = new Date(yil, ay + 1, 0).getDate(); return Array.from({ length: bas + toplam }, (_, i) => i < bas ? null : i - bas + 1); }
 
 export function SaatTakvimWidget() {
-  const [simdi, setSimdi] = useState(() => new Date());
-  const [acik, setAcik] = useState(false);
-  const ref = useRef<HTMLDivElement>(null);
-  const panelRef = useRef<HTMLDivElement>(null);
+  const [simdi, setSimdi] = useState(() => new Date()); const [acik, setAcik] = useState(false);
+  const [gorunen, setGorunen] = useState(() => ({ yil: new Date().getFullYear(), ay: new Date().getMonth() }));
+  const [notlar, setNotlar] = useState<Record<string, TakvimNotu>>(() => takvimNotlariOku()); const [duzenlenen, setDuzenlenen] = useState<string | null>(null); const [metin, setMetin] = useState('');
+  const ref = useRef<HTMLDivElement>(null); const panelRef = useRef<HTMLDivElement>(null); const tekTik = useRef<ReturnType<typeof setTimeout> | null>(null);
   useAksiyonCubuguPanelSync(acik, panelRef);
-
-  useEffect(() => {
-    const id = setInterval(() => setSimdi(new Date()), 30_000);
-    return () => clearInterval(id);
-  }, []);
-
-  useEffect(() => {
-    if (!acik) return;
-    function disariTikla(e: MouseEvent) {
-      if (ref.current && !ref.current.contains(e.target as Node)) setAcik(false);
-    }
-    document.addEventListener('mousedown', disariTikla);
-    return () => document.removeEventListener('mousedown', disariTikla);
-  }, [acik]);
-
-  const saat = new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit' }).format(simdi);
-  const tarih = new Intl.DateTimeFormat('tr-TR', { day: 'numeric', month: 'short' }).format(simdi);
-  const hucreler = takvimHucreleri(simdi.getFullYear(), simdi.getMonth());
-  const bugun = simdi.getDate();
-
-  return (
-    <div ref={ref} className="ap-saat-wrap relative">
-      <button type="button" onClick={() => setAcik((a) => !a)} className="ap-saat-btn" title="Tarih ve saat">
-        <span className="ap-saat-saat">{saat}</span>
-        <span className="ap-saat-tarih">{tarih}</span>
-      </button>
-      {acik && (
-        <div ref={panelRef} className="ap-takvim-panel ap-takvim-panel--kenarlik-anim">
-          <p className="ap-heading text-center text-sm font-semibold">
-            {AYLAR[simdi.getMonth()]} {simdi.getFullYear()}
-          </p>
-          <div className="ap-takvim-grid mt-2">
-            {GUNLER.map((g) => (
-              <span key={g} className="ap-takvim-gun-baslik">{g}</span>
-            ))}
-            {hucreler.map((gun, i) => (
-              <span
-                key={i}
-                className={`ap-takvim-gun ${gun === bugun ? 'ap-takvim-bugun' : ''} ${gun ? '' : 'ap-takvim-bos'}`}
-              >
-                {gun ?? ''}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-    </div>
-  );
+  useEffect(() => { const id = window.setInterval(() => setSimdi(new Date()), 1000); return () => window.clearInterval(id); }, []);
+  useEffect(() => { if (!acik) return; const disari = (e: MouseEvent) => { if (!ref.current?.contains(e.target as Node)) { setAcik(false); setDuzenlenen(null); } }; document.addEventListener('mousedown', disari); return () => document.removeEventListener('mousedown', disari); }, [acik]);
+  const ayDegistir = (delta: number) => setGorunen((onceki) => { const d = new Date(onceki.yil, onceki.ay + delta, 1); return { yil: d.getFullYear(), ay: d.getMonth() }; });
+  const gunTikla = (anahtar: string) => { if (tekTik.current) { clearTimeout(tekTik.current); tekTik.current = null; setDuzenlenen(anahtar); setMetin(notlar[anahtar]?.metin ?? ''); return; } tekTik.current = setTimeout(() => { tekTik.current = null; }, 250); };
+  const kaydet = () => { if (!duzenlenen) return; if (metin.trim()) takvimNotuKaydet(duzenlenen, metin); else takvimNotuSil(duzenlenen); setNotlar(takvimNotlariOku()); setDuzenlenen(null); };
+  const saat = new Intl.DateTimeFormat('tr-TR', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).format(simdi); const tarih = new Intl.DateTimeFormat('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(simdi);
+  return <div ref={ref} className="ap-saat-wrap relative"><button type="button" onClick={() => { setAcik(v => !v); setNotlar(takvimNotlariOku()); setDuzenlenen(null); }} className={`ap-saat-btn${acik ? ' ap-saat-btn--aktif' : ''}`} title="Tarih, özel günler ve notlar"><span className="ap-saat-saat">{saat}</span><span className="ap-saat-tarih">{tarih}</span></button>{acik && <div ref={panelRef} className="ap-takvim-panel ap-takvim-panel--kenarlik-anim"><div className="ap-takvim-ust"><button type="button" className="ap-takvim-nav" onClick={() => ayDegistir(-1)} aria-label="Önceki ay"><IconChevronLeft size={16}/></button><strong>{AYLAR[gorunen.ay]} {gorunen.yil}</strong><button type="button" className="ap-takvim-nav" onClick={() => ayDegistir(1)} aria-label="Sonraki ay"><IconChevronRight size={16}/></button></div><div className="ap-takvim-grid">{GUNLER.map(g => <span key={g} className="ap-takvim-gun-baslik">{g}</span>)}{hucreler(gorunen.yil,gorunen.ay).map((gun,i) => { if (!gun) return <span key={i} className="ap-takvim-gun ap-takvim-bos"/>; const anahtar=tarihAnahtari(gorunen.yil,gorunen.ay,gun); const bugun=anahtar===tarihAnahtari(simdi.getFullYear(),simdi.getMonth(),simdi.getDate()); return <button key={i} type="button" className={`ap-takvim-gun${bugun?' ap-takvim-bugun':''}${notlar[anahtar]?' ap-takvim-notlu':''}`} onClick={() => gunTikla(anahtar)} title={notlar[anahtar] ? 'Tek tıkla notu gör, çift tıkla düzenle' : 'Not eklemek için çift tıkla'}>{gun}</button>; })}</div><p className="ap-takvim-ipucu">Çift tıkla: not ekle · Tek tıkla: notu oku</p>{duzenlenen && <div className="ap-takvim-not-kart"><div className="flex items-center justify-between"><strong>{tarihEtiketi(duzenlenen)}</strong><button type="button" onClick={() => setDuzenlenen(null)} aria-label="Kapat"><IconX size={15}/></button></div><textarea value={metin} onChange={e=>setMetin(e.target.value)} rows={3} placeholder="Bu gün için not yazın..." className="ap-takvim-not-textarea"/><div className="ap-takvim-not-aksiyonlar"><button type="button" className="ap-takvim-not-tus ap-takvim-not-tus--birincil" onClick={kaydet}>Kaydet</button><button type="button" className="ap-takvim-not-tus" onClick={() => setDuzenlenen(null)}>İptal</button></div></div>}</div>}</div>;
 }

@@ -45,6 +45,7 @@ function AdminPanelGovde() {
     setAktifSekmeId,
     sekmeAc,
     sekmeKapat,
+    sekmeleriKapat,
     sekmeTasi,
     sekmeBirlestir,
     kaydedilmediIsaretle,
@@ -175,6 +176,17 @@ function AdminPanelGovde() {
     sekmeKapat(sekmeId);
   }
 
+  function sekmeleriKapatHandler(sekmeIdleri: string[]) {
+    const kapatilacaklar = new Set(sekmeIdleri);
+    const kalan = sekmeler.filter((sekme) => !kapatilacaklar.has(sekme.id));
+    const hedefSekme = kalan[0] ?? sekmeler[0];
+    if (kapatilacaklar.has(aktifSekmeId) && hedefSekme) {
+      const hedefModul = modulBul(hedefSekme.modulId);
+      if (hedefModul) navigate(hedefModul.yol || '/gt-admin', { replace: true });
+    }
+    sekmeleriKapat(sekmeIdleri);
+  }
+
   function sekmeSecHandler(sekmeId: string) {
     setAktifSekmeId(sekmeId);
     const sekme = sekmeler.find((s) => s.id === sekmeId);
@@ -297,6 +309,7 @@ function AdminPanelGovde() {
         aktifSekmeId={aktifSekmeId}
         onSekmeSec={sekmeSecHandler}
         onSekmeKapat={sekmeKapatHandler}
+        onSekmeleriKapat={sekmeleriKapatHandler}
         onSekmeTasi={sekmeTasi}
         onSekmeBirlestir={sekmeBirlestir}
         onModulSec={modulAcHandler}

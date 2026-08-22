@@ -83,6 +83,18 @@ export function useAdminSekmeler() {
     });
   }, []);
 
+  const sekmeleriKapat = useCallback((sekmeIdleri: string[]) => {
+    const kapatilacaklar = new Set(sekmeIdleri);
+    setDurum((onceki) => {
+      let kalan = onceki.sekmeler.filter((sekme) => !kapatilacaklar.has(sekme.id));
+      if (kalan.length === 0) kalan = [onceki.sekmeler[0]];
+      const aktifSekmeId = kalan.some((sekme) => sekme.id === onceki.aktifSekmeId)
+        ? onceki.aktifSekmeId
+        : kalan[0].id;
+      return { sekmeler: kalan, aktifSekmeId };
+    });
+  }, []);
+
   const sekmeSec = useCallback((sekmeId: string) => {
     setDurum((onceki) => ({
       aktifSekmeId: sekmeId,
@@ -174,6 +186,7 @@ export function useAdminSekmeler() {
     setAktifSekmeId: sekmeSec,
     sekmeAc,
     sekmeKapat,
+    sekmeleriKapat,
     sekmeTasi,
     sekmeBirlestir,
     kaydedilmediIsaretle,

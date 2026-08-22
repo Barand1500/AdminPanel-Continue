@@ -27,6 +27,7 @@ export const adminModulleri: AdminModul[] = [
 
 /** Footer vb. üzerinden açılan, başlat menüsünde görünmeyen modüller */
 export const adminGizliModuller: AdminModul[] = [
+  { id: 'yapilacaklar', baslik: 'Yapılacaklar', ikon: '✓', kategori: 'Sistem', yol: '/gt-admin/yapilacaklar', menuGizle: true },
   { id: 'loglar', baslik: 'Log Takibi', ikon: '📜', kategori: 'Sistem', yol: '/gt-admin/loglar', menuGizle: true },
   { id: 'veri-yedekleme', baslik: 'Veri Yedekleme', ikon: '💾', kategori: 'Sistem', yol: '/gt-admin/veri-yedekleme', menuGizle: true },
 ];
