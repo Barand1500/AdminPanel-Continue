@@ -145,8 +145,7 @@ export function SistemAyarlariSayfasi() {
   if (yukleniyor) return <YukleniyorDurumu mesaj="Sistem ayarları yükleniyor..." />;
 
   return (
-    <AdminModulKabuk onizleGoster={false} baslik="Sistem Ayarları" aciklama={`${siteAdi} — site durumu, bakım, 404 ve panel tercihleri`}>
-
+    <AdminModulKabuk onizleGoster={false}>
       <div className="ap-sistem-yonetimi">
         <div className="ap-sistem-layout">
           <aside className="ap-sistem-sol">

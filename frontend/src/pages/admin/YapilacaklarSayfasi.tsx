@@ -8,6 +8,7 @@ import {
   adminGorevleriGetir,
   type AdminGorev,
   type AdminGorevGuncelleForm,
+  type AdminGorevOlusturForm,
 } from '@/features/admin/gorevApi';
 
 type Gorev = AdminGorev;
@@ -43,6 +44,7 @@ export function YapilacaklarSayfasi() {
   const [gorevler, setGorevler] = useState<Gorev[]>([]);
   const [yukleniyor, setYukleniyor] = useState(true);
   const [hata, setHata] = useState('');
+  const [yerelDepoEtkin, setYerelDepoEtkin] = useState(false);
   const [yenilemeSayaci, setYenilemeSayaci] = useState(0);
   const [islemKimligi, setIslemKimligi] = useState<string | null>(null);
   const [filtre, setFiltre] = useState<'tumu' | 'aktif' | 'onemli' | 'tamamlandi'>('tumu');
@@ -61,6 +63,7 @@ export function YapilacaklarSayfasi() {
     if (oturumYukleniyor) return;
     if (!kullaniciId) {
       setGorevler([]);
+      setYerelDepoEtkin(false);
       setYukleniyor(false);
       return;
     }
@@ -73,14 +76,29 @@ export function YapilacaklarSayfasi() {
       try {
         const sunucuGorevleri = await adminGorevleriGetir();
         if (iptalEdildi) return;
-        setGorevler(sunucuGorevleri);
 
         const aktarim = await eskiGorevleriAktar(aktifKullaniciId);
         if (iptalEdildi) return;
-        if (aktarim.eklenen.length) setGorevler([...sunucuGorevleri, ...aktarim.eklenen]);
+        if (aktarim.hata && gorevDeposuKullanilamaz(aktarim.hata)) {
+          setGorevler(yerelGorevleriYukle());
+          setYerelDepoEtkin(true);
+          return;
+        }
+
+        setGorevler([...sunucuGorevleri, ...aktarim.eklenen]);
+        setYerelDepoEtkin(false);
         if (aktarim.hata) setHata(`Eski tarayıcı görevleri tam aktarılamadı: ${aktarim.hata.message}`);
       } catch (err) {
-        if (!iptalEdildi) setHata(err instanceof Error ? err.message : 'Görevler alınamadı.');
+        if (iptalEdildi) return;
+        if (gorevDeposuKullanilamaz(err)) {
+          setGorevler(yerelGorevleriYukle());
+          setYerelDepoEtkin(true);
+          return;
+        }
+
+        setGorevler([]);
+        setYerelDepoEtkin(false);
+        setHata(err instanceof Error ? err.message : 'Görevler alınamadı.');
       } finally {
         if (!iptalEdildi) setYukleniyor(false);
       }
@@ -101,8 +119,11 @@ export function YapilacaklarSayfasi() {
     setIslemKimligi('yeni-gorev');
     setHata('');
     try {
-      const gorev = await adminGorevOlustur({ metin: baslik, tamamlandi: false, onemli, tarih: bas, tarihBitis: bit });
-      setGorevler((onceki) => [...onceki, gorev]);
+      const form: AdminGorevOlusturForm = { metin: baslik, tamamlandi: false, onemli, tarih: bas, tarihBitis: bit };
+      const gorev = yerelDepoEtkin ? yerelGorevOlustur(form) : await adminGorevOlustur(form);
+      const sonraki = [...gorevler, gorev];
+      if (yerelDepoEtkin) yerelGorevleriKaydet(sonraki);
+      setGorevler(sonraki);
       setModal(false);
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Görev kaydedilemedi.');
@@ -116,8 +137,10 @@ export function YapilacaklarSayfasi() {
     setIslemKimligi(gorev.id);
     setHata('');
     try {
-      const guncel = await adminGorevGuncelle(gorev.id, degisiklik);
-      setGorevler((onceki) => onceki.map((x) => x.id === guncel.id ? guncel : x));
+      const guncel = yerelDepoEtkin ? yerelGorevGuncelle(gorev, degisiklik) : await adminGorevGuncelle(gorev.id, degisiklik);
+      const sonraki = gorevler.map((x) => x.id === guncel.id ? guncel : x);
+      if (yerelDepoEtkin) yerelGorevleriKaydet(sonraki);
+      setGorevler(sonraki);
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Görev güncellenemedi.');
     } finally {
@@ -130,8 +153,10 @@ export function YapilacaklarSayfasi() {
     setIslemKimligi(silinecek.id);
     setHata('');
     try {
-      await adminGorevSil(silinecek.id);
-      setGorevler((onceki) => onceki.filter((g) => g.id !== silinecek.id));
+      if (!yerelDepoEtkin) await adminGorevSil(silinecek.id);
+      const sonraki = gorevler.filter((g) => g.id !== silinecek.id);
+      if (yerelDepoEtkin) yerelGorevleriKaydet(sonraki);
+      setGorevler(sonraki);
       setSilinecek(null);
     } catch (err) {
       setHata(err instanceof Error ? err.message : 'Görev silinemedi.');
@@ -233,4 +258,82 @@ function eskiTarihNormalize(deger: unknown): string | null {
   if (typeof deger !== 'string') return null;
   const eslesme = /^(\d{4}-\d{2}-\d{2})/.exec(deger.trim());
   return eslesme ? eslesme[1] : null;
+}
+
+function yerelGorevleriYukle(): Gorev[] {
+  const simdi = new Date().toISOString();
+  return eskiGorevleriOku().map((gorev, sira) => ({
+    id: gorev.id ?? `yerel-${encodeURIComponent(eskiGorevKimligi(gorev, sira))}`,
+    metin: gorev.metin,
+    tamamlandi: gorev.tamamlandi,
+    onemli: gorev.onemli,
+    tarih: gorev.tarih,
+    tarihBitis: gorev.tarihBitis,
+    olusturma: simdi,
+    guncelleme: simdi,
+  }));
+}
+
+function yerelGorevOlustur(form: AdminGorevOlusturForm): Gorev {
+  const simdi = new Date().toISOString();
+  return {
+    id: `yerel-${Date.now()}-${Math.random().toString(36).slice(2, 10)}`,
+    metin: form.metin.trim(),
+    tamamlandi: form.tamamlandi ?? false,
+    onemli: form.onemli ?? false,
+    tarih: eskiTarihNormalize(form.tarih),
+    tarihBitis: eskiTarihNormalize(form.tarihBitis),
+    olusturma: simdi,
+    guncelleme: simdi,
+  };
+}
+
+function yerelGorevGuncelle(gorev: Gorev, degisiklik: AdminGorevGuncelleForm): Gorev {
+  const guncel: Gorev = { ...gorev, guncelleme: new Date().toISOString() };
+  if (typeof degisiklik.metin === 'string') guncel.metin = degisiklik.metin.trim();
+  if (typeof degisiklik.tamamlandi === 'boolean') guncel.tamamlandi = degisiklik.tamamlandi;
+  if (typeof degisiklik.onemli === 'boolean') guncel.onemli = degisiklik.onemli;
+  if (degisiklik.tarih !== undefined) guncel.tarih = eskiTarihNormalize(degisiklik.tarih);
+  if (degisiklik.tarihBitis !== undefined) guncel.tarihBitis = eskiTarihNormalize(degisiklik.tarihBitis);
+  return guncel;
+}
+
+function yerelGorevleriKaydet(gorevler: Gorev[]) {
+  const kayitlar: EskiGorev[] = gorevler.map((gorev) => ({
+    id: gorev.id,
+    metin: gorev.metin,
+    tamamlandi: gorev.tamamlandi,
+    onemli: gorev.onemli,
+    tarih: gorev.tarih,
+    tarihBitis: gorev.tarihBitis,
+  }));
+
+  try {
+    localStorage.setItem(ESKI_ANAHTAR, JSON.stringify(kayitlar));
+  } catch {
+    throw new Error('Görevler tarayıcıya kaydedilemedi.');
+  }
+}
+
+function gorevDeposuKullanilamaz(hata: unknown) {
+  const mesaj = hata instanceof Error ? hata.message.toLowerCase() : String(hata).toLowerCase();
+  return [
+    'veritabani veya prisma client guncel degil',
+    'veritabanı veya prisma client güncel değil',
+    'veritabani baglantisi kurulamadi',
+    'veritabanı bağlantısı kurulamadı',
+    'database_url',
+    "can't reach database",
+    'p2021',
+    'admingorev',
+    'failed to fetch',
+    'networkerror',
+    'network request failed',
+    "backend'e baglanilamadi",
+    'api yaniti html dondu',
+    'sunucu hatasi (404)',
+    'sunucu hatasi (502)',
+    'sunucu hatasi (503)',
+    'sunucu hatasi (504)',
+  ].some((ipucu) => mesaj.includes(ipucu));
 }

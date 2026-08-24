@@ -12,7 +12,6 @@ import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
 import {
   AdminPanelKarti,
   BildirimKutusu,
-  ModulBaslik,
   YukleniyorDurumu,
   HataDurumu,
 } from '@/components/admin/ortak/AdminBilesenleri';
@@ -89,11 +88,6 @@ export function SiteAyarlariSayfasi() {
 
   return (
     <div className="ap-site-ayarlari">
-      <ModulBaslik
-        baslik="Site Ayarları"
-        aciklama={`${siteAd || site?.ad || 'Site'} — global tema ve iletişim bilgileri`}
-      />
-
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 

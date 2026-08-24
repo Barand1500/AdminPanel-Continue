@@ -205,27 +205,36 @@ export function FooterYonetimiFormu() {
       ? ayarlar.whatsapp
       : whatsappFormatla(ayarlar.whatsapp)
     : null;
+  const gorunumSekmeleri = (
+    <div className="w-auto max-w-full overflow-visible">
+      <AdminPilSekme
+        sekmeler={[
+          { id: 'galeri', etiket: 'Footer Tipleri', ikon: <GaleriIkon /> },
+          { id: 'editor', etiket: 'Düzenleme', ikon: <DuzenlemeIkon /> },
+        ]}
+        aktif={gorunum}
+        onDegistir={setGorunum}
+      />
+    </div>
+  );
 
   return (
-    <AdminModulKabuk
-      onizleGoster={false}
-      ustIcerik={
-        <AdminPilSekme
-          sekmeler={[
-            { id: 'galeri', etiket: 'Footer Tipleri', ikon: <GaleriIkon /> },
-            { id: 'editor', etiket: 'Düzenleme', ikon: <DuzenlemeIkon /> },
-          ]}
-          aktif={gorunum}
-          onDegistir={setGorunum}
-        />
-      }
-    >
+    <AdminModulKabuk onizleGoster={false}>
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
       <AdminIkiEkranSlider
         aktif={gorunum === 'editor' ? 'iki' : 'bir'}
-        birinci={<FooterTipGaleri secili={aktifTip} onSec={tipSec} siteAd={siteAd} ayarlar={ayarlar} footer={footer} />}
+        birinci={
+          <FooterTipGaleri
+            secili={aktifTip}
+            onSec={tipSec}
+            siteAd={siteAd}
+            ayarlar={ayarlar}
+            footer={footer}
+            ustAksiyon={gorunumSekmeleri}
+          />
+        }
         ikinci={
           <div className="ap-editor-panel ap-form-editor ap-header-editor">
           <div className="ap-form-editor-ust">
@@ -238,6 +247,7 @@ export function FooterYonetimiFormu() {
                 </button>
               </p>
             </div>
+            {gorunumSekmeleri}
           </div>
 
           <div className="ap-form-editor-govde">

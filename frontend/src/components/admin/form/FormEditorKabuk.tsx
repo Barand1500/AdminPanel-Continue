@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import type { FormFormDegeri } from '@/features/admin/formApi';
 import type { FormEditorSekmeId } from '@/types/formYonetimi';
 import {
@@ -22,9 +22,10 @@ interface FormEditorKabukProps {
   form: FormFormDegeri;
   seciliId: string | null;
   onChange: (form: FormFormDegeri) => void;
+  ustAksiyon?: ReactNode;
 }
 
-export function FormEditorKabuk({ form, seciliId, onChange }: FormEditorKabukProps) {
+export function FormEditorKabuk({ form, seciliId, onChange, ustAksiyon }: FormEditorKabukProps) {
   const [sekme, setSekme] = useState<FormEditorSekmeId>('alanlar');
   const [slugManuel, setSlugManuel] = useState(false);
 
@@ -52,12 +53,15 @@ export function FormEditorKabuk({ form, seciliId, onChange }: FormEditorKabukPro
             {form.slug ? `/form/${form.slug}` : 'Boş bırakılırsa slug otomatik oluşur'}
           </p>
         </div>
-        <div className={`ap-form-yayin-anahtar${form.aktif ? ' ap-form-yayin-anahtar--acik' : ''}`}>
-          <AdminAnahtarDugme
-            etiket="Yayında"
-            acik={form.aktif}
-            onDegistir={(aktif) => onChange({ ...form, aktif })}
-          />
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
+          <div className={`ap-form-yayin-anahtar${form.aktif ? ' ap-form-yayin-anahtar--acik' : ''}`}>
+            <AdminAnahtarDugme
+              etiket="Yayında"
+              acik={form.aktif}
+              onDegistir={(aktif) => onChange({ ...form, aktif })}
+            />
+          </div>
+          {ustAksiyon}
         </div>
       </div>
 

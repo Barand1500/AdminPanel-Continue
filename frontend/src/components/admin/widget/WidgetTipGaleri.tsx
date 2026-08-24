@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { AdminAramaKutusu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { WidgetTipIkonu } from './WidgetTipIkonu';
 import { GaleriKartAksiyonlar } from '@/components/admin/ortak/GaleriKartAksiyonlar';
@@ -47,6 +47,7 @@ const ONERILEN_SIRALAMA = [
 interface WidgetTipGaleriProps {
   tipFiltre?: string;
   onSec: (tip: string) => void;
+  ustAksiyon?: ReactNode;
 }
 
 function tipSirala(tipler: WidgetTipMeta[]) {
@@ -60,7 +61,7 @@ function tipSirala(tipler: WidgetTipMeta[]) {
   });
 }
 
-export function WidgetTipGaleri({ tipFiltre, onSec }: WidgetTipGaleriProps) {
+export function WidgetTipGaleri({ tipFiltre, onSec, ustAksiyon }: WidgetTipGaleriProps) {
   const [arama, setArama] = useState('');
   const [kategori, setKategori] = useState('tumu');
   const [infoTip, setInfoTip] = useState<string | null>(null);
@@ -101,7 +102,10 @@ export function WidgetTipGaleri({ tipFiltre, onSec }: WidgetTipGaleriProps) {
           <h2 className="ap-heading text-sm font-semibold">Nasıl bir blok eklemek istiyorsunuz?</h2>
           <p className="ap-muted text-xs">Kartlara bakın, beğendiğinizi seçin. İçeriği bir sonraki adımda doldurursunuz.</p>
         </div>
-        <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Slider, hizmet, galeri..." />
+        <div className="ml-auto flex min-w-0 max-w-full items-center justify-end gap-3">
+          <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Slider, hizmet, galeri..." />
+          {ustAksiyon}
+        </div>
       </div>
 
       <div className="ap-widget-galeri-govde">

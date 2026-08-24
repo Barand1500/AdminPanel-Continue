@@ -261,24 +261,23 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
     );
   }
 
+  const gorunumSekmeleri = (
+    <AdminPilSekme
+      sekmeler={[
+        { id: 'liste', etiket: 'Widget Listesi', ikon: <ListeIkon /> },
+        {
+          id: 'editor',
+          etiket: editorEtiket,
+          ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniIkon />,
+        },
+      ]}
+      aktif={gorunum}
+      onDegistir={gorunumDegistir}
+    />
+  );
+
   return (
-    <AdminModulKabuk
-      onizleGoster={false}
-      ustIcerik={
-        <AdminPilSekme
-          sekmeler={[
-            { id: 'liste', etiket: 'Widget Listesi', ikon: <ListeIkon /> },
-            {
-              id: 'editor',
-              etiket: editorEtiket,
-              ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniIkon />,
-            },
-          ]}
-          aktif={gorunum}
-          onDegistir={gorunumDegistir}
-        />
-      }
-    >
+    <AdminModulKabuk onizleGoster={false}>
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
@@ -291,10 +290,11 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
           sayfalar={sayfalar}
           onSec={widgetSec}
           onDuzenle={widgetDuzenleAc}
+          ustAksiyon={gorunumSekmeleri}
         />
       )}
       {gorunum === 'editor' && yeniMod && !tipOnaylandi && (
-        <WidgetTipGaleri tipFiltre={varsayilanTip} onSec={galeridenTipSec} />
+        <WidgetTipGaleri tipFiltre={varsayilanTip} onSec={galeridenTipSec} ustAksiyon={gorunumSekmeleri} />
       )}
       {gorunum === 'editor' && tipOnaylandi && (
         <WidgetEditorPanel
@@ -307,6 +307,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
           onChange={(yeni) => setForm(widgetFormNormalize(yeni))}
           onOtomatikDoldurChange={setOtomatikDoldur}
           onTipDegistirIste={yeniMod ? tipiDegistir : undefined}
+          ustAksiyon={gorunumSekmeleri}
         />
       )}
 

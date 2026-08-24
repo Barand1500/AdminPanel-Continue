@@ -21,6 +21,7 @@ import {
 import { siteAyarlariGuncelleSchema } from '../../Application/DTOs/SiteAyarlariDto.js';
 import { sistemAyarlariGuncelleSchema } from '../../Application/DTOs/SistemAyarlariDto.js';
 import { widgetGuncelleSchema, widgetOlusturSchema } from '../../Application/DTOs/WidgetDto.js';
+import { gorevGuncelleSchema, gorevOlusturSchema } from '../../Application/DTOs/GorevDto.js';
 import { AuthController, authMiddleware } from '../controllers/AuthController.js';
 import { BlogController } from '../controllers/BlogController.js';
 import { DashboardController } from '../controllers/DashboardController.js';
@@ -44,6 +45,7 @@ import { SekmeController } from '../controllers/SekmeController.js';
 import { NavKategoriController } from '../controllers/NavKategoriController.js';
 import { KonumluSliderController } from '../controllers/KonumluSliderController.js';
 import { EklentiController } from '../controllers/EklentiController.js';
+import { GorevController } from '../controllers/GorevController.js';
 import {
   navKategoriGuncelleSchema,
   navKategoriOlusturSchema,
@@ -84,6 +86,7 @@ const sekmeController = new SekmeController();
 const navKategoriController = new NavKategoriController();
 const konumluSliderController = new KonumluSliderController();
 const eklentiController = new EklentiController();
+const gorevController = new GorevController();
 
 const yG = yetkiMiddleware('goruntuleme');
 const yE = yetkiMiddleware('ekleme');
@@ -114,6 +117,15 @@ router.get('/dashboard', authMiddleware, yG, (req, res) => dashboardController.o
 
 router.get('/bildirimler', authMiddleware, yG, (req, res) => bildirimController.listele(req, res));
 router.patch('/bildirimler/tumu-okundu', authMiddleware, yG, (req, res) => bildirimController.tumunuOkundu(req, res));
+
+router.get('/gorevler', authMiddleware, (req, res) => gorevController.listele(req, res));
+router.post('/gorevler', authMiddleware, validateBySchema(gorevOlusturSchema), (req, res) =>
+  gorevController.olustur(req, res)
+);
+router.patch('/gorevler/:id', authMiddleware, validateBySchema(gorevGuncelleSchema), (req, res) =>
+  gorevController.guncelle(req, res)
+);
+router.delete('/gorevler/:id', authMiddleware, (req, res) => gorevController.sil(req, res));
 
 router.get('/widgetlar', authMiddleware, yG, (req, res) => widgetController.listele(req, res));
 router.post('/widgetlar', authMiddleware, yE, validateBySchema(widgetOlusturSchema), (req, res) => widgetController.olustur(req, res));

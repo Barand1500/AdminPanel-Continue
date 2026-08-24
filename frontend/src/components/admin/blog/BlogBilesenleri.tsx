@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import type { AdminBlog, BlogFormDegeri } from '@/features/admin/blogApi';
 import { medyaTamUrl } from '@/features/admin/medyaApi';
 import {
@@ -71,10 +71,12 @@ export function BlogListesiPanel({
   bloglar,
   seciliId,
   onSec,
+  ustAksiyon,
 }: {
   bloglar: AdminBlog[];
   seciliId: string | null;
   onSec: (blog: AdminBlog) => void;
+  ustAksiyon?: ReactNode;
 }) {
   const [arama, setArama] = useState('');
   const [filtre, setFiltre] = useState<ListeFiltre>('tumu');
@@ -106,17 +108,20 @@ export function BlogListesiPanel({
             {bloglar.length} kayıt · {yayindaSayisi} yayında
           </p>
         </div>
-        <div className="ap-blog-filtre-piller">
-          {LISTE_FILTRELER.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              className={`ap-blog-filtre-pil${filtre === f.id ? ' ap-blog-filtre-pil--aktif' : ''}`}
-              onClick={() => setFiltre(f.id)}
-            >
-              {f.etiket}
-            </button>
-          ))}
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
+          <div className="ap-blog-filtre-piller">
+            {LISTE_FILTRELER.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                className={`ap-blog-filtre-pil${filtre === f.id ? ' ap-blog-filtre-pil--aktif' : ''}`}
+                onClick={() => setFiltre(f.id)}
+              >
+                {f.etiket}
+              </button>
+            ))}
+          </div>
+          {ustAksiyon}
         </div>
       </div>
       <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Başlık, slug veya kategori ara..." />
@@ -177,10 +182,12 @@ export function BlogEditorPanel({
   form,
   seciliId,
   onChange,
+  ustAksiyon,
 }: {
   form: BlogFormDegeri;
   seciliId: string | null;
   onChange: (form: BlogFormDegeri) => void;
+  ustAksiyon?: ReactNode;
 }) {
   const [slugManuel, setSlugManuel] = useState(false);
 
@@ -216,6 +223,7 @@ export function BlogEditorPanel({
               onDegistir={(yayinda) => onChange({ ...form, yayinda })}
             />
           </div>
+          {ustAksiyon}
         </div>
       </div>
 
@@ -323,9 +331,11 @@ export function BlogEditorPanel({
 export function BlogGorunumPaneli({
   ayarlar,
   onDegistir,
+  ustAksiyon,
 }: {
   ayarlar: BlogAyarlari;
   onDegistir: (ayarlar: BlogAyarlari) => void;
+  ustAksiyon?: ReactNode;
 }) {
   const guncelle = (parca: Partial<BlogAyarlari>) => onDegistir({ ...ayarlar, ...parca });
 
@@ -336,6 +346,7 @@ export function BlogGorunumPaneli({
           <h2 className="ap-heading text-sm font-semibold">Görünüm</h2>
           <p className="ap-muted text-xs">Blog’un sitede nerede duracağı — Kaydet ile uygulanır</p>
         </div>
+        {ustAksiyon}
       </div>
       <div className="ap-blog-editor-govde">
         <AdminFormBolumu baslik="Yerleşim">

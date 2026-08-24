@@ -306,24 +306,23 @@ export function SliderYonetimiSayfasi() {
     );
   }
 
+  const gorunumSekmeleri = (
+    <AdminPilSekme
+      sekmeler={[
+        { id: 'liste', etiket: 'Banner Listesi', ikon: <ListeIkon /> },
+        {
+          id: 'editor',
+          etiket: gorunum === 'editor' && seciliSliderId ? 'Düzenleme' : 'Yeni Banner',
+          ikon: gorunum === 'editor' && seciliSliderId ? <DuzenlemeIkon /> : <YeniIkon />,
+        },
+      ]}
+      aktif={gorunum}
+      onDegistir={gorunumDegistir}
+    />
+  );
+
   return (
-    <AdminModulKabuk
-      onizleGoster={false}
-      ustIcerik={
-        <AdminPilSekme
-          sekmeler={[
-            { id: 'liste', etiket: 'Banner Listesi', ikon: <ListeIkon /> },
-            {
-              id: 'editor',
-              etiket: gorunum === 'editor' && seciliSliderId ? 'Düzenleme' : 'Yeni Banner',
-              ikon: gorunum === 'editor' && seciliSliderId ? <DuzenlemeIkon /> : <YeniIkon />,
-            },
-          ]}
-          aktif={gorunum}
-          onDegistir={gorunumDegistir}
-        />
-      }
-    >
+    <AdminModulKabuk onizleGoster={false}>
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
 
@@ -337,6 +336,7 @@ export function SliderYonetimiSayfasi() {
             sliderSec(slider);
             setGorunum('editor');
           }}
+          ustAksiyon={gorunumSekmeleri}
         />
       ) : (
         <SliderEditorPanel
@@ -355,6 +355,7 @@ export function SliderYonetimiSayfasi() {
           onSayfaId={sayfaDegistir}
           onConfig={setConfig}
           onSecimler={secimGuncelle}
+          ustAksiyon={gorunumSekmeleri}
         />
       )}
 

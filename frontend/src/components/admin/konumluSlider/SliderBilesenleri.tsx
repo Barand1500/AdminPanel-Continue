@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
 import { KonumluSliderOnizleme } from '@/components/admin/konumluSlider/KonumluSliderOnizleme';
 import {
@@ -41,12 +41,14 @@ export function SliderListesiPanel({
   seciliId,
   onSec,
   onDuzenle,
+  ustAksiyon,
 }: {
   sliderlar: KonumluSliderKayit[];
   sayfaAdlari: Map<string, string>;
   seciliId: string | null;
   onSec: (slider: KonumluSliderKayit) => void;
   onDuzenle: (slider: KonumluSliderKayit) => void;
+  ustAksiyon?: ReactNode;
 }) {
   const [arama, setArama] = useState('');
   const [sayfaFiltre, setSayfaFiltre] = useState('hepsi');
@@ -94,6 +96,7 @@ export function SliderListesiPanel({
           <h2 className="ap-heading text-sm font-semibold">Banner Listesi</h2>
           <p className="ap-muted text-xs">{sliderlar.length} kayıt</p>
         </div>
+        {ustAksiyon}
       </div>
       <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Ad veya konum ara..." />
       <div className="ap-slider-filtre">
@@ -116,7 +119,7 @@ export function SliderListesiPanel({
             aciklama={
               arama || sayfaFiltre !== 'hepsi'
                 ? 'Filtreyi temizleyip tekrar deneyin'
-                : 'Üstten Yeni Banner sekmesine geçerek başlayın'
+                : 'Yeni Banner ile başlayın'
             }
           />
         ) : (
@@ -183,6 +186,7 @@ export function SliderEditorPanel({
   onSayfaId,
   onConfig,
   onSecimler,
+  ustAksiyon,
 }: {
   ad: string;
   aktif: boolean;
@@ -198,6 +202,7 @@ export function SliderEditorPanel({
   onSayfaId: (v: string) => void;
   onConfig: (v: KonumluSliderConfig) => void;
   onSecimler: (v: KonumSecimNoktasi[]) => void;
+  ustAksiyon?: ReactNode;
 }) {
   const [sekme, setSekme] = useState<EditorSekme>('slaytlar');
 
@@ -212,7 +217,10 @@ export function SliderEditorPanel({
             placeholder="Örn. Kampanya banner"
           />
         </FormAlani>
-        <AdminAnahtarDugme acik={aktif} onDegistir={onAktif} etiket="Yayında" />
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          <AdminAnahtarDugme acik={aktif} onDegistir={onAktif} etiket="Yayında" />
+          {ustAksiyon}
+        </div>
       </div>
 
       <AdminSekmeler

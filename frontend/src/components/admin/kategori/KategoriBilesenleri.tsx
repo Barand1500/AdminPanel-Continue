@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
 import {
@@ -151,6 +151,7 @@ export function KategoriListesiPanel({
   menuKaydediliyor,
   onSec,
   onMenuToggle,
+  ustAksiyon,
 }: {
   kategoriler: NavKategoriKayit[];
   seciliId: string | null;
@@ -158,6 +159,7 @@ export function KategoriListesiPanel({
   menuKaydediliyor?: boolean;
   onSec: (k: NavKategoriKayit) => void;
   onMenuToggle: (acik: boolean) => void;
+  ustAksiyon?: ReactNode;
 }) {
   const [arama, setArama] = useState('');
   const filtreli = useMemo(() => kategoriAramaFiltre(kategoriler, arama), [kategoriler, arama]);
@@ -169,11 +171,14 @@ export function KategoriListesiPanel({
           <h2 className="ap-heading text-sm font-semibold">Menü Listesi</h2>
           <p className="ap-muted text-xs">{kategoriler.length} öğe</p>
         </div>
-        <AdminAnahtarDugme
-          etiket="Menüde göster"
-          acik={menuAcik}
-          onDegistir={onMenuToggle}
-        />
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
+          <AdminAnahtarDugme
+            etiket="Menüde göster"
+            acik={menuAcik}
+            onDegistir={onMenuToggle}
+          />
+          {ustAksiyon}
+        </div>
       </div>
       {menuKaydediliyor && <p className="ap-kategori-liste-not">Menü ayarı kaydediliyor…</p>}
       <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Ad veya slug ara..." />
@@ -205,11 +210,13 @@ export function KategoriEditorPanel({
   seciliId,
   kategoriler,
   onChange,
+  ustAksiyon,
 }: {
   form: NavKategoriFormDegeri;
   seciliId: string | null;
   kategoriler: NavKategoriKayit[];
   onChange: (form: NavKategoriFormDegeri) => void;
+  ustAksiyon?: ReactNode;
 }) {
   const ustSecenekleri = navKategoriUstSecenekleri(kategoriler, seciliId ?? undefined);
   const ust = form.ustKategoriId
@@ -236,6 +243,7 @@ export function KategoriEditorPanel({
               onDegistir={(aktif) => onChange({ ...form, aktif })}
             />
           </div>
+          {ustAksiyon}
         </div>
       </div>
 

@@ -228,37 +228,50 @@ export function BlogYonetimiSayfasi() {
     );
   }
 
+  const gorunumSekmeleri = (
+    <AdminPilSekme
+      sekmeler={[
+        { id: 'liste', etiket: 'Yazı Listesi', ikon: <ListeIkon /> },
+        {
+          id: 'editor',
+          etiket: editorEtiket,
+          ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniIkon />,
+        },
+        { id: 'gorunum', etiket: 'Görünüm', ikon: <GorunumIkon /> },
+      ]}
+      aktif={gorunum}
+      onDegistir={gorunumDegistir}
+    />
+  );
+
   return (
-    <AdminModulKabuk
-      onizleGoster={false}
-      ustIcerik={
-        <AdminPilSekme
-          sekmeler={[
-            { id: 'liste', etiket: 'Yazı Listesi', ikon: <ListeIkon /> },
-            {
-              id: 'editor',
-              etiket: editorEtiket,
-              ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniIkon />,
-            },
-            { id: 'gorunum', etiket: 'Görünüm', ikon: <GorunumIkon /> },
-          ]}
-          aktif={gorunum}
-          onDegistir={gorunumDegistir}
-        />
-      }
-    >
+    <AdminModulKabuk onizleGoster={false}>
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
 
       {gorunum === 'liste' && (
-        <BlogListesiPanel bloglar={bloglar} seciliId={seciliId} onSec={yaziSec} />
+        <BlogListesiPanel
+          bloglar={bloglar}
+          seciliId={seciliId}
+          onSec={yaziSec}
+          ustAksiyon={gorunumSekmeleri}
+        />
       )}
       {gorunum === 'editor' && (
-        <BlogEditorPanel form={form} seciliId={seciliId} onChange={setForm} />
+        <BlogEditorPanel
+          form={form}
+          seciliId={seciliId}
+          onChange={setForm}
+          ustAksiyon={gorunumSekmeleri}
+        />
       )}
       {gorunum === 'gorunum' && (
-        <BlogGorunumPaneli ayarlar={blogAyarlari} onDegistir={blogAyarlariGuncelle} />
+        <BlogGorunumPaneli
+          ayarlar={blogAyarlari}
+          onDegistir={blogAyarlariGuncelle}
+          ustAksiyon={gorunumSekmeleri}
+        />
       )}
 
       <BlogOnizlemeModal

@@ -22,6 +22,7 @@ const backendRoot = path.resolve(__dirname, '..');
 const TABLOLAR = [
   'form_gonderimler',
   'admin_loglari',
+  'admin_gorevler',
   'yedek_kayitlari',
   'widgetlar',
   'sekme_ayarlari',

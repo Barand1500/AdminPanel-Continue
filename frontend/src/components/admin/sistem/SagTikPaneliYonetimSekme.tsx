@@ -2,11 +2,7 @@ import { adminModulleri } from '@/data/adminMenuYapisi';
 import { SAG_TIK_OGE_TANIMLARI } from '@/data/sagTikPanelTanimlari';
 import { DurumAnahtari } from '@/components/admin/sistem/SistemSekmeCubugu';
 import { AdminModulIkonu } from '@/components/admin/AdminModulIkonu';
-import {
-  IconClipboardCopy, IconClipboardPlus, IconCut, IconDeviceFloppy, IconEye, IconFilePlus,
-  IconFileText, IconLayoutDashboard, IconMinus, IconMoonStars, IconPuzzle, IconSelectAll,
-  IconSparkles, IconWorld,
-} from '@tabler/icons-react';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 import type { SistemAyarlariForm } from '@/types/sistemAyarlari';
 import type { SagTikOgeId } from '@/types/sagTikPaneli';
 
@@ -14,13 +10,6 @@ interface SagTikPaneliYonetimSekmeProps {
   form: SistemAyarlariForm;
   onChange: (form: SistemAyarlariForm) => void;
 }
-
-const SAG_TIK_IKONLARI = {
-  kopyala: IconClipboardCopy, kes: IconCut, yapistir: IconClipboardPlus, tumunuSec: IconSelectAll,
-  ayirici1: IconMinus, moduller: IconPuzzle, sayfalar: IconFileText, yeniSayfa: IconFilePlus,
-  dashboard: IconLayoutDashboard, ayirici2: IconMinus, kaydet: IconDeviceFloppy, onizle: IconEye,
-  siteAc: IconWorld, tema: IconMoonStars, sistemKesif: IconSparkles,
-} as const;
 
 export function SagTikPaneliYonetimSekme({ form, onChange }: SagTikPaneliYonetimSekmeProps) {
   const panel = form.sagTikPaneli;
@@ -67,7 +56,7 @@ export function SagTikPaneliYonetimSekme({ form, onChange }: SagTikPaneliYonetim
         aciklama="Admin panelde herhangi bir yere sağ tıklayınca özel menü açılır."
         acik={panel.aktif}
         onChange={(aktif) => panelGuncelle({ aktif })}
-        ikon="🖱️"
+        ikon={<AdminFlatIkon ad="fare" boyut={18} />}
         renk="mavi"
       />
 
@@ -87,7 +76,7 @@ export function SagTikPaneliYonetimSekme({ form, onChange }: SagTikPaneliYonetim
                     onChange={(e) => ogeToggle(oge.id, e.target.checked)}
                   />
                   <span className="ap-sag-tik-oge-ikon" aria-hidden>
-                    {(() => { const Ikon = SAG_TIK_IKONLARI[oge.id]; return <Ikon size={18} stroke={1.8} />; })()}
+                    <AdminFlatIkon ad={tanim.ikon} boyut={18} />
                   </span>
                   <span>
                     <strong>{tanim.etiket}</strong>

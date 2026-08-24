@@ -3,6 +3,8 @@ import { adminModulleri, modulBul } from '@/data/adminMenuYapisi';
 import { adminSayfalariGetir, type AdminSayfa } from '@/features/admin/sayfaApi';
 import { useSagTikPanel } from '@/contexts/SagTikPanelContext';
 import { sagTikOgeTanimBul } from '@/data/sagTikPanelTanimlari';
+import { AdminModulIkonu } from '@/components/admin/AdminModulIkonu';
+import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
 import type { SagTikOgeId } from '@/types/sagTikPaneli';
 import {
   metinAlaniMi,
@@ -175,9 +177,9 @@ export function AdminSagTikMenu({ aksiyonlar }: { aksiyonlar: AdminSagTikAksiyon
                 onMouseEnter={() => setFlyout('moduller')}
                 onClick={() => setFlyout((f) => (f === 'moduller' ? null : 'moduller'))}
               >
-                <span>{tanim.ikon}</span>
+                <span className="ap-sag-tik-ikon"><AdminFlatIkon ad={tanim.ikon} boyut={16} /></span>
                 <span>{tanim.etiket}</span>
-                <span className="ap-sag-tik-ok">›</span>
+                <span className="ap-sag-tik-ok"><AdminFlatIkon ad="sag-ok" boyut={15} /></span>
               </button>
               {flyout === 'moduller' && (
                 <div className="ap-sag-tik-flyout">
@@ -192,7 +194,7 @@ export function AdminSagTikMenu({ aksiyonlar }: { aksiyonlar: AdminSagTikAksiyon
                           kapat();
                         }}
                       >
-                        <span>{m.ikon}</span>
+                        <span className="ap-sag-tik-ikon"><AdminModulIkonu modulId={m.id} boyut={16} /></span>
                         <span>{m.baslik}</span>
                       </button>
                     ) : null
@@ -212,9 +214,9 @@ export function AdminSagTikMenu({ aksiyonlar }: { aksiyonlar: AdminSagTikAksiyon
                 onMouseEnter={() => setFlyout('sayfalar')}
                 onClick={() => setFlyout((f) => (f === 'sayfalar' ? null : 'sayfalar'))}
               >
-                <span>{tanim.ikon}</span>
+                <span className="ap-sag-tik-ikon"><AdminFlatIkon ad={tanim.ikon} boyut={16} /></span>
                 <span>{tanim.etiket}</span>
-                <span className="ap-sag-tik-ok">›</span>
+                <span className="ap-sag-tik-ok"><AdminFlatIkon ad="sag-ok" boyut={15} /></span>
               </button>
               {flyout === 'sayfalar' && (
                 <div className="ap-sag-tik-flyout ap-sag-tik-flyout-genis">
@@ -243,7 +245,9 @@ export function AdminSagTikMenu({ aksiyonlar }: { aksiyonlar: AdminSagTikAksiyon
                           kapat();
                         }}
                       >
-                        <span>{s.yayinda ? '✅' : '📄'}</span>
+                        <span className="ap-sag-tik-ikon">
+                          <AdminFlatIkon ad={s.yayinda ? 'onay' : 'belge'} boyut={16} />
+                        </span>
                         <span>
                           <strong>{s.baslik}</strong>
                           <small>/{s.slug}</small>
@@ -265,7 +269,7 @@ export function AdminSagTikMenu({ aksiyonlar }: { aksiyonlar: AdminSagTikAksiyon
             disabled={ogeDevreDisi(oge.id)}
             onClick={() => void ogeCalistir(oge.id)}
           >
-            <span>{tanim.ikon}</span>
+            <span className="ap-sag-tik-ikon"><AdminFlatIkon ad={tanim.ikon} boyut={16} /></span>
             <span>{tanim.etiket}</span>
           </button>
         );

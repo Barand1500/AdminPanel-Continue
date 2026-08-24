@@ -235,24 +235,23 @@ export function KategoriYonetimiSayfasi() {
     );
   }
 
+  const gorunumSekmeleri = (
+    <AdminPilSekme
+      sekmeler={[
+        { id: 'liste', etiket: 'Menü Listesi', ikon: <ListeIkon /> },
+        {
+          id: 'editor',
+          etiket: editorEtiket,
+          ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniIkon />,
+        },
+      ]}
+      aktif={gorunum}
+      onDegistir={gorunumDegistir}
+    />
+  );
+
   return (
-    <AdminModulKabuk
-      onizleGoster={false}
-      ustIcerik={
-        <AdminPilSekme
-          sekmeler={[
-            { id: 'liste', etiket: 'Menü Listesi', ikon: <ListeIkon /> },
-            {
-              id: 'editor',
-              etiket: editorEtiket,
-              ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniIkon />,
-            },
-          ]}
-          aktif={gorunum}
-          onDegistir={gorunumDegistir}
-        />
-      }
-    >
+    <AdminModulKabuk onizleGoster={false}>
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
@@ -265,6 +264,7 @@ export function KategoriYonetimiSayfasi() {
           menuKaydediliyor={siteKaydediliyor}
           onSec={kategoriSec}
           onMenuToggle={(v) => void kategoriMenuToggle(v)}
+          ustAksiyon={gorunumSekmeleri}
         />
       ) : (
         <KategoriEditorPanel
@@ -272,6 +272,7 @@ export function KategoriYonetimiSayfasi() {
           seciliId={seciliId}
           kategoriler={kategoriler}
           onChange={setForm}
+          ustAksiyon={gorunumSekmeleri}
         />
       )}
     </AdminModulKabuk>

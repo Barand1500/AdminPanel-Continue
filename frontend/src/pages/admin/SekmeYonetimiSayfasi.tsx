@@ -152,11 +152,7 @@ export function SekmeYonetimiSayfasi() {
   }, [ayarlar]);
 
   return (
-    <AdminModulKabuk
-      baslik="Sekme Yönetimi"
-      aciklama="Üst sekme çubuğunun görünümünü ve davranışını ayarlayın."
-      onizleGoster={false}
-    >
+    <AdminModulKabuk onizleGoster={false}>
       <AdminPanelKarti baslik="Sekme Ayarları" altBaslik="Değişiklikler, Kaydet ile uygulanır">
         <div className="space-y-5">
           <div className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-surface-2)]/35 p-3">

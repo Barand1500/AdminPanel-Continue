@@ -206,21 +206,21 @@ export function HeaderYonetimiFormu() {
   const kategori = headerAyarlari.kategori!;
   const arama = headerAyarlari.arama!;
   const dilDestegi = headerAyarlari.dilDestegi!;
+  const gorunumSekmeleri = (
+    <div className="w-auto max-w-full overflow-visible">
+      <AdminPilSekme
+        sekmeler={[
+          { id: 'galeri', etiket: 'Header Tipleri', ikon: <GaleriIkon /> },
+          { id: 'editor', etiket: 'Düzenleme', ikon: <DuzenlemeIkon /> },
+        ]}
+        aktif={gorunum}
+        onDegistir={setGorunum}
+      />
+    </div>
+  );
 
   return (
-    <AdminModulKabuk
-      onizleGoster={false}
-      ustIcerik={
-        <AdminPilSekme
-          sekmeler={[
-            { id: 'galeri', etiket: 'Header Tipleri', ikon: <GaleriIkon /> },
-            { id: 'editor', etiket: 'Düzenleme', ikon: <DuzenlemeIkon /> },
-          ]}
-          aktif={gorunum}
-          onDegistir={setGorunum}
-        />
-      }
-    >
+    <AdminModulKabuk onizleGoster={false}>
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
@@ -233,6 +233,7 @@ export function HeaderYonetimiFormu() {
             siteAd={siteAd}
             headerAyarlari={birlesikHeader}
             iletisim={{ telefon: ayarlar.telefon, email: ayarlar.email }}
+            ustAksiyon={gorunumSekmeleri}
           />
         }
         ikinci={
@@ -247,6 +248,7 @@ export function HeaderYonetimiFormu() {
                 </button>
               </p>
             </div>
+            {gorunumSekmeleri}
           </div>
 
           <div className="ap-form-editor-govde">

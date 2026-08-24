@@ -62,6 +62,7 @@ interface SayfaListesiPanelProps {
   onSirala?: (sayfaId: string, yon: 'yukari' | 'asagi') => void;
   islemde?: boolean;
   tamGenislik?: boolean;
+  ustAksiyon?: ReactNode;
 }
 
 function SayfaSiraTuslari({
@@ -276,6 +277,7 @@ export function SayfaListesiPanel({
   onSirala,
   islemde,
   tamGenislik,
+  ustAksiyon,
 }: SayfaListesiPanelProps) {
   const [arama, setArama] = useState('');
   const [daraltildi, setDaraltildi] = useState<Record<string, boolean>>({});
@@ -300,15 +302,18 @@ export function SayfaListesiPanel({
           <h2 className="ap-heading text-sm font-semibold">Sayfa Listesi</h2>
           <p className="ap-muted text-xs">{sayfalar.length} sayfa</p>
         </div>
-        <button
-          type="button"
-          className={`ap-sayfa-duzenleme-modu-tus ${duzenlemeModu ? 'ap-sayfa-duzenleme-modu-tus-aktif' : ''}`}
-          onClick={() => setDuzenlemeModu((v) => !v)}
-          disabled={Boolean(arama.trim())}
-          title={arama.trim() ? 'Arama varken düzenleme modu kapalı' : undefined}
-        >
-          {duzenlemeModu ? 'Bitti' : 'Sırala'}
-        </button>
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          <button
+            type="button"
+            className={`ap-sayfa-duzenleme-modu-tus ${duzenlemeModu ? 'ap-sayfa-duzenleme-modu-tus-aktif' : ''}`}
+            onClick={() => setDuzenlemeModu((v) => !v)}
+            disabled={Boolean(arama.trim())}
+            title={arama.trim() ? 'Arama varken düzenleme modu kapalı' : undefined}
+          >
+            {duzenlemeModu ? 'Bitti' : 'Sırala'}
+          </button>
+          {ustAksiyon}
+        </div>
       </div>
       <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Başlık veya slug ara..." />
       <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
@@ -316,7 +321,7 @@ export function SayfaListesiPanel({
           <AdminBosDurum
             ikon={<AdminFlatIkon ad="belge" boyut={28} />}
             baslik={arama ? 'Sonuç yok' : 'Henüz sayfa yok'}
-            aciklama={arama ? 'Farklı bir arama deneyin' : 'Üstten Yeni Sayfa sekmesine geçerek başlayın'}
+            aciklama={arama ? 'Farklı bir arama deneyin' : 'Yeni Sayfa ile başlayın'}
           />
         ) : (
           <SayfaAgacDallari
@@ -348,6 +353,7 @@ interface SayfaEditorPanelProps {
   onSayfaSec?: (sayfa: AdminSayfa) => void;
   onSirala?: (sayfaId: string, yon: 'yukari' | 'asagi') => void;
   islemde?: boolean;
+  ustAksiyon?: ReactNode;
 }
 
 export function SayfaEditorPanel({
@@ -362,6 +368,7 @@ export function SayfaEditorPanel({
   onSayfaSec,
   onSirala,
   islemde,
+  ustAksiyon,
 }: SayfaEditorPanelProps) {
   const [sekme, setSekme] = useState<EditorSekme>('icerik');
   const ustSayfa = ustSayfaBul(sayfalar, form.ustSayfaId);
@@ -456,14 +463,17 @@ export function SayfaEditorPanel({
                 : 'Boş sayfa şablonu'}
           </p>
         </div>
-        <div className="flex flex-wrap gap-2">
-          {form.yayinda ? (
-            <AdminDurumEtiketi tur="yayinda">Yayında</AdminDurumEtiketi>
-          ) : (
-            <AdminDurumEtiketi tur="taslak">Taslak</AdminDurumEtiketi>
-          )}
-          {form.ustSayfaId && <AdminDurumEtiketi tur="bilgi">Alt sayfa</AdminDurumEtiketi>}
-          {altSayi > 0 && <AdminDurumEtiketi tur="menu">{altSayi} alt sayfa</AdminDurumEtiketi>}
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          <div className="flex flex-wrap gap-2">
+            {form.yayinda ? (
+              <AdminDurumEtiketi tur="yayinda">Yayında</AdminDurumEtiketi>
+            ) : (
+              <AdminDurumEtiketi tur="taslak">Taslak</AdminDurumEtiketi>
+            )}
+            {form.ustSayfaId && <AdminDurumEtiketi tur="bilgi">Alt sayfa</AdminDurumEtiketi>}
+            {altSayi > 0 && <AdminDurumEtiketi tur="menu">{altSayi} alt sayfa</AdminDurumEtiketi>}
+          </div>
+          {ustAksiyon}
         </div>
       </div>
 

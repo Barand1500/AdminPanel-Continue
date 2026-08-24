@@ -98,7 +98,7 @@ export class AuthService {
       throw new Error('Kullanici bulunamadi');
     }
 
-    const onceki = this.tercihleriOku(mevcut.tercihlerJson);
+    const onceki = this.hamTercihleriOku(mevcut.tercihlerJson);
     const guncel = await kullaniciRepo.guncelle(kullaniciId, {
       tercihlerJson: {
         ...onceki,
@@ -114,13 +114,17 @@ export class AuthService {
 
   private tercihleriOku(ham: unknown): KullaniciTercihleriDto {
     const varsayilan: KullaniciTercihleriDto = { dashboardHizliErisim: [] };
-    if (!ham || typeof ham !== 'object') return varsayilan;
-    const kayit = ham as Record<string, unknown>;
+    const kayit = this.hamTercihleriOku(ham);
     const liste = kayit.dashboardHizliErisim;
     if (!Array.isArray(liste)) return varsayilan;
     return {
       dashboardHizliErisim: liste.filter((id): id is string => typeof id === 'string'),
     };
+  }
+
+  private hamTercihleriOku(ham: unknown): Record<string, unknown> {
+    if (!ham || typeof ham !== 'object' || Array.isArray(ham)) return {};
+    return { ...(ham as Record<string, unknown>) };
   }
 
   private async toDto(kullanici: {

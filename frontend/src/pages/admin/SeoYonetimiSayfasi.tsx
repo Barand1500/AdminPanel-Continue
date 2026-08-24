@@ -373,6 +373,27 @@ export function SeoYonetimiSayfasi() {
 
   const kategoriEtiket = sekme === 'kategori' && gorunum === 'editor' ? 'Düzenleme' : 'Kategori';
   const sayfaEtiket = sekme === 'sabit-sayfa' && gorunum === 'editor' ? 'Düzenleme' : 'Sabit Sayfa';
+  const gorunumSekmeleri = (
+    <div className="w-full overflow-x-auto sm:w-auto">
+      <AdminPilSekme
+        sekmeler={[
+          { id: 'genel', etiket: 'Genel', ikon: <GenelIkon /> },
+          {
+            id: 'kategori',
+            etiket: kategoriEtiket,
+            ikon: sekme === 'kategori' && gorunum === 'editor' ? <DuzenlemeIkon /> : <ListeIkon />,
+          },
+          {
+            id: 'sabit-sayfa',
+            etiket: sayfaEtiket,
+            ikon: sekme === 'sabit-sayfa' && gorunum === 'editor' ? <DuzenlemeIkon /> : <ListeIkon />,
+          },
+        ]}
+        aktif={sekme}
+        onDegistir={sekmeDegistir}
+      />
+    </div>
+  );
 
   if (yukleniyor) {
     return (
@@ -383,33 +404,14 @@ export function SeoYonetimiSayfasi() {
   }
 
   return (
-    <AdminModulKabuk
-      onizleGoster={false}
-      ustIcerik={
-        <AdminPilSekme
-          sekmeler={[
-            { id: 'genel', etiket: 'Genel', ikon: <GenelIkon /> },
-            {
-              id: 'kategori',
-              etiket: kategoriEtiket,
-              ikon: sekme === 'kategori' && gorunum === 'editor' ? <DuzenlemeIkon /> : <ListeIkon />,
-            },
-            {
-              id: 'sabit-sayfa',
-              etiket: sayfaEtiket,
-              ikon: sekme === 'sabit-sayfa' && gorunum === 'editor' ? <DuzenlemeIkon /> : <ListeIkon />,
-            },
-          ]}
-          aktif={sekme}
-          onDegistir={sekmeDegistir}
-        />
-      }
-    >
+    <AdminModulKabuk onizleGoster={false}>
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
-      {sekme === 'genel' && <SeoGenelPanel form={genelForm} onChange={setGenelForm} />}
+      {sekme === 'genel' && (
+        <SeoGenelPanel form={genelForm} onChange={setGenelForm} ustAksiyon={gorunumSekmeleri} />
+      )}
 
       {urlSekmesi && gorunum === 'liste' && (
         <SeoUrlListesiPanel
@@ -420,6 +422,7 @@ export function SeoYonetimiSayfasi() {
           seciliId={seciliKayitId}
           baslik={sekme === 'kategori' ? 'Kategori SEO' : 'Sayfa SEO'}
           onSec={kayitSec}
+          ustAksiyon={gorunumSekmeleri}
         />
       )}
 
@@ -432,6 +435,7 @@ export function SeoYonetimiSayfasi() {
           onYonlendirmeDegistir={yonlendirmeDegistir}
           onYonlendirmeSec={setSeciliYonlendirmeId}
           onYonlendirmeSil={yonlendirmeSil}
+          ustAksiyon={gorunumSekmeleri}
         />
       )}
 

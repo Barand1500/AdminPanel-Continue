@@ -9,6 +9,8 @@ export function veritabaniHataMesaji(err: unknown): string | null {
     mesaj.includes('BlogYazisi') ||
     mesaj.includes('FormTanimi') ||
     mesaj.includes('AdminLog') ||
+    mesaj.includes('adminGorev') ||
+    mesaj.includes('AdminGorev') ||
     mesaj.includes('does not exist') ||
     mesaj.includes('P2021')
   ) {

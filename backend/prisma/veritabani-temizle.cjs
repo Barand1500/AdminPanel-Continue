@@ -45,6 +45,7 @@ const prisma = new PrismaClient();
 const TABLOLAR = [
   'form_gonderimler',
   'admin_loglari',
+  'admin_gorevler',
   'yedek_kayitlari',
   'widgetlar',
   'sekme_ayarlari',

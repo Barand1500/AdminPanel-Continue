@@ -6,6 +6,7 @@ import {
 } from '@/utils/sekmePanelAyarlari';
 import { AnimasyonluKenarlik } from './AnimasyonluKenarlik';
 import { AdminModulIkonu } from './AdminModulIkonu';
+import { AdminFlatIkon } from './ortak/AdminFlatIkon';
 
 interface UstSekmeCubuguProps {
   sekmeler: AdminSekme[];
@@ -25,6 +26,7 @@ type GrupOgesi =
   | { tip: 'grup'; grupId: string; sekmeler: AdminSekme[] };
 
 type DropMod = 'once' | 'sonra' | 'grup';
+type BaglamIslem = 'tek' | 'digerleri' | 'sol' | 'sag' | 'tumu';
 
 const SURUKLE_AYIR_ESIK = 48;
 
@@ -286,8 +288,20 @@ export function UstSekmeCubugu({
     setBaglamMenu({ x: e.clientX, y: e.clientY, sekmeId });
   }
 
-  function baglamIslem(islem: 'tek' | 'digerleri' | 'sol' | 'sag' | 'tumu') {
+  const baglamMenuSekmeIndeksi = baglamMenu
+    ? sekmeler.findIndex((sekme) => sekme.id === baglamMenu.sekmeId)
+    : -1;
+
+  function baglamIslemDevreDisi(islem: BaglamIslem) {
+    if (baglamMenuSekmeIndeksi < 0) return true;
+    if (islem === 'sol') return baglamMenuSekmeIndeksi === 0;
+    if (islem === 'sag') return baglamMenuSekmeIndeksi === sekmeler.length - 1;
+    return sekmeler.length <= 1;
+  }
+
+  function baglamIslem(islem: BaglamIslem) {
     if (!baglamMenu) return;
+    if (baglamIslemDevreDisi(islem)) return;
     const index = sekmeler.findIndex((sekme) => sekme.id === baglamMenu.sekmeId);
     if (index < 0) return;
     const idler = islem === 'tek' ? [baglamMenu.sekmeId]
@@ -398,11 +412,27 @@ export function UstSekmeCubugu({
       </div>
       <button type="button" className="ap-sekme-gezin" aria-label="Sonraki sekmelere git" onClick={() => scrollRef.current?.scrollBy({ left: 220, behavior: 'smooth' })}>›</button>
       {baglamMenu && <div className="ap-sekme-baglam-menu" style={{ left: baglamMenu.x, top: baglamMenu.y }} onPointerDown={(e) => e.stopPropagation()}>
-        <button type="button" onClick={() => baglamIslem('tek')}>Sekmeyi Kapat</button>
-        <button type="button" onClick={() => baglamIslem('digerleri')}>Diğerlerini Kapat</button>
-        <button type="button" onClick={() => baglamIslem('sol')}>Solundakileri Kapat</button>
-        <button type="button" onClick={() => baglamIslem('sag')}>Sağındakileri Kapat</button>
-        <button type="button" onClick={() => baglamIslem('tumu')}>Tümünü Kapat</button>
+        <button type="button" onClick={() => baglamIslem('tek')} disabled={baglamIslemDevreDisi('tek')}>
+          <AdminFlatIkon ad="sekmeKapat" boyut={15} />
+          <span>Sekmeyi Kapat</span>
+        </button>
+        <button type="button" onClick={() => baglamIslem('digerleri')} disabled={baglamIslemDevreDisi('digerleri')}>
+          <AdminFlatIkon ad="digerSekmeleriKapat" boyut={15} />
+          <span>Diğerlerini Kapat</span>
+        </button>
+        <button type="button" onClick={() => baglamIslem('sol')} disabled={baglamIslemDevreDisi('sol')}>
+          <AdminFlatIkon ad="solSekmeleriKapat" boyut={15} />
+          <span>Solundakileri Kapat</span>
+        </button>
+        <button type="button" onClick={() => baglamIslem('sag')} disabled={baglamIslemDevreDisi('sag')}>
+          <AdminFlatIkon ad="sagSekmeleriKapat" boyut={15} />
+          <span>Sağındakileri Kapat</span>
+        </button>
+        <div className="ap-sekme-baglam-menu-ayirici" role="separator" />
+        <button type="button" onClick={() => baglamIslem('tumu')} disabled={baglamIslemDevreDisi('tumu')}>
+          <AdminFlatIkon ad="tumSekmeleriKapat" boyut={15} />
+          <span>Tümünü Kapat</span>
+        </button>
       </div>}
     </div>
   );

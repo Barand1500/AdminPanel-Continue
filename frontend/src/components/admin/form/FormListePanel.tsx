@@ -20,6 +20,7 @@ interface FormListePanelProps {
   formlar: AdminForm[];
   seciliId: string | null;
   onSec: (form: AdminForm) => void;
+  ustAksiyon?: ReactNode;
 }
 
 function formIkonu(f: AdminForm): ReactNode {
@@ -28,7 +29,7 @@ function formIkonu(f: AdminForm): ReactNode {
   return <AdminFlatIkon ad="belge" boyut={20} />;
 }
 
-export function FormListePanel({ formlar, seciliId, onSec }: FormListePanelProps) {
+export function FormListePanel({ formlar, seciliId, onSec, ustAksiyon }: FormListePanelProps) {
   const [arama, setArama] = useState('');
   const [filtre, setFiltre] = useState<ListeFiltre>('tumu');
 
@@ -59,17 +60,20 @@ export function FormListePanel({ formlar, seciliId, onSec }: FormListePanelProps
             {gonderimToplam > 0 ? ` · ${gonderimToplam} gönderim` : ''}
           </p>
         </div>
-        <div className="ap-form-filtre-piller">
-          {LISTE_FILTRELER.map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              className={`ap-form-filtre-pil${filtre === f.id ? ' ap-form-filtre-pil--aktif' : ''}`}
-              onClick={() => setFiltre(f.id)}
-            >
-              {f.etiket}
-            </button>
-          ))}
+        <div className="flex min-w-0 flex-wrap items-center justify-end gap-2">
+          <div className="ap-form-filtre-piller">
+            {LISTE_FILTRELER.map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                className={`ap-form-filtre-pil${filtre === f.id ? ' ap-form-filtre-pil--aktif' : ''}`}
+                onClick={() => setFiltre(f.id)}
+              >
+                {f.etiket}
+              </button>
+            ))}
+          </div>
+          {ustAksiyon}
         </div>
       </div>
       <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Form adı veya slug ara..." />

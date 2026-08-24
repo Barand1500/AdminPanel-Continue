@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
 import { widgetFormMockUygula } from '@/types/widget';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
@@ -52,6 +52,7 @@ interface WidgetListesiPanelProps {
   sayfalar?: AdminSayfa[];
   onSec: (widget: AdminWidget) => void;
   onDuzenle: (widget: AdminWidget) => void;
+  ustAksiyon?: ReactNode;
 }
 
 export function WidgetListesiPanel({
@@ -61,6 +62,7 @@ export function WidgetListesiPanel({
   sayfalar = [],
   onSec,
   onDuzenle,
+  ustAksiyon,
 }: WidgetListesiPanelProps) {
   const [arama, setArama] = useState('');
   const [durumFiltre, setDurumFiltre] = useState<'tumu' | 'aktif' | 'pasif'>('tumu');
@@ -158,21 +160,24 @@ export function WidgetListesiPanel({
             {widgetlar.length} kayıt · {aktifSayisi} aktif
           </p>
         </div>
-        <div className="ap-form-filtre-piller">
-          {([
-            { id: 'tumu', etiket: 'Tümü' },
-            { id: 'aktif', etiket: 'Aktif' },
-            { id: 'pasif', etiket: 'Pasif' },
-          ] as const).map((f) => (
-            <button
-              key={f.id}
-              type="button"
-              className={`ap-form-filtre-pil${durumFiltre === f.id ? ' ap-form-filtre-pil--aktif' : ''}`}
-              onClick={() => setDurumFiltre(f.id)}
-            >
-              {f.etiket}
-            </button>
-          ))}
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          <div className="ap-form-filtre-piller">
+            {([
+              { id: 'tumu', etiket: 'Tümü' },
+              { id: 'aktif', etiket: 'Aktif' },
+              { id: 'pasif', etiket: 'Pasif' },
+            ] as const).map((f) => (
+              <button
+                key={f.id}
+                type="button"
+                className={`ap-form-filtre-pil${durumFiltre === f.id ? ' ap-form-filtre-pil--aktif' : ''}`}
+                onClick={() => setDurumFiltre(f.id)}
+              >
+                {f.etiket}
+              </button>
+            ))}
+          </div>
+          {ustAksiyon}
         </div>
       </div>
       <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Widget adı veya tip ara..." />
@@ -203,7 +208,7 @@ export function WidgetListesiPanel({
       )}
       <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
         {widgetlar.length === 0 ? (
-          <AdminBosDurum ikon={<AdminFlatIkon ad="puzzle" boyut={28} />} baslik="Henüz widget yok" aciklama="Üstten Yeni Widget ile başlayın" />
+          <AdminBosDurum ikon={<AdminFlatIkon ad="puzzle" boyut={28} />} baslik="Henüz widget yok" aciklama="Yeni Widget ile başlayın" />
         ) : listeGorunumu.gruplar.length === 0 ? (
           <AdminBosDurum ikon={<AdminFlatIkon ad="arama" boyut={28} />} baslik="Sonuç yok" aciklama="Filtreyi veya aramayı temizleyip tekrar deneyin" />
         ) : (
@@ -231,6 +236,7 @@ interface WidgetEditorPanelProps {
   onChange: (form: WidgetFormDegeri) => void;
   onOtomatikDoldurChange?: (acik: boolean) => void;
   onTipDegistirIste?: () => void;
+  ustAksiyon?: ReactNode;
 }
 
 export function WidgetEditorPanel({
@@ -243,6 +249,7 @@ export function WidgetEditorPanel({
   onChange,
   onOtomatikDoldurChange,
   onTipDegistirIste,
+  ustAksiyon,
 }: WidgetEditorPanelProps) {
   const [sekme, setSekme] = useState<EditorSekme>('icerik');
   const [otomatikDoldur, setOtomatikDoldur] = useState(yeniMod);
@@ -347,8 +354,11 @@ export function WidgetEditorPanel({
             )}
           </p>
         </div>
-        <div className={`ap-form-yayin-anahtar${form.aktif ? ' ap-form-yayin-anahtar--acik' : ''}`}>
-          <AdminAnahtarDugme etiket="Aktif" acik={form.aktif} onDegistir={(aktif) => onChange({ ...form, aktif })} />
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          <div className={`ap-form-yayin-anahtar${form.aktif ? ' ap-form-yayin-anahtar--acik' : ''}`}>
+            <AdminAnahtarDugme etiket="Aktif" acik={form.aktif} onDegistir={(aktif) => onChange({ ...form, aktif })} />
+          </div>
+          {ustAksiyon}
         </div>
       </div>
 

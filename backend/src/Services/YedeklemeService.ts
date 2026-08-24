@@ -53,6 +53,7 @@ async function siteVeriYukle(payload: YedekPayload) {
   const {
     siteAyarlari,
     kullanicilar,
+    adminGorevler = [],
     sayfalar,
     widgetlar,
     medyalar,
@@ -199,6 +200,27 @@ async function siteVeriYukle(payload: YedekPayload) {
       },
     },
   });
+
+  const kullaniciIdleri = new Set(kullanicilar.map((k) => k.id));
+  for (const gorev of adminGorevler) {
+    if (!kullaniciIdleri.has(gorev.kullaniciId)) {
+      throw new Error('Yedekteki gorev sahibi bu siteye ait degil');
+    }
+    await prisma.adminGorev.create({
+      data: {
+        id: gorev.id,
+        siteId: site.id,
+        kullaniciId: gorev.kullaniciId,
+        baslik: gorev.baslik,
+        tamamlandi: gorev.tamamlandi,
+        onemli: gorev.onemli,
+        baslangicTarihi: gorev.baslangicTarihi,
+        bitisTarihi: gorev.bitisTarihi,
+        olusturma: gorev.olusturma,
+        guncelleme: gorev.guncelleme,
+      },
+    });
+  }
 
   for (const log of payload.loglar) {
     await prisma.adminLog.create({ data: log });

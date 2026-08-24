@@ -29,25 +29,26 @@ export const ustMenuOgesiSchema = z.object({
 });
 
 export const headerAyarlariSchema = z.object({
-  headerTipi: z.preprocess(
-    (v) => (v === 'split' ? 'imza-kurumsal' : v),
-    z
-      .enum([
-        'klasik',
-        'sade',
-        'kompakt',
-        'merkez-logo',
-        'arama-odakli',
-        'modern',
-        'kurumsal',
-        'mega-menu',
-        'seffaf-hero',
-        'imza-kurumsal',
-        'yuzen-hap',
-        'masthead',
-      ])
-      .optional()
-  ),
+  headerTipi: z
+    .enum([
+      'klasik',
+      'sade',
+      'kompakt',
+      'merkez-logo',
+      'arama-odakli',
+      'modern',
+      'kurumsal',
+      'mega-menu',
+      'seffaf-hero',
+      'split',
+      'imza-kurumsal',
+      'cta-serit',
+      'sosyal-sahne',
+      'kartlar',
+      'yuzen-hap',
+      'masthead',
+    ])
+    .optional(),
   tipEk: z
     .object({
       sabit: z.boolean().optional(),

@@ -129,7 +129,7 @@ export function MedyaGalerisiSayfasi() {
   }
 
   return (
-    <AdminModulKabuk onizleGoster={false} baslik="Medya Galerisi" aciklama="Görselleri yükleyin, seçin, kopyalayın.">
+    <AdminModulKabuk onizleGoster={false}>
       <div className="ap-medya">
         <MedyaYukleyici
           urlForm={urlForm}

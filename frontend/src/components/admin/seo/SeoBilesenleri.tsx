@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import type { SeoGenelForm, SeoKayit, SeoYonlendirme } from '@/features/admin/seoApi';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
@@ -61,13 +61,19 @@ export function SeoSerpOnizleme({
 export function SeoGenelPanel({
   form,
   onChange,
+  ustAksiyon,
 }: {
   form: SeoGenelForm;
   onChange: (form: SeoGenelForm) => void;
+  ustAksiyon?: ReactNode;
 }) {
   return (
     <div className="ap-seo-genel-grid">
-      <AdminPanelKarti baslik="Site Genel SEO" altBaslik="Anasayfa ve varsayılan meta bilgileri">
+      <AdminPanelKarti
+        baslik="Site Genel SEO"
+        altBaslik="Anasayfa ve varsayılan meta bilgileri"
+        ustAksiyon={ustAksiyon}
+      >
         <div className="ap-seo-form ap-seo-form--genel">
           <FormAlani etiket="Site Başlığı (Title)" aciklama="Tarayıcı sekmesi ve arama sonuçları">
             <input
@@ -119,6 +125,7 @@ export function SeoUrlListesiPanel({
   seciliId,
   baslik,
   onSec,
+  ustAksiyon,
 }: {
   kayitlar: SeoKayit[];
   yonlendirmeler: SeoYonlendirme[];
@@ -127,6 +134,7 @@ export function SeoUrlListesiPanel({
   seciliId: string | null;
   baslik: string;
   onSec: (kayit: SeoKayit) => void;
+  ustAksiyon?: ReactNode;
 }) {
   const [arama, setArama] = useState('');
 
@@ -159,6 +167,7 @@ export function SeoUrlListesiPanel({
           <h2 className="ap-heading text-sm font-semibold">{baslik}</h2>
           <p className="ap-muted text-xs">{kayitlar.length} URL</p>
         </div>
+        {ustAksiyon}
       </div>
 
       <div className="ap-seo-ozet">
@@ -230,6 +239,7 @@ export function SeoKayitEditorPanel({
   onYonlendirmeDegistir,
   onYonlendirmeSec,
   onYonlendirmeSil,
+  ustAksiyon,
 }: {
   kayit: SeoKayit;
   yonlendirmeler: SeoYonlendirme[];
@@ -238,6 +248,7 @@ export function SeoKayitEditorPanel({
   onYonlendirmeDegistir: (id: string, alan: 'seoTitle' | 'seoDesc', deger: string) => void;
   onYonlendirmeSec: (id: string) => void;
   onYonlendirmeSil: (id: string) => void;
+  ustAksiyon?: ReactNode;
 }) {
   const altlar = hedefYonlendirmeleri(yonlendirmeler, kayit);
 
@@ -248,6 +259,7 @@ export function SeoKayitEditorPanel({
           <h2 className="ap-heading text-sm font-semibold">{kayit.etiket}</h2>
           <p className="ap-muted text-xs">{kayit.url}</p>
         </div>
+        {ustAksiyon}
       </div>
 
       <div className="ap-seo-editor-govde">

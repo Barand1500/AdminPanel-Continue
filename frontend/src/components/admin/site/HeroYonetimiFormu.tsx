@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
 import { GorselAlan } from '@/components/form/GorselAlan';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
@@ -255,10 +255,12 @@ function SlideDuzenlemeForm({
   slide,
   siraNo,
   slideGuncelle,
+  ustAksiyon,
 }: {
   slide: HeroSlide;
   siraNo: number;
   slideGuncelle: (id: string, parca: Partial<HeroSlide>) => void;
+  ustAksiyon?: ReactNode;
 }) {
   const tamEkran = slide.stil === 'tam-ekran';
 
@@ -269,12 +271,15 @@ function SlideDuzenlemeForm({
           <h2 className="ap-heading text-sm font-semibold">Slider {siraNo}</h2>
           <p className="ap-muted text-xs">{stilAdi(slide.stil)}</p>
         </div>
-        <div className={`ap-hero-aktif-anahtar${slide.aktif ? ' ap-hero-aktif-anahtar--acik' : ''}`}>
-          <AdminAnahtarDugme
-            etiket="Aktif"
-            acik={slide.aktif}
-            onDegistir={(aktif) => slideGuncelle(slide.id, { aktif })}
-          />
+        <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+          <div className={`ap-hero-aktif-anahtar${slide.aktif ? ' ap-hero-aktif-anahtar--acik' : ''}`}>
+            <AdminAnahtarDugme
+              etiket="Aktif"
+              acik={slide.aktif}
+              onDegistir={(aktif) => slideGuncelle(slide.id, { aktif })}
+            />
+          </div>
+          {ustAksiyon}
         </div>
       </div>
 
@@ -620,6 +625,22 @@ export function HeroYonetimiFormu() {
 
   const editorEtiket = gorunum === 'editor' && seciliSlide ? 'Düzenleme' : 'Yeni Slider';
 
+  const gorunumSekmeleri = (
+    <AdminPilSekme
+      sekmeler={[
+        { id: 'liste', etiket: 'Slider Listesi', ikon: <ListeIkon /> },
+        {
+          id: 'editor',
+          etiket: editorEtiket,
+          ikon: gorunum === 'editor' && seciliSlide ? <DuzenlemeIkon /> : <YeniIkon />,
+        },
+        { id: 'kartlar', etiket: 'Güven Kartları', ikon: <KartIkon /> },
+      ]}
+      aktif={gorunum}
+      onDegistir={gorunumDegistir}
+    />
+  );
+
   if (yukleniyor) {
     return (
       <AdminModulKabuk onizleGoster={false}>
@@ -630,24 +651,7 @@ export function HeroYonetimiFormu() {
   if (!ayarlar) return <HataDurumu mesaj={hata ?? 'Ayarlar yüklenemedi'} />;
 
   return (
-    <AdminModulKabuk
-      onizleGoster={false}
-      ustIcerik={
-        <AdminPilSekme
-          sekmeler={[
-            { id: 'liste', etiket: 'Slider Listesi', ikon: <ListeIkon /> },
-            {
-              id: 'editor',
-              etiket: editorEtiket,
-              ikon: gorunum === 'editor' && seciliSlide ? <DuzenlemeIkon /> : <YeniIkon />,
-            },
-            { id: 'kartlar', etiket: 'Güven Kartları', ikon: <KartIkon /> },
-          ]}
-          aktif={gorunum}
-          onDegistir={gorunumDegistir}
-        />
-      }
-    >
+    <AdminModulKabuk onizleGoster={false}>
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {kaydediliyor && <BildirimKutusu mesaj="Kaydediliyor..." tur="bilgi" />}
 
@@ -658,26 +662,29 @@ export function HeroYonetimiFormu() {
               <h2 className="ap-heading text-sm font-semibold">Hero sliderlar</h2>
               <p className="ap-muted text-xs">{hero.sliderlar.length} kayıt</p>
             </div>
-            <label className="ap-hero-gecis">
-              <span>Geçiş</span>
-              <input
-                type="number"
-                min={2}
-                max={60}
-                className={formInputSinifi}
-                value={gecisMetin}
-                onChange={(e) => gecisYaz(e.target.value)}
-                onBlur={gecisBlur}
-              />
-              <span>sn</span>
-            </label>
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+              <label className="ap-hero-gecis">
+                <span>Geçiş</span>
+                <input
+                  type="number"
+                  min={2}
+                  max={60}
+                  className={formInputSinifi}
+                  value={gecisMetin}
+                  onChange={(e) => gecisYaz(e.target.value)}
+                  onBlur={gecisBlur}
+                />
+                <span>sn</span>
+              </label>
+              {gorunumSekmeleri}
+            </div>
           </div>
           <div className="ap-sidebar-icerik ap-sayfa-liste-kaydir">
             {hero.sliderlar.length === 0 ? (
               <AdminBosDurum
                 ikon={<AdminFlatIkon ad="hero" boyut={28} />}
                 baslik="Henüz slider yok"
-                aciklama="Üstten Yeni Slider ile başlayın"
+                aciklama="Yeni Slider ile başlayın"
               />
             ) : (
               hero.sliderlar.map((s, i) => (
@@ -723,6 +730,7 @@ export function HeroYonetimiFormu() {
           slide={seciliSlide}
           siraNo={hero.sliderlar.findIndex((s) => s.id === seciliSlide.id) + 1}
           slideGuncelle={slideGuncelle}
+          ustAksiyon={gorunumSekmeleri}
         />
       )}
 
@@ -733,12 +741,15 @@ export function HeroYonetimiFormu() {
               <h2 className="ap-heading text-sm font-semibold">Güven kartları</h2>
               <p className="ap-muted text-xs">Slider altındaki ikonlu kutular</p>
             </div>
-            <div className={`ap-hero-aktif-anahtar${hero.kartlarAktif ? ' ap-hero-aktif-anahtar--acik' : ''}`}>
-              <AdminAnahtarDugme
-                etiket="Göster"
-                acik={hero.kartlarAktif}
-                onDegistir={(kartlarAktif) => heroGuncelle({ ...hero, kartlarAktif })}
-              />
+            <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
+              <div className={`ap-hero-aktif-anahtar${hero.kartlarAktif ? ' ap-hero-aktif-anahtar--acik' : ''}`}>
+                <AdminAnahtarDugme
+                  etiket="Göster"
+                  acik={hero.kartlarAktif}
+                  onDegistir={(kartlarAktif) => heroGuncelle({ ...hero, kartlarAktif })}
+                />
+              </div>
+              {gorunumSekmeleri}
             </div>
           </div>
           {hero.kartlarAktif && (

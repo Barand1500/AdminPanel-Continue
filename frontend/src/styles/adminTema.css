@@ -5896,7 +5896,7 @@ html:has(.admin-panel[data-tema='acik']) body {
   display: flex;
   flex-wrap: wrap;
   gap: 0.3rem;
-  padding: 0 0.15rem 0.35rem;
+  padding: 0 0.75rem 0.35rem;
 }
 
 .ap-widget-kimlik-satir {
@@ -5948,6 +5948,11 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 .ap-widget-galeri-ust .ap-arama {
   width: min(100%, 16rem);
+  padding: 0;
+}
+
+.ap-widget-galeri-ust .ap-pil-sekme-oge {
+  white-space: nowrap;
 }
 
 .ap-widget-galeri-govde {
@@ -11359,7 +11364,10 @@ html:has(.admin-panel[data-tema='acik']) body {
 .ap-sekme-gezin{display:inline-flex;align-self:stretch;width:2rem;flex:0 0 2rem;align-items:center;justify-content:center;border:0;border-right:1px solid var(--ap-border);background:transparent;color:var(--ap-text-muted);font-size:1.45rem;line-height:1;transition:background-color .15s,color .15s}
 .ap-sekme-gezin:last-of-type{border-right:0;border-left:1px solid var(--ap-border)}
 .ap-sekme-gezin:hover{background:var(--ap-hover);color:var(--ap-heading)}
-.ap-sekme-baglam-menu{position:fixed;z-index:250;min-width:15rem;overflow:hidden;border:1px solid var(--ap-border);border-radius:.5rem;background:var(--ap-surface);box-shadow:0 .8rem 2rem rgba(0,0,0,.35)}
-.ap-sekme-baglam-menu button{display:block;width:100%;border:0;border-bottom:1px solid var(--ap-border);background:transparent;padding:.65rem .85rem;color:var(--ap-heading);text-align:left;font-size:.78rem;font-weight:600}
-.ap-sekme-baglam-menu button:last-child{border-bottom:0}
-.ap-sekme-baglam-menu button:hover{background:var(--ap-hover)}
+.ap-sekme-baglam-menu{position:fixed;z-index:250;min-width:16.25rem;padding:.3rem;overflow:hidden;border:1px solid var(--ap-border);border-radius:.5rem;background:var(--ap-surface);box-shadow:0 .8rem 2rem rgba(0,0,0,.35)}
+.ap-sekme-baglam-menu button{display:flex;width:100%;align-items:center;gap:.65rem;border:0;border-radius:.3rem;background:transparent;padding:.6rem .65rem;color:var(--ap-heading);text-align:left;font-size:.78rem;font-weight:600;transition:background-color .15s,color .15s}
+.ap-sekme-baglam-menu button svg{flex:0 0 auto;color:var(--ap-text-muted)}
+.ap-sekme-baglam-menu button:hover:not(:disabled){background:var(--ap-hover)}
+.ap-sekme-baglam-menu button:disabled{cursor:not-allowed;color:var(--ap-text-muted);opacity:.5}
+.ap-sekme-baglam-menu button:disabled svg{color:currentColor}
+.ap-sekme-baglam-menu-ayirici{height:1px;margin:.35rem .2rem;background:var(--ap-border)}

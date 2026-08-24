@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import type { AdminForm, FormGonderim } from '@/features/admin/formApi';
 import { AdminBosDurum } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { AdminFlatIkon } from '@/components/admin/ortak/AdminFlatIkon';
@@ -10,6 +11,7 @@ interface FormGonderimPanelProps {
   onFormSec: (id: string) => void;
   onOkundu: (id: string) => void;
   onSil: (id: string) => void;
+  ustAksiyon?: ReactNode;
 }
 
 export function FormGonderimPanel({
@@ -19,6 +21,7 @@ export function FormGonderimPanel({
   onFormSec,
   onOkundu,
   onSil,
+  ustAksiyon,
 }: FormGonderimPanelProps) {
   const okunmamis = gonderimler.filter((g) => !g.okundu).length;
   const seciliForm = formlar.find((f) => f.id === seciliId) ?? null;
@@ -51,6 +54,7 @@ export function FormGonderimPanel({
               </option>
             ))}
           </select>
+          {ustAksiyon}
         </div>
       </div>
 

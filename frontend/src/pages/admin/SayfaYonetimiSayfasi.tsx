@@ -261,24 +261,23 @@ export function SayfaYonetimiSayfasi() {
     };
   }, [sayfalar, yeniBaslat]);
 
+  const gorunumSekmeleri = (
+    <AdminPilSekme
+      sekmeler={[
+        { id: 'liste', etiket: 'Sayfa Listesi', ikon: <ListeIkon /> },
+        {
+          id: 'editor',
+          etiket: gorunum === 'editor' && seciliId ? 'Düzenleme' : 'Yeni Sayfa',
+          ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniSayfaIkon />,
+        },
+      ]}
+      aktif={gorunum}
+      onDegistir={gorunumDegistir}
+    />
+  );
+
   return (
-    <AdminModulKabuk
-      onizleGoster={false}
-      ustIcerik={
-        <AdminPilSekme
-          sekmeler={[
-            { id: 'liste', etiket: 'Sayfa Listesi', ikon: <ListeIkon /> },
-            {
-              id: 'editor',
-              etiket: gorunum === 'editor' && seciliId ? 'Düzenleme' : 'Yeni Sayfa',
-              ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniSayfaIkon />,
-            },
-          ]}
-          aktif={gorunum}
-          onDegistir={gorunumDegistir}
-        />
-      }
-    >
+    <AdminModulKabuk onizleGoster={false}>
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
@@ -294,6 +293,7 @@ export function SayfaYonetimiSayfasi() {
           onSirala={sayfaSirala}
           islemde={kaydediliyor}
           tamGenislik
+          ustAksiyon={gorunumSekmeleri}
         />
       ) : (
         <SayfaEditorPanel
@@ -308,6 +308,7 @@ export function SayfaYonetimiSayfasi() {
           onSayfaSec={sayfaSec}
           onSirala={sayfaSirala}
           islemde={kaydediliyor}
+          ustAksiyon={gorunumSekmeleri}
         />
       )}
     </AdminModulKabuk>

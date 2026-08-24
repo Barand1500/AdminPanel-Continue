@@ -31,6 +31,7 @@ model Site {
   sekmeAyarlari      SekmeAyari[]
   sistemAyari        SistemAyari?
   adminLoglari       AdminLog[]
+  adminGorevler      AdminGorev[]
   yedekKayitlari     YedekKaydi[]
   navKategoriler     NavKategori[]
   seoYonlendirmeler  SeoYonlendirme[]
@@ -76,6 +77,7 @@ model Kullanici {
   guncelleme    DateTime @updatedAt
 
   adminLoglari AdminLog[]
+  adminGorevler AdminGorev[]
 
   @@index([siteId, rol])
   @@map("kullanicilar")
@@ -467,6 +469,25 @@ model AdminLog {
 
   @@index([siteId, olusturma])
   @@map("admin_loglari")
+}
+
+model AdminGorev {
+  id               Int       @id @default(autoincrement())
+  siteId           Int
+  site             Site      @relation(fields: [siteId], references: [id], onDelete: Cascade)
+  kullaniciId      Int
+  kullanici        Kullanici @relation(fields: [kullaniciId], references: [id], onDelete: Cascade)
+  baslik           String
+  tamamlandi       Boolean   @default(false)
+  onemli           Boolean   @default(false)
+  baslangicTarihi  DateTime?
+  bitisTarihi      DateTime?
+  olusturma        DateTime  @default(now())
+  guncelleme       DateTime  @updatedAt
+
+  @@index([kullaniciId, siteId, tamamlandi, bitisTarihi])
+  @@index([kullaniciId, siteId, olusturma])
+  @@map("admin_gorevler")
 }
 
 model YedekKaydi {

@@ -231,34 +231,43 @@ export function FormYonetimiSayfasi() {
     );
   }
 
+  const gorunumSekmeleri = (
+    <AdminPilSekme
+      sekmeler={[
+        { id: 'liste', etiket: 'Form Listesi', ikon: <ListeIkon /> },
+        {
+          id: 'editor',
+          etiket: editorEtiket,
+          ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniIkon />,
+        },
+        { id: 'gonderimler', etiket: 'Gönderimler', ikon: <GonderimIkon /> },
+      ]}
+      aktif={gorunum}
+      onDegistir={gorunumDegistir}
+    />
+  );
+
   return (
-    <AdminModulKabuk
-      onizleGoster={false}
-      ustIcerik={
-        <AdminPilSekme
-          sekmeler={[
-            { id: 'liste', etiket: 'Form Listesi', ikon: <ListeIkon /> },
-            {
-              id: 'editor',
-              etiket: editorEtiket,
-              ikon: gorunum === 'editor' && seciliId ? <DuzenlemeIkon /> : <YeniIkon />,
-            },
-            { id: 'gonderimler', etiket: 'Gönderimler', ikon: <GonderimIkon /> },
-          ]}
-          aktif={gorunum}
-          onDegistir={gorunumDegistir}
-        />
-      }
-    >
+    <AdminModulKabuk onizleGoster={false}>
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
 
       {gorunum === 'liste' && (
-        <FormListePanel formlar={formlar} seciliId={seciliId} onSec={formSec} />
+        <FormListePanel
+          formlar={formlar}
+          seciliId={seciliId}
+          onSec={formSec}
+          ustAksiyon={gorunumSekmeleri}
+        />
       )}
       {gorunum === 'editor' && (
-        <FormEditorKabuk form={form} seciliId={seciliId} onChange={setForm} />
+        <FormEditorKabuk
+          form={form}
+          seciliId={seciliId}
+          onChange={setForm}
+          ustAksiyon={gorunumSekmeleri}
+        />
       )}
       {gorunum === 'gonderimler' && (
         <FormGonderimPanel
@@ -268,6 +277,7 @@ export function FormYonetimiSayfasi() {
           onFormSec={gonderimFormSec}
           onOkundu={okunduIsaretle}
           onSil={gonderimSilHandler}
+          ustAksiyon={gorunumSekmeleri}
         />
       )}
 

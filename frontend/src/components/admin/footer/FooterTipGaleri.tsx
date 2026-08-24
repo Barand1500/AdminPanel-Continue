@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { AdminAramaKutusu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { GaleriKartAksiyonlar, GaleriOnizlemeKabugu } from '@/components/admin/ortak/GaleriKartAksiyonlar';
 import { FOOTER_TIP_TANIMLARI, type FooterTipi } from '@/data/footerTipleri';
@@ -19,9 +19,17 @@ interface FooterTipGaleriProps {
   siteAd: string;
   ayarlar?: SiteAyarlari | null;
   footer: FooterAyarlari;
+  ustAksiyon?: ReactNode;
 }
 
-export function FooterTipGaleri({ secili, onSec, siteAd, ayarlar, footer }: FooterTipGaleriProps) {
+export function FooterTipGaleri({
+  secili,
+  onSec,
+  siteAd,
+  ayarlar,
+  footer,
+  ustAksiyon,
+}: FooterTipGaleriProps) {
   const [arama, setArama] = useState('');
   const [kategori, setKategori] = useState('tumu');
   const [infoTip, setInfoTip] = useState<string | null>(null);
@@ -55,7 +63,10 @@ export function FooterTipGaleri({ secili, onSec, siteAd, ayarlar, footer }: Foot
             {seciliTanim ? ` Şu an: ${seciliTanim.ad}.` : ''}
           </p>
         </div>
-        <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Klasik, bülten, koyu..." />
+        <div className="ml-auto flex min-w-0 max-w-full items-center justify-end gap-3">
+          <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Klasik, bülten, koyu..." />
+          {ustAksiyon}
+        </div>
       </div>
 
       <div className="ap-widget-galeri-govde">

@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, type ReactNode } from 'react';
 import { AdminAramaKutusu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { GaleriKartAksiyonlar, GaleriOnizlemeKabugu } from '@/components/admin/ortak/GaleriKartAksiyonlar';
 import { HEADER_TIP_TANIMLARI, type HeaderTipi } from '@/data/headerTipleri';
@@ -18,9 +18,17 @@ interface HeaderTipGaleriProps {
   siteAd?: string;
   headerAyarlari: HeaderAyarlari;
   iletisim: { telefon?: string | null; email?: string | null };
+  ustAksiyon?: ReactNode;
 }
 
-export function HeaderTipGaleri({ secili, onSec, siteAd, headerAyarlari, iletisim }: HeaderTipGaleriProps) {
+export function HeaderTipGaleri({
+  secili,
+  onSec,
+  siteAd,
+  headerAyarlari,
+  iletisim,
+  ustAksiyon,
+}: HeaderTipGaleriProps) {
   const [arama, setArama] = useState('');
   const [kategori, setKategori] = useState('tumu');
   const [infoTip, setInfoTip] = useState<string | null>(null);
@@ -54,7 +62,10 @@ export function HeaderTipGaleri({ secili, onSec, siteAd, headerAyarlari, iletisi
             {seciliTanim ? ` Şu an: ${seciliTanim.ad}.` : ''}
           </p>
         </div>
-        <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Klasik, Amazon, şeffaf..." />
+        <div className="ml-auto flex min-w-0 max-w-full items-center justify-end gap-3">
+          <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Klasik, Amazon, şeffaf..." />
+          {ustAksiyon}
+        </div>
       </div>
 
       <div className="ap-widget-galeri-govde">
