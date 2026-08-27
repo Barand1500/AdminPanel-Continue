@@ -1,4 +1,4 @@
-import { useLayoutEffect, useRef, useState, type RefObject } from 'react';
+import { useEffect, useLayoutEffect, useRef, useState, type RefObject } from 'react';
 
 interface AnimasyonluKenarlikProps {
   animasyonAnahtar: string | number;
@@ -39,7 +39,7 @@ export function AnimasyonluKenarlik({
     setBoyut({ w: 0, h: 0 });
   }, [animasyonAnahtar]);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     const el = kapsayiciRef.current;
     if (!el) return;
 

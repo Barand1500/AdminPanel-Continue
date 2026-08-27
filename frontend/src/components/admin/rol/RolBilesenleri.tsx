@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { YETKI_ETIKETLERI, type RolTanimi, type YetkiKodu, type YetkiTanimi } from '@/features/admin/rolApi';
 
 const SISTEM_ROL_KODLARI = new Set([
@@ -19,9 +20,20 @@ interface RolMatrisiProps {
   yetkiler: YetkiTanimi[];
   duzenlenebilir?: boolean;
   onYetkiToggle?: (rolKod: string, yetkiKod: YetkiKodu) => void;
+  altSatir?: ReactNode;
+  seciliRolKod?: string | null;
+  onRolSec?: (rol: RolTanimi) => void;
 }
 
-export function RolMatrisi({ roller, yetkiler, duzenlenebilir, onYetkiToggle }: RolMatrisiProps) {
+export function RolMatrisi({
+  roller,
+  yetkiler,
+  duzenlenebilir,
+  onYetkiToggle,
+  altSatir,
+  seciliRolKod,
+  onRolSec,
+}: RolMatrisiProps) {
   return (
     <div className="min-w-[620px] overflow-x-auto bg-[var(--ap-surface)]">
       <table className="w-full text-left text-sm">
@@ -39,8 +51,17 @@ export function RolMatrisi({ roller, yetkiler, duzenlenebilir, onYetkiToggle }: 
           {roller.map((rol) => {
             const superAdmin = rol.kod === 'SUPER_ADMIN';
             const hucreDuzenlenebilir = duzenlenebilir && !superAdmin;
+            const secili = seciliRolKod === rol.kod;
             return (
-              <tr key={rol.kod} className="border-b border-[var(--ap-border)] last:border-b-0 hover:bg-[var(--ap-hover)]">
+              <tr
+                key={rol.kod}
+                onClick={() => onRolSec?.(rol)}
+                className={`border-b border-[var(--ap-border)] last:border-b-0 ${
+                  secili
+                    ? 'bg-[color-mix(in_srgb,var(--ap-accent)_14%,var(--ap-surface))]'
+                    : 'hover:bg-[var(--ap-hover)]'
+                } ${onRolSec ? 'cursor-pointer' : ''}`}
+              >
                 <td className="px-4 py-3">
                   <div className="ap-heading font-semibold">{rol.baslik}</div>
                   <div className="ap-muted mt-1 text-[10px] uppercase tracking-wide">{rol.kod}</div>
@@ -81,6 +102,7 @@ export function RolMatrisi({ roller, yetkiler, duzenlenebilir, onYetkiToggle }: 
               </tr>
             );
           })}
+          {altSatir}
         </tbody>
       </table>
     </div>

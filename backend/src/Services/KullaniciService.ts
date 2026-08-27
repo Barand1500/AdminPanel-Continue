@@ -66,7 +66,8 @@ export class KullaniciService {
 
     if (cagiran.rol === 'SUPER_ADMIN') {
       const siteId = opsiyonelSayisalId(filtreSiteId ?? undefined);
-      const liste = await kullaniciRepo.listele(siteId ?? undefined);
+      // Genel Super Admin hesapları siteye bağlı değildir; aktif site filtresinde de görünmelidir.
+      const liste = await kullaniciRepo.listele(siteId ?? undefined, true);
       return liste.map(kullaniciDto);
     }
 

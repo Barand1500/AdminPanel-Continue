@@ -71,6 +71,7 @@ function SekmeButonu({
   kareYerlesim,
   baslatMenuAcik,
   kenarlikAnimKey,
+  kenarlikAnimasyonHazir,
   onSekmeSec,
   onSekmeKapat,
   onSekmeBaglamMenu,
@@ -94,6 +95,7 @@ function SekmeButonu({
   kareYerlesim: boolean;
   baslatMenuAcik: boolean;
   kenarlikAnimKey: number;
+  kenarlikAnimasyonHazir: boolean;
   onSekmeSec: (id: string) => void;
   onSekmeKapat: (id: string) => void;
   onSekmeBaglamMenu: (event: MouseEvent, id: string) => void;
@@ -147,7 +149,7 @@ function SekmeButonu({
       }`}
       style={{ minHeight: 'var(--ap-tab-height, 2rem)', fontSize: 'var(--ap-tab-font-size, 0.75rem)' }}
     >
-      {sekmeVurgulu && (
+      {sekmeVurgulu && kenarlikAnimasyonHazir && (
         <AnimasyonluKenarlik
           animasyonAnahtar={`${sekme.id}-${kenarlikAnimKey}`}
           kapsayiciRef={tabRef}
@@ -210,6 +212,7 @@ export function UstSekmeCubugu({
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollTrackRef = useRef<HTMLDivElement>(null);
   const [kenarlikAnimKey, setKenarlikAnimKey] = useState(0);
+  const [kenarlikAnimasyonHazir, setKenarlikAnimasyonHazir] = useState(false);
   const [baglamMenu, setBaglamMenu] = useState<{ x: number; y: number; sekmeId: string } | null>(null);
   const surukleBaslangic = useRef<{ x: number; y: number; id: string } | null>(null);
 
@@ -256,6 +259,13 @@ export function UstSekmeCubugu({
     const kapat = () => setBaglamMenu(null);
     window.addEventListener('pointerdown', kapat);
     return () => window.removeEventListener('pointerdown', kapat);
+  }, []);
+
+  // İlk açılışta aktif sekmenin kenarlığını bir sonraki karede ekleriz.
+  // Böylece tarayıcı başlangıç durumunu boyar ve çizim animasyonu da görünür.
+  useEffect(() => {
+    const kare = requestAnimationFrame(() => setKenarlikAnimasyonHazir(true));
+    return () => cancelAnimationFrame(kare);
   }, []);
 
   function onDragStart(e: DragEvent, id: string) {
@@ -361,6 +371,7 @@ export function UstSekmeCubugu({
     kareYerlesim: ayarlar.sekmeYerlesim === 'kare',
     baslatMenuAcik,
     kenarlikAnimKey,
+    kenarlikAnimasyonHazir,
     onSekmeSec: sekmeSecAnim,
     onSekmeKapat,
     onSekmeBaglamMenu: sekmeBaglamMenuAc,

@@ -74,7 +74,7 @@ html:has(.admin-panel[data-tema='acik']) body {
 
 .admin-panel .ap-header {
   background-color: var(--ap-header-bg);
-  border-color: var(--ap-border);
+  border-bottom: 2px solid var(--ap-accent) !important;
   color: var(--ap-text);
   overflow: hidden;
 }
@@ -90,7 +90,7 @@ html:has(.admin-panel[data-tema='acik']) body {
   flex-shrink: 0;
   width: 100%;
   overflow: visible;
-  --ap-aksiyon-kenarlik-kalinlik: 2px;
+  --ap-aksiyon-kenarlik-kalinlik: 5px;
 }
 
 .admin-panel .ap-footer.ap-gorev-cubugu {
@@ -10485,13 +10485,14 @@ html:has(.admin-panel[data-tema='acik']) body {
   left: 0;
   width: 100%;
   pointer-events: none;
-  z-index: 55;
+  z-index: 61;
   overflow: visible;
 }
 
 .ap-gorev-cubugu-ust-cizgi-yol {
   stroke: var(--ap-accent);
-  stroke-width: var(--ap-aksiyon-kenarlik-kalinlik, 2px);
+  /* Panel etrafındaki SVG hattı, footer ile birebir aynı görsel kalınlıktadır. */
+  stroke-width: 5px;
   stroke-linecap: butt;
   stroke-linejoin: miter;
 }

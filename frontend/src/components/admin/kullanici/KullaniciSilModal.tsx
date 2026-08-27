@@ -1,19 +1,18 @@
 import { useCallback, useEffect } from 'react';
 import { IconAlertTriangle, IconX } from '@tabler/icons-react';
-import type { RolTanimi } from '@/features/admin/rolApi';
+import type { AdminKullanici } from '@/features/admin/kullaniciApi';
 
-interface RolSilModalProps {
-  acik: boolean;
-  rol: RolTanimi | null;
+interface KullaniciSilModalProps {
+  kullanici: AdminKullanici | null;
   onKapat: () => void;
   onOnayla: () => void;
 }
 
-export function RolSilModal({ acik, rol, onKapat, onOnayla }: RolSilModalProps) {
+export function KullaniciSilModal({ kullanici, onKapat, onOnayla }: KullaniciSilModalProps) {
   const kapat = useCallback(() => onKapat(), [onKapat]);
 
   useEffect(() => {
-    if (!acik) return;
+    if (!kullanici) return;
     function tusHandler(event: KeyboardEvent) {
       if (event.key === 'Escape') {
         event.preventDefault();
@@ -22,7 +21,6 @@ export function RolSilModal({ acik, rol, onKapat, onOnayla }: RolSilModalProps) 
       if (event.key === 'Enter') {
         event.preventDefault();
         onOnayla();
-        kapat();
       }
     }
     document.addEventListener('keydown', tusHandler);
@@ -31,35 +29,30 @@ export function RolSilModal({ acik, rol, onKapat, onOnayla }: RolSilModalProps) 
       document.removeEventListener('keydown', tusHandler);
       document.body.style.overflow = '';
     };
-  }, [acik, kapat, onOnayla]);
+  }, [kullanici, kapat, onOnayla]);
 
-  if (!acik || !rol) return null;
-
-  function onayla() {
-    onOnayla();
-    kapat();
-  }
+  if (!kullanici) return null;
 
   return (
     <div className="ap-yap-modal-arka" role="presentation">
       <div className="erp-donen-cerceve erp-donen-cerceve-surekli">
         <span className="erp-donen-cerceve-iz" />
         <div className="erp-donen-cerceve-icerik">
-          <div className="ap-yap-sil-modal" role="alertdialog" aria-modal="true" aria-labelledby="rol-sil-baslik">
+          <div className="ap-yap-sil-modal" role="alertdialog" aria-modal="true" aria-labelledby="kullanici-sil-baslik">
             <header>
               <span className="ap-yap-sil-uyari"><IconAlertTriangle size={19} /></span>
-              <h2 id="rol-sil-baslik">Bu rolü silmek istiyor musunuz?</h2>
+              <h2 id="kullanici-sil-baslik">Bu kullanıcıyı silmek istiyor musunuz?</h2>
               <button type="button" onClick={kapat}>
                 <IconX size={15} /> ESC
               </button>
             </header>
             <p>
-              <strong>{rol.baslik} ({rol.kod})</strong> kayıt taslağından kaldırılacak.
-              Değişikliğin kalıcı olması için ardından Kaydet&apos;e basmanız gerekir.
+              <strong>{kullanici.ad} ({kullanici.email})</strong> kalıcı olarak silinecektir.
+              Bu işlem geri alınamaz.
             </p>
             <footer>
               <button type="button" onClick={kapat}>Vazgeç<small>(ESC)</small></button>
-              <button type="button" onClick={onayla}>Evet, Sil<small>(ENTER)</small></button>
+              <button type="button" onClick={onOnayla}>Evet, Sil<small>(ENTER)</small></button>
             </footer>
           </div>
         </div>

@@ -16,9 +16,13 @@ export class KullaniciRepository {
     });
   }
 
-  async listele(siteId?: number | null) {
+  async listele(siteId?: number | null, globalSuperAdminDahil = false) {
     return prisma.kullanici.findMany({
-      where: siteId ? { siteId } : undefined,
+      where: siteId
+        ? globalSuperAdminDahil
+          ? { OR: [{ siteId }, { siteId: null, rol: 'SUPER_ADMIN' }] }
+          : { siteId }
+        : undefined,
       include: { site: { select: { id: true, ad: true, slug: true } } },
       orderBy: { olusturma: 'desc' },
     });

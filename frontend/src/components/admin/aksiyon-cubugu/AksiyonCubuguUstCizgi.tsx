@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef, useState, type RefObject } from 'react';
 
-const CIZGI_KALINLIK = 2;
+const CIZGI_KALINLIK = 5;
 const PANEL_YARICAP = 10;
 
 function ustCizgiYoluOlustur(

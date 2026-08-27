@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { KullaniciDuzenleFormu, KullaniciListesi, type AtanabilirRol } from '@/components/admin/kullanici/KullaniciBilesenleri';
+import { KullaniciSilModal } from '@/components/admin/kullanici/KullaniciSilModal';
 import { AdminModulKabuk, AdminPanelKarti, BildirimKutusu } from '@/components/admin/ortak/AdminBilesenleri';
 import { useAuth } from '@/contexts/AuthContext';
 import { useModulAksiyonlari } from '@/hooks/useModulAksiyonlari';
@@ -45,6 +46,7 @@ export function KullanicilarSayfasi() {
   const [yukleniyor, setYukleniyor] = useState(true);
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [hata, setHata] = useState('');
+  const [silmeOnayiAcik, setSilmeOnayiAcik] = useState(false);
   const [tumRoller, setTumRoller] = useState<AtanabilirRol[]>([]);
   const [rolBasliklari, setRolBasliklari] = useState<Record<string, string>>(VARSAYILAN_ROL_ETIKETLERI);
 
@@ -52,6 +54,7 @@ export function KullanicilarSayfasi() {
     if (oturum?.rol === 'SUPER_ADMIN') return true;
     return rol.kod !== 'SUPER_ADMIN' && rol.kod !== 'AJANS_ADMIN';
   });
+  const seciliKullanici = kullanicilar.find((kullanici) => kullanici.id === seciliId) ?? null;
 
   const yukle = useCallback(async () => {
     setYukleniyor(true);
@@ -113,7 +116,8 @@ export function KullanicilarSayfasi() {
   }, [form, seciliId, sifreDegisti, yeniBaslat, yukle]);
 
   const sil = useCallback(async () => {
-    if (!seciliId || !confirm('Bu kullanıcıyı silmek istediğinize emin misiniz?')) return;
+    if (!seciliId) return;
+    setSilmeOnayiAcik(false);
     setKaydediliyor(true);
     try {
       await adminKullaniciSil(seciliId);
@@ -126,8 +130,12 @@ export function KullanicilarSayfasi() {
     }
   }, [seciliId, yeniBaslat, yukle]);
 
+  const silIste = useCallback(() => {
+    if (seciliId) setSilmeOnayiAcik(true);
+  }, [seciliId]);
+
   useModulAksiyonlari(
-    { kaydet, ekle: yeniBaslat, sil },
+    { kaydet, ekle: yeniBaslat, sil: silIste },
     { kaydet: !kaydediliyor, ekle: !kaydediliyor, sil: Boolean(seciliId) && !kaydediliyor }
   );
 
@@ -170,6 +178,11 @@ export function KullanicilarSayfasi() {
           />
         </div>
       )}
+      <KullaniciSilModal
+        kullanici={silmeOnayiAcik ? seciliKullanici : null}
+        onKapat={() => setSilmeOnayiAcik(false)}
+        onOnayla={() => void sil()}
+      />
     </AdminModulKabuk>
   );
 }

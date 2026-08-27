@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { IconKey, IconLayoutGrid } from '@tabler/icons-react';
 import { RolKartlari, RolMatrisi, rolSilinebilirMi } from '@/components/admin/rol/RolBilesenleri';
 import { RolDuzenleModal } from '@/components/admin/rol/RolDuzenleModal';
-import { RolEkleModal } from '@/components/admin/rol/RolEkleModal';
+import { RolEkleSatiri } from '@/components/admin/rol/RolEkleSatiri';
 import { RolSilModal } from '@/components/admin/rol/RolSilModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { useKaydedilmemisBildirim } from '@/contexts/AdminUyariBildirimContext';
@@ -112,7 +112,7 @@ export function RollerSayfasi() {
     );
   }, []);
 
-  const rolEkle = useCallback((deger: { baslik: string; aciklama: string }) => {
+  const rolEkle = useCallback((deger: { baslik: string; aciklama: string; yetkiler: YetkiKodu[] }) => {
     setTaslakRoller((onceki) => {
       const kod = baslikdanKodUret(
         deger.baslik,
@@ -125,7 +125,7 @@ export function RollerSayfasi() {
           kod,
           baslik: deger.baslik,
           aciklama: deger.aciklama,
-          yetkiler: ['goruntuleme'] as YetkiKodu[],
+          yetkiler: deger.yetkiler,
           sistemRolu: false,
         },
       ];
@@ -134,6 +134,10 @@ export function RollerSayfasi() {
 
   const rolSec = useCallback((rol: RolTanimi) => {
     setSeciliRolKod((onceki) => (onceki === rol.kod ? null : rol.kod));
+  }, []);
+
+  const rolMatrisSec = useCallback((rol: RolTanimi) => {
+    setSeciliRolKod(rol.kod);
   }, []);
 
   const silIste = useCallback(() => {
@@ -163,7 +167,11 @@ export function RollerSayfasi() {
     }
   }, [taslakRoller]);
 
-  const ekleAc = useCallback(() => setEkleModalAcik(true), []);
+  const ekleAc = useCallback(() => {
+    setAktifGorunum('matris');
+    setMatrisFiltreKod(null);
+    setEkleModalAcik(true);
+  }, []);
 
   useModulAksiyonlari(
     { kaydet, ekle: ekleAc, sil: silIste },
@@ -266,6 +274,15 @@ export function RollerSayfasi() {
                 yetkiler={yetkiler}
                 duzenlenebilir={superAdminMi}
                 onYetkiToggle={yetkiToggle}
+                seciliRolKod={seciliRolKod}
+                onRolSec={rolMatrisSec}
+                altSatir={ekleModalAcik ? (
+                  <RolEkleSatiri
+                    yetkiler={yetkiler}
+                    onKapat={() => setEkleModalAcik(false)}
+                    onEkle={rolEkle}
+                  />
+                ) : null}
               />
             </div>
           </div>
@@ -280,11 +297,6 @@ export function RollerSayfasi() {
         )}
       </AdminPanelKarti>
 
-      <RolEkleModal
-        acik={ekleModalAcik}
-        onKapat={() => setEkleModalAcik(false)}
-        onEkle={rolEkle}
-      />
       <RolDuzenleModal
         acik={!!duzenleRol}
         rol={duzenleRol}
