@@ -70,24 +70,59 @@ export const SABIT_HIZLI_LINKLER: { ad: string; link: string }[] = [
 ];
 
 export function ustMenuOgeleriOlustur(ustMenu: UstMenuOgesi[], sayfalar: Sayfa[] = []): MenuOgesi[] {
-  return [...ustMenu]
-    .sort((a, b) => a.sira - b.sira)
-    .map((o) => {
-      const sayfa =
-        (o.sayfaId ? sayfalar.find((s) => idString(s.id) === idString(o.sayfaId!)) : undefined) ??
-        sayfalar.find((s) => sayfaYolunuBul(s.slug) === o.link.trim());
-      const acilisModu: SayfaAcilisModu =
-        sayfa?.acilisModu ?? (o.yeniSekme ? 'yeni_sekme' : 'normal');
-      const altOgeler = sayfa ? sayfaAltMenuOgeleriOlustur(sayfa.id, sayfalar) : [];
-      return {
-        baslik: o.ad,
-        yol: o.link,
-        ikon: sayfa?.ikon ?? null,
-        yeniSekme: acilisModu === 'yeni_sekme',
-        acilisModu,
-        ...(altOgeler.length > 0 ? { altOgeler } : {}),
-      };
-    });
+  // Eski kayıtlar alt menüyü sayfa hiyerarşisinden üretir. Yeni yönetim ekranı
+  // ilk kez kaydedilene kadar bu davranışı koruyarak mevcut siteleri bozmuyoruz.
+  const yeniAgacKullaniliyor = ustMenu.some((o) => Object.prototype.hasOwnProperty.call(o, 'ustOgeId'));
+  if (!yeniAgacKullaniliyor) {
+    return [...ustMenu]
+      .sort((a, b) => a.sira - b.sira)
+      .map((o) => {
+        const sayfa =
+          (o.sayfaId ? sayfalar.find((s) => idString(s.id) === idString(o.sayfaId!)) : undefined) ??
+          sayfalar.find((s) => sayfaYolunuBul(s.slug) === o.link.trim());
+        const acilisModu: SayfaAcilisModu = sayfa?.acilisModu ?? (o.yeniSekme ? 'yeni_sekme' : 'normal');
+        const altOgeler = sayfa ? sayfaAltMenuOgeleriOlustur(sayfa.id, sayfalar) : [];
+        return {
+          baslik: o.ad, yol: o.link, ikon: sayfa?.ikon ?? null,
+          yeniSekme: acilisModu === 'yeni_sekme', acilisModu,
+          ...(altOgeler.length > 0 ? { altOgeler } : {}),
+        };
+      });
+  }
+
+  const gorunenler = ustMenu.filter((o) => o.gorunur !== false);
+  const ogeler = new Map(gorunenler.map((o) => [o.id, o]));
+  const altlar = new Map<string | null, UstMenuOgesi[]>();
+
+  for (const oge of gorunenler) {
+    // Eski kayıtlar ustOgeId içermediği için otomatik ana menüde kalır.
+    const ustId = oge.ustOgeId && oge.ustOgeId !== oge.id && ogeler.has(oge.ustOgeId)
+      ? oge.ustOgeId
+      : null;
+    altlar.set(ustId, [...(altlar.get(ustId) ?? []), oge]);
+  }
+
+  const dal = (ustId: string | null, ziyaret: Set<string>): MenuOgesi[] =>
+    [...(altlar.get(ustId) ?? [])]
+      .sort((a, b) => a.sira - b.sira)
+      .filter((o) => !ziyaret.has(o.id))
+      .map((o) => {
+        const sayfa =
+          (o.sayfaId ? sayfalar.find((s) => idString(s.id) === idString(o.sayfaId!)) : undefined) ??
+          sayfalar.find((s) => sayfaYolunuBul(s.slug) === o.link.trim());
+        const sonrakiZiyaret = new Set(ziyaret).add(o.id);
+        const altOgeler = dal(o.id, sonrakiZiyaret);
+        return {
+          baslik: o.ad,
+          yol: sayfa && o.tip === 'sayfa' ? sayfaYolunuBul(sayfa.slug) : o.link,
+          ikon: sayfa?.ikon ?? null,
+          yeniSekme: o.yeniSekme,
+          acilisModu: o.yeniSekme ? 'yeni_sekme' : 'normal',
+          ...(altOgeler.length > 0 ? { altOgeler } : {}),
+        };
+      });
+
+  return dal(null, new Set());
 }
 
 export function sayfaMenudenUstMenuAktar(sayfalar: AdminSayfa[]): UstMenuOgesi[] {

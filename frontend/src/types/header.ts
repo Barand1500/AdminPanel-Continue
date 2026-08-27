@@ -52,6 +52,12 @@ export interface UstMenuOgesi {
   yeniSekme: boolean;
   sira: number;
   sayfaId?: string;
+  /** WordPress benzeri menü ağacında bağlı üst öğe. Boşsa ana menüdedir. */
+  ustOgeId?: string | null;
+  /** Öğeyi silmeden ziyaretçi menüsünden saklar. */
+  gorunur?: boolean;
+  /** Kaynak panelinde hangi türden eklendiğini belirtir. */
+  tip?: 'sayfa' | 'kategori' | 'ozel_link';
 }
 
 export type DilGorunumModu = 'bayrak' | 'kod';

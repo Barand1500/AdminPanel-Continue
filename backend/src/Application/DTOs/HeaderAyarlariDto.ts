@@ -26,6 +26,9 @@ export const ustMenuOgesiSchema = z.object({
   yeniSekme: z.boolean(),
   sira: z.number().int().min(0),
   sayfaId: z.string().optional(),
+  ustOgeId: z.string().nullable().optional(),
+  gorunur: z.boolean().optional(),
+  tip: z.enum(['sayfa', 'kategori', 'ozel_link']).optional(),
 });
 
 export const headerAyarlariSchema = z.object({
@@ -102,6 +105,7 @@ export const headerAyarlariSchema = z.object({
     .object({
       acilisModu: z.enum(['dropdown', 'sidebar', 'liste']),
       baslikMetni: z.string().max(80),
+      menuGoster: z.boolean().optional(),
     })
     .optional(),
   arama: z

@@ -22,8 +22,10 @@ import type { NavKategoriFormDegeri, NavKategoriKayit } from '@/types/navKategor
 import { navKategoriDerinlik } from '@/utils/navKategoriAgaci';
 import { headerAyarlariBirlestir } from '@/types/header';
 import { useSiteAyarlariYonetimi } from '@/contexts/SiteAyarlariContext';
+import { AnaMenuYonetimiPanel } from '@/components/admin/menu/AnaMenuYonetimiPanel';
 
 type Gorunum = 'liste' | 'editor';
+type MenuBolumu = 'ana-menu' | 'kategori-menu';
 
 function ListeIkon() {
   return (
@@ -55,6 +57,7 @@ export function KategoriYonetimiSayfasi() {
     useSiteAyarlariYonetimi();
   const header = headerAyarlariBirlestir(headerAyarlari ? { headerAyarlariJson: headerAyarlari } : null);
   const kategoriMenuAcik = header.kategori?.menuGoster !== false;
+  const [bolum, setBolum] = useState<MenuBolumu>('ana-menu');
 
   const [kategoriler, setKategoriler] = useState<NavKategoriKayit[]>([]);
   const [form, setForm] = useState<NavKategoriFormDegeri>(bosKategoriForm);
@@ -175,11 +178,11 @@ export function KategoriYonetimiSayfasi() {
       duzenle: duzenlemeyeGit,
     },
     {
-      kaydet: gorunum === 'editor' && !kaydediliyor && Boolean(form.baslik.trim()),
-      ekle: true,
-      altEkle: !!seciliId && gorunum === 'liste' && !kaydediliyor,
-      sil: !!seciliId && !kaydediliyor,
-      duzenle: !!seciliId && gorunum === 'liste' && !kaydediliyor,
+      kaydet: bolum === 'kategori-menu' && gorunum === 'editor' && !kaydediliyor && Boolean(form.baslik.trim()),
+      ekle: bolum === 'kategori-menu',
+      altEkle: bolum === 'kategori-menu' && !!seciliId && gorunum === 'liste' && !kaydediliyor,
+      sil: bolum === 'kategori-menu' && !!seciliId && !kaydediliyor,
+      duzenle: bolum === 'kategori-menu' && !!seciliId && gorunum === 'liste' && !kaydediliyor,
     }
   );
 
@@ -252,6 +255,17 @@ export function KategoriYonetimiSayfasi() {
 
   return (
     <AdminModulKabuk onizleGoster={false}>
+      <div className="mb-5">
+        <AdminPilSekme
+          sekmeler={[
+            { id: 'ana-menu', etiket: 'Ana Menü' },
+            { id: 'kategori-menu', etiket: 'Kategori / Mega Menü' },
+          ]}
+          aktif={bolum}
+          onDegistir={setBolum}
+        />
+      </div>
+      {bolum === 'ana-menu' ? <AnaMenuYonetimiPanel /> : <>
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
@@ -275,6 +289,7 @@ export function KategoriYonetimiSayfasi() {
           ustAksiyon={gorunumSekmeleri}
         />
       )}
+      </>}
     </AdminModulKabuk>
   );
 }
