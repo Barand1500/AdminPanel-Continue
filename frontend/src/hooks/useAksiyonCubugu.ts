@@ -99,6 +99,7 @@ const modulAksiyonlari: Record<string, AksiyonButonu[]> = {
     A('altEkle', 'Yeni Alt Ekle', false),
     A('sil', 'Sil', true),
     A('duzenle', 'Düzenle', false),
+    A('onizle', 'Önizle', true),
   ],
   ayarlar: [
     A('kaydet', 'Kaydet', true, true),

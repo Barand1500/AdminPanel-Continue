@@ -253,19 +253,21 @@ export function KategoriYonetimiSayfasi() {
     />
   );
 
+  const menuBolumSekmeleri = (
+    <AdminPilSekme
+      sekmeler={[
+        { id: 'ana-menu', etiket: 'Ana Menü' },
+        { id: 'kategori-menu', etiket: 'Kategori / Mega Menü' },
+      ]}
+      aktif={bolum}
+      onDegistir={setBolum}
+    />
+  );
+
   return (
     <AdminModulKabuk onizleGoster={false}>
-      <div className="mb-5">
-        <AdminPilSekme
-          sekmeler={[
-            { id: 'ana-menu', etiket: 'Ana Menü' },
-            { id: 'kategori-menu', etiket: 'Kategori / Mega Menü' },
-          ]}
-          aktif={bolum}
-          onDegistir={setBolum}
-        />
-      </div>
-      {bolum === 'ana-menu' ? <AnaMenuYonetimiPanel /> : <>
+      {bolum === 'ana-menu' ? <AnaMenuYonetimiPanel menuSekmeleri={menuBolumSekmeleri} /> : <>
+      <div className="mb-5 flex justify-end">{menuBolumSekmeleri}</div>
       {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
