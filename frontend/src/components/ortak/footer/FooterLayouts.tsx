@@ -125,7 +125,7 @@ function FooterLayoutNewsletter({ siteAdi, ayarlar, footer, cevir }: FooterLayou
         <div className="footer-sema-uc grid gap-8">
           <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} cevir={cevir} />
           <div className="footer-kolonlar grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-            <FooterKolonlar footer={footer} cevir={cevir} />
+            <FooterKolonlar footer={footer} cevir={cevir} ayarlar={ayarlar} />
           </div>
         </div>
       </div>
@@ -175,7 +175,7 @@ function FooterLayoutSplit({ siteAdi, ayarlar, footer, cevir }: FooterLayoutProp
             <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} cevir={cevir} />
           </div>
           <div className="footer-split-kolonlar">
-            <FooterKolonlar footer={footer} cevir={cevir} />
+            <FooterKolonlar footer={footer} cevir={cevir} ayarlar={ayarlar} />
           </div>
         </div>
       </div>
@@ -191,7 +191,7 @@ function FooterLayoutSplitVitrin({ siteAdi, ayarlar, footer, cevir }: FooterLayo
         <div className="footer-split-vitrin">
           <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} cevir={cevir} />
           <div className="footer-kolonlar grid gap-8 sm:grid-cols-2">
-            <FooterKolonlar footer={footer} cevir={cevir} />
+            <FooterKolonlar footer={footer} cevir={cevir} ayarlar={ayarlar} />
           </div>
         </div>
       </div>
@@ -303,7 +303,7 @@ function FooterLayoutKartlar({ siteAdi, ayarlar, footer, cevir }: FooterLayoutPr
           <div className="footer-kart footer-kart--marka">
             <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} cevir={cevir} />
           </div>
-          <FooterKolonlar footer={footer} cevir={cevir} />
+          <FooterKolonlar footer={footer} cevir={cevir} ayarlar={ayarlar} />
         </div>
       </div>
       <FooterTelifBand siteAdi={siteAdi} ayarlar={ayarlar} cevir={cevir} />
@@ -321,7 +321,7 @@ function FooterLayoutMasthead({ siteAdi, ayarlar, footer, cevir }: FooterLayoutP
       </div>
       <div className="container-site py-10">
         <div className="footer-kolonlar grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          <FooterKolonlar footer={footer} cevir={cevir} />
+          <FooterKolonlar footer={footer} cevir={cevir} ayarlar={ayarlar} />
         </div>
       </div>
       <FooterGuvenBand footer={footer} cevir={cevir} ayarlar={ayarlar} />

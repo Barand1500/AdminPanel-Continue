@@ -144,7 +144,11 @@ export function headerMenuOlustur(
   headerAyarlari?: HeaderAyarlari | null,
   siteAyarlari?: SiteAyarlari | null
 ): MenuOgesi[] {
-  const ustMenu = headerAyarlari?.ustMenu ?? [];
+  const seciliMenuId = headerAyarlari?.menuKonumlari?.header;
+  const seciliMenu = seciliMenuId
+    ? headerAyarlari?.menuler?.find((menu) => menu.id === seciliMenuId)
+    : undefined;
+  const ustMenu = seciliMenu?.ogeler ?? headerAyarlari?.ustMenu ?? [];
   if (ustMenu.length > 0) {
     return ustMenuOgeleriOlustur(ustMenu, sayfalar);
   }

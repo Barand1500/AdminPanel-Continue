@@ -121,17 +121,26 @@ export function FooterMarka({
 export function FooterKolonlar({
   footer,
   cevir,
+  ayarlar,
 }: {
   footer: FooterBirlesik;
   cevir: CevirFn;
+  ayarlar?: SiteAyarlari | null;
 }) {
   const linkIkon = footerLinkIkonGoster(footer.linkIkon);
   const aktifKolonlar = footer.kolonlar.filter((k) => k.aktif);
+  const header = headerAyarlariBirlestir(ayarlar);
+  const footerMenuId = header.menuKonumlari?.footer;
+  const footerKolonId = header.menuKonumlari?.footerKolonId;
+  const footerMenu = footerMenuId ? header.menuler?.find((menu) => menu.id === footerMenuId) : undefined;
 
   return (
     <>
       {aktifKolonlar.map((kolon) => {
-        const linkler = [...kolon.linkler]
+        const menuLinkleri = kolon.id === footerKolonId && footerMenu
+          ? footerMenu.ogeler.filter((oge) => !oge.ustOgeId && oge.gorunur !== false).map((oge, sira) => ({ id: oge.id, ad: oge.ad, link: oge.link, yeniSekme: oge.yeniSekme, aktif: true, sira }))
+          : null;
+        const linkler = [...(menuLinkleri ?? kolon.linkler)]
           .filter((l) => l.aktif !== false)
           .sort((a, b) => a.sira - b.sira);
         return (
@@ -374,7 +383,7 @@ export function footerAnaIcerik({
     <div className={`footer-icerik ${sema}`}>
       <FooterMarka siteAdi={siteAdi} ayarlar={ayarlar} footer={footer} cevir={cevir} />
       <div className="footer-kolonlar">
-        <FooterKolonlar footer={footer} cevir={cevir} />
+        <FooterKolonlar footer={footer} cevir={cevir} ayarlar={ayarlar} />
       </div>
     </div>
   );

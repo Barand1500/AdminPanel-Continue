@@ -60,6 +60,21 @@ export interface UstMenuOgesi {
   tip?: 'sayfa' | 'kategori' | 'ozel_link';
 }
 
+/** WordPress'teki isimli menü kaydı; mevcut Header ayar JSON'unda tutulur. */
+export interface KayitliMenu {
+  id: string;
+  ad: string;
+  ogeler: UstMenuOgesi[];
+}
+
+export interface MenuKonumlari {
+  header?: string | null;
+  footer?: string | null;
+  /** Footer menüsünün, Footer Yönetimi'ndeki hangi bağlantı kolonunu beslediği. */
+  footerKolonId?: string | null;
+  mobil?: string | null;
+}
+
 export type DilGorunumModu = 'bayrak' | 'kod';
 
 export interface SiteDilKaydi {
@@ -148,6 +163,8 @@ export interface HeaderAyarlari {
   };
   sonKurGuncelleme?: string | null;
   ustMenu?: UstMenuOgesi[];
+  menuler?: KayitliMenu[];
+  menuKonumlari?: MenuKonumlari;
   dilDestegi?: DilDestegiAyarlari;
 }
 
@@ -256,6 +273,8 @@ export function varsayilanHeaderAyarlari(
     },
     sonKurGuncelleme: mevcut?.sonKurGuncelleme ?? null,
     ustMenu: mevcut?.ustMenu ?? [],
+    menuler: mevcut?.menuler ?? [],
+    menuKonumlari: mevcut?.menuKonumlari ?? {},
     dilDestegi: dilDestegiBirlestir(mevcut?.dilDestegi),
   };
 }

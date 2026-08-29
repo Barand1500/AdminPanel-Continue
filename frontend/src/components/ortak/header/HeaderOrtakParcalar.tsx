@@ -14,6 +14,7 @@ import { SiteMarkaAlani } from '../SiteMarkaAlani';
 import { HeaderDilSecici } from '../HeaderDilSecici';
 import { SosyalMedyaIkonSatirlari } from '../SosyalMedyaIkon';
 import { CizgiIkon } from '@/components/widget/CizgiIkonlari';
+import { ustMenuOgeleriOlustur } from '@/utils/menuYardimci';
 
 export function MenuOgeGoster({
   oge,
@@ -361,6 +362,9 @@ export function MobilMenuPanel({
   menuAcik: boolean;
   onMenuKapat: () => void;
 }) {
+  const mobilMenuId = veri.header.menuKonumlari?.mobil;
+  const mobilMenuKaydi = mobilMenuId ? veri.header.menuler?.find((menu) => menu.id === mobilMenuId) : undefined;
+  const mobilMenu = mobilMenuKaydi ? ustMenuOgeleriOlustur(mobilMenuKaydi.ogeler) : veri.cevrilmisMenu;
   if (!menuAcik) return null;
 
   return (
@@ -377,7 +381,7 @@ export function MobilMenuPanel({
         aria-label="Mobil menü"
       >
         <div className="site-mobil-menu-links">
-          {veri.cevrilmisMenu.map((oge, i) => (
+          {mobilMenu.map((oge, i) => (
             <div key={`${oge.yol}-${i}`}>
               <MenuOgeGoster
                 oge={oge}
