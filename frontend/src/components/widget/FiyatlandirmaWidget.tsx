@@ -35,22 +35,40 @@ function Baslik({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
   );
 }
 
+function BicimlendirilmisOzellikMetni({ metin }: { metin: string }) {
+  const parcalar = metin.split(/(\*\*[^*]+\*\*)/g);
+
+  return (
+    <>
+      {parcalar.map((parca, index) =>
+        parca.startsWith('**') && parca.endsWith('**')
+          ? <strong key={index}>{parca.slice(2, -2)}</strong>
+          : parca
+      )}
+    </>
+  );
+}
+
 function OzellikListesi({
   paket,
-  vurgu,
   metin,
 }: {
   paket: WidgetFiyatPaketi;
-  vurgu: string;
   metin: string;
 }) {
   return (
     <ul className="fp-ozellikler">
       {(paket.ozellikler ?? []).map((o, i) => (
-        <li key={i} className={`fp-ozellik${o.dahil ? '' : ' fp-ozellik-kapali'}`} style={{ color: metin }}>
-          <span style={{ color: o.dahil ? vurgu : '#94a3b8' }}>{o.dahil ? '✓' : '✕'}</span>
-          <span>{o.metin}</span>
-        </li>
+        o.baslik ? (
+          <li key={i} className="fp-ozellik-baslik" style={{ color: metin }}><BicimlendirilmisOzellikMetni metin={o.metin} /></li>
+        ) : (
+          <li key={i} className={`fp-ozellik${o.durum === 'haric' || !o.dahil ? ' fp-ozellik-kapali' : ''}`} style={{ color: metin }}>
+            <span className={`fp-ozellik-ikon fp-ozellik-ikon-${o.durum === 'ek' ? 'ek' : o.durum === 'ozel' ? 'ozel' : o.durum === 'sinirli' ? 'sinirli' : o.durum === 'haric' || !o.dahil ? 'haric' : 'dahil'}`} aria-label={o.durum === 'ek' ? 'Ek hizmet' : o.durum === 'ozel' ? 'Özel hizmet' : o.durum === 'sinirli' ? 'Sınırlı hizmet' : o.durum === 'haric' || !o.dahil ? 'Dahil değil' : 'Dahil'}>
+              {o.durum === 'ek' ? '+' : o.durum === 'ozel' ? '↻' : o.durum === 'sinirli' ? '!' : o.durum === 'haric' || !o.dahil ? '×' : '✓'}
+            </span>
+            <span><BicimlendirilmisOzellikMetni metin={o.metin} /></span>
+          </li>
+        )
       ))}
     </ul>
   );
@@ -118,7 +136,8 @@ function PaketKart({
       <div className="fp-paket-govde">
         <p className="fp-paket-fiyat" style={{ color: renk.baslik }}>{paket.fiyat}</p>
         {paket.aciklama && <p className="fp-paket-aciklama" style={{ color: renk.metin }}>{paket.aciklama}</p>}
-        <OzellikListesi paket={paket} vurgu={renk.vurgu} metin={renk.metin} />
+        {paket.altAciklama && <p className="fp-paket-alt-aciklama" style={{ color: renk.metin }}>{paket.altAciklama}</p>}
+        <OzellikListesi paket={paket} metin={renk.metin} />
       </div>
       {paket.butonLink && (
         <footer className="fp-paket-alt" style={{ background: renk.vurgu }}>
@@ -221,9 +240,8 @@ function SpotlightMerkez({ widget, cfg, paketler }: { widget: Widget; cfg: Widge
           <div
             key={p.id}
             className={`fp-spotlight-kolon${i === merkez ? ' fp-spotlight-merkez' : ''}`}
-            style={i === merkez ? { transform: 'scale(1.05)', zIndex: 2 } : undefined}
           >
-            <PaketKart paket={p} cfg={cfg} oneCikan={i === merkez} />
+            <PaketKart paket={p} cfg={cfg} oneCikan={i === merkez} sinif="fp-paket-karsilastirma" />
           </div>
         ))}
       </div>
@@ -314,7 +332,7 @@ function KartDestesi({ widget, cfg, paketler }: { widget: Widget; cfg: WidgetCon
             >
               <h3 className="fp-paket-ad" style={{ color: renk.baslik }}>{p.ad}</h3>
               <p className="fp-paket-fiyat" style={{ color: renk.vurgu }}>{p.fiyat}</p>
-              <OzellikListesi paket={p} vurgu={renk.vurgu} metin={renk.metin} />
+              <OzellikListesi paket={p} metin={renk.metin} />
               <PaketButon paket={p} vurgu={renk.vurgu} outline={!p.oneCikan} />
             </article>
           ))}

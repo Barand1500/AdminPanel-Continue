@@ -1,11 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useOutletContext, useParams } from 'react-router-dom';
 import { blogDetayGetir } from '@/features/site/blogApi';
 import type { BlogYazisiDetay } from '@/types/blog';
 import { blogTarihFormatla } from '@/types/blog';
 import { medyaTamUrl } from '@/features/admin/medyaApi';
+import type { SitePublicData } from '@/types/site';
+import { BlogSidebar } from '@/components/blog/BlogSidebar';
 
 export function BlogDetaySayfasi() {
+  const veri = useOutletContext<SitePublicData>();
   const { slug } = useParams<{ slug: string }>();
   const [yazi, setYazi] = useState<BlogYazisiDetay | null>(null);
   const [yukleniyor, setYukleniyor] = useState(true);
@@ -86,11 +89,12 @@ export function BlogDetaySayfasi() {
         </div>
       )}
 
-      <div className="container-site max-w-3xl py-12">
+      <div className="container-site grid gap-8 py-12 lg:grid-cols-[minmax(0,1fr)_18rem]">
         <div
           className="prose prose-slate max-w-none text-slate-700 leading-relaxed"
           dangerouslySetInnerHTML={{ __html: yazi.icerik }}
         />
+        <BlogSidebar veri={veri} />
       </div>
     </article>
   );

@@ -46,5 +46,6 @@ export function useModulAksiyonlari(
     durumlar?.duzenle,
     durumlar?.onizle,
     durumlar?.yayinla,
+    durumlar?.gizli,
   ]);
 }

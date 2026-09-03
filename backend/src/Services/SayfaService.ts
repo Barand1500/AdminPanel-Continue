@@ -1,9 +1,30 @@
 import type { Prisma } from '@prisma/client';
 import type { MenuGuncelleDto, SayfaGuncelleDto, SayfaOlusturDto, SayfaTasiDto } from '../Application/DTOs/SayfaDto.js';
 import { SayfaRepository } from '../Infrastructure/repositories/SayfaRepository.js';
+import { SiteAyarlariRepository } from '../Infrastructure/repositories/SiteAyarlariRepository.js';
 import { sayisalId } from '../Infrastructure/utils/sayisalId.js';
 
 const sayfaRepo = new SayfaRepository();
+const ayarlarRepo = new SiteAyarlariRepository();
+
+type JsonNesne = Record<string, unknown>;
+
+function nesneMi(deger: unknown): deger is JsonNesne {
+  return typeof deger === 'object' && deger !== null && !Array.isArray(deger);
+}
+
+/**
+ * Sayfa kaynağından eklenmiş menü öğelerini temizler. URL'si aynı olsa bile
+ * özel bağlantılar sayfa kaynağı değildir; onlara hiçbir zaman dokunulmaz.
+ */
+function silinenSayfaMenuOgeleriniTemizle(ogeler: unknown, sayfaId: number) {
+  if (!Array.isArray(ogeler)) return { ogeler, degisti: false };
+
+  const temiz = ogeler.filter(
+    (oge) => !nesneMi(oge) || String(oge.sayfaId ?? '') !== String(sayfaId)
+  );
+  return { ogeler: temiz, degisti: temiz.length !== ogeler.length };
+}
 
 function slugOlustur(baslik: string) {
   return baslik
@@ -284,6 +305,42 @@ export class SayfaService {
     if (altSayi > 0) throw new Error('Alt sayfalari olan bir sayfa silinemez');
 
     await sayfaRepo.deleteForSite(sayfaId, siteId);
+    await this.silinenSayfaBaglantilariniTemizle(siteId, sayfaId);
+  }
+
+  /** Sayfa silindiğinde Header JSON içindeki yalnız sayfa-kaynaklı kayıtları ayıklar. */
+  private async silinenSayfaBaglantilariniTemizle(siteId: number, sayfaId: number) {
+    const ayarlar = await ayarlarRepo.findBySiteId(siteId);
+    if (!ayarlar || !nesneMi(ayarlar.headerAyarlariJson)) return;
+
+    const header = ayarlar.headerAyarlariJson;
+    let degisti = false;
+    const temizHeader: JsonNesne = { ...header };
+
+    const ustMenu = silinenSayfaMenuOgeleriniTemizle(header.ustMenu, sayfaId);
+    if (ustMenu.degisti) {
+      temizHeader.ustMenu = ustMenu.ogeler;
+      degisti = true;
+    }
+
+    if (Array.isArray(header.menuler)) {
+      let menulerDegisti = false;
+      const menuler = header.menuler.map((menu) => {
+        if (!nesneMi(menu)) return menu;
+        const ogeler = silinenSayfaMenuOgeleriniTemizle(menu.ogeler, sayfaId);
+        if (!ogeler.degisti) return menu;
+        menulerDegisti = true;
+        degisti = true;
+        return { ...menu, ogeler: ogeler.ogeler };
+      });
+      if (menulerDegisti) temizHeader.menuler = menuler;
+    }
+
+    if (degisti) {
+      await ayarlarRepo.upsert(siteId, {
+        headerAyarlariJson: temizHeader as Prisma.InputJsonValue,
+      });
+    }
   }
 
   async menuGuncelle(siteId: number, dto: MenuGuncelleDto) {

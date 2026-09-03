@@ -75,6 +75,29 @@ export interface MenuKonumlari {
   mobil?: string | null;
 }
 
+export type SidebarBilesenTipi = 'menu' | 'arama' | 'son_yazilar' | 'kategoriler' | 'arsivler' | 'takvim' | 'metin' | 'form';
+export interface SidebarBileseni {
+  id: string;
+  tip: SidebarBilesenTipi;
+  baslik?: string;
+  menuId?: string;
+  formId?: string;
+  icerik?: string;
+  adet?: number;
+  aktif: boolean;
+  sira: number;
+}
+export interface SidebarAyarlari {
+  blogAktif: boolean;
+  blogBilesenleri: SidebarBileseni[];
+  sayfaAktif: boolean;
+  sayfaBilesenleri: SidebarBileseni[];
+  /** Sayfa Sidebar'ın gösterileceği, sidebar destekleyen standart sayfa kimlikleri. */
+  sayfaIdleri: string[];
+  anaSayfaAktif: boolean;
+  anaSayfaBilesenleri: SidebarBileseni[];
+}
+
 export type DilGorunumModu = 'bayrak' | 'kod';
 
 export interface SiteDilKaydi {
@@ -165,6 +188,7 @@ export interface HeaderAyarlari {
   ustMenu?: UstMenuOgesi[];
   menuler?: KayitliMenu[];
   menuKonumlari?: MenuKonumlari;
+  sidebarAyarlari?: SidebarAyarlari;
   dilDestegi?: DilDestegiAyarlari;
 }
 
@@ -275,6 +299,7 @@ export function varsayilanHeaderAyarlari(
     ustMenu: mevcut?.ustMenu ?? [],
     menuler: mevcut?.menuler ?? [],
     menuKonumlari: mevcut?.menuKonumlari ?? {},
+    sidebarAyarlari: { blogAktif: mevcut?.sidebarAyarlari?.blogAktif ?? false, blogBilesenleri: mevcut?.sidebarAyarlari?.blogBilesenleri ?? [], sayfaAktif: mevcut?.sidebarAyarlari?.sayfaAktif ?? false, sayfaBilesenleri: mevcut?.sidebarAyarlari?.sayfaBilesenleri ?? [], sayfaIdleri: mevcut?.sidebarAyarlari?.sayfaIdleri ?? [], anaSayfaAktif: mevcut?.sidebarAyarlari?.anaSayfaAktif ?? false, anaSayfaBilesenleri: mevcut?.sidebarAyarlari?.anaSayfaBilesenleri ?? [] },
     dilDestegi: dilDestegiBirlestir(mevcut?.dilDestegi),
   };
 }

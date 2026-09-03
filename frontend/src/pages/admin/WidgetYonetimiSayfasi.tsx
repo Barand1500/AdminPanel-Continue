@@ -21,10 +21,12 @@ import { sonrakiWidgetSira, siraCakismasiBul } from '@/utils/widgetSiraYardimci'
 import { siteVerisiGuncellendiYayinla } from '@/utils/siteVerisiOlaylari';
 import { widgetFormNormalize } from '@/utils/widgetFormYardimci';
 import type { AdminWidget, WidgetFormDegeri } from '@/types/admin';
+import { SidebarAlanlariPanel } from '@/components/admin/widget/SidebarAlanlariPanel';
 
 const YENI_WIDGET_TIPI = 'BLOK_OLUSTURUCU';
 
 type Gorunum = 'liste' | 'editor';
+type YonetimSekmesi = 'widgetlar' | 'sidebar';
 
 function varsayilanYeniTip(filtre?: string) {
   return filtre ?? YENI_WIDGET_TIPI;
@@ -77,6 +79,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
   const [otomatikDoldur, setOtomatikDoldur] = useState(false);
   const [yeniTaslakSayac, setYeniTaslakSayac] = useState(0);
   const [tipOnaylandi, setTipOnaylandi] = useState(Boolean(varsayilanTip));
+  const [yonetimSekmesi, setYonetimSekmesi] = useState<YonetimSekmesi>('widgetlar');
 
   const yeniMod = seciliId === null;
   const editorAnahtar = seciliId ?? `yeni-${yeniTaslakSayac}`;
@@ -187,14 +190,14 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
   }, [seciliId]);
 
   useModulAksiyonlari(
-    {
+    yonetimSekmesi === 'sidebar' ? {} : {
       kaydet,
       ekle: yeniBaslat,
       sil: silHandler,
       duzenle: duzenlemeyeGit,
       onizle: () => setOnizlemeAcik(true),
     },
-    {
+    yonetimSekmesi === 'sidebar' ? {} : {
       kaydet: gorunum === 'editor' && tipOnaylandi && !kaydediliyor && kaydetHazirMi(form),
       ekle: true,
       sil: !!seciliId && !kaydediliyor,
@@ -275,6 +278,7 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
       onDegistir={gorunumDegistir}
     />
   );
+  const yonetimSekmeleri = <AdminPilSekme sekmeler={[{ id: 'widgetlar', etiket: 'Widgetlar' }, { id: 'sidebar', etiket: 'Sidebar Alanları' }]} aktif={yonetimSekmesi} onDegistir={(id) => setYonetimSekmesi(id as YonetimSekmesi)} />;
 
   return (
     <AdminModulKabuk onizleGoster={false}>
@@ -282,7 +286,9 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
       {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
       {kaydediliyor && <BildirimKutusu mesaj="İşlem yapılıyor..." tur="bilgi" />}
 
-      {gorunum === 'liste' && (
+      {yonetimSekmesi === 'sidebar' && <SidebarAlanlariPanel ustAksiyon={yonetimSekmeleri} />}
+
+      {yonetimSekmesi === 'widgetlar' && gorunum === 'liste' && (
         <WidgetListesiPanel
           widgetlar={widgetlar}
           seciliId={seciliId}
@@ -291,12 +297,13 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
           onSec={widgetSec}
           onDuzenle={widgetDuzenleAc}
           ustAksiyon={gorunumSekmeleri}
+          solAksiyon={yonetimSekmeleri}
         />
       )}
-      {gorunum === 'editor' && yeniMod && !tipOnaylandi && (
+      {yonetimSekmesi === 'widgetlar' && gorunum === 'editor' && yeniMod && !tipOnaylandi && (
         <WidgetTipGaleri tipFiltre={varsayilanTip} onSec={galeridenTipSec} ustAksiyon={gorunumSekmeleri} />
       )}
-      {gorunum === 'editor' && tipOnaylandi && (
+      {yonetimSekmesi === 'widgetlar' && gorunum === 'editor' && tipOnaylandi && (
         <WidgetEditorPanel
           form={form}
           seciliWidget={seciliWidget}
@@ -311,12 +318,12 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
         />
       )}
 
-      <WidgetOnizlemeModal
+      {yonetimSekmesi === 'widgetlar' && <WidgetOnizlemeModal
         acik={onizlemeAcik}
         form={form}
         otomatikDoldur={otomatikDoldur}
         onKapat={() => setOnizlemeAcik(false)}
-      />
+      />}
     </AdminModulKabuk>
   );
 }

@@ -4,7 +4,7 @@ import { GorevCubuguTray } from './GorevCubuguTray';
 import { SaatTakvimWidget } from './SaatTakvimWidget';
 import { CubukModulArama } from './CubukModulArama';
 import { AdminModulIkonu } from './AdminModulIkonu';
-import { IconChecklist, IconHelpCircle, IconStar, IconX, IconGripVertical, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
+import { IconHelpCircle, IconStar, IconX, IconGripVertical, IconChevronDown, IconChevronUp } from '@tabler/icons-react';
 import { modulRehberBul } from '@/data/adminModulRehberleri';
 import { modulBul } from '@/data/adminMenuYapisi';
 import { BildirimPaneli, useBildirimSayaci } from './BildirimPaneli';
@@ -206,15 +206,6 @@ function AltAksiyonCubuguGovde({
             </div>
           )}
         </div>
-        <button
-          type="button"
-          onClick={() => onModulAc?.('yapilacaklar')}
-          className="ap-tray-ikon relative"
-          title="Yapılacaklar"
-          aria-label="Yapılacaklar"
-        >
-          <IconChecklist size={17} stroke={1.8} aria-hidden />
-        </button>
         <button
           type="button"
           onClick={temaDegistir}

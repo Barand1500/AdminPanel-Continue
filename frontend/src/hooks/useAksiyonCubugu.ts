@@ -176,7 +176,7 @@ export function useAksiyonCubugu(modulId: string) {
     const modulYetki = MODUL_AKSIYON_YETKI[modulId] ?? {};
     const yetkiVar = (kod: YetkiKodu) => yetkiler.includes(kod);
 
-    return temel.map((aksiyon) => {
+    return temel.filter((aksiyon) => !aksiyonDurumlari.gizli?.includes(aksiyon.id as AksiyonId)).map((aksiyon) => {
       const dinamik = aksiyonDurumlari[aksiyon.id as AksiyonId];
       const etiket = t(`aksiyon.${aksiyon.id}`, aksiyon.etiket);
       const guncel = { ...aksiyon, etiket };

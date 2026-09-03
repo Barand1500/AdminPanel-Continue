@@ -53,6 +53,7 @@ interface WidgetListesiPanelProps {
   onSec: (widget: AdminWidget) => void;
   onDuzenle: (widget: AdminWidget) => void;
   ustAksiyon?: ReactNode;
+  solAksiyon?: ReactNode;
 }
 
 export function WidgetListesiPanel({
@@ -63,6 +64,7 @@ export function WidgetListesiPanel({
   onSec,
   onDuzenle,
   ustAksiyon,
+  solAksiyon,
 }: WidgetListesiPanelProps) {
   const [arama, setArama] = useState('');
   const [durumFiltre, setDurumFiltre] = useState<'tumu' | 'aktif' | 'pasif'>('tumu');
@@ -149,17 +151,10 @@ export function WidgetListesiPanel({
     return sayfaAdlari.get(idString(sayfaId)) ?? 'Sayfa';
   }
 
-  const aktifSayisi = widgetlar.filter((w) => w.aktif).length;
-
   return (
     <aside className="ap-sidebar-panel ap-sayfa-liste-panel ap-sayfa-liste-panel--tam">
       <div className="ap-sidebar-baslik">
-        <div>
-          <h2 className="ap-heading text-sm font-semibold">Widgetlar</h2>
-          <p className="ap-muted text-xs">
-            {widgetlar.length} kayıt · {aktifSayisi} aktif
-          </p>
-        </div>
+        <div>{solAksiyon}</div>
         <div className="ml-auto flex flex-wrap items-center justify-end gap-2">
           <div className="ap-form-filtre-piller">
             {([
@@ -253,6 +248,7 @@ export function WidgetEditorPanel({
 }: WidgetEditorPanelProps) {
   const [sekme, setSekme] = useState<EditorSekme>('icerik');
   const [otomatikDoldur, setOtomatikDoldur] = useState(yeniMod);
+  const [fiyatYardimAcik, setFiyatYardimAcik] = useState(false);
   const formYedekRef = useRef<WidgetFormDegeri | null>(null);
   const yedekAnahtarRef = useRef<string | null>(null);
   const widgetAnahtar = editorAnahtar ?? seciliWidget?.id ?? 'yeni';
@@ -272,6 +268,10 @@ export function WidgetEditorPanel({
       setSekme('genel');
     }
   }, [form.tip, sekme]);
+
+  useEffect(() => {
+    if (form.tip !== 'FIYATLANDIRMA') setFiyatYardimAcik(false);
+  }, [form.tip]);
 
   useEffect(() => {
     if (oncekiAnahtarRef.current === widgetAnahtar) return;
@@ -344,7 +344,37 @@ export function WidgetEditorPanel({
     <div className="ap-editor-panel ap-form-editor ap-widget-editor">
       <div className="ap-form-editor-ust">
         <div>
-          <h2 className="ap-heading text-sm font-semibold">{yeniMod ? 'Yeni widget' : 'Widget düzenle'}</h2>
+          <div className="ap-widget-editor-baslik-satir">
+            <h2 className="ap-heading text-sm font-semibold">{yeniMod ? 'Yeni widget' : 'Widget düzenle'}</h2>
+            {form.tip === 'FIYATLANDIRMA' && (
+              <div className="ap-fiyat-yardim">
+                <button
+                  type="button"
+                  className="ap-fiyat-yardim-tus"
+                  aria-label="Fiyat paketi özellikleri yazım rehberi"
+                  aria-expanded={fiyatYardimAcik}
+                  onClick={() => setFiyatYardimAcik((acik) => !acik)}
+                >
+                  !
+                </button>
+                {fiyatYardimAcik && (
+                  <div className="ap-fiyat-yardim-kutu" role="tooltip">
+                    <strong>Özellik satırları</strong>
+                    <p>Her satır ayrı özellik; Enter yeni satır açar.</p>
+                    <ul>
+                      <li><b>Özellik</b><span>✓ Dahil</span></li>
+                      <li><b>-Özellik</b><span>× Hariç</span></li>
+                      <li><b>+Özellik</b><span>+ Ek özellik</span></li>
+                      <li><b>~Özellik</b><span>↻ Özel</span></li>
+                      <li><b>!Özellik</b><span>! Sınırlı</span></li>
+                      <li><b>#Başlık</b><span>Ara başlık</span></li>
+                      <li><b>**Metin**</b><span>Kalın metin</span></li>
+                    </ul>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
           <p className="ap-widget-editor-tip">
             <span>{seciliTipMeta?.etiket ?? tipEtiketi(form.tip)}</span>
             {onTipDegistirIste && (

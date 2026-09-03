@@ -166,23 +166,29 @@ export function KategoriYonetimiSayfasi() {
     setGorunum('editor');
   }, [seciliId]);
 
+  const anaMenuAksiyonuYayinla = useCallback((aksiyon: string) => {
+    window.dispatchEvent(new CustomEvent(`ap-ana-menu-${aksiyon}`));
+  }, []);
+
   useModulAksiyonlari(
     {
-      kaydet,
-      ekle: yeniBaslat,
+      kaydet: () => bolum === 'ana-menu' ? anaMenuAksiyonuYayinla('kaydet') : kaydet(),
+      ekle: () => bolum === 'ana-menu' ? anaMenuAksiyonuYayinla('yeni') : yeniBaslat(),
       altEkle: () => {
         const secili = kategoriler.find((k) => k.id === seciliId);
         if (secili) altEkle(secili);
       },
-      sil,
-      duzenle: duzenlemeyeGit,
+      sil: () => bolum === 'ana-menu' ? anaMenuAksiyonuYayinla('sil') : sil(),
+      duzenle: () => bolum === 'ana-menu' ? anaMenuAksiyonuYayinla('adlandir') : duzenlemeyeGit(),
+      onizle: () => bolum === 'ana-menu' ? anaMenuAksiyonuYayinla('onizle') : undefined,
     },
     {
-      kaydet: bolum === 'kategori-menu' && gorunum === 'editor' && !kaydediliyor && Boolean(form.baslik.trim()),
-      ekle: bolum === 'kategori-menu',
+      kaydet: bolum === 'ana-menu' || (bolum === 'kategori-menu' && gorunum === 'editor' && !kaydediliyor && Boolean(form.baslik.trim())),
+      ekle: bolum === 'ana-menu' || bolum === 'kategori-menu',
       altEkle: bolum === 'kategori-menu' && !!seciliId && gorunum === 'liste' && !kaydediliyor,
-      sil: bolum === 'kategori-menu' && !!seciliId && !kaydediliyor,
-      duzenle: bolum === 'kategori-menu' && !!seciliId && gorunum === 'liste' && !kaydediliyor,
+      sil: bolum === 'ana-menu' || (bolum === 'kategori-menu' && !!seciliId && !kaydediliyor),
+      duzenle: bolum === 'ana-menu' || (bolum === 'kategori-menu' && !!seciliId && gorunum === 'liste' && !kaydediliyor),
+      onizle: bolum === 'ana-menu',
     }
   );
 

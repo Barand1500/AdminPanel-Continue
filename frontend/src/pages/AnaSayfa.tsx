@@ -68,16 +68,8 @@ export function AnaSayfa() {
       {blogAyarlari.anaSayfaKonum === 'urunler-ustu' && blogBolumu}
       {blogAyarlari.anaSayfaKonum === 'widgetlar-ustu' && blogBolumu}
 
-      <KonumluWidgetBolge
-        widgetlar={anaWidgetlar}
-        bolge="icerik_alani"
-        konumluSliderlar={sayfaSliderlar}
-      />
-      <AnaSayfaHizmetBlog
-        widgetlar={anaWidgetlar}
-        blogOnizleme={blogOnizleme}
-        hizmetlerAlani={blogAyarlari.hizmetlerAlani}
-      />
+      <KonumluWidgetBolge widgetlar={anaWidgetlar} bolge="icerik_alani" konumluSliderlar={sayfaSliderlar} />
+      <AnaSayfaHizmetBlog widgetlar={anaWidgetlar} blogOnizleme={blogOnizleme} hizmetlerAlani={blogAyarlari.hizmetlerAlani} />
 
       {blogAyarlari.anaSayfaKonum === 'widgetlar-alti' && blogBolumu}
       <KonumluWidgetBolge

@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react';
+import { Link, useOutletContext } from 'react-router-dom';
 import type { Widget } from '@/types/site';
+import type { SitePublicData } from '@/types/site';
 import type { WidgetConfig } from '@/types/widget';
 import type { WidgetVideoKarti } from '@/types/haberWidget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
@@ -135,6 +137,7 @@ export function KoseYazarlariWidget({ widget }: { widget: Widget }) {
 }
 
 export function IletisimBlokWidget({ widget }: { widget: Widget }) {
+  const { site } = useOutletContext<SitePublicData>();
   const cfg = cfgOku(widget);
   const g = gOku(cfg);
   const kartlar = cfg.iletisimKartlari ?? [];
@@ -150,21 +153,68 @@ export function IletisimBlokWidget({ widget }: { widget: Widget }) {
       <iframe title="Harita" src={harita} className={sinif ?? 'ib-harita'} loading="lazy" />
     ) : null;
 
-  const IletisimKart = ({ k, kompakt = false }: { k: (typeof kartlar)[number]; kompakt?: boolean }) => (
-    <div className={kompakt ? 'ib-kart ib-kart--kompakt' : 'ib-kart'} style={{ borderRadius: radius }}>
-      <span className="ib-kart-ikon" style={{ backgroundColor: `${vurgu}18`, color: vurgu }}>
-        <CizgiIkon deger={`${k.ikon ?? ''} ${k.etiket} ${k.deger}`} yedek="konum" boyut={22} />
-      </span>
-      <div>
-        <p className="ib-kart-etiket" style={{ color: metinRenk }}>
-          {k.etiket}
-        </p>
-        <p className="ib-kart-deger" style={{ color: baslikRenk }}>
-          {k.deger}
-        </p>
-      </div>
-    </div>
-  );
+  function kartBaglantisi(k: (typeof kartlar)[number]) {
+    const ozelLink = k.link?.trim();
+    if (ozelLink) return ozelLink;
+
+    const tanim = `${k.ikon ?? ''} ${k.etiket ?? ''}`.toLocaleLowerCase('tr-TR');
+    const deger = k.deger.trim();
+    if (!deger) return '';
+    if (tanim.includes('whatsapp') || tanim.includes('whats app')) {
+      const numara = deger.replace(/\D/g, '');
+      return numara ? `https://wa.me/${numara}` : '';
+    }
+    if (tanim.includes('mail') || tanim.includes('posta') || deger.includes('@')) {
+      // Kartta görünen metin farklı olsa bile mesaj, Site Bilgileri'ndeki ana e-posta adresine gider.
+      const alici = site.ayarlar?.email?.trim() || deger;
+      return `mailto:${alici}`;
+    }
+    if (tanim.includes('telefon') || tanim.includes('gsm') || tanim.includes('tel')) {
+      const numara = deger.replace(/[^\d+]/g, '');
+      return numara ? `tel:${numara}` : '';
+    }
+    if (tanim.includes('adres') || tanim.includes('konum') || tanim.includes('harita') || tanim.includes('map')) {
+      // Karttaki adres, genel widget haritasından farklı olabilir; her zaman bu adresi merkez al.
+      const params = new URLSearchParams({ adres: deger, haritaUrl: deger });
+      return `/harita-konum?${params.toString()}`;
+    }
+    return '';
+  }
+
+  const IletisimKartIcerik = ({ k }: { k: (typeof kartlar)[number] }) => {
+    const tanim = `${k.ikon ?? ''} ${k.etiket ?? ''}`.toLocaleLowerCase('tr-TR');
+    const epostaKarti = tanim.includes('mail') || tanim.includes('posta') || k.deger.includes('@');
+    const gorunenDeger = epostaKarti ? site.ayarlar?.email?.trim() || k.deger : k.deger;
+
+    return (
+      <>
+        <span className="ib-kart-ikon" style={{ backgroundColor: `${vurgu}18`, color: vurgu }}>
+          <CizgiIkon deger={`${k.ikon ?? ''} ${k.etiket} ${gorunenDeger}`} yedek="konum" boyut={22} />
+        </span>
+        <div>
+          <p className="ib-kart-etiket" style={{ color: metinRenk }}>
+            {k.etiket}
+          </p>
+          <p className="ib-kart-deger" style={{ color: baslikRenk }}>
+            {gorunenDeger}
+          </p>
+        </div>
+      </>
+    );
+  };
+
+  const IletisimKart = ({ k, kompakt = false }: { k: (typeof kartlar)[number]; kompakt?: boolean }) => {
+    const link = kartBaglantisi(k);
+    const sinif = `${kompakt ? 'ib-kart ib-kart--kompakt' : 'ib-kart'}${link ? ' ib-kart--baglanti' : ''}`;
+    const stil = { borderRadius: radius };
+    const icerik = <IletisimKartIcerik k={k} />;
+
+    if (!link) return <div className={sinif} style={stil}>{icerik}</div>;
+    if (link.startsWith('/')) return <Link to={link} className={sinif} style={stil}>{icerik}</Link>;
+    if (link.startsWith('mailto:') || link.startsWith('tel:')) return <a href={link} className={sinif} style={stil}>{icerik}</a>;
+    const href = /^https?:\/\//i.test(link) ? link : `https://${link}`;
+    return <a href={href} className={sinif} style={stil} target="_blank" rel="noopener noreferrer">{icerik}</a>;
+  };
 
   const BaslikAlani = () => (
     <>

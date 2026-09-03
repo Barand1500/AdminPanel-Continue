@@ -75,8 +75,15 @@ export function KurumsalHeroWidget({ widget, onizleme }: KurumsalHeroWidgetProps
   const slaytlar = kh.slaytlar.filter((s) => s.aktif && s.arkaPlanUrl?.trim());
   const [aktif, setAktif] = useState(0);
   const sureMs = Math.max(2000, (kh.gecisSuresiSn ?? 6) * 1000);
+  const yarimKapakOrta = gorunumTipi === 'vetahsilat-yarim-kapak' && kh.gorunum.yukseklik === '70vh';
+  // Orta kompakt, geniş ise içerik sayfasındaki önceki dengeli kapak ölçüsündedir.
+  // Tam ekran seçeneği kendi mevcut yüksekliğini korur.
   const yukseklik = gorunumTipi === 'vetahsilat-yarim-kapak'
-    ? 'clamp(22rem, 34vw, 29rem)'
+    ? yarimKapakOrta
+      ? 'clamp(14rem, 21vw, 17rem)'
+      : kh.gorunum.yukseklik === '85vh'
+        ? 'clamp(19rem, 27vw, 23rem)'
+        : 'clamp(22rem, 34vw, 29rem)'
     : gorunumTipi === 'vetahsilat-klasik'
       ? 'calc(100svh - 2rem)'
       : kh.gorunum.yukseklik;
@@ -138,7 +145,7 @@ export function KurumsalHeroWidget({ widget, onizleme }: KurumsalHeroWidgetProps
 
   return (
     <section
-      className={`kurumsal-hero kurumsal-hero--${gorunumTipi}${kh.headerOverlay && !onizleme ? ' kurumsal-hero--overlay' : ''}`}
+      className={`kurumsal-hero kurumsal-hero--${gorunumTipi}${yarimKapakOrta ? ' kurumsal-hero--yarim-kapak-orta' : ''}${kh.headerOverlay && !onizleme ? ' kurumsal-hero--overlay' : ''}`}
       style={{ minHeight: yukseklik }}
       aria-label={widget.ad || 'Kurumsal hero'}
     >

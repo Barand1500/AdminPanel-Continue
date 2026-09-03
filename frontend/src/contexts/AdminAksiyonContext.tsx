@@ -23,7 +23,10 @@ export interface AksiyonHandlerlar {
   duzenle?: () => void;
 }
 
-export type AksiyonDurumlari = Partial<Record<AksiyonId, boolean>>;
+export type AksiyonDurumlari = Partial<Record<AksiyonId, boolean>> & {
+  /** Modüle özel olarak aksiyon çubuğundan tamamen kaldırılacak butonlar. */
+  gizli?: readonly AksiyonId[];
+};
 
 export interface AksiyonGeriBildirim {
   aksiyonId: AksiyonId;

@@ -1,11 +1,18 @@
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useSearchParams } from 'react-router-dom';
 import type { SitePublicData } from '@/types/site';
 import { BlogKart } from '@/components/blog/BlogKart';
 import { siteBlogYazilariHazirla } from '@/utils/blogKaruselYardimci';
+import { BlogSidebar } from '@/components/blog/BlogSidebar';
 
 export function BlogSayfasi() {
-  const { bloglar, widgetlar } = useOutletContext<SitePublicData>();
-  const gosterilecekBloglar = siteBlogYazilariHazirla(bloglar, widgetlar);
+  const veri = useOutletContext<SitePublicData>();
+  const [aramaParametreleri] = useSearchParams();
+  const { bloglar, widgetlar } = veri;
+  const tumBloglar = siteBlogYazilariHazirla(bloglar, widgetlar);
+  const arama = aramaParametreleri.get('ara')?.trim().toLocaleLowerCase('tr-TR') ?? '';
+  const kategori = aramaParametreleri.get('kategori') ?? '';
+  const ay = aramaParametreleri.get('ay') ?? '';
+  const gosterilecekBloglar = tumBloglar.filter((blog) => (!arama || `${blog.baslik} ${blog.ozet ?? ''}`.toLocaleLowerCase('tr-TR').includes(arama)) && (!kategori || blog.kategori === kategori) && (!ay || blog.olusturma.startsWith(ay)));
 
   return (
     <>
@@ -22,7 +29,8 @@ export function BlogSayfasi() {
       </section>
 
       <section className="py-16">
-        <div className="container-site">
+        <div className="container-site grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
+          <div>
           {gosterilecekBloglar.length === 0 ? (
             <div className="rounded-xl border border-dashed border-slate-200 bg-slate-50 py-16 text-center">
               <p className="text-4xl">📰</p>
@@ -35,7 +43,8 @@ export function BlogSayfasi() {
                 <BlogKart key={yazi.id} yazi={yazi} />
               ))}
             </div>
-          )}
+          )}</div>
+          <BlogSidebar veri={veri} />
         </div>
       </section>
     </>

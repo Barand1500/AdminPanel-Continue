@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
+import { IconAlertTriangle, IconX } from '@tabler/icons-react';
 import {
   varsayilanSayfaForm,
   SayfaEditorPanel,
@@ -65,6 +66,7 @@ export function SayfaYonetimiSayfasi() {
   const [hata, setHata] = useState('');
   const [basari, setBasari] = useState('');
   const [gorunum, setGorunum] = useState<SayfaGorunum>('liste');
+  const [silmeOnayAcik, setSilmeOnayAcik] = useState(false);
 
   async function yukle() {
     setYukleniyor(true);
@@ -152,8 +154,14 @@ export function SayfaYonetimiSayfasi() {
     }
   }, [form, seciliId]);
 
-  const sil = useCallback(async () => {
-    if (!seciliId || !confirm('Bu sayfayı silmek istediğinize emin misiniz?')) return;
+  const sil = useCallback(() => {
+    if (!seciliId) return;
+    setSilmeOnayAcik(true);
+  }, [seciliId]);
+
+  const silOnayla = useCallback(async () => {
+    if (!seciliId) return;
+    setSilmeOnayAcik(false);
     setKaydediliyor(true);
     setHata('');
     try {
@@ -168,6 +176,26 @@ export function SayfaYonetimiSayfasi() {
       setKaydediliyor(false);
     }
   }, [seciliId, formuSifirla]);
+
+  useEffect(() => {
+    if (!silmeOnayAcik) return;
+    function tusHandler(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        setSilmeOnayAcik(false);
+      }
+      if (event.key === 'Enter') {
+        event.preventDefault();
+        void silOnayla();
+      }
+    }
+    document.addEventListener('keydown', tusHandler);
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', tusHandler);
+      document.body.style.overflow = '';
+    };
+  }, [silmeOnayAcik, silOnayla]);
 
   const sayfaSirala = useCallback(
     async (sayfaId: string, yon: 'yukari' | 'asagi') => {
@@ -310,6 +338,32 @@ export function SayfaYonetimiSayfasi() {
           islemde={kaydediliyor}
           ustAksiyon={gorunumSekmeleri}
         />
+      )}
+      {silmeOnayAcik && seciliId && (
+        <div className="ap-yap-modal-arka" role="presentation">
+          <div className="erp-donen-cerceve erp-donen-cerceve-surekli">
+            <span className="erp-donen-cerceve-iz" />
+            <div className="erp-donen-cerceve-icerik">
+              <div className="ap-yap-sil-modal" role="alertdialog" aria-modal="true" aria-labelledby="sayfa-sil-baslik">
+                <header>
+                  <span className="ap-yap-sil-uyari"><IconAlertTriangle size={19} /></span>
+                  <h2 id="sayfa-sil-baslik">Bu sayfayı silmek istiyor musunuz?</h2>
+                  <button type="button" onClick={() => setSilmeOnayAcik(false)} disabled={kaydediliyor}>
+                    <IconX size={15} /> ESC
+                  </button>
+                </header>
+                <p>
+                  <strong>{sayfalar.find((sayfa) => sayfa.id === seciliId)?.baslik ?? form.baslik}</strong> kalıcı olarak silinecek.
+                  Bu işlem geri alınamaz.
+                </p>
+                <footer>
+                  <button type="button" onClick={() => setSilmeOnayAcik(false)} disabled={kaydediliyor}>Vazgeç<small>(ESC)</small></button>
+                  <button type="button" onClick={() => void silOnayla()} disabled={kaydediliyor}>Evet, Sil<small>(ENTER)</small></button>
+                </footer>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </AdminModulKabuk>
   );

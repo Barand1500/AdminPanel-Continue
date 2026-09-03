@@ -70,11 +70,18 @@ export const SABIT_HIZLI_LINKLER: { ad: string; link: string }[] = [
 ];
 
 export function ustMenuOgeleriOlustur(ustMenu: UstMenuOgesi[], sayfalar: Sayfa[] = []): MenuOgesi[] {
+  // Sayfa silindiği anda API menü kaydını da temizler. Bu filtre ise eski bir
+  // kayıt ya da önbellek varsa ziyaretçiye kırık bir sayfa bağlantısı göstermemek
+  // için ikinci güvenlik katmanıdır. Özel bağlantılar sayfaId taşımadığından kalır.
+  const sayfaKaynagiGecerliMi = (oge: UstMenuOgesi) =>
+    !oge.sayfaId || sayfalar.some((sayfa) => idString(sayfa.id) === idString(oge.sayfaId!));
+
   // Eski kayıtlar alt menüyü sayfa hiyerarşisinden üretir. Yeni yönetim ekranı
   // ilk kez kaydedilene kadar bu davranışı koruyarak mevcut siteleri bozmuyoruz.
   const yeniAgacKullaniliyor = ustMenu.some((o) => Object.prototype.hasOwnProperty.call(o, 'ustOgeId'));
   if (!yeniAgacKullaniliyor) {
     return [...ustMenu]
+      .filter(sayfaKaynagiGecerliMi)
       .sort((a, b) => a.sira - b.sira)
       .map((o) => {
         const sayfa =
@@ -90,7 +97,7 @@ export function ustMenuOgeleriOlustur(ustMenu: UstMenuOgesi[], sayfalar: Sayfa[]
       });
   }
 
-  const gorunenler = ustMenu.filter((o) => o.gorunur !== false);
+  const gorunenler = ustMenu.filter((o) => o.gorunur !== false && sayfaKaynagiGecerliMi(o));
   const ogeler = new Map(gorunenler.map((o) => [o.id, o]));
   const altlar = new Map<string | null, UstMenuOgesi[]>();
 

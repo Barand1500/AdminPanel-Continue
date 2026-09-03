@@ -145,7 +145,7 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
           </FormAlani>
         )}
         <SecimAlani
-          etiket="Bölüm padding"
+          etiket="Widget üst / alt boşluğu"
           deger={g.padding ?? 'normal'}
           secenekler={[
             { id: 'dar', etiket: 'Dar' },

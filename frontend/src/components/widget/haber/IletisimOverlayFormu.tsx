@@ -1,7 +1,9 @@
 import { useState, type FormEvent, type ReactNode } from 'react';
+import { useOutletContext } from 'react-router-dom';
 import { IconList, IconMail, IconMessage, IconPhone, IconUser } from '@tabler/icons-react';
 import { publicFormGonder } from '@/features/site/formApi';
 import { CizgiIkon } from '../CizgiIkonlari';
+import type { SitePublicData } from '@/types/site';
 
 export function IletisimOverlayFormu({
   baslik,
@@ -14,6 +16,7 @@ export function IletisimOverlayFormu({
   vurgu: string;
   baslikRenk: string;
 }) {
+  const { site } = useOutletContext<SitePublicData>();
   const [adSoyad, setAdSoyad] = useState('');
   const [email, setEmail] = useState('');
   const [telefon, setTelefon] = useState('');
@@ -23,12 +26,28 @@ export function IletisimOverlayFormu({
   const [gonderiliyor, setGonderiliyor] = useState(false);
   const [hata, setHata] = useState('');
 
+  function mailtoAc() {
+    const alici = site.ayarlar?.email?.trim();
+    if (!alici || typeof window === 'undefined') return;
+    const konuMetni = konu.trim() || `Web sitesi iletişim formu — ${adSoyad.trim() || 'Yeni mesaj'}`;
+    const govde = [
+      `Ad Soyad: ${adSoyad}`,
+      `E-posta: ${email}`,
+      `Telefon: ${telefon || '-'}`,
+      '',
+      'Mesaj:',
+      mesaj,
+    ].join('\n');
+    window.location.href = `mailto:${encodeURIComponent(alici)}?${new URLSearchParams({ subject: konuMetni, body: govde }).toString()}`;
+  }
+
   async function gonder(e: FormEvent) {
     e.preventDefault();
     setGonderiliyor(true);
     setHata('');
     try {
       await publicFormGonder('iletisim', { adSoyad, email, telefon, konu, mesaj });
+      mailtoAc();
       setGonderildi(true);
       setAdSoyad('');
       setEmail('');

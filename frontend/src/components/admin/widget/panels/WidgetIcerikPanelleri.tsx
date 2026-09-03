@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import { useEffect, useRef, useState, type ComponentType } from 'react';
 import type { WidgetIletisimKarti } from '@/types/haberWidget';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
 import { CizgiIkonSecici } from '@/components/form/CizgiIkonSecici';
@@ -17,6 +17,7 @@ import {
   type WidgetSayac,
   type WidgetYorum,
   type WidgetFiyatPaketi,
+  type WidgetFiyatOzellik,
   type WidgetIkonKart,
   type WidgetHaritaSube,
   type WidgetKartOgesi,
@@ -624,13 +625,13 @@ export function HaritaIcerik({ form, onChange }: WidgetPanelProps) {
         </AdminFormBolumu>
       )}
       {kartliIletisimMod && (
-        <AdminFormBolumu baslik="İletişim kartları" aciklama="Sol tarafta iki sütun halinde gösterilecek ikon, küçük etiket ve değer">
+        <AdminFormBolumu baslik="İletişim kartları" aciklama="Telefon ve e-posta otomatik tıklanabilir olur. Adres kartı, Harita Üzerinde Yerimiz sayfasına yönlenir; isterseniz bağlantıyı aşağıdan değiştirebilirsiniz.">
           <ListeSiralayici<WidgetIletisimKarti>
             ogeler={iletisimKartlari}
             onDegistir={(kartlar) => onChange(configGuncelle(form, (c) => ({ ...c, iletisimKartlari: kartlar })))}
             yeniEkle={() => ({ id: uid(), ikon: 'konum', etiket: '', deger: '' })}
             renderOge={(k, i) => (
-            <div className="grid gap-2 sm:grid-cols-3 sm:items-start">
+              <div className="grid gap-2 sm:grid-cols-3 sm:items-start">
                 <FormAlani etiket="Çizgi ikon">
                   <CizgiIkonSecici
                     deger={k.ikon}
@@ -647,6 +648,10 @@ export function HaritaIcerik({ form, onChange }: WidgetPanelProps) {
                 }} />
                 <input className={formInputSinifi} placeholder="Değer (adres, telefon vb.)" value={k.deger} onChange={(e) => {
                   const kopya = [...iletisimKartlari]; kopya[i] = { ...k, deger: e.target.value };
+                  onChange(configGuncelle(form, (c) => ({ ...c, iletisimKartlari: kopya })));
+                }} />
+                <input className={`${formInputSinifi} sm:col-span-3`} placeholder="Tıklama bağlantısı (opsiyonel — örn. /subelerimiz veya https://...)" value={k.link ?? ''} onChange={(e) => {
+                  const kopya = [...iletisimKartlari]; kopya[i] = { ...k, link: e.target.value };
                   onChange(configGuncelle(form, (c) => ({ ...c, iletisimKartlari: kopya })));
                 }} />
               </div>
@@ -1123,6 +1128,93 @@ export function ModulLogoBlokIcerik({ form, onChange }: WidgetPanelProps) {
   );
 }
 
+function fiyatOzellikleriniMetneCevir(ozellikler: WidgetFiyatOzellik[] = []) {
+  return ozellikler
+    .map((ozellik) => {
+      const isaret = ozellik.baslik
+        ? '#'
+        : ozellik.durum === 'ek'
+          ? '+'
+          : ozellik.durum === 'ozel'
+            ? '~'
+            : ozellik.durum === 'sinirli'
+              ? '!'
+              : ozellik.durum === 'haric' || !ozellik.dahil
+                ? '-'
+                : '';
+      return `${isaret}${ozellik.metin}`;
+    })
+    .join('\n');
+}
+
+function metindenFiyatOzellikleri(metin: string): WidgetFiyatOzellik[] {
+  return metin
+    .split('\n')
+    .map((satir) => satir.trim())
+    .filter(Boolean)
+    .map((satir) => {
+      const baslik = satir.startsWith('#');
+      const durum: NonNullable<WidgetFiyatOzellik['durum']> = baslik
+        ? 'dahil'
+        : satir.startsWith('+')
+          ? 'ek'
+          : satir.startsWith('~')
+            ? 'ozel'
+            : satir.startsWith('!')
+              ? 'sinirli'
+              : satir.startsWith('-')
+                ? 'haric'
+                : 'dahil';
+
+      return {
+        metin: baslik || durum !== 'dahil' ? satir.slice(1).trim() : satir,
+        dahil: durum !== 'haric',
+        durum,
+        ...(baslik ? { baslik: true } : {}),
+      };
+    });
+}
+
+function FiyatOzellikMetinAlani({
+  ozellikler,
+  onKaydet,
+}: {
+  ozellikler: WidgetFiyatOzellik[];
+  onKaydet: (ozellikler: WidgetFiyatOzellik[]) => void;
+}) {
+  const disMetin = fiyatOzellikleriniMetneCevir(ozellikler);
+  const [taslak, setTaslak] = useState(disMetin);
+  const sonYayinlananMetinRef = useRef(disMetin);
+
+  useEffect(() => {
+    // Kendi yazdığımız değer formdan geri geldiğinde imleci/satırı bozma.
+    // Yalnızca dışarıdan gelen gerçek bir değişiklikte alanı yenile.
+    if (disMetin !== sonYayinlananMetinRef.current) setTaslak(disMetin);
+    sonYayinlananMetinRef.current = disMetin;
+  }, [disMetin]);
+
+  return (
+    <div className="ap-fiyat-ozellik-editor-wrap">
+      <div className="ap-fiyat-ozellik-editor-yardim">
+        Her satır bir özellik. Yazdıkça önizlemeye yansır; Enter ile yeni satıra geçin. Kalın metin için <strong>**metin**</strong> yazın. İşaretleri sağ üstteki <strong>!</strong> yardımından görebilirsiniz.
+      </div>
+      <textarea
+        className={`${formInputSinifi} ap-fiyat-ozellik-editor`}
+        placeholder={'Örn. 5 sayfa\nE-posta desteği\n-API erişimi\n#Ek özellikler'}
+        rows={7}
+        value={taslak}
+        onChange={(e) => {
+          const yeniTaslak = e.target.value;
+          setTaslak(yeniTaslak);
+          const yeniOzellikler = metindenFiyatOzellikleri(yeniTaslak);
+          sonYayinlananMetinRef.current = fiyatOzellikleriniMetneCevir(yeniOzellikler);
+          onKaydet(yeniOzellikler);
+        }}
+      />
+    </div>
+  );
+}
+
 export function FiyatlandirmaIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const paketler = cfg.paketler ?? [];
@@ -1133,7 +1225,7 @@ export function FiyatlandirmaIcerik({ form, onChange }: WidgetPanelProps) {
       <ListeSiralayici<WidgetFiyatPaketi>
         ogeler={paketler}
         onDegistir={(p) => onChange(configGuncelle(form, (c) => ({ ...c, paketler: p })))}
-        yeniEkle={() => ({ id: uid(), ad: '', fiyat: '', aciklama: '', ozellikler: [], butonMetni: 'Satın Al', butonLink: '', oneCikan: false })}
+        yeniEkle={() => ({ id: uid(), ad: '', fiyat: '', aciklama: '', altAciklama: '', ozellikler: [], butonMetni: 'Satın Al', butonLink: '', oneCikan: false })}
         renderOge={(p, i) => (
           <div className="space-y-2">
             <input className={formInputSinifi} placeholder="Paket adı" value={p.ad} onChange={(e) => {
@@ -1148,11 +1240,11 @@ export function FiyatlandirmaIcerik({ form, onChange }: WidgetPanelProps) {
               const kopya = [...paketler]; kopya[i] = { ...p, aciklama: e.target.value };
               onChange(configGuncelle(form, (c) => ({ ...c, paketler: kopya })));
             }} />
-            <textarea className={formInputSinifi} placeholder="Özellikler (her satır: metin veya -metin)" rows={3} value={(p.ozellikler ?? []).map((o) => (o.dahil ? '' : '-') + o.metin).join('\n')} onChange={(e) => {
-              const ozellikler = e.target.value.split('\n').filter(Boolean).map((satir) => {
-                const dahil = !satir.startsWith('-');
-                return { metin: dahil ? satir : satir.slice(1), dahil };
-              });
+            <input className={formInputSinifi} placeholder="Paket alt açıklaması (opsiyonel)" value={p.altAciklama ?? ''} onChange={(e) => {
+              const kopya = [...paketler]; kopya[i] = { ...p, altAciklama: e.target.value };
+              onChange(configGuncelle(form, (c) => ({ ...c, paketler: kopya })));
+            }} />
+            <FiyatOzellikMetinAlani ozellikler={p.ozellikler ?? []} onKaydet={(ozellikler) => {
               const kopya = [...paketler]; kopya[i] = { ...p, ozellikler };
               onChange(configGuncelle(form, (c) => ({ ...c, paketler: kopya })));
             }} />

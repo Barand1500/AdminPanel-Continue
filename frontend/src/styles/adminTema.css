@@ -5117,6 +5117,22 @@ html:has(.admin-panel[data-tema='acik']) body {
   background: var(--ap-hover);
 }
 
+/* Footer link düzenleme modalı panel içi taşma/konum kurallarından bağımsızdır. */
+.ap-footer-link-modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 300;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgb(2 6 23 / 0.72);
+}
+
+.ap-footer-link-modal-overlay .ap-admin-modal {
+  width: min(100%, 32rem);
+}
+
 .ap-hizli-erisim-modul-ikon,
 .ap-hizli-erisim-sira-ikon {
   display: inline-flex;
@@ -5949,6 +5965,101 @@ html:has(.admin-panel[data-tema='acik']) body {
 .ap-widget-galeri-ust .ap-arama {
   width: min(100%, 16rem);
   padding: 0;
+}
+
+.ap-widget-editor-baslik-satir {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.ap-fiyat-yardim {
+  position: relative;
+  display: inline-flex;
+}
+
+.ap-fiyat-yardim-tus {
+  display: inline-flex;
+  width: 1.15rem;
+  height: 1.15rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid color-mix(in srgb, var(--ap-accent) 65%, var(--ap-border));
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--ap-accent) 12%, var(--ap-surface));
+  padding: 0;
+  font-size: 0.72rem;
+  font-weight: 800;
+  line-height: 1;
+  color: var(--ap-accent);
+  cursor: pointer;
+}
+
+.ap-fiyat-yardim-tus:hover,
+.ap-fiyat-yardim-tus[aria-expanded='true'] {
+  background: var(--ap-accent);
+  color: #fff;
+}
+
+.ap-fiyat-yardim-kutu {
+  position: absolute;
+  z-index: 30;
+  top: calc(100% + 0.5rem);
+  left: 0;
+  width: min(20rem, calc(100vw - 4rem));
+  border: 1px solid var(--ap-border);
+  border-radius: 0.55rem;
+  background: var(--ap-surface);
+  padding: 0.75rem;
+  box-shadow: 0 0.85rem 2rem color-mix(in srgb, #000 22%, transparent);
+  color: var(--ap-text);
+  font-size: 0.75rem;
+}
+
+.ap-fiyat-yardim-kutu strong,
+.ap-fiyat-yardim-kutu p {
+  display: block;
+}
+
+.ap-fiyat-yardim-kutu p {
+  margin: 0.25rem 0 0.6rem;
+  color: var(--ap-text-muted);
+}
+
+.ap-fiyat-yardim-kutu ul {
+  display: grid;
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ap-fiyat-yardim-kutu li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.ap-fiyat-yardim-kutu li span {
+  color: var(--ap-text-muted);
+}
+
+.ap-fiyat-ozellik-editor-wrap {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.ap-fiyat-ozellik-editor-yardim {
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--ap-text-muted);
+}
+
+.ap-fiyat-ozellik-editor {
+  min-height: 10.5rem;
+  resize: vertical;
+  line-height: 1.55;
+  white-space: pre-wrap;
 }
 
 .ap-widget-galeri-ust .ap-pil-sekme-oge {

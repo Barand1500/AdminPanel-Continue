@@ -6,6 +6,7 @@ import { PublicCatchAll } from '@/components/ortak/PublicCatchAll';
 import { AnaSayfa } from '@/pages/AnaSayfa';
 import { HakkimizdaSayfasi } from '@/pages/HakkimizdaSayfasi';
 import { IletisimSayfasi } from '@/pages/IletisimSayfasi';
+import { HaritaKonumSayfasi } from '@/pages/HaritaKonumSayfasi';
 import { HesapGirisFormu } from '@/pages/hesap/HesapGirisFormu';
 import { HesapPanelSayfasi } from '@/pages/hesap/HesapPanelSayfasi';
 import { HesapProfilSayfasi, HesapSifreSayfasi } from '@/pages/hesap/HesapAltSayfalar';
@@ -39,6 +40,10 @@ export const siteRouter = createBrowserRouter([
         element: <Navigate to="/gt-admin" replace />,
       },
       {
+        path: '/gt-admin/yapilacaklar/*',
+        element: <Navigate to="/gt-admin" replace />,
+      },
+      {
         path: '/gt-admin/*',
         element: <AdminLayout />,
       },
@@ -48,6 +53,7 @@ export const siteRouter = createBrowserRouter([
           { path: '/', element: <AnaSayfa /> },
           { path: '/hakkimizda', element: <HakkimizdaSayfasi /> },
           { path: '/iletisim', element: <IletisimSayfasi /> },
+          { path: '/harita-konum', element: <HaritaKonumSayfasi /> },
           { path: '/blog', element: <BlogSayfasi /> },
           { path: '/blog/:slug', element: <BlogDetaySayfasi /> },
           { path: '/hesabim', element: <HesapGirisFormu /> },

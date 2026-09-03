@@ -18,6 +18,7 @@ type KaynakSekmesi = 'sayfalar' | 'kategoriler' | 'bloglar' | 'formlar' | 'ozel-
 type DuzSatir = { oge: UstMenuOgesi; derinlik: number };
 type KaynakGorunurluk = Record<KaynakSekmesi, boolean>;
 const VARSAYILAN_KAYNAKLAR: KaynakGorunurluk = { sayfalar: true, kategoriler: true, bloglar: false, formlar: false, 'ozel-link': true };
+const ANA_MENU_GIZLI_AKSIYONLAR = ['altEkle'] as const;
 
 function menuleriCoz(header: { menuler?: KayitliMenu[]; ustMenu?: UstMenuOgesi[] }): KayitliMenu[] {
   return header.menuler?.length ? header.menuler : [{ id: 'ana-menu', ad: 'Ana Menü', ogeler: header.ustMenu ?? [] }];
@@ -213,16 +214,32 @@ export function AnaMenuYonetimiPanel({ menuSekmeleri }: { menuSekmeleri?: ReactN
   const menuSilTalep = () => { if (menuListesi.length > 1) setMenuSilOnayAcik(true); };
   const menuSilOnayla = () => { const kalan = menuListesi.filter((m) => m.id !== seciliMenuId); if (!kalan.length) return; const sonraki = kalan[0].id; setMenuListesi(kalan); setSeciliMenuId(sonraki); setMenu(normalize(kalan[0].ogeler)); setKonumlar((k) => ({ header: k.header === seciliMenuId ? sonraki : k.header, footer: k.footer === seciliMenuId ? '' : k.footer, footerKolonId: k.footer === seciliMenuId ? '' : k.footerKolonId, mobil: k.mobil === seciliMenuId ? sonraki : k.mobil })); setMenuSilOnayAcik(false); };
 
-  // Ana Menü açıkken alttaki ortak aksiyon çubuğundaki Kaydet bu işlemi çağırır.
-  useModulAksiyonlari({ kaydet: kaydetMenu, sil: menuSilTalep, onizle: () => setOnizlemeAcik(true) }, { kaydet: !kaydediliyor, sil: menuListesi.length > 1, onizle: true });
+  useEffect(() => {
+    const dinleyiciler: Array<[string, () => void]> = [
+      ['ap-ana-menu-kaydet', () => { void kaydetMenu(); }],
+      ['ap-ana-menu-yeni', menuOlustur],
+      ['ap-ana-menu-adlandir', menuYenidenAdlandir],
+      ['ap-ana-menu-sil', menuSilTalep],
+      ['ap-ana-menu-onizle', () => setOnizlemeAcik(true)],
+    ];
+    dinleyiciler.forEach(([ad, dinleyici]) => window.addEventListener(ad, dinleyici));
+    return () => dinleyiciler.forEach(([ad, dinleyici]) => window.removeEventListener(ad, dinleyici));
+  }, [menu, menuListesi, seciliMenuId, konumlar, headerAyarlari]);
+
+  // Ana Menü açıkken ortak çubuktan yeni menü oluşturulabilir; öğe düzenleme
+  // işlemleri doğrudan menü yapısı kartlarında kalır.
+  useModulAksiyonlari(
+    { kaydet: kaydetMenu, ekle: menuOlustur, sil: menuSilTalep, duzenle: menuYenidenAdlandir, onizle: () => setOnizlemeAcik(true) },
+    { kaydet: !kaydediliyor, ekle: true, sil: menuListesi.length > 1, duzenle: true, onizle: true, gizli: ANA_MENU_GIZLI_AKSIYONLAR }
+  );
 
   if (yukleniyor) return <YukleniyorDurumu mesaj="Ana menü yükleniyor..." />;
 
   return <div className="space-y-4">
     {hata && <BildirimKutusu mesaj={hata} tur="hata" />}
     {basari && <BildirimKutusu mesaj={basari} tur="basari" />}
-    <div className="flex items-start justify-between gap-3 rounded-xl border border-[var(--ap-border)] bg-[var(--ap-panel)] p-4">
-      <div><h2 className="ap-heading text-base font-semibold">Menü Yönetimi</h2><div className="mt-2 flex flex-wrap items-center gap-2"><select value={seciliMenuId} onChange={(e) => menuSec(e.target.value)} className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] px-2 py-1.5 text-sm">{menuListesi.map((m) => <option key={m.id} value={m.id}>{m.ad}</option>)}</select><button type="button" onClick={menuOlustur} className="rounded-md border border-[var(--ap-border)] px-2 py-1.5 text-xs">Yeni Menü</button><button type="button" onClick={menuYenidenAdlandir} className="rounded-md border border-[var(--ap-border)] px-2 py-1.5 text-xs">Adlandır</button></div></div>
+    <div className="flex items-center justify-between gap-3 rounded-xl border border-[var(--ap-border)] bg-[var(--ap-panel)] p-4">
+      <div><select value={seciliMenuId} onChange={(e) => menuSec(e.target.value)} className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] px-2 py-1.5 text-sm">{menuListesi.map((m) => <option key={m.id} value={m.id}>{m.ad}</option>)}</select></div>
       <div className="relative flex shrink-0 items-center gap-3"><div><button type="button" onClick={() => setTercihlerAcik((v) => !v)} className="rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] px-3 py-2 text-xs font-medium">Ekran Tercihleri ▾</button>{tercihlerAcik && <div className="absolute left-0 top-full z-50 mt-2 w-56 rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] p-3 shadow-2xl ring-1 ring-black/20"><p className="ap-muted mb-2 text-xs">Sol kaynak panelinde görünecek alanlar</p>{(Object.entries({ sayfalar: 'Sayfalar', kategoriler: 'Kategoriler', bloglar: 'Blog yazıları', formlar: 'Formlar', 'ozel-link': 'Özel bağlantı' }) as [KaynakSekmesi, string][]).map(([id, etiket]) => <label key={id} className="flex cursor-pointer items-center justify-between py-1.5 text-sm"><span>{etiket}</span><input type="checkbox" checked={kaynaklar[id]} onChange={(e) => { const sonraki = { ...kaynaklar, [id]: e.target.checked }; setKaynaklar(sonraki); setSeciliKaynakIdleri([]); if (!e.target.checked && kaynak === id) setKaynak('sayfalar'); }} /></label>)}</div>}</div>{menuSekmeleri}</div>
     </div>
 

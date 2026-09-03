@@ -334,6 +334,10 @@ export interface WidgetYorum {
 export interface WidgetFiyatOzellik {
   metin: string;
   dahil: boolean;
+  /** Paket karşılaştırmasında: dahil, hariç, ek, özel veya sınırlı. Eski kayıtlarda dahil alanından okunur. */
+  durum?: 'dahil' | 'haric' | 'ek' | 'ozel' | 'sinirli';
+  /** Satırı ikonlu özellik yerine bölüm ara başlığı olarak gösterir. */
+  baslik?: boolean;
 }
 
 export interface WidgetFiyatPaketi {
@@ -341,6 +345,8 @@ export interface WidgetFiyatPaketi {
   ad: string;
   fiyat: string;
   aciklama: string;
+  /** Paket açıklamasının altında gösterilen ikincil kısa açıklama. */
+  altAciklama?: string;
   ozellikler: WidgetFiyatOzellik[];
   butonMetni: string;
   butonLink: string;

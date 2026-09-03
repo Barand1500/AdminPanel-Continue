@@ -16,6 +16,7 @@ import {
 import { KonumluWidgetBolge } from '@/components/konumluSlider/KonumluWidgetBolge';
 import { sayfaBolgeWidgetlariHaric, sayfaWidgetlari } from '@/utils/widgetYerlesim';
 import { konumluSliderlarSayfaFiltre } from '@/utils/konumluSliderYerlesim';
+import { BlogSidebar } from '@/components/blog/BlogSidebar';
 
 export interface DinamikSayfaLoaderVerisi {
   bulunamadi: boolean;
@@ -66,7 +67,8 @@ function AltSayfaGrid({ altSayfalar, ustBasliksiz }: { altSayfalar: PublicSayfa[
 
 export function DinamikSayfaSayfasi() {
   const { sayfa } = useLoaderData() as DinamikSayfaLoaderVerisi;
-  const { sayfalar, widgetlar, konumluSliderlar = [] } = useOutletContext<SitePublicData>();
+  const veri = useOutletContext<SitePublicData>();
+  const { sayfalar, widgetlar, konumluSliderlar = [] } = veri;
   const navigation = useNavigation();
   const yukleniyor = navigation.state === 'loading';
   const tumSayfaWidgetlar = useMemo(
@@ -163,7 +165,8 @@ export function DinamikSayfaSayfasi() {
       />
       {ortaBolumGoster && (
         <section className="py-12 sm:py-16">
-          <div className="container-site">
+          <div className="container-site grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
+            <div>
             {baslikGoster && (
               <SayfaBaslikBlok sayfa={sayfa} altSayfalar={altSayfalar} icerikVar={icerikVar} />
             )}
@@ -177,6 +180,8 @@ export function DinamikSayfaSayfasi() {
             {altSayfaGoster && (
               <AltSayfaGrid altSayfalar={altSayfalar} ustBasliksiz={!icerikVar} />
             )}
+            </div>
+            <BlogSidebar veri={veri} alan="sayfa" sayfaId={String(sayfa.id)} />
           </div>
         </section>
       )}

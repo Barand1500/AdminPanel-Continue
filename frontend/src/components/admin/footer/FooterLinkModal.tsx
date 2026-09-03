@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
+import { createPortal } from 'react-dom';
 import type { AdminSayfa } from '@/features/admin/sayfaApi';
 import type { FooterLink } from '@/types/footer';
 import { formInputSinifi } from '@/components/form/FormAlani';
@@ -95,10 +96,13 @@ export function FooterLinkModal({
   };
 
   const yayindakiSayfalar = sayfalar.filter((s) => s.yayinda);
+  // Portal body altına taşındığı için, modalın tema değişkenlerini de koru.
+  const tema = document.querySelector<HTMLElement>('.admin-panel')?.dataset.tema ?? 'koyu';
 
-  return (
-    <div className="ap-admin-modal-overlay" role="dialog" aria-modal="true">
-      <div className="ap-admin-modal">
+  return createPortal(
+    <div className="admin-panel" data-tema={tema}>
+      <div className="ap-footer-link-modal-overlay" role="dialog" aria-modal="true">
+        <div className="ap-admin-modal">
         <header className="ap-admin-modal-header">
           <h2 className="ap-heading text-base font-semibold">
             {duzenlenen ? 'Link Düzenle' : 'Link Ekle'}
@@ -188,7 +192,9 @@ export function FooterLinkModal({
             {duzenlenen ? 'Güncelle' : 'Ekle'}
           </button>
         </footer>
+        </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

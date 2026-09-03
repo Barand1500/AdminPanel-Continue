@@ -2568,6 +2568,10 @@ html[data-site-tema='koyu'] .site-public .rounded-lg.bg-white {
   font-weight: 400;
 }
 
+.kurumsal-hero--yarim-kapak-orta .kurumsal-hero-baslik {
+  font-size: clamp(2.25rem, 3vw, 3.3rem);
+}
+
 .kurumsal-hero--vetahsilat-yarim-kapak .kurumsal-hero-on-gorsel {
   display: none;
 }
@@ -4050,6 +4054,9 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 @media (min-width: 640px) { .ib-kart-grid--2 { grid-template-columns: 1fr 1fr; } }
 .ib-kart { display: flex; gap: 0.75rem; padding: 1rem; background: #f8fafc; border: 1px solid #e2e8f0; }
 .ib-kart--kompakt { padding: 0.75rem; }
+.ib-kart--baglanti { color: inherit; text-decoration: none; cursor: pointer; transition: transform 0.18s ease, box-shadow 0.18s ease, background-color 0.18s ease; }
+.ib-kart--baglanti:hover { transform: translateY(-2px); box-shadow: 0 11px 22px rgba(15, 23, 42, 0.1); }
+.ib-kart--baglanti:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
 .ib-kart-ikon { display: flex; height: 2.5rem; width: 2.5rem; flex-shrink: 0; align-items: center; justify-content: center; border-radius: 0.5rem; font-size: 1.125rem; }
 .ib-kart-etiket { font-size: 0.75rem; }
 .ib-kart-deger { font-weight: 700; }
@@ -8974,6 +8981,13 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   line-height: 1.55;
 }
 
+.fp-paket-alt-aciklama {
+  margin: 0.7rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  opacity: 0.72;
+}
+
 .fp-ozellikler {
   width: calc(100% + 3rem);
   margin: 1.4rem -1.5rem 0;
@@ -9132,7 +9146,120 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 
 .fp-spotlight-merkez .fp-paket-kart {
-  padding-top: 2rem;
+  padding-top: 0;
+}
+
+/* Karşılaştırmalı paket görünümü: VETahsilat benzeri geniş, satır bazlı paket kartları. */
+.fp-spotlight {
+  max-width: 76rem;
+  margin-inline: auto;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 1.75rem;
+}
+
+.fp-spotlight-kolon {
+  display: flex;
+  flex: 1 1 0;
+  max-width: none;
+}
+
+.fp-spotlight .fp-paket-karsilastirma {
+  width: 100%;
+  min-width: 0;
+  box-shadow: 0 10px 26px rgba(15, 23, 42, 0.08);
+}
+
+.fp-spotlight .fp-paket-karsilastirma .fp-paket-ust {
+  min-height: 3.55rem;
+}
+
+.fp-spotlight-merkez .fp-paket-karsilastirma .fp-paket-ust {
+  min-height: 4.35rem;
+  padding-top: 1.1rem;
+}
+
+.fp-spotlight-merkez .fp-paket-karsilastirma .fp-rozet {
+  top: 0.35rem;
+}
+
+.fp-spotlight .fp-paket-karsilastirma .fp-paket-govde {
+  padding: 2.35rem 0 0;
+}
+
+.fp-spotlight .fp-paket-karsilastirma .fp-paket-fiyat {
+  font-size: clamp(2.15rem, 3vw, 3rem);
+}
+
+.fp-spotlight .fp-paket-karsilastirma .fp-paket-aciklama {
+  min-height: 2.8rem;
+  padding-inline: 1.35rem;
+}
+
+.fp-spotlight .fp-paket-karsilastirma .fp-ozellikler {
+  width: 100%;
+  margin-inline: 0;
+  margin-top: 1.55rem;
+}
+
+.fp-spotlight .fp-paket-karsilastirma .fp-ozellik {
+  min-height: 2.8rem;
+  justify-content: flex-start;
+  gap: 0.75rem;
+  padding: 0.55rem 1rem;
+  text-align: left;
+}
+
+.fp-ozellik-ikon {
+  display: inline-flex;
+  width: 1.05rem;
+  height: 1.05rem;
+  flex: 0 0 1.05rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.fp-ozellik-ikon-dahil { background: #62b979; }
+.fp-ozellik-ikon-haric { background: #f45d3c; }
+.fp-ozellik-ikon-ek { background: #63aee8; }
+.fp-ozellik-ikon-ozel { background: #10b9cb; }
+.fp-ozellik-ikon-sinirli { background: #e9a13b; }
+
+.fp-ozellik-baslik {
+  display: block;
+  align-self: stretch;
+  min-height: 2.9rem;
+  padding: 0.85rem 1rem 0.65rem;
+  border-top: 1px solid rgba(15, 23, 42, 0.08);
+  text-align: left;
+  font-size: 0.82rem;
+  font-weight: 850;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.fp-spotlight-merkez .fp-paket-karsilastirma {
+  border-color: color-mix(in srgb, var(--fp-vurgu, #111827) 44%, #55c3bc);
+  box-shadow: 0 14px 34px color-mix(in srgb, var(--fp-vurgu, #111827) 16%, transparent);
+}
+
+.fp-spotlight-merkez .fp-paket-karsilastirma .fp-paket-ust,
+.fp-spotlight-merkez .fp-paket-karsilastirma .fp-paket-alt {
+  background: color-mix(in srgb, var(--fp-vurgu, #111827) 58%, #55c3bc) !important;
+}
+
+.fp-spotlight-merkez .fp-paket-karsilastirma .fp-paket-fiyat {
+  color: color-mix(in srgb, var(--fp-vurgu, #111827) 58%, #55c3bc) !important;
+}
+
+@media (max-width: 900px) {
+  .fp-spotlight { flex-wrap: wrap; }
+  .fp-spotlight-kolon { flex-basis: min(100%, 22rem); margin-inline: auto; }
 }
 
 .fp-serit-baslik {
@@ -13634,6 +13761,22 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .ib-ikon-serit .ib-kart { background: #f4f7fb; box-shadow: none; border: 0; }
 .ib-kart-ikon { border: 1px solid color-mix(in srgb, currentColor 16%, transparent); }
 .ib-harita--split { border: 1px solid #e8edf3; border-radius: 0.5rem; }
+
+/* VETahsilat referansındaki sade, okunaklı iletişim tipografisi. */
+.ib-ikon-serit,
+.ib-form {
+  font-family: 'Roboto', var(--font-sans), sans-serif;
+}
+
+/* İletişim kartından açılan konum sayfası: mevcut kurumsal hero ile tam genişlikte kapak. */
+.harita-konum-sayfa { background: #f7f9fc; }
+.harita-konum-hero { background: #123b8d; }
+.harita-konum-hero .kurumsal-hero-icerik { padding-top: 7.5rem; }
+.harita-konum-hero-etiket { margin: 0 0 0.75rem; color: rgb(255 255 255 / 0.74); font-size: 0.75rem; font-weight: 750; letter-spacing: 0.14em; text-transform: uppercase; }
+.harita-konum-harita-bolum { padding: clamp(2.5rem, 5vw, 5rem) 0; }
+.harita-konum-harita-kart { overflow: hidden; border: 1px solid #e2e8f0; border-radius: 0.8rem; background: #fff; padding: 0.45rem; box-shadow: 0 14px 36px rgba(15, 23, 42, 0.08); }
+.harita-konum-iframe { display: block; width: 100%; height: clamp(28rem, 55vw, 38rem); border: 0; border-radius: 0.5rem; }
+.harita-konum-bos { margin: 0; padding: 2rem; color: #475569; font-size: 0.9rem; }
 
 /* Modern başlat menüsü: Sade Panel yerleşimi */
 .ap-baslat-menu-modern {
