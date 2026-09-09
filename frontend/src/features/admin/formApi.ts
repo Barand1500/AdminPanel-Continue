@@ -14,6 +14,17 @@ export interface FormGonderim {
   veriJson: Record<string, unknown>;
   okundu: boolean;
   olusturma: string;
+  yanitlar?: FormGonderimYanit[];
+}
+
+export interface FormGonderimYanit {
+  id: string;
+  gonderimId: string;
+  alicilar: string[];
+  konu: string;
+  mesaj: string;
+  gonderen: string;
+  olusturma: string;
 }
 
 export interface AdminForm {
@@ -92,6 +103,18 @@ export async function adminGonderimSil(formId: string, gonderimId: string): Prom
     method: 'DELETE',
     headers: adminHeaders(),
   });
+}
+
+export async function adminFormGonderimYanitla(
+  formId: string,
+  gonderimId: string,
+  payload: { alicilar: string[]; konu: string; mesaj: string },
+): Promise<FormGonderimYanit> {
+  const veri = await adminJsonFetch<{ yanit: FormGonderimYanit }>(
+    `/formlar/${formId}/gonderimler/${gonderimId}/yanit`,
+    { method: 'POST', headers: adminHeaders(), body: JSON.stringify(payload) },
+  );
+  return veri.yanit;
 }
 
 function normalizeForm(form: AdminForm): AdminForm {

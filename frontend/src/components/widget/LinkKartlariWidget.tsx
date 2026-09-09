@@ -4,7 +4,12 @@ import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetLinkOgesi } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
-import { configOkuFromWidget, linkKartIkonu } from './widgetHelpers';
+import { configOkuFromWidget } from './widgetHelpers';
+import { CizgiIkon } from './CizgiIkonlari';
+
+function LinkIkon({ ikon, boyut = 22 }: { ikon?: string | null; boyut?: number }) {
+  return <CizgiIkon deger={ikon} yedek="baglanti" boyut={boyut} />;
+}
 
 function renkler(cfg: WidgetConfig) {
   const g = cfg.gorunum ?? {};
@@ -85,7 +90,7 @@ function MetroTile({
               background: `linear-gradient(145deg, ${metroRenk(renk.vurgu, i)}ee, ${metroRenk(renk.vurgu, i)}bb)`,
             }}
           >
-            <span className="lk-metro-ikon">{linkKartIkonu(l.ikon)}</span>
+            <span className="lk-metro-ikon"><LinkIkon ikon={l.ikon} /></span>
             <span className="lk-metro-metin">{l.metin}</span>
           </LinkHref>
         ))}
@@ -139,7 +144,7 @@ function ChipSerit({
               background: `${renk.vurgu}10`,
             }}
           >
-            <span style={{ color: renk.vurgu }}>{linkKartIkonu(l.ikon)}</span>
+            <span style={{ color: renk.vurgu }}><LinkIkon ikon={l.ikon} boyut={18} /></span>
             {l.metin}
           </LinkHref>
         ))}
@@ -179,7 +184,7 @@ function SidebarNav({
               onClick={() => setAktif(i)}
             >
               <span className="lk-sidebar-cizgi" style={{ background: renk.vurgu }} />
-              <span>{linkKartIkonu(l.ikon)}</span>
+              <span><LinkIkon ikon={l.ikon} boyut={18} /></span>
               <span>{l.metin}</span>
             </button>
           ))}
@@ -187,7 +192,7 @@ function SidebarNav({
         {secili && (
           <div className="lk-sidebar-panel" style={{ borderColor: `${renk.vurgu}33` }}>
             <span className="lk-sidebar-panel-ikon" style={{ color: renk.vurgu }}>
-              {linkKartIkonu(secili.ikon)}
+              <LinkIkon ikon={secili.ikon} boyut={30} />
             </span>
             <h3 style={{ color: renk.baslik }}>{secili.metin}</h3>
             <p className="lk-sidebar-panel-yol" style={{ color: renk.metin }}>
@@ -230,7 +235,7 @@ function OrbitIkon({
           >
             <span className="lk-orbit-kart" style={{ borderColor: `${renk.vurgu}44`, color: renk.metin }}>
               <span className="lk-orbit-ikon" style={{ color: renk.vurgu }}>
-                {linkKartIkonu(l.ikon)}
+                <LinkIkon ikon={l.ikon} />
               </span>
               <span className="lk-orbit-metin">{l.metin}</span>
             </span>
@@ -245,7 +250,7 @@ function OrbitIkon({
             className="lk-orbit-mobil-oge"
             style={{ borderColor: `${renk.vurgu}33`, color: renk.metin }}
           >
-            <span style={{ color: renk.vurgu }}>{linkKartIkonu(l.ikon)}</span>
+            <span style={{ color: renk.vurgu }}><LinkIkon ikon={l.ikon} boyut={18} /></span>
             {l.metin}
             <span className="lk-ok">→</span>
           </LinkHref>
@@ -285,7 +290,7 @@ function KartDestesi({
               }
             >
               <span className="lk-deste-ikon" style={{ color: renk.vurgu }}>
-                {linkKartIkonu(l.ikon)}
+                <LinkIkon ikon={l.ikon} />
               </span>
               <span className="lk-deste-metin" style={{ color: renk.baslik }}>
                 {l.metin}
@@ -332,7 +337,7 @@ function AccordionListe({
                 onClick={() => setAcikId(acik ? null : l.id)}
               >
                 <span className="lk-accordion-ikon" style={{ color: renk.vurgu }}>
-                  {linkKartIkonu(l.ikon)}
+                  <LinkIkon ikon={l.ikon} />
                 </span>
                 <span className="lk-accordion-baslik" style={{ color: renk.baslik }}>
                   {l.metin}

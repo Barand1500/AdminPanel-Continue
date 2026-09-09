@@ -18,6 +18,7 @@ import {
   adminFormlariGetir,
   adminGonderimOkundu,
   adminGonderimSil,
+  adminFormGonderimYanitla,
   bosForm,
   formdanDeger,
   type AdminForm,
@@ -208,6 +209,22 @@ export function FormYonetimiSayfasi() {
     await gonderimleriYukle(seciliId);
   }
 
+  async function gonderimYanitla(gonderimId: string, payload: { alicilar: string[]; konu: string; mesaj: string }) {
+    if (!seciliId) return;
+    setKaydediliyor(true);
+    setHata('');
+    try {
+      await adminFormGonderimYanitla(seciliId, gonderimId, payload);
+      setBasari('Yanit e-posta olarak gonderildi.');
+      await gonderimleriYukle(seciliId);
+    } catch (err) {
+      setHata(err instanceof Error ? err.message : 'Yanit gonderilemedi');
+      throw err;
+    } finally {
+      setKaydediliyor(false);
+    }
+  }
+
   function gorunumDegistir(id: Gorunum) {
     if (id === gorunum) return;
     if (id === 'liste' || id === 'gonderimler') {
@@ -277,6 +294,7 @@ export function FormYonetimiSayfasi() {
           onFormSec={gonderimFormSec}
           onOkundu={okunduIsaretle}
           onSil={gonderimSilHandler}
+          onYanitla={gonderimYanitla}
           ustAksiyon={gorunumSekmeleri}
         />
       )}

@@ -32,6 +32,7 @@ Thumbs.db
 backend/prisma/migrations/**/migration_lock.toml
 *.db
 *.db-journal
+backend/prisma/schema.mysql.prisma
 
 # Uploads (local dev)
 backend/uploads/*

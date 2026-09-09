@@ -179,6 +179,12 @@ export interface WidgetGorunumAyarlari {
   tabloBaslikArkaPlan?: string;
   tabloKenarRengi?: string;
   vurguRengi?: string;
+  /** Widget CTA butonunun arka plan rengi. */
+  ctaRengi?: string;
+  /** Widget CTA butonunun yazı rengi. */
+  ctaYaziRengi?: string;
+  /** Fiyatlandırmada öne çıkan paketin ayrı vurgu rengi. */
+  oneCikanRengi?: string;
   /** Slider / karusel / haber widget sayfalama */
   sayfalamaStili?: SayfalamaStili;
   /** Kartlarda görsel konumu */
@@ -443,6 +449,8 @@ export interface WidgetConfig {
   popupGecikme?: number;
   popupTetikleyici?: 'sayfa_yukle' | 'cikis';
   formSlug?: string;
+  /** Fiyat paketinden teklif formuna geçerken açılacak sayfa yolu. */
+  teklifFormYolu?: string;
   metin?: string;
   kategoriler?: WidgetLinkOgesi[];
   timeline?: WidgetTimelineOgesi[];

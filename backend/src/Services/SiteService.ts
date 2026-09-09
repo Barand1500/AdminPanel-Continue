@@ -139,6 +139,7 @@ export class SiteService {
         alanlarJson: f.alanlarJson,
         ayarlarJson: f.ayarlarJson,
         aktif: f.aktif,
+        bildirimEmail: f.bildirimEmail,
       })),
       seoYonlendirmeler: seoYonlendirmeler
         .map((y) => {

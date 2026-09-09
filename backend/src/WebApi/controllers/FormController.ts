@@ -112,4 +112,22 @@ export class FormController {
       return res.status(400).json({ mesaj });
     }
   }
+
+  async gonderimYanitla(req: Request, res: Response) {
+    try {
+      const siteId = cozulenSiteId(req);
+      if (!siteId) return res.status(400).json({ mesaj: 'Site secimi gerekli' });
+      const yanit = await service.gonderimYanitla(
+        siteId,
+        paramId(req.params.id),
+        paramId(req.params.gonderimId),
+        req.body,
+      );
+      return res.status(201).json({ yanit, mesaj: 'Yanit e-posta olarak gonderildi' });
+    } catch (err) {
+      const mesaj = err instanceof Error ? err.message : 'Yanit gonderilemedi';
+      const status = mesaj === 'Gonderim bulunamadi' ? 404 : 400;
+      return res.status(status).json({ mesaj });
+    }
+  }
 }

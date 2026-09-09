@@ -41,6 +41,26 @@ function normalize(menu: UstMenuOgesi[]): UstMenuOgesi[] {
   );
 }
 
+/** Yayındaki ve menüde görünür sayfalardan mevcut üst/alt sayfa ağacını yeniden kurar. */
+function sayfaYapisindanMenuOlustur(sayfalar: AdminSayfa[]): UstMenuOgesi[] {
+  const gorunenSayfalar = sayfalar
+    .filter((sayfa) => sayfa.yayinda && sayfa.menudeGoster)
+    .sort((a, b) => a.sira - b.sira || a.baslik.localeCompare(b.baslik, 'tr'));
+  const ogeIdleri = new Map(gorunenSayfalar.map((sayfa) => [sayfa.id, yeniMenuId()]));
+
+  return gorunenSayfalar.map((sayfa) => ({
+    id: ogeIdleri.get(sayfa.id)!,
+    ad: sayfa.baslik,
+    link: sayfaYolunuBul(sayfa.slug),
+    sayfaId: sayfa.id,
+    yeniSekme: sayfa.acilisModu === 'yeni_sekme',
+    gorunur: true,
+    tip: 'sayfa' as const,
+    ustOgeId: sayfa.ustSayfaId ? ogeIdleri.get(sayfa.ustSayfaId) ?? null : null,
+    sira: sayfa.sira,
+  }));
+}
+
 function duzListe(menu: UstMenuOgesi[]): DuzSatir[] {
   const sirali = normalize(menu);
   const altlar = new Map<string | null, UstMenuOgesi[]>();
@@ -92,6 +112,7 @@ export function AnaMenuYonetimiPanel({ menuSekmeleri }: { menuSekmeleri?: ReactN
   const [menuModal, setMenuModal] = useState<'yeni' | 'adlandir' | null>(null);
   const [menuAdiTaslak, setMenuAdiTaslak] = useState('');
   const [menuSilOnayAcik, setMenuSilOnayAcik] = useState(false);
+  const [varsayilanOnayAcik, setVarsayilanOnayAcik] = useState(false);
 
   useEffect(() => {
     const liste = menuleriCoz(headerAyarlari);
@@ -127,7 +148,7 @@ export function AnaMenuYonetimiPanel({ menuSekmeleri }: { menuSekmeleri?: ReactN
   const menudekiSayfaIdleri = useMemo(() => new Set(menu.filter((o) => o.tip === 'sayfa').map((o) => o.sayfaId)), [menu]);
   const filtre = arama.trim().toLocaleLowerCase('tr');
   const gorunenKaynakIdleri = useMemo(() => {
-    if (kaynak === 'sayfalar') return sayfalar.filter((s) => s.yayinda && !menudekiSayfaIdleri.has(s.id) && (!filtre || s.baslik.toLocaleLowerCase('tr').includes(filtre))).map((s) => s.id);
+    if (kaynak === 'sayfalar') return sayfalar.filter((s) => s.yayinda && s.menudeGoster && !menudekiSayfaIdleri.has(s.id) && (!filtre || s.baslik.toLocaleLowerCase('tr').includes(filtre))).map((s) => s.id);
     if (kaynak === 'kategoriler') return kategoriler.filter((k) => k.aktif && (!filtre || k.baslik.toLocaleLowerCase('tr').includes(filtre))).map((k) => k.id);
     if (kaynak === 'bloglar') return bloglar.filter((b) => b.yayinda && (!filtre || b.baslik.toLocaleLowerCase('tr').includes(filtre))).map((b) => b.id);
     if (kaynak === 'formlar') return formlar.filter((f) => f.aktif && (!filtre || f.ad.toLocaleLowerCase('tr').includes(filtre))).map((f) => f.id);
@@ -152,7 +173,7 @@ export function AnaMenuYonetimiPanel({ menuSekmeleri }: { menuSekmeleri?: ReactN
     if (seciliKaynakIdleri.length === 0) return;
     const secili = new Set(seciliKaynakIdleri);
     const ekler: UstMenuOgesi[] = kaynak === 'sayfalar'
-      ? sayfalar.filter((sayfa) => secili.has(sayfa.id) && sayfa.yayinda && !menudekiSayfaIdleri.has(sayfa.id)).map((sayfa, sira) => ({ id: yeniMenuId(), ad: sayfa.baslik, link: sayfaYolunuBul(sayfa.slug), sayfaId: sayfa.id, yeniSekme: false, gorunur: true, tip: 'sayfa', ustOgeId: null, sira: menu.length + sira }))
+      ? sayfalar.filter((sayfa) => secili.has(sayfa.id) && sayfa.yayinda && sayfa.menudeGoster && !menudekiSayfaIdleri.has(sayfa.id)).map((sayfa, sira) => ({ id: yeniMenuId(), ad: sayfa.baslik, link: sayfaYolunuBul(sayfa.slug), sayfaId: sayfa.id, yeniSekme: false, gorunur: true, tip: 'sayfa', ustOgeId: null, sira: menu.length + sira }))
       : kaynak === 'kategoriler'
         ? kategoriler.filter((kategori) => secili.has(kategori.id) && kategori.aktif).map((kategori, sira) => ({ id: yeniMenuId(), ad: kategori.baslik, link: kategori.yol?.trim() || `/kategori/${kategori.slug}`, yeniSekme: false, gorunur: true, tip: 'kategori', ustOgeId: null, sira: menu.length + sira }))
         : kaynak === 'bloglar'
@@ -207,6 +228,39 @@ export function AnaMenuYonetimiPanel({ menuSekmeleri }: { menuSekmeleri?: ReactN
     } catch (err) { setHata(err instanceof Error ? err.message : 'Menü kaydedilemedi.'); }
   };
 
+  const varsayilanaDon = () => setVarsayilanOnayAcik(true);
+
+  const varsayilaniUygula = async () => {
+    setVarsayilanOnayAcik(false);
+    const varsayilanMenu = normalize(sayfaYapisindanMenuOlustur(sayfalar));
+    const sonrakiMenuler = menuListesi.map((kayitliMenu) =>
+      kayitliMenu.id === seciliMenuId ? { ...kayitliMenu, ogeler: varsayilanMenu } : kayitliMenu
+    );
+    const headerMenu = sonrakiMenuler.find((kayitliMenu) => kayitliMenu.id === (konumlar.header || seciliMenuId));
+    const header = {
+      ...headerAyarlari,
+      ustMenu: headerMenu?.ogeler ?? varsayilanMenu,
+      menuler: sonrakiMenuler,
+      menuKonumlari: {
+        header: konumlar.header || null,
+        footer: konumlar.footer || null,
+        footerKolonId: konumlar.footer && konumlar.footerKolonId ? konumlar.footerKolonId : null,
+        mobil: konumlar.mobil || null,
+      },
+    };
+    setMenu(varsayilanMenu);
+    setMenuListesi(sonrakiMenuler);
+    setSeciliKaynakIdleri([]);
+    setHata('');
+    try {
+      headerGuncelle(header);
+      await kaydet({ header });
+      setBasari('Menü, sayfa yapısına göre varsayılana döndürüldü.');
+    } catch (err) {
+      setHata(err instanceof Error ? err.message : 'Varsayılan menü kaydedilemedi.');
+    }
+  };
+
   const menuSec = (id: string) => { setSeciliMenuId(id); setMenu(normalize(menuListesi.find((m) => m.id === id)?.ogeler ?? [])); };
   const menuOlustur = () => { setMenuAdiTaslak(''); setMenuModal('yeni'); };
   const menuYenidenAdlandir = () => { setMenuAdiTaslak(menuListesi.find((m) => m.id === seciliMenuId)?.ad ?? ''); setMenuModal('adlandir'); };
@@ -221,6 +275,7 @@ export function AnaMenuYonetimiPanel({ menuSekmeleri }: { menuSekmeleri?: ReactN
       ['ap-ana-menu-adlandir', menuYenidenAdlandir],
       ['ap-ana-menu-sil', menuSilTalep],
       ['ap-ana-menu-onizle', () => setOnizlemeAcik(true)],
+      ['ap-ana-menu-varsayilana-don', () => { void varsayilanaDon(); }],
     ];
     dinleyiciler.forEach(([ad, dinleyici]) => window.addEventListener(ad, dinleyici));
     return () => dinleyiciler.forEach(([ad, dinleyici]) => window.removeEventListener(ad, dinleyici));
@@ -229,8 +284,8 @@ export function AnaMenuYonetimiPanel({ menuSekmeleri }: { menuSekmeleri?: ReactN
   // Ana Menü açıkken ortak çubuktan yeni menü oluşturulabilir; öğe düzenleme
   // işlemleri doğrudan menü yapısı kartlarında kalır.
   useModulAksiyonlari(
-    { kaydet: kaydetMenu, ekle: menuOlustur, sil: menuSilTalep, duzenle: menuYenidenAdlandir, onizle: () => setOnizlemeAcik(true) },
-    { kaydet: !kaydediliyor, ekle: true, sil: menuListesi.length > 1, duzenle: true, onizle: true, gizli: ANA_MENU_GIZLI_AKSIYONLAR }
+    { kaydet: kaydetMenu, ekle: menuOlustur, sil: menuSilTalep, duzenle: menuYenidenAdlandir, onizle: () => setOnizlemeAcik(true), varsayilanaDon },
+    { kaydet: !kaydediliyor, ekle: true, sil: menuListesi.length > 1, duzenle: true, onizle: true, varsayilanaDon: !kaydediliyor, gizli: ANA_MENU_GIZLI_AKSIYONLAR }
   );
 
   if (yukleniyor) return <YukleniyorDurumu mesaj="Ana menü yükleniyor..." />;
@@ -266,7 +321,7 @@ export function AnaMenuYonetimiPanel({ menuSekmeleri }: { menuSekmeleri?: ReactN
         </div>
         {kaynak !== 'ozel-link' && <AdminAramaKutusu deger={arama} onChange={setArama} placeholder="Ara..." />}
         {kaynak !== 'ozel-link' && <div className="mt-3 flex items-center justify-between gap-2"><span className="ap-muted text-xs">Arama sonucundaki uygun kayıtlar</span><button type="button" onClick={gorunenlerinSeciminiDegistir} disabled={gorunenKaynakIdleri.length === 0} className="rounded-md border border-[var(--ap-border)] px-2 py-1 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-40">{gorunenKaynakIdleri.length > 0 && gorunenKaynakIdleri.every((id) => seciliKaynakIdleri.includes(id)) ? 'Seçimi kaldır' : 'Tümünü seç'}</button></div>}
-        {kaynak === 'sayfalar' && <div className="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">{sayfalar.filter((s) => s.yayinda && (!filtre || s.baslik.toLocaleLowerCase('tr').includes(filtre))).map((s) => <label key={s.id} className="flex cursor-pointer items-center gap-3 rounded-lg border border-[var(--ap-border)] p-2"><input type="checkbox" checked={seciliKaynakIdleri.includes(s.id)} disabled={menudekiSayfaIdleri.has(s.id)} onChange={(e) => kaynakSeciminiDegistir(s.id, e.target.checked)} /><div className="min-w-0"><p className="ap-heading truncate text-sm">{s.baslik}</p><p className="ap-muted truncate text-xs">{sayfaYolunuBul(s.slug)}</p></div><span className="ap-muted ml-auto text-xs">{menudekiSayfaIdleri.has(s.id) ? 'Eklendi' : 'Seç'}</span></label>)}{sayfalar.filter((s) => s.yayinda).length === 0 && <p className="ap-muted text-sm">Yayındaki sayfa bulunmuyor.</p>}</div>}
+        {kaynak === 'sayfalar' && <div className="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">{sayfalar.filter((s) => s.yayinda && s.menudeGoster && (!filtre || s.baslik.toLocaleLowerCase('tr').includes(filtre))).map((s) => <label key={s.id} className="flex cursor-pointer items-center gap-3 rounded-lg border border-[var(--ap-border)] p-2"><input type="checkbox" checked={seciliKaynakIdleri.includes(s.id)} disabled={menudekiSayfaIdleri.has(s.id)} onChange={(e) => kaynakSeciminiDegistir(s.id, e.target.checked)} /><div className="min-w-0"><p className="ap-heading truncate text-sm">{s.baslik}</p><p className="ap-muted truncate text-xs">{sayfaYolunuBul(s.slug)}</p></div><span className="ap-muted ml-auto text-xs">{menudekiSayfaIdleri.has(s.id) ? 'Eklendi' : 'Seç'}</span></label>)}{sayfalar.filter((s) => s.yayinda && s.menudeGoster).length === 0 && <p className="ap-muted text-sm">Menüde göster açık, yayındaki sayfa bulunmuyor.</p>}</div>}
         {kaynak === 'kategoriler' && <div className="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">{kategoriler.filter((k) => k.aktif && (!filtre || k.baslik.toLocaleLowerCase('tr').includes(filtre))).map((k) => <label key={k.id} className="flex cursor-pointer items-center gap-3 rounded-lg border border-[var(--ap-border)] p-2"><input type="checkbox" checked={seciliKaynakIdleri.includes(k.id)} onChange={(e) => kaynakSeciminiDegistir(k.id, e.target.checked)} /><div className="min-w-0"><p className="ap-heading truncate text-sm">{k.baslik}</p><p className="ap-muted truncate text-xs">{k.yol || `/kategori/${k.slug}`}</p></div><span className="ap-muted ml-auto text-xs">Seç</span></label>)}{kategoriler.length === 0 && <p className="ap-muted text-sm">Kategori menüsünde kayıt yok.</p>}</div>}
         {kaynak === 'bloglar' && <div className="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">{bloglar.filter((b) => b.yayinda && (!filtre || b.baslik.toLocaleLowerCase('tr').includes(filtre))).map((b) => <label key={b.id} className="flex cursor-pointer items-center gap-3 rounded-lg border border-[var(--ap-border)] p-2"><input type="checkbox" checked={seciliKaynakIdleri.includes(b.id)} onChange={(e) => kaynakSeciminiDegistir(b.id, e.target.checked)} /><div className="min-w-0"><p className="ap-heading truncate text-sm">{b.baslik}</p><p className="ap-muted truncate text-xs">/blog/{b.slug}</p></div><span className="ap-muted ml-auto text-xs">Seç</span></label>)}</div>}
         {kaynak === 'formlar' && <div className="mt-3 max-h-80 space-y-2 overflow-y-auto pr-1">{formlar.filter((f) => f.aktif && (!filtre || f.ad.toLocaleLowerCase('tr').includes(filtre))).map((f) => <label key={f.id} className="flex cursor-pointer items-center gap-3 rounded-lg border border-[var(--ap-border)] p-2"><input type="checkbox" checked={seciliKaynakIdleri.includes(f.id)} onChange={(e) => kaynakSeciminiDegistir(f.id, e.target.checked)} /><div className="min-w-0"><p className="ap-heading truncate text-sm">{f.ad}</p><p className="ap-muted truncate text-xs">/form/{f.slug}</p></div><span className="ap-muted ml-auto text-xs">Seç</span></label>)}</div>}
@@ -281,6 +336,7 @@ export function AnaMenuYonetimiPanel({ menuSekmeleri }: { menuSekmeleri?: ReactN
 
     <MenuOnizlemeModal acik={onizlemeAcik} mobil={mobilOnizleme} menu={menu} onKapat={() => setOnizlemeAcik(false)} onModDegistir={setMobilOnizleme} />
     <MenuSilModal acik={menuSilOnayAcik} menuAd={menuListesi.find((m) => m.id === seciliMenuId)?.ad ?? ''} onKapat={() => setMenuSilOnayAcik(false)} onOnayla={menuSilOnayla} />
+    <MenuVarsayilanModal acik={varsayilanOnayAcik} menuAd={menuListesi.find((m) => m.id === seciliMenuId)?.ad ?? ''} onKapat={() => setVarsayilanOnayAcik(false)} onOnayla={() => void varsayilaniUygula()} />
     <MenuAdModal acik={menuModal !== null} kip={menuModal} deger={menuAdiTaslak} onDegerDegistir={setMenuAdiTaslak} onKapat={() => setMenuModal(null)} onKaydet={menuModalKaydet} />
   </div>;
 }
@@ -306,6 +362,33 @@ function MenuSilModal({ acik, menuAd, onKapat, onOnayla }: { acik: boolean; menu
           <header><span className="ap-yap-sil-uyari"><IconAlertTriangle size={19} /></span><h2 id="menu-sil-baslik">Bu menüyü silmek istiyor musunuz?</h2><button type="button" onClick={onKapat}><IconX size={15} /> ESC</button></header>
           <p><strong>{menuAd}</strong> menü taslağından kaldırılacak. Değişikliğin kalıcı olması için ardından Kaydet&apos;e basmanız gerekir.</p>
           <footer><button type="button" onClick={onKapat}>Vazgeç<small>(ESC)</small></button><button type="button" onClick={onOnayla}>Evet, Sil<small>(ENTER)</small></button></footer>
+        </div>
+      </div>
+    </div>
+  </div>;
+}
+
+function MenuVarsayilanModal({ acik, menuAd, onKapat, onOnayla }: { acik: boolean; menuAd: string; onKapat: () => void; onOnayla: () => void }) {
+  useEffect(() => {
+    if (!acik) return;
+    const tusHandler = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') { event.preventDefault(); onKapat(); }
+      if (event.key === 'Enter') { event.preventDefault(); onOnayla(); }
+    };
+    document.addEventListener('keydown', tusHandler);
+    document.body.style.overflow = 'hidden';
+    return () => { document.removeEventListener('keydown', tusHandler); document.body.style.overflow = ''; };
+  }, [acik, onKapat, onOnayla]);
+
+  if (!acik) return null;
+  return <div className="ap-yap-modal-arka" role="presentation">
+    <div className="erp-donen-cerceve erp-donen-cerceve-surekli">
+      <span className="erp-donen-cerceve-iz" />
+      <div className="erp-donen-cerceve-icerik">
+        <div className="ap-yap-sil-modal" role="alertdialog" aria-modal="true" aria-labelledby="menu-varsayilan-baslik">
+          <header><span className="ap-yap-sil-uyari"><IconAlertTriangle size={19} /></span><h2 id="menu-varsayilan-baslik">Varsayılan menüye dönülsün mü?</h2><button type="button" onClick={onKapat}><IconX size={15} /> ESC</button></header>
+          <p><strong>{menuAd}</strong> menüsü; yayındaki ve “Menüde göster” açık sayfaların mevcut üst/alt sayfa yapısına göre yeniden kurulacak.</p>
+          <footer><button type="button" onClick={onKapat}>Vazgeç<small>(ESC)</small></button><button type="button" onClick={onOnayla}>Evet, Varsayılana Dön<small>(ENTER)</small></button></footer>
         </div>
       </div>
     </div>

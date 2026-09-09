@@ -23,6 +23,7 @@ export interface KurumsalHeroGorunum {
   yukseklik: KurumsalHeroYukseklik;
   overlayRenk: string;
   overlayOpaklik: number;
+  overlayEtkin?: boolean;
 }
 
 export interface KurumsalHeroConfig {
@@ -65,6 +66,7 @@ export function varsayilanKurumsalHeroConfig(): KurumsalHeroConfig {
       yukseklik: '85vh',
       overlayRenk: KURUMSAL_HERO_VARSAYILAN_OVERLAY,
       overlayOpaklik: KURUMSAL_HERO_VARSAYILAN_OPAKLIK,
+      overlayEtkin: false,
     },
     slaytlar: [],
   };

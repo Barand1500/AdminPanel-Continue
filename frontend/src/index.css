@@ -177,6 +177,78 @@ body {
   @apply w-full;
 }
 
+/* Fiyat paketi "Satın Al" akışındaki bağımsız teklif formu. */
+.teklif-form-sayfasi {
+  min-height: calc(100vh - 5rem);
+  padding: 7.5rem 0 5rem;
+  background:
+    radial-gradient(circle at 50% 0%, color-mix(in srgb, var(--color-primary) 10%, transparent), transparent 33rem),
+    var(--color-surface);
+}
+
+.teklif-form-baslik {
+  max-width: 46rem;
+  margin: 0 auto 2rem;
+  text-align: center;
+}
+
+.teklif-form-eyebrow,
+.teklif-form-paket-etiket {
+  margin: 0;
+  color: var(--color-primary);
+  font-size: .75rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.teklif-form-baslik h1 {
+  margin: .65rem 0 0;
+  color: var(--color-text);
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  letter-spacing: -.035em;
+  line-height: 1.1;
+}
+
+.teklif-form-baslik > p:last-child {
+  margin: .85rem auto 0;
+  color: var(--color-text-muted);
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.teklif-form-paket-karti {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  max-width: 48rem;
+  margin: 0 auto 1.5rem;
+  padding: 1.25rem 1.5rem;
+  border: 1px solid color-mix(in srgb, var(--color-primary) 25%, var(--color-border));
+  border-radius: 1.1rem;
+  background: var(--color-surface-elevated);
+  box-shadow: 0 14px 35px rgb(15 23 42 / .08);
+}
+
+.teklif-form-paket-ad { margin: .25rem 0 0; color: var(--color-text); font-size: 1.2rem; font-weight: 750; }
+.teklif-form-paket-fiyat { margin: 0; color: var(--color-primary); font-size: 1.65rem; font-weight: 800; white-space: nowrap; }
+.teklif-form-kapsayici { max-width: 48rem; margin: 0 auto; }
+.teklif-form-guven-notu { display: flex; align-items: center; justify-content: center; gap: .45rem; margin: 0 0 1rem; color: var(--color-text-muted); font-size: .84rem; }
+.teklif-form-guven-notu span { color: var(--color-primary); }
+.teklif-form-kapsayici .site-dinamik-form { border-radius: 1.1rem; padding: clamp(1.4rem, 4vw, 2.25rem); box-shadow: 0 18px 45px rgb(15 23 42 / .09); }
+
+/* Hero'dan fiyat paketinin satın alma eylemine inerken sticky header altında
+   küçük, sabit bir nefes alanı bırakır. */
+[data-fiyat-satin-al] { scroll-margin-top: 4.75rem; }
+
+@media (max-width: 640px) {
+  .teklif-form-sayfasi { padding: 6.5rem 0 3.5rem; }
+  .teklif-form-paket-karti { padding: 1rem 1.15rem; }
+  .teklif-form-paket-fiyat { font-size: 1.3rem; }
+}
+
 .site-form-bolge-sidebar .container-site {
   @apply max-w-sm;
 }
@@ -1231,6 +1303,35 @@ body:has(.site-public)::-webkit-scrollbar,
 }
 
 .site-header-imza-shell--hero-overlay .site-header-imza-kurumsal {
+  background: linear-gradient(180deg, rgb(15 23 42 / 0.45) 0%, rgb(15 23 42 / 0.15) 100%);
+  backdrop-filter: blur(4px);
+}
+
+/* Kurumsal hero sayfa içeriğinden / eski yerleşimden render edildiğinde
+   JavaScript yerleşim algılayıcısı header'a overlay sınıfını veremeyebilir.
+   Hero görünüyorsa header yine de onun üstünde cam görünümünde kalmalıdır. */
+.site-public:has(.kurumsal-hero--overlay) .site-header-imza-bosluk {
+  display: none;
+}
+
+.site-public:has(.kurumsal-hero--overlay) .site-header-imza-shell {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.site-public:has(.kurumsal-hero--overlay) .site-header-imza-shell > * {
+  pointer-events: auto;
+}
+
+.site-public:has(.kurumsal-hero--overlay) .site-header-imza-ust {
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+  background: rgb(15 23 42 / 0.35);
+  backdrop-filter: blur(6px);
+}
+
+.site-public:has(.kurumsal-hero--overlay) .site-header-imza-kurumsal {
   background: linear-gradient(180deg, rgb(15 23 42 / 0.45) 0%, rgb(15 23 42 / 0.15) 100%);
   backdrop-filter: blur(4px);
 }
@@ -2511,6 +2612,12 @@ html[data-site-tema='koyu'] .site-public .rounded-lg.bg-white {
 
 .kurumsal-hero--overlay {
   margin-top: 0;
+}
+
+/* Header görselin üstüne bindiğinde, önceki normal header yerleşimindeki
+   toplam kapak ve içerik ritmini korur. */
+.kurumsal-hero--vetahsilat-yarim-kapak.kurumsal-hero--overlay .kurumsal-hero-icerik {
+  padding-top: calc(6.5rem + var(--kurumsal-hero-header-yuksekligi, 7.5rem));
 }
 
 .kurumsal-hero-sahne {
@@ -4139,7 +4246,25 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 .ib-form-gonder:disabled { opacity: 0.7; cursor: wait; }
 .ib-form-hata { margin: 0; font-size: 0.8rem; color: #dc2626; }
-.ib-form-sonuc { margin: 0; font-size: 0.95rem; font-weight: 600; }
+.ib-form-sonuc {
+  margin: 1.9rem 0 0;
+  border: 2px solid #22c55e;
+  border-radius: 0.35rem;
+  padding: 0.8rem 1rem;
+  color: #166534;
+  background: #fff;
+  font-size: 0.9rem;
+}
+
+.site-dinamik-form-sonuc {
+  margin-top: 1.9rem;
+  border: 2px solid #22c55e;
+  border-radius: 0.35rem;
+  padding: 0.8rem 1rem;
+  color: #166534;
+  background: #fff;
+  font-size: 0.9rem;
+}
 .ib-sube-baslik-satir { display: flex; align-items: flex-start; gap: 0.55rem; margin-bottom: 1.25rem; }
 .ib-sube-baslik-ikon { display: flex; margin-top: 0.15rem; }
 .ib-sube-baslik { margin: 0; font-size: 1.35rem; font-weight: 800; }
@@ -9244,17 +9369,19 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 
 .fp-spotlight-merkez .fp-paket-karsilastirma {
-  border-color: color-mix(in srgb, var(--fp-vurgu, #111827) 44%, #55c3bc);
+  /* Öne çıkan paket rengi yönetim panelinden aynen uygulanır. Önceki
+     turkuaz renk karışımı seçilen tonu değiştiriyordu. */
+  border-color: var(--fp-vurgu, #111827);
   box-shadow: 0 14px 34px color-mix(in srgb, var(--fp-vurgu, #111827) 16%, transparent);
 }
 
 .fp-spotlight-merkez .fp-paket-karsilastirma .fp-paket-ust,
 .fp-spotlight-merkez .fp-paket-karsilastirma .fp-paket-alt {
-  background: color-mix(in srgb, var(--fp-vurgu, #111827) 58%, #55c3bc) !important;
+  background: var(--fp-vurgu, #111827) !important;
 }
 
 .fp-spotlight-merkez .fp-paket-karsilastirma .fp-paket-fiyat {
-  color: color-mix(in srgb, var(--fp-vurgu, #111827) 58%, #55c3bc) !important;
+  color: var(--fp-vurgu, #111827) !important;
 }
 
 @media (max-width: 900px) {

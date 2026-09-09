@@ -87,6 +87,13 @@ export interface FooterTipEkAyarlari {
   markaUstEtiket?: string;
   /** Koyu kurumsal footer ana zemini. */
   arkaPlanRengi?: string;
+  /** Footer zeminlerinin opaklığı (0 = saydam, 1 = tam dolu). */
+  arkaPlanSaydamlik?: number;
+  /** Ana ve alt bant zeminlerinde iki renkli geçiş kullanır. */
+  gradientEtkin?: boolean;
+  gradientBitisRengi?: string;
+  altBantGradientBitisRengi?: string;
+  gradientAcisi?: number;
   /** Koyu kurumsal footer alt bantlarının zemini. */
   altBantRengi?: string;
   /** Koyu kurumsal footer metin rengi. */

@@ -74,7 +74,9 @@ export function ustMenuOgeleriOlustur(ustMenu: UstMenuOgesi[], sayfalar: Sayfa[]
   // kayıt ya da önbellek varsa ziyaretçiye kırık bir sayfa bağlantısı göstermemek
   // için ikinci güvenlik katmanıdır. Özel bağlantılar sayfaId taşımadığından kalır.
   const sayfaKaynagiGecerliMi = (oge: UstMenuOgesi) =>
-    !oge.sayfaId || sayfalar.some((sayfa) => idString(sayfa.id) === idString(oge.sayfaId!));
+    !oge.sayfaId || sayfalar.some((sayfa) =>
+      idString(sayfa.id) === idString(oge.sayfaId!) && sayfa.menudeGoster !== false
+    );
 
   // Eski kayıtlar alt menüyü sayfa hiyerarşisinden üretir. Yeni yönetim ekranı
   // ilk kez kaydedilene kadar bu davranışı koruyarak mevcut siteleri bozmuyoruz.

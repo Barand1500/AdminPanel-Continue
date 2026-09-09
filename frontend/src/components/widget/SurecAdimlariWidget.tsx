@@ -3,6 +3,7 @@ import type { WidgetConfig, WidgetSurecAdimi } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget } from './widgetHelpers';
+import { CizgiIkon } from './CizgiIkonlari';
 
 function Baslik({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
   return (
@@ -30,7 +31,7 @@ function KartGrid({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetConfig;
             className="surec-adim-kart group relative rounded-2xl border border-slate-200 bg-white p-6 text-center shadow-sm transition hover:-translate-y-1 hover:shadow-lg"
           >
             <span className="surec-adim-numara">{String(i + 1).padStart(2, '0')}</span>
-            <span className="mt-4 block text-3xl">{a.ikon || '📌'}</span>
+            <span className="mt-4 flex justify-center"><CizgiIkon deger={a.ikon} yedek="hedef" boyut={30} /></span>
             <h3 className="mt-3 font-semibold text-slate-900">{a.baslik}</h3>
             {a.aciklama && <p className="mt-2 text-sm text-slate-600">{a.aciklama}</p>}
           </article>
@@ -58,13 +59,13 @@ function KoyuYatayAdim({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetCo
         )}
       </div>
       <div className="relative z-10 mt-14 grid gap-8 md:grid-cols-3">
-        {adimlar.slice(0, 3).map((a, i) => (
+        {adimlar.slice(0, 3).map((a) => (
           <div key={a.id} className="surec-adim-koyu-oge text-center">
             <div
               className="surec-adim-koyu-ikon mx-auto flex h-14 w-14 items-center justify-center rounded-full text-xl text-white"
               style={{ backgroundColor: vurgu }}
             >
-              {a.ikon || String(i + 1)}
+              <CizgiIkon deger={a.ikon} yedek="hedef" boyut={23} />
             </div>
             <h3 className="mt-4 text-lg font-semibold text-white">{a.baslik}</h3>
             {a.aciklama && <p className="mt-2 text-sm text-slate-400">{a.aciklama}</p>}
@@ -112,7 +113,7 @@ function RenkliKart({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetConfi
               className="rounded-2xl border-2 bg-white p-6 text-center shadow-sm"
               style={{ borderColor: renk, boxShadow: `0 8px 24px ${renk}18` }}
             >
-              <span className="text-2xl">{a.ikon || '📌'}</span>
+              <span className="flex justify-center"><CizgiIkon deger={a.ikon} yedek="hedef" boyut={26} /></span>
               <h3 className="mt-3 font-semibold" style={{ color: renk }}>{a.baslik}</h3>
               {a.aciklama && <p className="mt-2 text-sm text-slate-600">{a.aciklama}</p>}
             </article>
@@ -153,7 +154,7 @@ function BuyukSimge({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetConfi
               className="mx-auto flex h-20 w-20 items-center justify-center rounded-full text-3xl text-white shadow-lg"
               style={{ backgroundColor: vurgu }}
             >
-              {a.ikon || '✓'}
+              <CizgiIkon deger={a.ikon} yedek="basari" boyut={32} />
             </div>
             <h3 className="mt-4 text-lg font-bold text-slate-900">{a.baslik}</h3>
             {a.aciklama && <p className="mt-2 text-sm text-slate-600">{a.aciklama}</p>}

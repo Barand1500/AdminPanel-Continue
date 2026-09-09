@@ -137,7 +137,10 @@ export function KoseYazarlariWidget({ widget }: { widget: Widget }) {
 }
 
 export function IletisimBlokWidget({ widget }: { widget: Widget }) {
-  const { site } = useOutletContext<SitePublicData>();
+  // Yönetim paneli önizlemesi Outlet bağlamı olmadan render edilir. Canlı
+  // sitede site bilgilerini kullanırken önizlemede widget verisiyle devam et.
+  const siteVerisi = useOutletContext<SitePublicData | undefined>();
+  const site = siteVerisi?.site;
   const cfg = cfgOku(widget);
   const g = gOku(cfg);
   const kartlar = cfg.iletisimKartlari ?? [];
@@ -166,7 +169,7 @@ export function IletisimBlokWidget({ widget }: { widget: Widget }) {
     }
     if (tanim.includes('mail') || tanim.includes('posta') || deger.includes('@')) {
       // Kartta görünen metin farklı olsa bile mesaj, Site Bilgileri'ndeki ana e-posta adresine gider.
-      const alici = site.ayarlar?.email?.trim() || deger;
+      const alici = site?.ayarlar?.email?.trim() || deger;
       return `mailto:${alici}`;
     }
     if (tanim.includes('telefon') || tanim.includes('gsm') || tanim.includes('tel')) {
@@ -184,7 +187,7 @@ export function IletisimBlokWidget({ widget }: { widget: Widget }) {
   const IletisimKartIcerik = ({ k }: { k: (typeof kartlar)[number] }) => {
     const tanim = `${k.ikon ?? ''} ${k.etiket ?? ''}`.toLocaleLowerCase('tr-TR');
     const epostaKarti = tanim.includes('mail') || tanim.includes('posta') || k.deger.includes('@');
-    const gorunenDeger = epostaKarti ? site.ayarlar?.email?.trim() || k.deger : k.deger;
+    const gorunenDeger = epostaKarti ? site?.ayarlar?.email?.trim() || k.deger : k.deger;
 
     return (
       <>

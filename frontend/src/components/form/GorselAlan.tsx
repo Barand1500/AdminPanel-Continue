@@ -10,6 +10,7 @@ interface GorselAlanProps {
   kabul?: string;
   onizlemeSinifi?: string;
   duzen?: 'yatay' | 'dikey';
+  medyaTipi?: 'gorsel' | 'video';
 }
 
 function YukleIkon({ sinif }: { sinif?: string }) {
@@ -29,6 +30,7 @@ export function GorselAlan({
   kabul = 'image/*,.svg',
   onizlemeSinifi = 'h-16 w-16 rounded-lg object-contain bg-[var(--ap-input-bg)] border border-[var(--ap-border)]',
   duzen = 'yatay',
+  medyaTipi = 'gorsel',
 }: GorselAlanProps) {
   const inputRef = useRef<HTMLInputElement>(null);
   const [yukleniyor, setYukleniyor] = useState(false);
@@ -62,7 +64,9 @@ export function GorselAlan({
     <FormAlani etiket={etiket} aciklama={aciklama}>
       <div className={`ap-gorsel-alan ${duzen === 'dikey' ? 'ap-gorsel-alan-dikey' : ''}`}>
         <div className="ap-gorsel-onizleme">
-          {onizlemeUrl ? (
+          {onizlemeUrl && medyaTipi === 'video' ? (
+            <video src={onizlemeUrl} className={onizlemeSinifi} muted preload="metadata" />
+          ) : onizlemeUrl ? (
             <img src={onizlemeUrl} alt="" className={onizlemeSinifi} />
           ) : (
             <div className={`${onizlemeSinifi} flex items-center justify-center text-[var(--ap-text-muted)]`}>

@@ -54,8 +54,12 @@ export function CizgiIkonSecici({
     if (!tetik) return;
     const dikdortgen = tetik.getBoundingClientRect();
     const stil = getComputedStyle(kapsayiciRef.current ?? tetik);
+    const tahminiPanelYuksekligi = 290;
+    const altaSigiyor = dikdortgen.bottom + 8 + tahminiPanelYuksekligi <= window.innerHeight - 12;
     setPanelKonumu({
-      top: Math.min(dikdortgen.bottom + 8, window.innerHeight - 190),
+      top: altaSigiyor
+        ? dikdortgen.bottom + 8
+        : Math.max(12, dikdortgen.top - tahminiPanelYuksekligi - 8),
       left: Math.max(12, Math.min(dikdortgen.left, window.innerWidth - 332)),
       width: Math.min(Math.max(dikdortgen.width, 320), window.innerWidth - 24),
       arkaPlan: stil.getPropertyValue('--ap-surface').trim() || '#1e293b',

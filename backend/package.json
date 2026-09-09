@@ -8,10 +8,10 @@
     "build": "tsc",
     "start": "node server.js",
     "start:dist": "node dist/index.js",
-    "db:push": "prisma db push",
+    "db:push": "node prisma/prismaKomutu.cjs db push",
     "db:reset": "prisma db push --force-reset && npm run db:seed",
-    "db:generate": "prisma generate",
-    "postinstall": "prisma generate",
+    "db:generate": "node prisma/prismaKomutu.cjs generate",
+    "postinstall": "node prisma/prismaKomutu.cjs generate",
     "db:seed": "npx tsx prisma/seed.ts",
     "db:temizle": "node prisma/veritabani-temizle.cjs",
     "db:setup": "npm run db:push && npm run db:seed",
@@ -26,6 +26,7 @@
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
     "multer": "^2.1.1",
+    "nodemailer": "^10.0.1",
     "zod": "^3.25.67"
   },
   "prisma": {
@@ -39,6 +40,7 @@
     "@types/jsonwebtoken": "^9.0.9",
     "@types/multer": "^2.1.0",
     "@types/node": "^22.15.30",
+    "@types/nodemailer": "^8.0.1",
     "prisma": "^6.9.0",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3"

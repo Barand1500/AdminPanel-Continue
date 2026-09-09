@@ -4,12 +4,30 @@ import { footerAyarlariBirlestir, type FooterAyarlari } from '@/types/footer';
 import { useSiteDil } from '@/contexts/SiteDilContext';
 import { FooterLayoutSec, footerTipSinifi } from './footer/FooterLayouts';
 
+function saydamRenk(hex: string, opaklik: number): string {
+  const temiz = hex.trim().replace('#', '');
+  if (!/^[0-9a-fA-F]{6}$/.test(temiz)) return hex;
+  const r = Number.parseInt(temiz.slice(0, 2), 16);
+  const g = Number.parseInt(temiz.slice(2, 4), 16);
+  const b = Number.parseInt(temiz.slice(4, 6), 16);
+  return `rgba(${r}, ${g}, ${b}, ${Math.min(1, Math.max(0, opaklik))})`;
+}
+
+function lineerGradient(baslangic: string, bitis: string, aci: number, opaklik: number): string {
+  return `linear-gradient(${aci}deg, ${saydamRenk(baslangic, opaklik)} 0%, ${saydamRenk(bitis, opaklik)} 100%)`;
+}
+
 function footerRenkStili(footer: FooterAyarlari): CSSProperties | undefined {
   const ek = footer.tipEk;
   if (footer.footerTipi === 'kurumsal') {
+    const opaklik = ek?.arkaPlanSaydamlik ?? 1;
+    const gradient = ek?.gradientEtkin === true;
+    const aci = ek?.gradientAcisi ?? 90;
+    const anaRenk = ek?.arkaPlanRengi || '#0b2a77';
+    const altRenk = ek?.altBantRengi || '#08245f';
     return {
-      '--kurumsal-footer-bg': ek?.arkaPlanRengi || '#0b2a77',
-      '--kurumsal-footer-alt-bg': ek?.altBantRengi || '#08245f',
+      '--kurumsal-footer-bg': gradient ? lineerGradient(anaRenk, ek?.gradientBitisRengi || '#fb923c', aci, opaklik) : saydamRenk(anaRenk, opaklik),
+      '--kurumsal-footer-alt-bg': gradient ? lineerGradient(altRenk, ek?.altBantGradientBitisRengi || '#ea580c', aci, opaklik) : saydamRenk(altRenk, opaklik),
       '--kurumsal-footer-text': ek?.metinRengi || '#ffffff',
       '--kurumsal-footer-icon-bg': ek?.ikonArkaPlanRengi || '#08245f',
     } as CSSProperties;

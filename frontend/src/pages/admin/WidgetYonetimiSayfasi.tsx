@@ -202,7 +202,9 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
       ekle: true,
       sil: !!seciliId && !kaydediliyor,
       duzenle: !!seciliId && gorunum !== 'editor' && !kaydediliyor,
-      onizle: gorunum === 'editor' && tipOnaylandi && Boolean(form.tip) && !kaydediliyor,
+      // Listede satır seçildiğinde form zaten seçili widgettan doldurulur.
+      // Önizleme için önce Düzenle ekranına geçmeyi zorunlu tutmayalım.
+      onizle: tipOnaylandi && Boolean(form.tip) && !kaydediliyor,
     }
   );
 

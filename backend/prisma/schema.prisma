@@ -324,15 +324,30 @@ model FormTanimi {
 }
 
 model FormGonderim {
-  id        Int        @id @default(autoincrement())
+  id        Int                  @id @default(autoincrement())
   formId    Int
-  form      FormTanimi @relation(fields: [formId], references: [id], onDelete: Cascade)
+  form      FormTanimi           @relation(fields: [formId], references: [id], onDelete: Cascade)
   veriJson  Json
-  okundu    Boolean    @default(false)
-  olusturma DateTime   @default(now())
+  okundu    Boolean              @default(false)
+  olusturma DateTime             @default(now())
+  yanitlar  FormGonderimYanit[]
 
   @@index([formId, okundu])
   @@map("form_gonderimler")
+}
+
+model FormGonderimYanit {
+  id          Int           @id @default(autoincrement())
+  gonderimId  Int
+  gonderim    FormGonderim  @relation(fields: [gonderimId], references: [id], onDelete: Cascade)
+  alicilar    Json
+  konu        String
+  mesaj       String
+  gonderen    String
+  olusturma   DateTime      @default(now())
+
+  @@index([gonderimId, olusturma])
+  @@map("form_gonderim_yanitlari")
 }
 
 model SeoYonlendirme {

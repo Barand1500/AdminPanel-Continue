@@ -9,7 +9,7 @@ import {
 } from 'react';
 import { adminIslemBildirimi } from '@/utils/adminBildirimOlaylari';
 
-export type AksiyonId = 'kaydet' | 'hizliKaydet' | 'guncelle' | 'ekle' | 'altEkle' | 'sil' | 'onizle' | 'yayinla' | 'duzenle';
+export type AksiyonId = 'kaydet' | 'hizliKaydet' | 'guncelle' | 'ekle' | 'altEkle' | 'sil' | 'onizle' | 'yayinla' | 'duzenle' | 'varsayilanaDon';
 
 export interface AksiyonHandlerlar {
   kaydet?: () => Promise<void> | void;
@@ -21,6 +21,7 @@ export interface AksiyonHandlerlar {
   onizle?: () => void;
   yayinla?: () => Promise<void> | void;
   duzenle?: () => void;
+  varsayilanaDon?: () => Promise<void> | void;
 }
 
 export type AksiyonDurumlari = Partial<Record<AksiyonId, boolean>> & {
@@ -41,6 +42,7 @@ const AKSİYON_BASARI: Partial<Record<AksiyonId, string>> = {
   ekle: 'Eklendi',
   sil: 'Silindi',
   yayinla: 'Yayınlandı',
+  varsayilanaDon: 'Varsayılan menü yüklendi',
   onizle: 'Önizleme açıldı',
 };
 
@@ -140,6 +142,7 @@ export function AdminAksiyonProvider({ children }: { children: ReactNode }) {
         else if (id === 'duzenle' && handlers.duzenle) handlers.duzenle();
         else if (id === 'onizle' && handlers.onizle) handlers.onizle();
         else if (id === 'yayinla' && handlers.yayinla) await handlers.yayinla();
+        else if (id === 'varsayilanaDon' && handlers.varsayilanaDon) await handlers.varsayilanaDon();
         else return;
 
         if (AKSİYON_BASARI[aksiyonId]) {

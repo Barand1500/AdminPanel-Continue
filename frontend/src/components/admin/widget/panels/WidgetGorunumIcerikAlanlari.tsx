@@ -1,4 +1,5 @@
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
+import { CizgiIkonSecici } from '@/components/form/CizgiIkonSecici';
 import { AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
   gorunumIcerikAlanlariBul,
@@ -106,12 +107,7 @@ export function WidgetGorunumIcerikAlanlari({ form, onChange }: WidgetPanelProps
       )}
       {alanVar('modulIkon') && (
         <FormAlani etiket={ALAN_ETIKET.modulIkon} aciklama={ALAN_ACIKLAMA.modulIkon}>
-          <input
-            className={formInputSinifi}
-            placeholder="💳"
-            value={cfg.modulIkon ?? ''}
-            onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, modulIkon: e.target.value })))}
-          />
+          <CizgiIkonSecici deger={cfg.modulIkon} varsayilan="odeme" onChange={(modulIkon) => onChange(configGuncelle(form, (c) => ({ ...c, modulIkon })))} />
         </FormAlani>
       )}
       {(alanVar('butonMetni') || alanVar('butonLink')) && (

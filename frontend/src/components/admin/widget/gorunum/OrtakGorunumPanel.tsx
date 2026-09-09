@@ -125,6 +125,15 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
         {(metinGoster || gridGoster || ikiBaslikli || karsilastirmaEk || popupEk || tip === 'SSS') && !haberWidget && (
           <RenkSecici etiket="Vurgu / üst etiket rengi" deger={g.vurguRengi ?? ''} varsayilan="#111827" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, vurguRengi: v } })))} />
         )}
+        {(tip === 'SITE_HAKKINDA' || tip === 'ILETISIM_FORMU') && (
+          <>
+            <RenkSecici etiket="Buton arka planı" deger={g.ctaRengi ?? ''} varsayilan={g.vurguRengi || '#111827'} onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, ctaRengi: v } })))} />
+            <RenkSecici etiket="Buton yazı rengi" deger={g.ctaYaziRengi ?? ''} varsayilan="#ffffff" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, ctaYaziRengi: v } })))} />
+          </>
+        )}
+        {tip === 'FIYATLANDIRMA' && (
+          <RenkSecici etiket="Öne çıkan paket rengi" deger={g.oneCikanRengi ?? ''} varsayilan={g.vurguRengi || '#111827'} onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, oneCikanRengi: v } })))} />
+        )}
         {ikiBaslikli && !haberWidget && (
           <AdminAnahtarDugme
             etiket="Üst başlık alt çizgisi"

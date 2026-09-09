@@ -65,9 +65,29 @@ export function FooterTipEkAyarlariFormu({ tip, tipEk, onGuncelle }: FooterTipEk
 
       {tip === 'kurumsal' && (
         <>
+          <AdminAnahtarDugme
+            etiket="Lineer gradient arka plan"
+            acik={tipEk.gradientEtkin === true}
+            onDegistir={(gradientEtkin) => guncelle({ gradientEtkin })}
+          />
           <div className="ap-header-form-grid">
             <RenkSecici etiket="Footer ana arka planı" deger={tipEk.arkaPlanRengi ?? ''} varsayilan="#0b2a77" onChange={(arkaPlanRengi) => guncelle({ arkaPlanRengi })} />
+            {tipEk.gradientEtkin && <RenkSecici etiket="Gradient bitiş rengi" deger={tipEk.gradientBitisRengi ?? ''} varsayilan="#fb923c" onChange={(gradientBitisRengi) => guncelle({ gradientBitisRengi })} />}
+            <FormAlani etiket={`Arka plan saydamlığı (%${Math.round((tipEk.arkaPlanSaydamlik ?? 1) * 100)})`}>
+              <input type="range" min={0} max={1} step={0.05} value={tipEk.arkaPlanSaydamlik ?? 1} onChange={(e) => guncelle({ arkaPlanSaydamlik: Number(e.target.value) })} className="w-full" />
+            </FormAlani>
             <RenkSecici etiket="Alt bant arka planı" deger={tipEk.altBantRengi ?? ''} varsayilan="#08245f" onChange={(altBantRengi) => guncelle({ altBantRengi })} />
+            {tipEk.gradientEtkin && <RenkSecici etiket="Alt bant bitiş rengi" deger={tipEk.altBantGradientBitisRengi ?? ''} varsayilan="#ea580c" onChange={(altBantGradientBitisRengi) => guncelle({ altBantGradientBitisRengi })} />}
+            {tipEk.gradientEtkin && (
+              <FormAlani etiket="Gradient yönü">
+                <select className={formInputSinifi} value={tipEk.gradientAcisi ?? 90} onChange={(e) => guncelle({ gradientAcisi: Number(e.target.value) })}>
+                  <option value={90}>Soldan sağa</option>
+                  <option value={135}>Sol üstten sağ alta</option>
+                  <option value={180}>Yukarıdan aşağı</option>
+                  <option value={45}>Sol alttan sağ üste</option>
+                </select>
+              </FormAlani>
+            )}
             <RenkSecici etiket="Yazı rengi" deger={tipEk.metinRengi ?? ''} varsayilan="#ffffff" onChange={(metinRengi) => guncelle({ metinRengi })} />
             <RenkSecici etiket="İkon kutusu" deger={tipEk.ikonArkaPlanRengi ?? ''} varsayilan="#08245f" onChange={(ikonArkaPlanRengi) => guncelle({ ikonArkaPlanRengi })} />
           </div>

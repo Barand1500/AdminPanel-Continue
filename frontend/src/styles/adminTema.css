@@ -7510,6 +7510,30 @@ html:has(.admin-panel[data-tema='acik']) body {
   visibility: hidden;
 }
 
+.ap-form-yanit-editor,
+.ap-form-yanit-gecmisi {
+  display: grid;
+  gap: 0.65rem;
+  margin-top: 0.9rem;
+  padding: 0.9rem;
+  border: 1px solid color-mix(in srgb, var(--ap-accent) 24%, var(--ap-border));
+  border-radius: 0.6rem;
+  background: color-mix(in srgb, var(--ap-accent) 5%, var(--ap-input-bg));
+}
+
+.ap-form-yanit-alicilar,
+.ap-form-yanit-alan { display: grid; gap: 0.4rem; font-size: 0.78rem; color: var(--ap-text-muted); }
+.ap-form-yanit-alicilar label { display: flex; align-items: center; gap: 0.45rem; color: var(--ap-text); }
+.ap-form-yanit-alicilar small { font-size: 0.7rem; }
+.ap-form-yanit-alan input,
+.ap-form-yanit-alan textarea { width: 100%; border: 1px solid var(--ap-border); border-radius: 0.45rem; background: var(--ap-input-bg); color: var(--ap-text); padding: 0.55rem 0.65rem; }
+.ap-form-yanit-alan textarea { resize: vertical; }
+.ap-form-yanit-hata { margin: 0; color: #ef4444; font-size: 0.75rem; }
+.ap-form-yanit-gecmisi > div { display: grid; gap: 0.25rem; padding: 0.65rem; border-radius: 0.45rem; background: color-mix(in srgb, var(--ap-input-bg) 75%, transparent); }
+.ap-form-yanit-gecmisi small { color: var(--ap-text-muted); }
+.ap-form-yanit-gecmisi b { font-size: 0.78rem; }
+.ap-form-yanit-gecmisi p { margin: 0; white-space: pre-wrap; font-size: 0.8rem; color: var(--ap-text); }
+
 .ap-takvim-ust { display:flex; align-items:center; justify-content:space-between; gap:.5rem; margin-bottom:.6rem; color:var(--ap-heading); font-size:.8rem; }
 .ap-takvim-nav { display:inline-flex; width:1.75rem; height:1.75rem; align-items:center; justify-content:center; border:1px solid var(--ap-border); border-radius:.4rem; background:var(--ap-input-bg); color:var(--ap-heading); }
 .ap-takvim-panel .ap-takvim-gun { border:0; background:transparent; color:var(--ap-heading); cursor:pointer; min-height:1.55rem; }

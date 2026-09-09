@@ -181,6 +181,7 @@ export function KategoriYonetimiSayfasi() {
       sil: () => bolum === 'ana-menu' ? anaMenuAksiyonuYayinla('sil') : sil(),
       duzenle: () => bolum === 'ana-menu' ? anaMenuAksiyonuYayinla('adlandir') : duzenlemeyeGit(),
       onizle: () => bolum === 'ana-menu' ? anaMenuAksiyonuYayinla('onizle') : undefined,
+      varsayilanaDon: () => bolum === 'ana-menu' ? anaMenuAksiyonuYayinla('varsayilana-don') : undefined,
     },
     {
       kaydet: bolum === 'ana-menu' || (bolum === 'kategori-menu' && gorunum === 'editor' && !kaydediliyor && Boolean(form.baslik.trim())),
@@ -189,6 +190,7 @@ export function KategoriYonetimiSayfasi() {
       sil: bolum === 'ana-menu' || (bolum === 'kategori-menu' && !!seciliId && !kaydediliyor),
       duzenle: bolum === 'ana-menu' || (bolum === 'kategori-menu' && !!seciliId && gorunum === 'liste' && !kaydediliyor),
       onizle: bolum === 'ana-menu',
+      varsayilanaDon: bolum === 'ana-menu',
     }
   );
 

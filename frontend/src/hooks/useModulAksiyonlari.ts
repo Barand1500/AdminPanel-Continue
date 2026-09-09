@@ -29,6 +29,7 @@ export function useModulAksiyonlari(
     handlers.duzenle,
     handlers.onizle,
     handlers.yayinla,
+    handlers.varsayilanaDon,
   ]);
 
   useEffect(() => {
@@ -46,6 +47,7 @@ export function useModulAksiyonlari(
     durumlar?.duzenle,
     durumlar?.onizle,
     durumlar?.yayinla,
+    durumlar?.varsayilanaDon,
     durumlar?.gizli,
   ]);
 }

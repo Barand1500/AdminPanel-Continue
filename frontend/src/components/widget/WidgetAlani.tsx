@@ -155,7 +155,8 @@ export function WidgetRender({ widget, onizleme }: WidgetRenderProps) {
     }
   })();
 
-  return inner;
+  // Hero gibi sayfa içi bağlantılar, seçilen widget'ın benzersiz id'sine iner.
+  return <div id={`widget-${widget.id}`}>{inner}</div>;
 }
 
 interface WidgetAlaniProps {

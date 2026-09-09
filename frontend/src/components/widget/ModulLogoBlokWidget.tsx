@@ -5,6 +5,7 @@ import type { WidgetConfig, WidgetEtiketKarti, WidgetIkonKart } from '@/types/wi
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk } from './widgetKabuk';
 import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
+import { CizgiIkon } from './CizgiIkonlari';
 
 function renkler(cfg: WidgetConfig) {
   const g = cfg.gorunum ?? {};
@@ -52,7 +53,7 @@ function OzellikListesiMasaustu({ ozellikler, vurgu }: { ozellikler: WidgetIkonK
       {ozellikler.map((o) => (
         <li key={o.id} className="mlb-ozellik">
           <span className="mlb-ozellik-isaret" style={{ color: vurgu }}>
-            {o.ikon || '✓'}
+            <CizgiIkon deger={o.ikon} yedek="basari" boyut={18} />
           </span>
           <span className="mlb-ozellik-metin">{o.metin}</span>
         </li>
@@ -86,7 +87,7 @@ function OzellikListesiMobil({ ozellikler, vurgu }: { ozellikler: WidgetIkonKart
       {morlar.map((o) => (
         <li key={o.id} className="mlb-ozellik">
           <span className="mlb-ozellik-isaret" style={{ color: vurgu }}>
-            {o.ikon}
+            <CizgiIkon deger={o.ikon} yedek="basari" boyut={18} />
           </span>
           <span className="mlb-ozellik-metin mlb-ozellik-metin--mor" style={{ color: vurgu }}>
             {o.baslik}
@@ -125,7 +126,7 @@ function ModulBaslik({
     <div className="mlb-baslik-alan">
       {ikon && (
         <div className="mlb-modul-ikon" style={{ background: renk.vurgu }}>
-          <span aria-hidden>{ikon}</span>
+          <span aria-hidden><CizgiIkon deger={ikon} yedek="odeme" boyut={25} /></span>
         </div>
       )}
       <div className="mlb-baslik-metin">
@@ -405,7 +406,7 @@ function BentoModul({
         )}
         {cfg.modulIkon && (
           <div className="mlb-modul-ikon mlb-modul-ikon-buyuk" style={{ background: renk.vurgu }}>
-            <span aria-hidden>{cfg.modulIkon}</span>
+            <span aria-hidden><CizgiIkon deger={cfg.modulIkon} yedek="odeme" boyut={34} /></span>
           </div>
         )}
         {widget.baslik && (

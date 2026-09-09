@@ -1,8 +1,10 @@
 import { FormEvent, useMemo, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import type { FormAlani, FormAyarlar } from '@/types/formYonetimi';
 import { ayarlariBirlestir } from '@/types/formYonetimi';
 import { publicFormGonder } from '@/features/site/formApi';
 import { alanGorunur, formDogrula, formVerisiOlustur } from '@/utils/formYardimci';
+import { telefonFormatla } from '@/utils/telefonFormat';
 
 interface DinamikFormProps {
   slug: string;
@@ -13,6 +15,12 @@ interface DinamikFormProps {
   /** Admin önizlemede slug henüz yoksa yerel test */
   onizlemeModu?: boolean;
   className?: string;
+  /** Sayfa üstünde özel bir paket kartı varsa form içindeki özeti gizler. */
+  paketOzetiGoster?: boolean;
+  /** Dış sayfa başlığı kullanıldığında form içi başlığı gizler. */
+  baslikGoster?: boolean;
+  /** Formu gizlemeden, altında başarı bildirimi gösterir. */
+  basariBildirimSatirIci?: boolean;
 }
 
 function FormAlaniGirdi({
@@ -88,13 +96,17 @@ function FormAlaniGirdi({
             ? 'date'
             : 'text';
 
+  const telefonAlani = alan.tip === 'tel';
+
   return (
     <input
       type={inputTip}
       className={sinif}
+      inputMode={telefonAlani ? 'tel' : undefined}
+      autoComplete={telefonAlani ? 'tel-national' : undefined}
       placeholder={alan.placeholder}
-      value={deger}
-      onChange={(e) => onChange(e.target.value)}
+      value={telefonAlani ? telefonFormatla(deger) : deger}
+      onChange={(e) => onChange(telefonAlani ? telefonFormatla(e.target.value) : e.target.value)}
       required={alan.zorunlu}
     />
   );
@@ -108,13 +120,25 @@ export function DinamikForm({
   ayarlar: ayarHam,
   onizlemeModu = false,
   className = '',
+  paketOzetiGoster = true,
+  baslikGoster = true,
+  basariBildirimSatirIci = false,
 }: DinamikFormProps) {
+  const { search } = useLocation();
   const ayar = ayarlariBirlestir(ayarHam);
   const [degerler, setDegerler] = useState<Record<string, string>>({});
   const [kvkkOnay, setKvkkOnay] = useState(false);
   const [gonderiliyor, setGonderiliyor] = useState(false);
   const [hata, setHata] = useState('');
   const [basari, setBasari] = useState(false);
+  const secilenPaket = useMemo(() => {
+    const parametreler = new URLSearchParams(search);
+    const hedefForm = parametreler.get('teklifForm')?.trim();
+    if (hedefForm && hedefForm !== slug) return null;
+    const paket = parametreler.get('paket')?.trim();
+    if (!paket) return null;
+    return { paket, fiyat: parametreler.get('fiyat')?.trim() || '' };
+  }, [search, slug]);
 
   const gorunurAlanlar = useMemo(
     () => alanlar.filter((a) => alanGorunur(a, degerler)),
@@ -139,6 +163,10 @@ export function DinamikForm({
     }
 
     const veri = formVerisiOlustur(alanlar, degerler);
+    if (secilenPaket) {
+      veri['Seçilen Paket'] = secilenPaket.paket;
+      if (secilenPaket.fiyat) veri['Paket Fiyatı'] = secilenPaket.fiyat;
+    }
     if (Object.keys(veri).length === 0) {
       setHata('En az bir alan doldurulmalı');
       return;
@@ -163,7 +191,7 @@ export function DinamikForm({
     }
   }
 
-  if (basari && !hata) {
+  if (basari && !hata && !basariBildirimSatirIci) {
     return (
       <div className={`site-dinamik-form ${genislikSinif} mx-auto rounded-xl border border-green-200 bg-green-50 p-6 text-center ${className}`}>
         <p className="text-sm font-medium text-green-800">
@@ -183,13 +211,20 @@ export function DinamikForm({
   }
 
   return (
-    <form
+    <>
+      <form
       onSubmit={gonder}
       className={`site-dinamik-form ${genislikSinif} mx-auto rounded-xl border border-slate-200 p-6 shadow-sm ${className}`}
       style={kartStil}
-    >
-      {ayar.baslikGoster && <h3 className="text-lg font-bold text-slate-800">{ad || 'Form'}</h3>}
+      >
+      {baslikGoster && ayar.baslikGoster && <h3 className="text-lg font-bold text-slate-800">{ad || 'Form'}</h3>}
       {ayar.aciklamaGoster && aciklama && <p className="mt-1 text-sm text-slate-600">{aciklama}</p>}
+      {paketOzetiGoster && secilenPaket && (
+        <div className="mt-4 rounded-lg border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-950">
+          <p className="font-semibold">Seçtiğiniz paket: {secilenPaket.paket}</p>
+          {secilenPaket.fiyat && <p className="mt-1 text-blue-800">Paket fiyatı: {secilenPaket.fiyat}</p>}
+        </div>
+      )}
 
       {hata && (
         <p className="mt-3 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700" role="alert">
@@ -244,6 +279,12 @@ export function DinamikForm({
           {gonderiliyor ? 'Gönderiliyor...' : ayar.gonderButonMetni || 'Gönder'}
         </button>
       </div>
-    </form>
+      </form>
+      {basari && !hata && basariBildirimSatirIci && (
+        <p className={`site-dinamik-form-sonuc ${genislikSinif} mx-auto ${className}`} role="status">
+          Mesajınız için teşekkürler. Gönderildi.
+        </p>
+      )}
+    </>
   );
 }

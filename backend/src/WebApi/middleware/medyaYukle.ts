@@ -23,10 +23,10 @@ export const medyaYukle = multer({
   storage,
   limits: { fileSize: MEDYA_MAX_DOSYA_BOYUTU },
   fileFilter: (_req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
+    if (file.mimetype.startsWith('image/') || ['video/mp4', 'video/webm', 'video/ogg'].includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Sadece gorsel dosyalari kabul edilir'));
+      cb(new Error('Sadece gorsel veya MP4, WebM, Ogg video dosyalari kabul edilir'));
     }
   },
 });

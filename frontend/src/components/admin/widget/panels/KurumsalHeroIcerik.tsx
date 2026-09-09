@@ -1,4 +1,5 @@
-import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
+import { useEffect, useState } from 'react';
+import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
 import { LinkYoluAlani } from '@/components/form/LinkYoluAlani';
 import { AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
@@ -13,11 +14,20 @@ import {
 } from '@/types/kurumsalHero';
 import { ListeSiralayici, SecimAlani } from './WidgetPanelOrtak';
 import type { WidgetPanelProps } from './types';
+import { widgetlariGetir } from '@/features/admin/widgetApi';
+import type { AdminWidget } from '@/types/admin';
 
 export function KurumsalHeroIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const kh = kurumsalHeroConfigOku(cfg);
   const slaytlar = kh.slaytlar;
+  const [hedefWidgetlar, setHedefWidgetlar] = useState<AdminWidget[]>([]);
+
+  useEffect(() => {
+    void widgetlariGetir()
+      .then((liste) => setHedefWidgetlar(liste.filter((widget) => widget.aktif)))
+      .catch(() => setHedefWidgetlar([]));
+  }, []);
 
   const khGuncelle = (guncelle: (mevcut: typeof kh) => typeof kh) => {
     onChange(
@@ -80,7 +90,7 @@ export function KurumsalHeroIcerik({ form, onChange }: WidgetPanelProps) {
           <FormAlani etiket={`Overlay opaklık (${Math.round(kh.gorunum.overlayOpaklik * 100)}%)`}>
             <input
               type="range"
-              min={0.4}
+              min={0}
               max={0.95}
               step={0.01}
               value={kh.gorunum.overlayOpaklik}
@@ -95,6 +105,14 @@ export function KurumsalHeroIcerik({ form, onChange }: WidgetPanelProps) {
           </FormAlani>
         </div>
         <div className="mt-4 flex flex-wrap gap-4">
+          <label className="flex items-center gap-2 text-sm">
+            <input
+              type="checkbox"
+              checked={kh.gorunum.overlayEtkin === true}
+              onChange={(e) => khGuncelle((k) => ({ ...k, gorunum: { ...k.gorunum, overlayEtkin: e.target.checked } }))}
+            />
+            Görsel renk katmanını uygula
+          </label>
           <label className="flex items-center gap-2 text-sm">
             <input
               type="checkbox"
@@ -170,6 +188,38 @@ export function KurumsalHeroIcerik({ form, onChange }: WidgetPanelProps) {
                     }
                   />
                 </FormAlani>
+                <FormAlani etiket="Buton arka planı">
+                  <input type="color" className="h-10 w-full cursor-pointer rounded border border-[var(--ap-border)]" value={s.birincilButon?.renk || '#38bdf8'} onChange={(e) => slaytGuncelle(i, { ...s, birincilButon: { ...s.birincilButon!, renk: e.target.value } })} />
+                </FormAlani>
+                <FormAlani etiket="Buton yazı rengi">
+                  <input type="color" className="h-10 w-full cursor-pointer rounded border border-[var(--ap-border)]" value={s.birincilButon?.yaziRenk || '#ffffff'} onChange={(e) => slaytGuncelle(i, { ...s, birincilButon: { ...s.birincilButon!, yaziRenk: e.target.value } })} />
+                </FormAlani>
+                <FormAlani etiket="Hedef widget" aciklama="Seçildiğinde buton sayfayı animasyonla bu widgeta kaydırır. Fiyatlandırmada ilk Satın Al butonuna iner.">
+                  <select
+                    className={formSelectSinifi}
+                    value={
+                      (s.birincilButon?.link ?? '').startsWith('#widget-')
+                        ? (s.birincilButon?.link ?? '').slice('#widget-'.length)
+                        : ''
+                    }
+                    onChange={(e) =>
+                      slaytGuncelle(i, {
+                        ...s,
+                        birincilButon: {
+                          ...s.birincilButon!,
+                          link: e.target.value ? `#widget-${e.target.value}` : '',
+                        },
+                      })
+                    }
+                  >
+                    <option value="">Normal link kullan</option>
+                    {hedefWidgetlar.map((widget) => (
+                      <option key={widget.id} value={widget.id}>
+                        {widget.ad || widget.baslik || `Widget #${widget.id}`} · {widget.tip}
+                      </option>
+                    ))}
+                  </select>
+                </FormAlani>
               </div>
               <div className="grid gap-2 rounded-lg border border-[var(--ap-border)] p-3 sm:grid-cols-2">
                 <p className="sm:col-span-2 text-xs font-semibold text-[var(--ap-text-muted)]">İkincil buton</p>
@@ -194,6 +244,12 @@ export function KurumsalHeroIcerik({ form, onChange }: WidgetPanelProps) {
                       })
                     }
                   />
+                </FormAlani>
+                <FormAlani etiket="Buton arka planı">
+                  <input type="color" className="h-10 w-full cursor-pointer rounded border border-[var(--ap-border)]" value={s.ikinciButon?.renk || '#ffffff'} onChange={(e) => slaytGuncelle(i, { ...s, ikinciButon: { ...(s.ikinciButon ?? { metin: '', link: '' }), renk: e.target.value } })} />
+                </FormAlani>
+                <FormAlani etiket="Buton yazı rengi">
+                  <input type="color" className="h-10 w-full cursor-pointer rounded border border-[var(--ap-border)]" value={s.ikinciButon?.yaziRenk || '#1e3a8a'} onChange={(e) => slaytGuncelle(i, { ...s, ikinciButon: { ...(s.ikinciButon ?? { metin: '', link: '' }), yaziRenk: e.target.value } })} />
                 </FormAlani>
               </div>
               <label className="flex items-center gap-2 text-sm">

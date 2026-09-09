@@ -674,6 +674,11 @@ export function SayfaEditorPanel({
                     acik={form.yayinda}
                     onDegistir={(v) => onChange({ ...form, yayinda: v })}
                   />
+                  <AdminAnahtarDugme
+                    etiket="Menüde göster"
+                    acik={form.menudeGoster}
+                    onDegistir={(v) => onChange({ ...form, menudeGoster: v })}
+                  />
                   <label className="ap-sayfa-sira-kompakt">
                     <span className="ap-heading text-sm font-medium">Sıra</span>
                     <input

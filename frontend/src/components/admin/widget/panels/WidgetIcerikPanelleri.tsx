@@ -2,7 +2,6 @@ import { useEffect, useRef, useState, type ComponentType } from 'react';
 import type { WidgetIletisimKarti } from '@/types/haberWidget';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
 import { CizgiIkonSecici } from '@/components/form/CizgiIkonSecici';
-import { EmojiSecici } from '@/components/form/EmojiSecici';
 import { GorselAlan } from '@/components/form/GorselAlan';
 import { AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
@@ -156,6 +155,17 @@ export function BaslikMetinGorselIcerik(props: WidgetPanelProps) {
           <FormAlani etiket="Buton link">
             <input className={formInputSinifi} value={form.butonLink} onChange={(e) => onChange({ ...form, butonLink: e.target.value })} />
           </FormAlani>
+        </div>
+        <div className="mt-3">
+          <GorselAlan
+            etiket="Tanıtım videosu dosyası"
+            aciklama="MP4, WebM veya Ogg yükleyin. Yüklendiğinde buton linki otomatik atanır; base64 kullanmaya gerek yoktur. En fazla 45 MB."
+            deger={form.butonLink}
+            onChange={(butonLink) => onChange({ ...form, butonLink })}
+            kabul="video/mp4,video/webm,video/ogg"
+            medyaTipi="video"
+            onizlemeSinifi="h-16 w-28 rounded-lg bg-[var(--ap-input-bg)] border border-[var(--ap-border)] object-cover"
+          />
         </div>
       </AdminFormBolumu>
     </>
@@ -460,12 +470,12 @@ export function LinkKartlariIcerik({ form, onChange }: WidgetPanelProps) {
         renderOge={(l, i) => (
           <div className="link-kart-satir grid gap-2 sm:grid-cols-[minmax(7rem,9rem)_1fr_1fr] sm:items-end">
             <FormAlani etiket="İkon">
-              <EmojiSecici
+              <CizgiIkonSecici
                 deger={l.ikon}
-                sadeceSecim
-                onChange={(emoji) => {
+                varsayilan="baglanti"
+                onChange={(ikon) => {
                   const kopya = [...linkler];
-                  kopya[i] = { ...l, ikon: emoji };
+                  kopya[i] = { ...l, ikon };
                   onChange(configGuncelle(form, (c) => ({ ...c, linkler: kopya })));
                 }}
               />
@@ -688,9 +698,9 @@ export function IletisimIcerik({ form, onChange }: WidgetPanelProps) {
           />
           <FormAlani etiket="Buton sol ikonu">
             <div className="flex flex-wrap items-center gap-2">
-              <EmojiSecici
-                sadeceSecim
+              <CizgiIkonSecici
                 deger={gorunum.ctaButonIkon ?? ''}
+                varsayilan="eposta"
                 onChange={(ikon) => onChange(configGuncelle(form, (c) => ({
                   ...c,
                   gorunum: { ...c.gorunum, ctaButonIkon: ikon },

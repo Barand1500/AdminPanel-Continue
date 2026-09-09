@@ -1,5 +1,5 @@
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
-import { EmojiSecici } from '@/components/form/EmojiSecici';
+import { CizgiIkonSecici } from '@/components/form/CizgiIkonSecici';
 import { GorselAlan } from '@/components/form/GorselAlan';
 import { AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
@@ -74,7 +74,7 @@ export function SurecAdimlariIcerik({ form, onChange }: WidgetPanelProps) {
         yeniEkle={() => ({ id: uid(), baslik: '', aciklama: '', ikon: '📌' })}
         renderOge={(a, i) => (
           <div className="grid gap-2 sm:grid-cols-2">
-            <EmojiSecici deger={a.ikon} onChange={(v) => {
+            <CizgiIkonSecici deger={a.ikon} varsayilan="hedef" onChange={(v) => {
               const k = [...adimlar]; k[i] = { ...a, ikon: v };
               onChange(configGuncelle(form, (c) => ({ ...c, surecAdimlari: k })));
             }} />
@@ -336,13 +336,12 @@ export function UcretsizDenemeIcerik({ form, onChange }: WidgetPanelProps) {
           yeniEkle={() => ({ id: uid(), ikon: '🎧', metin: '' })}
           renderOge={(k, i) => (
             <div className="grid gap-2 sm:grid-cols-2">
-              <input
-                className={formInputSinifi}
-                placeholder="İkon (emoji)"
-                value={k.ikon}
-                onChange={(e) => {
+              <CizgiIkonSecici
+                deger={k.ikon}
+                varsayilan="basari"
+                onChange={(ikon) => {
                   const kopya = [...ozellikler];
-                  kopya[i] = { ...k, ikon: e.target.value };
+                  kopya[i] = { ...k, ikon };
                   onChange(configGuncelle(form, (c) => ({ ...c, ikonKartlar: kopya })));
                 }}
               />

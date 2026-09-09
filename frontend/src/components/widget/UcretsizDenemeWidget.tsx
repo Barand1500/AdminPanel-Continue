@@ -4,6 +4,7 @@ import type { WidgetConfig, WidgetIkonKart } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk } from './widgetKabuk';
 import { configOkuFromWidget } from './widgetHelpers';
+import { CizgiIkon } from './CizgiIkonlari';
 import { publicFormGonder } from '@/features/site/formApi';
 
 interface FormVeri {
@@ -42,7 +43,7 @@ function OzellikGrid({
       {ozellikler.map((o) => (
         <li key={o.id} className="ud-ozellik">
           <span className="ud-ozellik-ikon" style={{ color: vurgu, background: `${vurgu}14` }}>
-            {o.ikon || '✓'}
+            <CizgiIkon deger={o.ikon} yedek="basari" boyut={18} />
           </span>
           <span className="ud-ozellik-metin">{o.metin}</span>
         </li>

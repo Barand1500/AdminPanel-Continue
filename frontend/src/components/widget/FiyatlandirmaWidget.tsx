@@ -74,6 +74,16 @@ function OzellikListesi({
   );
 }
 
+function paketLinki(paket: WidgetFiyatPaketi): string {
+  // Her paketin kendi hedefi olabilir. Bu nedenle yönlendirme paketin
+  // içindeki "Buton linki" alanından alınır.
+  const hedef = paket.butonLink.trim();
+  if (!hedef) return '';
+  const [yol, hash = ''] = hedef.split('#', 2);
+  const ayrac = yol.includes('?') ? '&' : '?';
+  return `${yol}${ayrac}paket=${encodeURIComponent(paket.ad)}&fiyat=${encodeURIComponent(paket.fiyat)}${hash ? `#${hash}` : ''}`;
+}
+
 function PaketButon({
   paket,
   vurgu,
@@ -85,20 +95,20 @@ function PaketButon({
   outline?: boolean;
   footer?: boolean;
 }) {
-  if (!paket.butonLink) return null;
+  const href = paketLinki(paket);
+  if (!href) return null;
   const sinif = `fp-btn${outline ? ' fp-btn-outline' : ''}${footer ? ' fp-btn-footer' : ''}`;
   const stil = footer ? { color: '#fff' } : outline ? { borderColor: vurgu, color: vurgu } : { background: vurgu };
-  const href = paket.butonLink;
   const children = paket.butonMetni || 'Satın Al';
   if (href.startsWith('/')) {
     return (
-      <Link to={href} className={sinif} style={stil}>
+      <Link to={href} className={sinif} style={stil} data-fiyat-satin-al>
         {children}
       </Link>
     );
   }
   return (
-    <a href={href} className={sinif} style={stil}>
+    <a href={href} className={sinif} style={stil} data-fiyat-satin-al>
       {children}
     </a>
   );
@@ -117,20 +127,22 @@ function PaketKart({
 }) {
   const renk = renkler(cfg);
   const v = oneCikan || paket.oneCikan;
+  const oneCikanRenk = cfg.gorunum?.oneCikanRengi || renk.vurgu;
+  const paketRengi = v ? oneCikanRenk : renk.vurgu;
   return (
     <article
       className={`fp-paket-kart${v ? ' fp-paket-one-cikan' : ''} ${sinif}`.trim()}
       style={
         {
-          '--fp-vurgu': renk.vurgu,
+          '--fp-vurgu': paketRengi,
           '--fp-metin': renk.metin,
           borderRadius: `${renk.radius}px`,
-          borderColor: v ? renk.vurgu : undefined,
+          borderColor: v ? paketRengi : undefined,
         } as CSSProperties
       }
     >
-      {v && <span className="fp-rozet" style={{ background: renk.vurgu }}>Önerilen</span>}
-      <header className="fp-paket-ust" style={{ background: renk.vurgu }}>
+      {v && <span className="fp-rozet" style={{ background: paketRengi }}>Önerilen</span>}
+      <header className="fp-paket-ust" style={{ background: paketRengi }}>
         <h3 className="fp-paket-ad">{paket.ad}</h3>
       </header>
       <div className="fp-paket-govde">
@@ -139,9 +151,9 @@ function PaketKart({
         {paket.altAciklama && <p className="fp-paket-alt-aciklama" style={{ color: renk.metin }}>{paket.altAciklama}</p>}
         <OzellikListesi paket={paket} metin={renk.metin} />
       </div>
-      {paket.butonLink && (
-        <footer className="fp-paket-alt" style={{ background: renk.vurgu }}>
-          <PaketButon paket={paket} vurgu={renk.vurgu} footer />
+      {paketLinki(paket) && (
+        <footer className="fp-paket-alt" style={{ background: paketRengi }}>
+          <PaketButon paket={paket} vurgu={paketRengi} footer />
         </footer>
       )}
     </article>
@@ -311,6 +323,7 @@ function SplitHero({ widget, cfg, paketler }: { widget: Widget; cfg: WidgetConfi
 
 function KartDestesi({ widget, cfg, paketler }: { widget: Widget; cfg: WidgetConfig; paketler: WidgetFiyatPaketi[] }) {
   const renk = renkler(cfg);
+  const oneCikanRenk = cfg.gorunum?.oneCikanRengi || renk.vurgu;
   const n = paketler.length;
 
   return (
@@ -326,14 +339,14 @@ function KartDestesi({ widget, cfg, paketler }: { widget: Widget; cfg: WidgetCon
                 {
                   '--fp-deste-i': i,
                   borderRadius: `${renk.radius}px`,
-                  borderColor: p.oneCikan ? renk.vurgu : '#e2e8f0',
+                  borderColor: p.oneCikan ? oneCikanRenk : '#e2e8f0',
                 } as CSSProperties
               }
             >
               <h3 className="fp-paket-ad" style={{ color: renk.baslik }}>{p.ad}</h3>
-              <p className="fp-paket-fiyat" style={{ color: renk.vurgu }}>{p.fiyat}</p>
+              <p className="fp-paket-fiyat" style={{ color: p.oneCikan ? oneCikanRenk : renk.vurgu }}>{p.fiyat}</p>
               <OzellikListesi paket={p} metin={renk.metin} />
-              <PaketButon paket={p} vurgu={renk.vurgu} outline={!p.oneCikan} />
+              <PaketButon paket={p} vurgu={p.oneCikan ? oneCikanRenk : renk.vurgu} outline={!p.oneCikan} />
             </article>
           ))}
         </div>
@@ -352,13 +365,15 @@ export function FiyatlandirmaWidget({ widget }: { widget: Widget }) {
   const ortak = { widget, cfg, paketler };
 
   return (
-    <WidgetKabuk widget={widget}>
-      {gt === 'karsilastirma-tablo' && <KarsilastirmaTablo {...ortak} />}
-      {gt === 'spotlight-merkez' && <SpotlightMerkez {...ortak} />}
-      {gt === 'yatay-serit' && <YataySerit {...ortak} />}
-      {gt === 'split-hero' && <SplitHero {...ortak} />}
-      {gt === 'kart-destesi' && <KartDestesi {...ortak} />}
-      {(gt === 'sekmeli-toggle' || !gt) && <SekmeliToggle {...ortak} />}
-    </WidgetKabuk>
+    <div id="fiyatlandirma">
+      <WidgetKabuk widget={widget}>
+        {gt === 'karsilastirma-tablo' && <KarsilastirmaTablo {...ortak} />}
+        {gt === 'spotlight-merkez' && <SpotlightMerkez {...ortak} />}
+        {gt === 'yatay-serit' && <YataySerit {...ortak} />}
+        {gt === 'split-hero' && <SplitHero {...ortak} />}
+        {gt === 'kart-destesi' && <KartDestesi {...ortak} />}
+        {(gt === 'sekmeli-toggle' || !gt) && <SekmeliToggle {...ortak} />}
+      </WidgetKabuk>
+    </div>
   );
 }

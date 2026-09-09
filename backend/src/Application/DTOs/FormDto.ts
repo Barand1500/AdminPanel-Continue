@@ -75,3 +75,11 @@ export const formGonderSchema = z.object({
 });
 
 export type FormGonderDto = z.infer<typeof formGonderSchema>;
+
+export const formYanitGonderSchema = z.object({
+  alicilar: z.array(z.string().trim().email()).min(1, 'En az bir alici secin').max(10),
+  konu: z.string().trim().min(1, 'Konu zorunludur').max(200),
+  mesaj: z.string().trim().min(1, 'Mesaj zorunludur').max(10_000),
+});
+
+export type FormYanitGonderDto = z.infer<typeof formYanitGonderSchema>;

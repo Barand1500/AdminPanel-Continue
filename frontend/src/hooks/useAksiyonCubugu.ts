@@ -95,6 +95,7 @@ const modulAksiyonlari: Record<string, AksiyonButonu[]> = {
   ],
   kategoriler: [
     A('kaydet', 'Kaydet', true, true),
+    A('varsayilanaDon', 'Varsayılana Dön', false),
     A('ekle', 'Yeni Ekle', true),
     A('altEkle', 'Yeni Alt Ekle', false),
     A('sil', 'Sil', true),
@@ -164,6 +165,7 @@ const AKSIYON_YETKI: Partial<Record<AksiyonId, YetkiKodu>> = {
   duzenle: 'duzenleme',
   onizle: 'goruntuleme',
   yayinla: 'duzenleme',
+  varsayilanaDon: 'duzenleme',
 };
 
 export function useAksiyonCubugu(modulId: string) {

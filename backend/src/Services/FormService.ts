@@ -1,9 +1,11 @@
-import type { FormGuncelleDto, FormGonderDto, FormOlusturDto } from '../Application/DTOs/FormDto.js';
+import type { FormGuncelleDto, FormGonderDto, FormOlusturDto, FormYanitGonderDto } from '../Application/DTOs/FormDto.js';
 import { FormRepository } from '../Infrastructure/repositories/FormRepository.js';
 import { SiteRepository } from '../Infrastructure/repositories/SiteRepository.js';
+import { EpostaService } from './EpostaService.js';
 
 const formRepo = new FormRepository();
 const siteRepo = new SiteRepository();
+const epostaService = new EpostaService();
 
 function slugOlustur(ad: string) {
   return ad
@@ -91,5 +93,14 @@ export class FormService {
     if (!doluAlan) throw new Error('En az bir alan doldurulmali');
 
     return formRepo.gonderimOlustur(form.id, veri as never);
+  }
+
+  async gonderimYanitla(siteId: number, formId: number, gonderimId: number, dto: FormYanitGonderDto) {
+    const gonderim = await formRepo.gonderimGetir(gonderimId, formId, siteId);
+    if (!gonderim) throw new Error('Gonderim bulunamadi');
+
+    const alicilar = [...new Set(dto.alicilar.map((email) => email.trim().toLowerCase()))];
+    await epostaService.gonder(alicilar, dto.konu, dto.mesaj);
+    return formRepo.yanitOlustur(gonderim.id, alicilar, dto.konu, dto.mesaj, 'Panel');
   }
 }

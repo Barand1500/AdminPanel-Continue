@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
 import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
@@ -23,6 +23,7 @@ function HeroButonLink({
   if (!buton.metin?.trim()) return null;
   const link = buton.link || '#';
   const dis = link.startsWith('http');
+  const sayfaIciHedef = link.startsWith('#') && link.length > 1;
   const stil =
     buton.renk || buton.yaziRenk
       ? { backgroundColor: buton.renk, color: buton.yaziRenk }
@@ -31,6 +32,33 @@ function HeroButonLink({
   if (dis) {
     return (
       <a href={link} target="_blank" rel="noreferrer" className={sinif} style={stil}>
+        {buton.metin}
+      </a>
+    );
+  }
+  if (sayfaIciHedef) {
+    return (
+      <a
+        href={link}
+        className={sinif}
+        style={stil}
+        onClick={(olay) => {
+          olay.preventDefault();
+          const hedef = document.getElementById(link.slice(1));
+          if (!hedef) return;
+          window.history.replaceState(null, '', link);
+          // Her zaman seçilen widgetın görünen ilk başlığına iner. Böylece
+          // fiyatlandırmada da paketlerin altındaki butona kaymaz.
+          const baslikHedefi = hedef.querySelector<HTMLElement>('h1, h2, h3');
+          const kaydirmaHedefi = baslikHedefi ?? hedef;
+          const headerBosluk = 78;
+          const hedefY = window.scrollY + kaydirmaHedefi.getBoundingClientRect().top - headerBosluk;
+          window.scrollTo({
+            top: Math.max(0, hedefY),
+            behavior: 'smooth',
+          });
+        }}
+      >
         {buton.metin}
       </a>
     );
@@ -87,6 +115,15 @@ export function KurumsalHeroWidget({ widget, onizleme }: KurumsalHeroWidgetProps
     : gorunumTipi === 'vetahsilat-klasik'
       ? 'calc(100svh - 2rem)'
       : kh.gorunum.yukseklik;
+  // Şeffaf header kendi alanını kapakta işgal etmez. Opaque header ile aynı
+  // toplam kapak yüksekliğini korumak için bu alanı hero'ya ekliyoruz.
+  // Üst iletişim bandı + ana menü, sınırlarla birlikte canlı sitede 120px yer kaplar.
+  const headerYuksekligi = kh.ustBantGoster ? '10rem' : '4.5rem';
+  const headerOverlayEtkin = kh.headerOverlay && !onizleme;
+  // Telafi yalnızca yarım kapakta gerekir. Klasik tam ekran kendi viewport
+  // yüksekliğini yönetir; burada ek alan verilmesi onu gereksiz uzatır.
+  const yarimKapakHeaderTelafisi = headerOverlayEtkin && gorunumTipi === 'vetahsilat-yarim-kapak';
+  const heroYuksekligi = yarimKapakHeaderTelafisi ? `calc(${yukseklik} + ${headerYuksekligi})` : yukseklik;
 
   useEffect(() => {
     setAktif(0);
@@ -108,7 +145,7 @@ export function KurumsalHeroWidget({ widget, onizleme }: KurumsalHeroWidgetProps
 
   if (slaytlar.length === 0) {
     return (
-      <section className="kurumsal-hero kurumsal-hero--bos" style={{ minHeight: yukseklik }}>
+      <section className="kurumsal-hero kurumsal-hero--bos" style={{ minHeight: heroYuksekligi }}>
         <div className="kurumsal-hero-bos-icerik">
           <p className="text-sm text-white/80">Kurumsal hero slaytları admin panelden eklenebilir.</p>
         </div>
@@ -118,7 +155,9 @@ export function KurumsalHeroWidget({ widget, onizleme }: KurumsalHeroWidgetProps
 
   const slayt = slaytlar[aktif];
   const overlayRenk = kh.gorunum.overlayRenk ?? '#1e40af';
-  const overlayOpaklik = kh.gorunum.overlayOpaklik ?? 0.72;
+  // Eski kayıtlardaki renk katmanı görseli maviye boyuyordu. Katman artık
+  // yalnızca yönetici özellikle açarsa uygulanır; aksi hâlde görsel özgün kalır.
+  const overlayOpaklik = kh.gorunum.overlayEtkin ? (kh.gorunum.overlayOpaklik ?? 0.72) : 0;
   const hex = overlayRenk.replace('#', '');
   const r = parseInt(hex.slice(0, 2), 16) || 30;
   const g = parseInt(hex.slice(2, 4), 16) || 64;
@@ -145,8 +184,8 @@ export function KurumsalHeroWidget({ widget, onizleme }: KurumsalHeroWidgetProps
 
   return (
     <section
-      className={`kurumsal-hero kurumsal-hero--${gorunumTipi}${yarimKapakOrta ? ' kurumsal-hero--yarim-kapak-orta' : ''}${kh.headerOverlay && !onizleme ? ' kurumsal-hero--overlay' : ''}`}
-      style={{ minHeight: yukseklik }}
+      className={`kurumsal-hero kurumsal-hero--${gorunumTipi}${yarimKapakOrta ? ' kurumsal-hero--yarim-kapak-orta' : ''}${headerOverlayEtkin ? ' kurumsal-hero--overlay' : ''}`}
+      style={{ minHeight: heroYuksekligi, '--kurumsal-hero-header-yuksekligi': headerYuksekligi } as CSSProperties}
       aria-label={widget.ad || 'Kurumsal hero'}
     >
       <div className="kurumsal-hero-sahne">

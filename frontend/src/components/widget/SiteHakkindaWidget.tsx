@@ -176,14 +176,17 @@ function OzellikListesi({
 
 function CtaButon({
   widget,
+  cfg,
   sinif = 'sh-cta',
   play = false,
 }: {
   widget: Widget;
+  cfg: Cfg;
   sinif?: string;
   play?: boolean;
 }) {
   if (!widget.butonLink || !widget.butonMetni) return null;
+  const videoDosyasi = /\.(mp4|webm|ogg)(?:[?#].*)?$/i.test(widget.butonLink);
   const icerik = play ? (
     <>
       <span className="sh-cta-play" aria-hidden>
@@ -198,15 +201,15 @@ function CtaButon({
     </>
   );
 
-  if (widget.butonLink.startsWith('/')) {
+  if (widget.butonLink.startsWith('/') && !videoDosyasi) {
     return (
-      <Link to={widget.butonLink} className={sinif}>
+      <Link to={widget.butonLink} className={sinif} style={{ backgroundColor: cfg.gorunum?.ctaRengi, color: cfg.gorunum?.ctaYaziRengi }}>
         {icerik}
       </Link>
     );
   }
   return (
-    <a href={widget.butonLink} className={sinif}>
+    <a href={widget.butonLink} className={sinif} style={{ backgroundColor: cfg.gorunum?.ctaRengi, color: cfg.gorunum?.ctaYaziRengi }} target={videoDosyasi ? '_blank' : undefined} rel={videoDosyasi ? 'noreferrer' : undefined}>
       {icerik}
     </a>
   );
@@ -231,7 +234,7 @@ function GorselAlani({
         <div className="sh-gorsel-bos">Görsel</div>
       )}
       {playCta && widget.butonMetni && widget.butonLink && (
-        <CtaButon widget={widget} sinif="sh-cta sh-cta-play-overlay" play />
+        <CtaButon widget={widget} cfg={configOkuFromWidget(widget)} sinif="sh-cta sh-cta-play-overlay" play />
       )}
     </div>
   );
@@ -258,7 +261,7 @@ function IcerikBlok({
       <BaslikAlani widget={widget} cfg={cfg} renk={renk} acik={acik} />
       <MetinParagraf cfg={cfg} renk={renk} acik={acik} />
       <OzellikListesi kartlar={ikonKartlar} renk={renk} varyant={ikonVaryant} />
-      {cta && <CtaButon widget={widget} />}
+      {cta && <CtaButon widget={widget} cfg={cfg} />}
     </div>
   );
 }
@@ -292,7 +295,7 @@ function UstAltGenis({ widget, cfg, gorselUrl }: { widget: Widget; cfg: Cfg; gor
         <GorselAlani gorselUrl={gorselUrl} widget={widget} sinif="sh-gorsel-ust-yuvarlak" />
         {widget.butonMetni && widget.butonLink && (
           <div className="sh-ust-alt-cta-serit">
-            <CtaButon widget={widget} sinif="sh-cta sh-cta-serit" play />
+            <CtaButon widget={widget} cfg={cfg} sinif="sh-cta sh-cta-serit" play />
           </div>
         )}
       </div>
@@ -348,7 +351,7 @@ function BentoHakkimizda({ widget, cfg, gorselUrl }: { widget: Widget; cfg: Cfg;
             ))}
           </ul>
         )}
-        <CtaButon widget={widget} sinif="sh-cta sh-kurumsal-cta" play />
+        <CtaButon widget={widget} cfg={cfg} sinif="sh-cta sh-kurumsal-cta" play />
       </div>
     </div>
   );

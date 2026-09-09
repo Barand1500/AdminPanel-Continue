@@ -5,6 +5,7 @@ import type { WidgetConfig } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
+import { CizgiIkon } from './CizgiIkonlari';
 
 interface IletisimCtaWidgetProps {
   widget: Widget;
@@ -54,10 +55,15 @@ function BirincilCta({
 }) {
   if (!widget.butonMetni || !widget.butonLink) return null;
   const ikon = cfg.gorunum?.ctaButonIkon?.trim();
+  const butonStili: CSSProperties = {
+    ...style,
+    ...(cfg.gorunum?.ctaRengi ? { backgroundColor: cfg.gorunum.ctaRengi } : {}),
+    ...(cfg.gorunum?.ctaYaziRengi ? { color: cfg.gorunum.ctaYaziRengi } : {}),
+  };
 
   return (
-    <Link to={widget.butonLink} className={className} style={style}>
-      {ikon && <span className="iletisim-cta-btn-ikon" aria-hidden="true">{ikon}</span>}
+    <Link to={widget.butonLink} className={className} style={butonStili}>
+      {ikon && <span className="iletisim-cta-btn-ikon" aria-hidden="true"><CizgiIkon deger={ikon} yedek="eposta" boyut={18} /></span>}
       <span>{widget.butonMetni}</span>
       {sonOk && <span aria-hidden="true">→</span>}
     </Link>

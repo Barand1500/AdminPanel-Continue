@@ -39,6 +39,8 @@ export interface PublicFormKayit {
   alanlarJson: FormAlani[];
   ayarlarJson?: Partial<FormAyarlar> | null;
   aktif: boolean;
+  /** mailto akışında ziyaretçinin posta uygulamasını açacak alıcı adresi. */
+  bildirimEmail?: string | null;
 }
 
 export function formSayfadaGoster(form: PublicFormKayit, sayfaSlug: string): boolean {

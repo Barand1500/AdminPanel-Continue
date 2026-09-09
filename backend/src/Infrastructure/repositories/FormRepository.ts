@@ -35,6 +35,7 @@ export class FormRepository {
         alanlarJson: true,
         ayarlarJson: true,
         aktif: true,
+        bildirimEmail: true,
       },
     });
   }
@@ -61,6 +62,19 @@ export class FormRepository {
     return prisma.formGonderim.findMany({
       where: { formId },
       orderBy: { olusturma: 'desc' },
+      include: { yanitlar: { orderBy: { olusturma: 'desc' } } },
+    });
+  }
+
+  async gonderimGetir(id: number, formId: number, siteId: number) {
+    return prisma.formGonderim.findFirst({
+      where: { id, formId, form: { siteId } },
+    });
+  }
+
+  async yanitOlustur(gonderimId: number, alicilar: string[], konu: string, mesaj: string, gonderen: string) {
+    return prisma.formGonderimYanit.create({
+      data: { gonderimId, alicilar, konu, mesaj, gonderen },
     });
   }
 

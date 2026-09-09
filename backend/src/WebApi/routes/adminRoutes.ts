@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { blogGuncelleSchema, blogOlusturSchema } from '../../Application/DTOs/BlogDto.js';
-import { formGuncelleSchema, formOlusturSchema } from '../../Application/DTOs/FormDto.js';
+import { formGuncelleSchema, formOlusturSchema, formYanitGonderSchema } from '../../Application/DTOs/FormDto.js';
 import { kisayolGuncelleSchema, kisayolOlusturSchema } from '../../Application/DTOs/KisayolDto.js';
 import { sekmeGuncelleSchema, sekmeOlusturSchema } from '../../Application/DTOs/SekmeDto.js';
 import { kullaniciGuncelleSchema, kullaniciOlusturSchema } from '../../Application/DTOs/KullaniciDto.js';
@@ -209,6 +209,7 @@ router.put('/formlar/:id', authMiddleware, yD, validateBySchema(formGuncelleSche
 router.delete('/formlar/:id', authMiddleware, yS, (req, res) => formController.sil(req, res));
 router.get('/formlar/:id/gonderimler', authMiddleware, yG, (req, res) => formController.gonderimler(req, res));
 router.patch('/formlar/:id/gonderimler/:gonderimId/okundu', authMiddleware, yD, (req, res) => formController.gonderimOkundu(req, res));
+router.post('/formlar/:id/gonderimler/:gonderimId/yanit', authMiddleware, yD, validateBySchema(formYanitGonderSchema), (req, res) => formController.gonderimYanitla(req, res));
 router.delete('/formlar/:id/gonderimler/:gonderimId', authMiddleware, yS, (req, res) => formController.gonderimSil(req, res));
 
 router.get('/loglar', authMiddleware, yG, (req, res) => logController.listele(req, res));

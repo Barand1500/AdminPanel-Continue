@@ -7,6 +7,7 @@ import { AnaSayfa } from '@/pages/AnaSayfa';
 import { HakkimizdaSayfasi } from '@/pages/HakkimizdaSayfasi';
 import { IletisimSayfasi } from '@/pages/IletisimSayfasi';
 import { HaritaKonumSayfasi } from '@/pages/HaritaKonumSayfasi';
+import { FormSayfasi } from '@/pages/FormSayfasi';
 import { HesapGirisFormu } from '@/pages/hesap/HesapGirisFormu';
 import { HesapPanelSayfasi } from '@/pages/hesap/HesapPanelSayfasi';
 import { HesapProfilSayfasi, HesapSifreSayfasi } from '@/pages/hesap/HesapAltSayfalar';
@@ -54,6 +55,7 @@ export const siteRouter = createBrowserRouter([
           { path: '/hakkimizda', element: <HakkimizdaSayfasi /> },
           { path: '/iletisim', element: <IletisimSayfasi /> },
           { path: '/harita-konum', element: <HaritaKonumSayfasi /> },
+          { path: '/form/:slug', element: <FormSayfasi /> },
           { path: '/blog', element: <BlogSayfasi /> },
           { path: '/blog/:slug', element: <BlogDetaySayfasi /> },
           { path: '/hesabim', element: <HesapGirisFormu /> },

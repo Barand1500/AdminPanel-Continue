@@ -11,11 +11,17 @@ interface SiteFormBolgeProps {
 }
 
 export function SiteFormBolge({ formlar, konum, className = '' }: SiteFormBolgeProps) {
-  const { pathname } = useLocation();
+  const { pathname, search } = useLocation();
   const sayfaSlug = pathnameDenSayfaSlug(pathname);
+  // Fiyat paketinden gelindiyse aynı sayfadaki diğer formlar yerine yalnızca
+  // seçilen teklif formunu gösteririz.
+  const teklifFormSlug = new URLSearchParams(search).get('teklifForm')?.trim();
 
   const bolgeFormlari = formlar.filter(
-    (f) => formSayfadaGoster(f, sayfaSlug) && formKonumda(f, konum)
+    (f) =>
+      formSayfadaGoster(f, sayfaSlug) &&
+      formKonumda(f, konum) &&
+      (!teklifFormSlug || f.slug === teklifFormSlug)
   );
 
   if (bolgeFormlari.length === 0) return null;
