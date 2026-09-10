@@ -31,6 +31,7 @@ export function CizgiIkonSecici({
   disabled = false,
 }: CizgiIkonSeciciProps) {
   const [acik, setAcik] = useState(false);
+  const [sayfaAktifMi, setSayfaAktifMi] = useState(true);
   const [panelKonumu, setPanelKonumu] = useState<{
     top: number;
     left: number;
@@ -72,18 +73,19 @@ export function CizgiIkonSecici({
   }
 
   useLayoutEffect(() => {
-    if (!acik) {
+    if (!acik || !sayfaAktifMi) {
       setPanelKonumu(null);
       return;
     }
     paneliKonumlandir();
-  }, [acik]);
+  }, [acik, sayfaAktifMi]);
 
   useEffect(() => {
     if (!acik) return;
 
     function disariTikla(event: MouseEvent) {
       const hedef = event.target as Node;
+      if (hedef instanceof Element && hedef.closest('.ap-header, .ap-baslat-menu-dock')) return;
       if (!kapsayiciRef.current?.contains(hedef) && !panelRef.current?.contains(hedef)) setAcik(false);
     }
 
@@ -105,6 +107,18 @@ export function CizgiIkonSecici({
       window.removeEventListener('scroll', paneliKonumlandir, true);
     };
   }, [acik]);
+
+  // Seçici portal ile document.body içine çizilir. Yönetim sekmesi değiştiğinde
+  // gizlenen sayfanın panelinin başka sayfanın üzerinde kalmaması için kapatılır.
+  useEffect(() => {
+    const aktifligiGuncelle = (olay: Event) => {
+      const aktifModulId = (olay as CustomEvent<{ modulId?: string }>).detail?.modulId;
+      const kapsayanModul = kapsayiciRef.current?.closest<HTMLElement>('[data-ap-kesif-modul]')?.dataset.apKesifModul;
+      setSayfaAktifMi(!aktifModulId || !kapsayanModul || kapsayanModul === aktifModulId);
+    };
+    window.addEventListener('ap-admin-sekme-degisti', aktifligiGuncelle);
+    return () => window.removeEventListener('ap-admin-sekme-degisti', aktifligiGuncelle);
+  }, []);
 
   function sec(ikon: CizgiIkonYedegi) {
     onChange(ikon);
@@ -142,7 +156,7 @@ export function CizgiIkonSecici({
         Seçili çizgi ikon: {secili.etiket}
       </span>
 
-      {acik && panelKonumu && typeof document !== 'undefined' && createPortal(
+      {acik && sayfaAktifMi && panelKonumu && typeof document !== 'undefined' && createPortal(
         <div
           ref={panelRef}
           id={panelId}

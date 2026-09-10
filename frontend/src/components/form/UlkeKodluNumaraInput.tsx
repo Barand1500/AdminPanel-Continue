@@ -215,6 +215,7 @@ export function UlkeKodluNumaraInput({
 
     aramaRef.current?.focus();
     const disariTiklama = (olay: MouseEvent) => {
+      if (olay.target instanceof Element && olay.target.closest('.ap-header, .ap-baslat-menu-dock')) return;
       if (!kapsayiciRef.current?.contains(olay.target as Node)) setAcik(false);
     };
     const escapeIleKapat = (olay: KeyboardEvent) => {

@@ -123,7 +123,11 @@ export function KurumsalHeroWidget({ widget, onizleme }: KurumsalHeroWidgetProps
   // Telafi yalnızca yarım kapakta gerekir. Klasik tam ekran kendi viewport
   // yüksekliğini yönetir; burada ek alan verilmesi onu gereksiz uzatır.
   const yarimKapakHeaderTelafisi = headerOverlayEtkin && gorunumTipi === 'vetahsilat-yarim-kapak';
-  const heroYuksekligi = yarimKapakHeaderTelafisi ? `calc(${yukseklik} + ${headerYuksekligi})` : yukseklik;
+  const heroYuksekligi = onizleme
+    ? '24rem'
+    : yarimKapakHeaderTelafisi
+      ? `calc(${yukseklik} + ${headerYuksekligi})`
+      : yukseklik;
 
   useEffect(() => {
     setAktif(0);
@@ -184,7 +188,7 @@ export function KurumsalHeroWidget({ widget, onizleme }: KurumsalHeroWidgetProps
 
   return (
     <section
-      className={`kurumsal-hero kurumsal-hero--${gorunumTipi}${yarimKapakOrta ? ' kurumsal-hero--yarim-kapak-orta' : ''}${headerOverlayEtkin ? ' kurumsal-hero--overlay' : ''}`}
+      className={`kurumsal-hero kurumsal-hero--${gorunumTipi}${yarimKapakOrta ? ' kurumsal-hero--yarim-kapak-orta' : ''}${headerOverlayEtkin ? ' kurumsal-hero--overlay' : ''}${onizleme ? ' kurumsal-hero--onizleme' : ''}`}
       style={{ minHeight: heroYuksekligi, '--kurumsal-hero-header-yuksekligi': headerYuksekligi } as CSSProperties}
       aria-label={widget.ad || 'Kurumsal hero'}
     >

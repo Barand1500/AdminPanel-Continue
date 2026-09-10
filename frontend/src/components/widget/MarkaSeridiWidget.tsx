@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetMarkaLogosu } from '@/types/widget';
 import { widgetTamEkranMi } from '@/types/widget';
@@ -177,107 +177,73 @@ function LogoKartKaruseli({
   cfg: WidgetConfig;
   markalar: WidgetMarkaLogosu[];
 }) {
-  const [baslangic, setBaslangic] = useState(0);
-  const [kaymaYonu, setKaymaYonu] = useState<'onceki' | 'sonraki' | null>(null);
-  const [kaymaAsama, setKaymaAsama] = useState<'durak' | 'cikis' | 'giris'>('durak');
-  const gorunenAdet = Math.min(6, markalar.length);
-  const kayiyor = kaymaAsama !== 'durak';
-  const gorunenMarkalar = Array.from({ length: gorunenAdet }, (_, sira) => {
-    const markaIndeksi = (baslangic + sira) % markalar.length;
-    return markalar[markaIndeksi];
-  });
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const [duraklatildi, setDuraklatildi] = useState(false);
+  const otomatikKaydir = cfg.otomatikKaydir ?? true;
+  const gecisSuresi = Math.min(60, Math.max(2, Number(cfg.otomatikKaydirSuresi) || 5));
+  const seritMarkalari = [...markalar, ...markalar];
+
+  function markaKartlariniCiz(markaListesi: WidgetMarkaLogosu[]) {
+    return markaListesi.map((m, sira) => {
+      const icerik = m.gorselUrl ? (
+        <img src={medyaUrl(m.gorselUrl)} alt={m.ad} className="marka-kart-karusel-logo" loading="lazy" />
+      ) : (
+        <span className="marka-kart-karusel-metin">{m.ad}</span>
+      );
+      const anahtar = `${m.id}-${sira}`;
+      return m.link ? (
+        <a key={anahtar} href={m.link} className="marka-kart-karusel-kart" target="_blank" rel="noopener noreferrer">{icerik}</a>
+      ) : (
+        <div key={anahtar} className="marka-kart-karusel-kart">{icerik}</div>
+      );
+    });
+  }
 
   function kaydir(yon: 'onceki' | 'sonraki') {
-    if (markalar.length <= 1 || kayiyor) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      setBaslangic((mevcut) =>
-        yon === 'onceki'
-          ? (mevcut - 1 + markalar.length) % markalar.length
-          : (mevcut + 1) % markalar.length,
-      );
-      return;
-    }
-    setKaymaYonu(yon);
-    setKaymaAsama('cikis');
+    const el = scrollRef.current;
+    if (!el || markalar.length <= 1) return;
+    const kartGenisligi = el.querySelector<HTMLElement>('.marka-kart-karusel-kart')?.offsetWidth ?? 180;
+    const adim = kartGenisligi + 18;
+    const tekrarNoktasi = el.scrollWidth / 2;
+    if (yon === 'sonraki' && el.scrollLeft >= tekrarNoktasi - adim) el.scrollLeft = 0;
+    if (yon === 'onceki' && el.scrollLeft <= 2) el.scrollLeft = tekrarNoktasi - adim;
+    el.scrollBy({ left: yon === 'onceki' ? -adim : adim, behavior: 'smooth' });
   }
 
-  function animasyonBitti() {
-    if (kaymaAsama === 'cikis' && kaymaYonu) {
-      setBaslangic((mevcut) =>
-        kaymaYonu === 'onceki'
-          ? (mevcut - 1 + markalar.length) % markalar.length
-          : (mevcut + 1) % markalar.length,
-      );
-      setKaymaAsama('giris');
-      return;
-    }
-    if (kaymaAsama === 'giris') {
-      setKaymaAsama('durak');
-      setKaymaYonu(null);
-    }
-  }
-
-  const listeSinif = [
-    'marka-kart-karusel-liste',
-    kaymaAsama === 'cikis' && kaymaYonu === 'sonraki' && 'marka-kart-karusel-liste--cikis-sol',
-    kaymaAsama === 'giris' && kaymaYonu === 'sonraki' && 'marka-kart-karusel-liste--giris-sol',
-    kaymaAsama === 'cikis' && kaymaYonu === 'onceki' && 'marka-kart-karusel-liste--cikis-sag',
-    kaymaAsama === 'giris' && kaymaYonu === 'onceki' && 'marka-kart-karusel-liste--giris-sag',
-  ]
-    .filter(Boolean)
-    .join(' ');
+  useEffect(() => {
+    if (!otomatikKaydir || duraklatildi || markalar.length <= 1) return;
+    const zamanlayici = window.setTimeout(() => kaydir('sonraki'), gecisSuresi * 1000);
+    return () => window.clearTimeout(zamanlayici);
+  }, [otomatikKaydir, duraklatildi, markalar.length, gecisSuresi]);
 
   return (
     <>
       <BaslikAlani widget={widget} cfg={cfg} tamEkran={widgetTamEkranMi(cfg)} />
-      <div className="marka-kart-karusel">
+      <div
+        className="marka-kart-karusel"
+        onMouseEnter={() => setDuraklatildi(true)}
+        onMouseLeave={() => setDuraklatildi(false)}
+        onFocusCapture={() => setDuraklatildi(true)}
+        onBlurCapture={() => setDuraklatildi(false)}
+      >
         {markalar.length > 1 && (
           <button
             type="button"
             className="marka-kart-karusel-ok"
             onClick={() => kaydir('onceki')}
-            disabled={kayiyor}
             aria-label="Önceki markalar"
           >
             ‹
           </button>
         )}
-        <div className="marka-kart-karusel-akis">
-          <div className={listeSinif} onAnimationEnd={animasyonBitti}>
-            {gorunenMarkalar.map((m, sira) => {
-              const icerik = m.gorselUrl ? (
-                <img src={medyaUrl(m.gorselUrl)} alt={m.ad} className="marka-kart-karusel-logo" loading="lazy" />
-              ) : (
-                <span className="marka-kart-karusel-metin">{m.ad}</span>
-              );
-
-              const kartSinif = 'marka-kart-karusel-kart';
-              const anahtar = `${m.id}-${baslangic}-${sira}`;
-
-              return m.link ? (
-                <a
-                  key={anahtar}
-                  href={m.link}
-                  className={kartSinif}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  {icerik}
-                </a>
-              ) : (
-                <div key={anahtar} className={kartSinif}>
-                  {icerik}
-                </div>
-              );
-            })}
-          </div>
+        <div className="marka-kart-karusel-akis" ref={scrollRef}>
+          <div className="marka-kart-karusel-liste">{markaKartlariniCiz(seritMarkalari)}</div>
         </div>
         {markalar.length > 1 && (
           <button
             type="button"
             className="marka-kart-karusel-ok"
             onClick={() => kaydir('sonraki')}
-            disabled={kayiyor}
             aria-label="Sonraki markalar"
           >
             ›

@@ -25,6 +25,25 @@ import { SidebarAlanlariPanel } from '@/components/admin/widget/SidebarAlanlariP
 
 const YENI_WIDGET_TIPI = 'BLOK_OLUSTURUCU';
 
+function oturumAnahtari(tip?: string) {
+  return `ap-widget-yonetimi:${tip ?? 'tum-widgetlar'}`;
+}
+
+function oturumdanOku(tip?: string): Partial<{
+  form: WidgetFormDegeri;
+  seciliId: string | null;
+  gorunum: Gorunum;
+  tipOnaylandi: boolean;
+  yonetimSekmesi: YonetimSekmesi;
+}> {
+  if (typeof window === 'undefined') return {};
+  try {
+    return JSON.parse(window.sessionStorage.getItem(oturumAnahtari(tip)) ?? '{}');
+  } catch {
+    return {};
+  }
+}
+
 type Gorunum = 'liste' | 'editor';
 type YonetimSekmesi = 'widgetlar' | 'sidebar';
 
@@ -66,20 +85,21 @@ interface WidgetYonetimiSayfasiProps {
 }
 
 export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiProps) {
+  const ilkOturum = oturumdanOku(varsayilanTip);
   const [widgetlar, setWidgetlar] = useState<AdminWidget[]>([]);
   const [sayfalar, setSayfalar] = useState<AdminSayfa[]>([]);
-  const [form, setForm] = useState<WidgetFormDegeri>(varsayilanWidgetForm(varsayilanYeniTip(varsayilanTip)));
+  const [form, setForm] = useState<WidgetFormDegeri>(() => ilkOturum.form ?? varsayilanWidgetForm(varsayilanYeniTip(varsayilanTip)));
   const [yukleniyor, setYukleniyor] = useState(true);
   const [kaydediliyor, setKaydediliyor] = useState(false);
   const [hata, setHata] = useState('');
   const [basari, setBasari] = useState('');
-  const [seciliId, setSeciliId] = useState<string | null>(null);
-  const [gorunum, setGorunum] = useState<Gorunum>('liste');
+  const [seciliId, setSeciliId] = useState<string | null>(ilkOturum.seciliId ?? null);
+  const [gorunum, setGorunum] = useState<Gorunum>(ilkOturum.gorunum ?? 'liste');
   const [onizlemeAcik, setOnizlemeAcik] = useState(false);
   const [otomatikDoldur, setOtomatikDoldur] = useState(false);
   const [yeniTaslakSayac, setYeniTaslakSayac] = useState(0);
-  const [tipOnaylandi, setTipOnaylandi] = useState(Boolean(varsayilanTip));
-  const [yonetimSekmesi, setYonetimSekmesi] = useState<YonetimSekmesi>('widgetlar');
+  const [tipOnaylandi, setTipOnaylandi] = useState(ilkOturum.tipOnaylandi ?? Boolean(varsayilanTip));
+  const [yonetimSekmesi, setYonetimSekmesi] = useState<YonetimSekmesi>(ilkOturum.yonetimSekmesi ?? 'widgetlar');
 
   const yeniMod = seciliId === null;
   const editorAnahtar = seciliId ?? `yeni-${yeniTaslakSayac}`;
@@ -104,6 +124,11 @@ export function WidgetYonetimiSayfasi({ varsayilanTip }: WidgetYonetimiSayfasiPr
   useEffect(() => {
     void yukle();
   }, [yukle]);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    window.sessionStorage.setItem(oturumAnahtari(varsayilanTip), JSON.stringify({ form, seciliId, gorunum, tipOnaylandi, yonetimSekmesi }));
+  }, [form, seciliId, gorunum, tipOnaylandi, varsayilanTip, yonetimSekmesi]);
 
   useEffect(() => {
     if (seciliId != null) return;

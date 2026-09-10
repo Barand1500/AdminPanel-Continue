@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetYorum } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
@@ -127,20 +127,37 @@ function BuyukAlintiHero({ widget, cfg, yorumlar }: { widget: Widget; cfg: Widge
 
 function YataySerit({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetConfig; yorumlar: WidgetYorum[] }) {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [duraklatildi, setDuraklatildi] = useState(false);
   const renk = gorunumRenk(cfg);
   const radius = cfg.gorunum?.borderRadius ?? 16;
+  const otomatikKaydir = cfg.otomatikKaydir ?? true;
+  const gecisSuresi = Math.min(60, Math.max(2, Number(cfg.otomatikKaydirSuresi) || 5));
 
   function kaydir(yon: 'sol' | 'sag') {
     const el = scrollRef.current;
     if (!el) return;
-    el.scrollBy({ left: yon === 'sol' ? -320 : 320, behavior: 'smooth' });
+    const kartGenisligi = el.querySelector<HTMLElement>('.yk-serit-kart')?.offsetWidth ?? 320;
+    const adim = kartGenisligi + 16;
+    const tekrarNoktasi = el.scrollWidth / 2;
+    if (yon === 'sag' && el.scrollLeft >= tekrarNoktasi - adim) el.scrollLeft = 0;
+    if (yon === 'sol' && el.scrollLeft <= 2) el.scrollLeft = tekrarNoktasi - adim;
+    el.scrollBy({ left: yon === 'sol' ? -adim : adim, behavior: 'smooth' });
   }
+
+  useEffect(() => {
+    if (!otomatikKaydir || duraklatildi || yorumlar.length <= 1) return;
+    const zamanlayici = window.setInterval(() => kaydir('sag'), gecisSuresi * 1000);
+    return () => window.clearInterval(zamanlayici);
+  }, [otomatikKaydir, duraklatildi, gecisSuresi, yorumlar.length]);
+
+  // İkinci kopya, üç kart ekranda tam sığsa bile şeridin kesintisiz kaymasını sağlar.
+  const seritYorumlari = [...yorumlar, ...yorumlar];
 
   return (
     <>
       <div className="yk-serit-baslik">
         <BaslikAlani widget={widget} cfg={cfg} />
-        {yorumlar.length > 3 && (
+        {yorumlar.length > 1 && (
           <div className="yk-serit-nav">
             <button type="button" className="yk-serit-ok" onClick={() => kaydir('sol')} aria-label="Önceki">
               ‹
@@ -151,10 +168,17 @@ function YataySerit({ widget, cfg, yorumlar }: { widget: Widget; cfg: WidgetConf
           </div>
         )}
       </div>
-      <div ref={scrollRef} className="yk-serit-scroll">
-        {yorumlar.map((y) => (
+      <div
+        ref={scrollRef}
+        className="yk-serit-scroll"
+        onMouseEnter={() => setDuraklatildi(true)}
+        onMouseLeave={() => setDuraklatildi(false)}
+        onFocusCapture={() => setDuraklatildi(true)}
+        onBlurCapture={() => setDuraklatildi(false)}
+      >
+        {seritYorumlari.map((y, indeks) => (
           <article
-            key={y.id}
+            key={`${y.id}-${indeks}`}
             className="yk-serit-kart"
             style={{
               borderRadius: `${radius}px`,

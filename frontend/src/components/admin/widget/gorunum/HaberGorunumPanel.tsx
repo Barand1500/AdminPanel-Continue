@@ -1,4 +1,4 @@
-import { EmojiSecici } from '@/components/form/EmojiSecici';
+import { CizgiIkonSecici } from '@/components/form/CizgiIkonSecici';
 import { RenkSecici } from '@/components/form/RenkSecici';
 import { AdminAnahtarDugme, AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import { configGuncelle, configOku, WIDGET_GORUNUM_HABER_TIPLERI } from '@/types/widget';
@@ -61,10 +61,11 @@ export function HaberGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
           />
           <div className="flex items-center gap-3">
             <span className="text-sm text-[var(--ap-muted)]">Başlık ikonu</span>
-            <EmojiSecici
-              sadeceSecim
-              deger={g.baslikIkon ?? '✒️'}
-              onChange={(emoji) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, baslikIkon: emoji } })))}
+            <CizgiIkonSecici
+              deger={g.baslikIkon}
+              varsayilan="yildiz"
+              etiket="Başlık ikonu seç"
+              onChange={(ikon) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, baslikIkon: ikon } })))}
             />
           </div>
           <AdminAnahtarDugme

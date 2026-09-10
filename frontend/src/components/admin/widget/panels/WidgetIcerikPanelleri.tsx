@@ -3,7 +3,7 @@ import type { WidgetIletisimKarti } from '@/types/haberWidget';
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
 import { CizgiIkonSecici } from '@/components/form/CizgiIkonSecici';
 import { GorselAlan } from '@/components/form/GorselAlan';
-import { AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminAnahtarDugme, AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
   configGuncelle,
   configOku,
@@ -40,6 +40,18 @@ import {
 } from './WidgetModernPanelleri';
 import type { WidgetPanelProps } from './types';
 import { KurumsalHeroIcerik } from './KurumsalHeroIcerik';
+
+function OtomatikAnimasyonAyari({ form, onChange }: WidgetPanelProps) {
+  const cfg = configOku(form);
+  return (
+    <AdminFormBolumu baslik="Otomatik animasyon" aciklama="Kartların otomatik hareketini açıp kapatın.">
+      <AdminAnahtarDugme etiket="Otomatik animasyon" acik={cfg.otomatikKaydir ?? true} onDegistir={(v) => onChange(configGuncelle(form, (c) => ({ ...c, otomatikKaydir: v })))} />
+      <FormAlani etiket="Geçiş süresi (saniye)">
+        <input type="number" min={2} max={60} disabled={cfg.otomatikKaydir === false} className={formInputSinifi} value={cfg.otomatikKaydirSuresi ?? 5} onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, otomatikKaydirSuresi: Math.min(60, Math.max(2, Number(e.target.value) || 5)) })))} />
+      </FormAlani>
+    </AdminFormBolumu>
+  );
+}
 
 function MetinAlanlari({ form, onChange, gorsel = false, ustEtiket = false }: WidgetPanelProps & { gorsel?: boolean; ustEtiket?: boolean }) {
   const cfg = configOku(form);
@@ -744,6 +756,8 @@ export function KategoriIcerik({ form, onChange }: WidgetPanelProps) {
   const cfg = configOku(form);
   const kategoriler = cfg.kategoriler ?? [];
   return (
+    <>
+    <OtomatikAnimasyonAyari form={form} onChange={onChange} />
     <AdminFormBolumu baslik="Kategori Navigasyonu">
       <FormAlani etiket="Bölüm başlığı">
         <input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} />
@@ -766,6 +780,7 @@ export function KategoriIcerik({ form, onChange }: WidgetPanelProps) {
         )}
       />
     </AdminFormBolumu>
+    </>
   );
 }
 
@@ -951,6 +966,22 @@ export function YorumKaruselIcerik({ form, onChange }: WidgetPanelProps) {
     <AdminFormBolumu baslik="Müşteri Yorumları">
       <FormAlani etiket="Üst etiket"><input className={formInputSinifi} value={form.altBaslik} onChange={(e) => onChange({ ...form, altBaslik: e.target.value })} /></FormAlani>
       <FormAlani etiket="Başlık"><input className={formInputSinifi} value={form.baslik} onChange={(e) => onChange({ ...form, baslik: e.target.value })} /></FormAlani>
+      <AdminAnahtarDugme
+        etiket="Otomatik kaydır"
+        acik={cfg.otomatikKaydir ?? true}
+        onDegistir={(v) => onChange(configGuncelle(form, (c) => ({ ...c, otomatikKaydir: v })))}
+      />
+      <FormAlani etiket="Kaydırma süresi (sn)">
+        <input
+          type="number"
+          min={2}
+          max={60}
+          disabled={cfg.otomatikKaydir === false}
+          className={`${formInputSinifi} max-w-32 disabled:cursor-not-allowed disabled:opacity-50`}
+          value={cfg.otomatikKaydirSuresi ?? 5}
+          onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, otomatikKaydirSuresi: Math.min(60, Math.max(2, Number(e.target.value) || 5)) })))}
+        />
+      </FormAlani>
       <ListeSiralayici<WidgetYorum>
         ogeler={yorumlar}
         onDegistir={(y) => onChange(configGuncelle(form, (c) => ({ ...c, yorumlar: y })))}
@@ -1231,6 +1262,9 @@ export function FiyatlandirmaIcerik({ form, onChange }: WidgetPanelProps) {
   return (
     <>
       <WidgetGorunumIcerikAlanlari form={form} onChange={onChange} />
+      <OtomatikAnimasyonAyari form={form} onChange={onChange} />
+      <OtomatikAnimasyonAyari form={form} onChange={onChange} />
+      <OtomatikAnimasyonAyari form={form} onChange={onChange} />
       <AdminFormBolumu baslik="Fiyat paketleri">
       <ListeSiralayici<WidgetFiyatPaketi>
         ogeler={paketler}

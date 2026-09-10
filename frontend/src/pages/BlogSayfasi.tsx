@@ -12,11 +12,18 @@ export function BlogSayfasi() {
   const arama = aramaParametreleri.get('ara')?.trim().toLocaleLowerCase('tr-TR') ?? '';
   const kategori = aramaParametreleri.get('kategori') ?? '';
   const ay = aramaParametreleri.get('ay') ?? '';
+  const anaRenk = veri.site.ayarlar?.anaRenk ?? '#7c3aed';
   const gosterilecekBloglar = tumBloglar.filter((blog) => (!arama || `${blog.baslik} ${blog.ozet ?? ''}`.toLocaleLowerCase('tr-TR').includes(arama)) && (!kategori || blog.kategori === kategori) && (!ay || blog.olusturma.startsWith(ay)));
 
   return (
     <>
-      <section className="relative overflow-hidden bg-gradient-to-br from-primary via-violet-700 to-fuchsia-800 py-16 text-white">
+      <section
+        className="relative overflow-hidden py-16 text-white"
+        style={{
+          background: `linear-gradient(135deg, ${anaRenk} 0%, color-mix(in srgb, ${anaRenk} 82%, #111827) 100%)`,
+          paddingTop: '3rem',
+        }}
+      >
         <div className="container-site relative">
           <span className="inline-block rounded-full bg-white/15 px-4 py-1 text-xs font-semibold uppercase tracking-wider">
             Blog

@@ -1,4 +1,4 @@
-import { useState, type CSSProperties } from 'react';
+import { useEffect, useState, type CSSProperties } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetYorum } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
@@ -84,14 +84,40 @@ function KartKarusel({
   yorumlar: WidgetYorum[];
 }) {
   const [baslangic, setBaslangic] = useState(0);
+  const [kaymaYonu, setKaymaYonu] = useState<'onceki' | 'sonraki'>('sonraki');
+  const [kaymaDurumu, setKaymaDurumu] = useState<'durak' | 'cikis' | 'giris'>('durak');
+  const [duraklatildi, setDuraklatildi] = useState(false);
   const renk = renkler(cfg);
   const gorunenAdet = Math.min(3, yorumlar.length);
   const gorunenYorumlar = Array.from({ length: gorunenAdet }, (_, sira) => yorumlar[(baslangic + sira) % yorumlar.length]);
+  const otomatikKaydir = cfg.otomatikKaydir ?? true;
+  const gecisSuresi = Math.min(60, Math.max(2, Number(cfg.otomatikKaydirSuresi) || 5));
 
   function kaydir(yon: 'onceki' | 'sonraki') {
-    setBaslangic((mevcut) =>
-      yon === 'onceki' ? (mevcut - 1 + yorumlar.length) % yorumlar.length : (mevcut + 1) % yorumlar.length,
-    );
+    if (yorumlar.length <= 1 || kaymaDurumu !== 'durak') return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setBaslangic((mevcut) => yon === 'onceki' ? (mevcut - 1 + yorumlar.length) % yorumlar.length : (mevcut + 1) % yorumlar.length);
+      return;
+    }
+    setKaymaYonu(yon);
+    setKaymaDurumu('cikis');
+  }
+
+  useEffect(() => {
+    // Üç kart aynı anda görünse bile sıra döner; aksi hâlde tam üç yorumda
+    // otomatik animasyon hiç başlamıyordu.
+    if (!otomatikKaydir || duraklatildi || yorumlar.length <= 1) return;
+    const zamanlayici = window.setTimeout(() => kaydir('sonraki'), gecisSuresi * 1000);
+    return () => window.clearTimeout(zamanlayici);
+  }, [otomatikKaydir, duraklatildi, gecisSuresi, yorumlar.length, gorunenAdet, kaymaDurumu]);
+
+  function animasyonBitti() {
+    if (kaymaDurumu === 'cikis') {
+      setBaslangic((mevcut) => kaymaYonu === 'onceki' ? (mevcut - 1 + yorumlar.length) % yorumlar.length : (mevcut + 1) % yorumlar.length);
+      setKaymaDurumu('giris');
+      return;
+    }
+    if (kaymaDurumu === 'giris') setKaymaDurumu('durak');
   }
 
   return (
@@ -109,7 +135,15 @@ function KartKarusel({
           </div>
         )}
       </div>
-      <div className="yk-kart-grid" style={{ '--yk-vurgu': renk.vurgu } as CSSProperties}>
+      <div
+        className={`yk-kart-grid${kaymaDurumu === 'cikis' ? ` yk-kart-grid--cikis-${kaymaYonu}` : ''}${kaymaDurumu === 'giris' ? ` yk-kart-grid--giris-${kaymaYonu}` : ''}`}
+        style={{ '--yk-vurgu': renk.vurgu } as CSSProperties}
+        onAnimationEnd={animasyonBitti}
+        onMouseEnter={() => setDuraklatildi(true)}
+        onMouseLeave={() => setDuraklatildi(false)}
+        onFocusCapture={() => setDuraklatildi(true)}
+        onBlurCapture={() => setDuraklatildi(false)}
+      >
         {gorunenYorumlar.map((yorum, indeks) => (
           <article key={`${yorum.id}-${baslangic}-${indeks}`} className="yk-kart" style={{ borderRadius: `${renk.radius}px` }}>
             <div className="yk-kart-icerik">

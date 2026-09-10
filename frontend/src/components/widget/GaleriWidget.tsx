@@ -142,10 +142,28 @@ function BolumBaslik({ widget, cfg }: { widget: Widget; cfg: Cfg }) {
 
 function SnapYataySerit({ widget, cfg, galeri }: { widget: Widget; cfg: Cfg; galeri: WidgetGaleriOgesi[] }) {
   const renk = renkler(cfg);
+  const seritRef = useRef<HTMLDivElement>(null);
+  const [duraklatildi, setDuraklatildi] = useState(false);
+  const otomatikKaydir = cfg.otomatikKaydir ?? true;
+  const gecisSuresi = Math.min(60, Math.max(2, Number(cfg.otomatikKaydirSuresi) || 5));
+
+  useEffect(() => {
+    if (!otomatikKaydir || duraklatildi || galeri.length <= 1) return;
+    const zamanlayici = window.setInterval(() => {
+      const el = seritRef.current;
+      const kart = el?.querySelector<HTMLElement>('.gl-snap-kart');
+      if (!el || !kart) return;
+      const adim = kart.offsetWidth + 16;
+      if (el.scrollLeft >= el.scrollWidth - el.clientWidth - adim) el.scrollLeft = 0;
+      el.scrollBy({ left: adim, behavior: 'smooth' });
+    }, gecisSuresi * 1000);
+    return () => window.clearInterval(zamanlayici);
+  }, [otomatikKaydir, duraklatildi, galeri.length, gecisSuresi]);
+
   return (
     <>
       <BolumBaslik widget={widget} cfg={cfg} />
-      <div className="gl-snap-scroll">
+      <div ref={seritRef} className="gl-snap-scroll gl-snap-scroll--otomatik" onMouseEnter={() => setDuraklatildi(true)} onMouseLeave={() => setDuraklatildi(false)}>
         {galeri.map((g) => (
           <GorselLink key={g.id} g={g} className="gl-snap-kart" style={{ borderRadius: renk.radius }}>
             {g.gorselUrl && <img src={medyaUrl(g.gorselUrl)} alt={g.baslik} className="gl-kart-gorsel" />}

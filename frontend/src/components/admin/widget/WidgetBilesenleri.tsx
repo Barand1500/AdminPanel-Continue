@@ -260,8 +260,14 @@ export function WidgetEditorPanel({
   }, [otomatikDoldur, onOtomatikDoldurChange]);
 
   useEffect(() => {
-    setSekme(form.tip === 'BLOK_OLUSTURUCU' ? 'widgetEkleme' : 'icerik');
+    const anahtar = `ap-widget-editor-sekme:${widgetAnahtar}`;
+    const kayitli = typeof window === 'undefined' ? null : window.sessionStorage.getItem(anahtar) as EditorSekme | null;
+    setSekme(kayitli ?? (form.tip === 'BLOK_OLUSTURUCU' ? 'widgetEkleme' : 'icerik'));
   }, [widgetAnahtar, form.tip]);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') window.sessionStorage.setItem(`ap-widget-editor-sekme:${widgetAnahtar}`, sekme);
+  }, [sekme, widgetAnahtar]);
 
   useEffect(() => {
     if (sekme === 'widgetEkleme' && form.tip !== 'BLOK_OLUSTURUCU') {

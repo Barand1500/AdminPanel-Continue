@@ -28,6 +28,8 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
   const karsilastirmaEk = tip === 'KARSILASTIRMA_TABLOSU';
   const popupEk = tip === 'POPUP';
   const iletisimCtaEk = tip === 'ILETISIM_FORMU';
+  const hizmetKartlariEk = tip === 'HIZMET_KARTLARI';
+  const otomatikAnimasyonEk = ['MARKA_SERIDI', 'YORUM_KARUSEL', 'YORUM_KARTLARI', 'KATEGORI', 'GALERI', 'GORSEL_ETIKET_KARTLARI'].includes(tip);
   const haberWidget = WIDGET_GORUNUM_HABER_TIPLERI.has(tip);
   // Sadece çizgiyi gerçekten render eden iki başlıklı widgetlarda gösterilir.
   // Böylece ayar, desteklenmeyen eski widgetlarda etkisiz bir anahtar olarak kalmaz.
@@ -41,6 +43,13 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
     'BLOG_KARUSEL',
     'GALERI',
     'FIYATLANDIRMA',
+    'KATEGORI',
+    'LINK_KARTLARI',
+    'SUREC_ADIMLARI',
+    'MARKA_SERIDI',
+    'UCRETSIZ_DENEME',
+    'MODUL_LOGO_BLOK',
+    'ILETISIM_FORMU',
   ].includes(tip);
   const gorunumTipi = g.gorunumTipi ?? 'merkez-basit';
   const tipEk = g.tipEk ?? {};
@@ -48,6 +57,27 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
   return (
     <>
       <WidgetGorunumTipSecici form={form} onChange={onChange} />
+
+      {otomatikAnimasyonEk && (
+        <AdminFormBolumu baslik="Otomatik animasyon">
+          <AdminAnahtarDugme
+            etiket="Otomatik animasyon"
+            acik={cfg.otomatikKaydir ?? true}
+            onDegistir={(v) => onChange(configGuncelle(form, (c) => ({ ...c, otomatikKaydir: v })))}
+          />
+          <FormAlani etiket="Geçiş süresi (saniye)">
+            <input
+              type="number"
+              min={2}
+              max={60}
+              disabled={cfg.otomatikKaydir === false}
+              className="max-w-[120px] rounded-lg border border-[var(--ap-border)] bg-[var(--ap-input-bg)] px-3 py-2 text-sm disabled:cursor-not-allowed disabled:opacity-50"
+              value={cfg.otomatikKaydirSuresi ?? 5}
+              onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, otomatikKaydirSuresi: Math.min(60, Math.max(2, Number(e.target.value) || 5)) })))}
+            />
+          </FormAlani>
+        </AdminFormBolumu>
+      )}
 
       {iletisimCtaEk && ['gradient-banner', 'bol-split'].includes(gorunumTipi) && (
         <AdminFormBolumu baslik="CTA banner ayarları">
@@ -129,6 +159,15 @@ export function OrtakGorunumPanel({ form, onChange }: WidgetGorunumPanelProps) {
           <>
             <RenkSecici etiket="Buton arka planı" deger={g.ctaRengi ?? ''} varsayilan={g.vurguRengi || '#111827'} onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, ctaRengi: v } })))} />
             <RenkSecici etiket="Buton yazı rengi" deger={g.ctaYaziRengi ?? ''} varsayilan="#ffffff" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, ctaYaziRengi: v } })))} />
+          </>
+        )}
+        {hizmetKartlariEk && (
+          <>
+            <RenkSecici etiket="Kart buton arka planı" deger={g.ctaRengi ?? ''} varsayilan={g.vurguRengi || '#2563eb'} onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, ctaRengi: v } })))} />
+            <RenkSecici etiket="Kart buton yazı rengi" deger={g.ctaYaziRengi ?? ''} varsayilan="#ffffff" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, ctaYaziRengi: v } })))} />
+            <RenkSecici etiket="Hover buton arka planı" deger={g.ctaHoverRengi ?? ''} varsayilan="#f1f5f9" onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, ctaHoverRengi: v } })))} />
+            <RenkSecici etiket="Hover buton yazı rengi" deger={g.ctaHoverYaziRengi ?? ''} varsayilan={g.vurguRengi || '#2563eb'} onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, ctaHoverYaziRengi: v } })))} />
+            <RenkSecici etiket="Hover kart başlığı rengi" deger={g.kartHoverBaslikRengi ?? ''} varsayilan={g.vurguRengi || '#2563eb'} onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, gorunum: { ...c.gorunum, kartHoverBaslikRengi: v } })))} />
           </>
         )}
         {tip === 'FIYATLANDIRMA' && (

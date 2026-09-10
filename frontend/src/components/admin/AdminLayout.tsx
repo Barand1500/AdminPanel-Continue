@@ -92,6 +92,10 @@ function AdminPanelGovde() {
   }, [aktifModul?.id, setFocusModulId]);
 
   useEffect(() => {
+    window.dispatchEvent(new CustomEvent('ap-admin-sekme-degisti', { detail: { modulId: aktifModul?.id } }));
+  }, [aktifSekmeId, aktifModul?.id]);
+
+  useEffect(() => {
     function tusHandler(e: KeyboardEvent) {
       const harita = kisayolAyarlariOku();
       const hedef = e.target as HTMLElement;
@@ -330,12 +334,22 @@ function AdminPanelGovde() {
             {splitSekmeler.map((sekme) => icerikPanel(sekme, aktifSekmeId === sekme.id, true))}
           </div>
         ) : (
-          aktifModul &&
-          !ayriPencereler.some((p) => p.sekmeId === aktifSekmeId) &&
-          icerikPanel(
-            aktifSekme ?? { id: aktifSekmeId, modulId: aktifModul.id, baslik: aktifModul.baslik },
-            true
-          )
+          <>
+            {sekmeler
+              .filter((sekme) => !ayriPencereler.some((pencere) => pencere.sekmeId === sekme.id))
+              .map((sekme) => {
+                const sekmeAktif = sekme.id === aktifSekmeId;
+                return (
+                  <div
+                    key={sekme.id}
+                    className={sekmeAktif ? 'flex min-h-0 flex-1' : 'hidden'}
+                    aria-hidden={!sekmeAktif}
+                  >
+                    {icerikPanel(sekme, sekmeAktif)}
+                  </div>
+                );
+              })}
+          </>
         )}
         <Outlet context={{ aktifModul }} />
       </main>

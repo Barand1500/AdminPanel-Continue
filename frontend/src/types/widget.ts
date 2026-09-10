@@ -183,6 +183,12 @@ export interface WidgetGorunumAyarlari {
   ctaRengi?: string;
   /** Widget CTA butonunun yazı rengi. */
   ctaYaziRengi?: string;
+  /** Kart/CTA butonunun hover durumundaki arka plan rengi. */
+  ctaHoverRengi?: string;
+  /** Kart/CTA butonunun hover durumundaki yazı rengi. */
+  ctaHoverYaziRengi?: string;
+  /** Hizmet kartı başlığının hover durumundaki rengi. */
+  kartHoverBaslikRengi?: string;
   /** Fiyatlandırmada öne çıkan paketin ayrı vurgu rengi. */
   oneCikanRengi?: string;
   /** Slider / karusel / haber widget sayfalama */
@@ -429,6 +435,8 @@ export interface WidgetConfig {
   blogKaynagi?: 'manuel' | 'otomatik';
   blogAdet?: number;
   otomatikKaydir?: boolean;
+  /** Otomatik karusel geçiş aralığı (saniye). */
+  otomatikKaydirSuresi?: number;
   tumunuGorLink?: string;
   tumunuGorMetin?: string;
   solBaslik?: string;
@@ -559,7 +567,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     case 'HIZMET_KARTLARI':
       return { yerlesim, gorunum, ek, kartlar: [] };
     case 'GALERI':
-      return { yerlesim, gorunum, ek, galeri: [], galeriDuzeni: 'grid' };
+      return { yerlesim, gorunum, ek, galeri: [], galeriDuzeni: 'grid', otomatikKaydir: true, otomatikKaydirSuresi: 5 };
     case 'SSS':
       return { yerlesim, gorunum, ek, sorular: [] };
     case 'REFERANSLAR':
@@ -596,9 +604,9 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     case 'POPUP':
       return { yerlesim: { bolge: 'footer_ustu' }, gorunum, ek, popupGecikme: 3, popupTetikleyici: 'sayfa_yukle' };
     case 'KATEGORI':
-      return { yerlesim, gorunum, ek, kategoriler: [] };
+      return { yerlesim, gorunum, ek, kategoriler: [], otomatikKaydir: true, otomatikKaydirSuresi: 5 };
     case 'GORSEL_ETIKET_KARTLARI':
-      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3 }, ek, etiketKartlar: [] };
+      return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3 }, ek, etiketKartlar: [], otomatikKaydir: true, otomatikKaydirSuresi: 5 };
     case 'EKIP_KARUSEL':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4 }, ek, uyeler: [], filtreler: [], otomatikKaydir: true };
     case 'SAYAC_BLOK':
@@ -619,6 +627,8 @@ export function varsayilanConfig(tip: string): WidgetConfig {
         },
         ek,
         yorumlar: [],
+        otomatikKaydir: true,
+        otomatikKaydirSuresi: 5,
       };
     case 'FIYATLANDIRMA':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 3 }, ek, paketler: [] };
@@ -638,7 +648,7 @@ export function varsayilanConfig(tip: string): WidgetConfig {
     case 'SUREC_ADIMLARI':
       return { yerlesim, gorunum: { ...gorunum, kolonSayisi: 4 }, ek, surecAdimlari: [] };
     case 'MARKA_SERIDI':
-      return { yerlesim, gorunum, ek, markalar: [], markaHizi: 'normal' };
+      return { yerlesim, gorunum, ek, markalar: [], markaHizi: 'normal', otomatikKaydir: true, otomatikKaydirSuresi: 5 };
     case 'KARSILASTIRMA_TABLOSU':
       return { yerlesim, gorunum, ek, karsilastirmaPaketler: [], karsilastirmaSatirlari: [] };
     case 'GERI_SAYIM':

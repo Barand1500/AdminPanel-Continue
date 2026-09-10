@@ -2610,6 +2610,18 @@ html[data-site-tema='koyu'] .site-public .rounded-lg.bg-white {
   background: #0f172a;
 }
 
+/* Modal önizleme tarayıcı viewport'unu değil, kendi tuvalini kullanır. */
+.ap-widget-oniz-olcek .kurumsal-hero {
+  width: 100%;
+  max-width: 100%;
+  margin-left: 0;
+}
+
+.ap-widget-oniz-olcek .kurumsal-hero--onizleme .kurumsal-hero-icerik {
+  padding-top: 3.5rem;
+  padding-bottom: 3.5rem;
+}
+
 .kurumsal-hero--overlay {
   margin-top: 0;
 }
@@ -3944,6 +3956,39 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 
 .iletisim-cta-arka-katman-koyu {
   background: rgba(2, 6, 23, 0.56);
+}
+
+.iletisim-cta-arka-katman-mavi {
+  background: linear-gradient(
+    105deg,
+    color-mix(in srgb, var(--iletisim-cta-vurgu, #0b4aa2) 90%, #06163e) 0%,
+    color-mix(in srgb, var(--iletisim-cta-vurgu, #0b4aa2) 68%, #06163e) 100%
+  );
+  opacity: 0.72;
+}
+
+.iletisim-cta-merkez {
+  width: 100%;
+  border-radius: 1rem;
+  background: var(--iletisim-cta-vurgu, #0b4aa2);
+}
+
+.iletisim-cta-merkez--tam-ekran {
+  width: 100vw;
+  margin-right: calc(50% - 50vw);
+  margin-left: calc(50% - 50vw);
+  border-radius: 0;
+}
+
+.iletisim-cta-merkez-btn {
+  box-shadow: 0 7px 16px rgb(0 37 89 / 0.22);
+  transition: transform 0.2s ease, filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.iletisim-cta-merkez-btn:hover {
+  transform: translateY(-1px);
+  filter: brightness(1.08);
+  box-shadow: 0 10px 20px rgb(0 37 89 / 0.3);
 }
 
 .iletisim-cta-btn-ikon {
@@ -7696,6 +7741,23 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   max-width: 74rem;
   margin: 0 auto;
   align-items: start;
+}
+
+.yk-kart-grid--cikis-sonraki { animation: yk-kart-cikis-sol 0.72s cubic-bezier(0.4, 0, 1, 1) forwards; }
+.yk-kart-grid--giris-sonraki { animation: yk-kart-giris-sag 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+.yk-kart-grid--cikis-onceki { animation: yk-kart-cikis-sag 0.72s cubic-bezier(0.4, 0, 1, 1) forwards; }
+.yk-kart-grid--giris-onceki { animation: yk-kart-giris-sol 0.72s cubic-bezier(0.22, 1, 0.36, 1) forwards; }
+
+@keyframes yk-kart-cikis-sol { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-100%); opacity: 0; } }
+@keyframes yk-kart-giris-sag { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes yk-kart-cikis-sag { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+@keyframes yk-kart-giris-sol { from { transform: translateX(-100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .yk-kart-grid--cikis-sonraki,
+  .yk-kart-grid--giris-sonraki,
+  .yk-kart-grid--cikis-onceki,
+  .yk-kart-grid--giris-onceki { animation: none; }
 }
 
 @media (min-width: 720px) {
@@ -13433,15 +13495,18 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .hk-dengeli-kart {
   display: flex;
   min-width: 0;
-  min-height: 0;
+  min-height: 19.5rem;
   flex-direction: column;
-  align-items: flex-start;
-  border: 1px solid #edf0f5;
-  border-radius: 0.75rem;
+  align-items: center;
+  overflow: hidden;
+  border: 1px solid #e7ebf1;
+  border-bottom: 4px solid var(--hk-dengeli-vurgu);
+  border-radius: 0.5rem;
   background: #fff;
-  padding: 1.65rem;
-  box-shadow: 0 8px 22px rgba(15, 23, 42, 0.055);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  padding: 2rem 1.6rem 1.35rem;
+  text-align: center;
+  box-shadow: 0 9px 24px rgba(15, 23, 42, 0.08);
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
 }
 
 .hk-dengeli-kart > * {
@@ -13449,36 +13514,49 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 
 .hk-dengeli-kart:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 14px 28px rgba(15, 23, 42, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 16px 32px rgba(15, 23, 42, 0.14);
 }
 
 .hk-dengeli-ikon {
   display: inline-flex;
-  width: 2.7rem;
-  height: 2.7rem;
+  width: 3.3rem;
+  height: 3.3rem;
   align-items: center;
   justify-content: center;
-  border-radius: 0.5rem;
-  background: color-mix(in srgb, var(--hk-dengeli-vurgu) 10%, #fff);
+  border-radius: 999px;
+  background: transparent;
 }
 
 .hk-dengeli-baslik {
   min-width: 0;
-  margin: 1.15rem 0 0;
+  margin: 1rem 0 0;
   font-size: 1.125rem;
   font-weight: 700;
   line-height: 1.3;
+  transition: color 0.2s ease;
   overflow-wrap: anywhere;
   word-break: break-word;
+}
+
+.hk-dengeli-kart:hover .hk-dengeli-baslik { color: var(--hk-dengeli-baslik-hover) !important; }
+
+.hk-dengeli-baslik::after {
+  display: block;
+  width: 3.9rem;
+  height: 2px;
+  margin: 1.15rem auto 0;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--hk-dengeli-vurgu) 20%, #ffffff);
+  content: '';
 }
 
 .hk-dengeli-aciklama {
   min-width: 0;
   max-width: 100%;
-  margin: 0.7rem 0 0;
-  font-size: 0.94rem;
-  line-height: 1.6;
+  margin: 1.2rem 0 0;
+  font-size: 0.9rem;
+  line-height: 1.55;
   overflow-wrap: anywhere;
   word-break: break-word;
 }
@@ -13488,14 +13566,26 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
   align-items: center;
   gap: 0.4rem;
   margin-top: auto;
-  padding-top: 1.25rem;
-  font-size: 0.875rem;
+  padding: 0.6rem 0.85rem;
+  border-radius: 0.3rem;
+  background: var(--hk-dengeli-buton);
+  color: var(--hk-dengeli-buton-yazi);
+  font-size: 0.82rem;
   font-weight: 700;
+  line-height: 1;
   overflow-wrap: anywhere;
+  text-decoration: none;
+  transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.hk-dengeli-kart:hover .hk-dengeli-cta,
+.hk-dengeli-cta:hover {
+  background: var(--hk-dengeli-buton-hover);
+  color: var(--hk-dengeli-buton-hover-yazi);
   text-decoration: none;
 }
 
-.hk-dengeli-cta:hover { text-decoration: underline; }
+.hk-dengeli-cta:hover { transform: translateX(2px); }
 
 @media (min-width: 640px) {
   .hk-dengeli-grid {
@@ -13775,52 +13865,57 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 .marka-kart-karusel-akis {
   min-width: 0;
   flex: 1;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
 }
+
+.marka-kart-karusel-akis::-webkit-scrollbar { display: none; }
 
 .marka-kart-karusel-liste {
   display: flex;
-  min-width: 0;
-  width: 100%;
+  width: max-content;
+  min-width: 100%;
   align-items: stretch;
-  justify-content: center;
+  justify-content: flex-start;
   gap: 0.85rem;
-  will-change: transform, opacity;
 }
 
 .marka-kart-karusel-liste--cikis-sol {
-  animation: marka-kart-kay-cikis-sol 0.32s ease forwards;
+  animation: marka-kart-kay-cikis-sol 1.05s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .marka-kart-karusel-liste--giris-sol {
-  animation: marka-kart-kay-giris-sol 0.32s ease forwards;
+  animation: marka-kart-kay-giris-sol 1.05s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .marka-kart-karusel-liste--cikis-sag {
-  animation: marka-kart-kay-cikis-sag 0.32s ease forwards;
+  animation: marka-kart-kay-cikis-sag 1.05s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 .marka-kart-karusel-liste--giris-sag {
-  animation: marka-kart-kay-giris-sag 0.32s ease forwards;
+  animation: marka-kart-kay-giris-sag 1.05s cubic-bezier(0.22, 1, 0.36, 1) forwards;
 }
 
 @keyframes marka-kart-kay-cikis-sol {
   from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(-10%); opacity: 0; }
+  to { transform: translateX(-100%); opacity: 0; }
 }
 
 @keyframes marka-kart-kay-giris-sol {
-  from { transform: translateX(10%); opacity: 0; }
+  from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 
 @keyframes marka-kart-kay-cikis-sag {
   from { transform: translateX(0); opacity: 1; }
-  to { transform: translateX(10%); opacity: 0; }
+  to { transform: translateX(100%); opacity: 0; }
 }
 
 @keyframes marka-kart-kay-giris-sag {
-  from { transform: translateX(-10%); opacity: 0; }
+  from { transform: translateX(-100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
 }
 
@@ -13835,12 +13930,12 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 
 .marka-kart-karusel-kart {
   display: flex;
-  min-width: 0;
+  flex: 0 0 clamp(8rem, 13vw, 10rem);
   min-height: 5.5rem;
-  flex: 1 1 0;
   align-items: center;
   justify-content: center;
   overflow: hidden;
+  scroll-snap-align: start;
   border: 1px solid #edf0f5;
   border-radius: 0.5rem;
   background: #fff;
@@ -13876,6 +13971,23 @@ html[data-site-tema='koyu'] .sayfa-icerik-html th {
 }
 .marka-kart-karusel-ok:disabled:hover { background: #fff; border-color: #e3e8f0; color: #111827; }
 .marka-kart-karusel-ok:focus-visible { outline: 3px solid #111827; outline-offset: 3px; }
+
+/* Kategori kartları şeritten farklı olarak sırayla hafifçe öne çıkar. */
+.kategori-otomatik-hareket a {
+  animation: kategori-kart-nefes var(--kategori-animasyon-suresi, 5s) cubic-bezier(.22, 1, .36, 1) infinite;
+}
+.kategori-otomatik-hareket a:nth-child(2) { animation-delay: calc(var(--kategori-animasyon-suresi, 5s) / 6); }
+.kategori-otomatik-hareket a:nth-child(3) { animation-delay: calc(var(--kategori-animasyon-suresi, 5s) / 3); }
+.kategori-otomatik-hareket a:nth-child(4) { animation-delay: calc(var(--kategori-animasyon-suresi, 5s) / 2); }
+.kategori-panel-renkleri .section-title { color: var(--kategori-baslik) !important; }
+.kategori-panel-renkleri a,
+.kategori-panel-renkleri a span { color: var(--kategori-metin) !important; }
+.kategori-panel-renkleri a:hover { border-color: var(--kategori-vurgu) !important; color: var(--kategori-vurgu) !important; }
+@keyframes kategori-kart-nefes {
+  0%, 72%, 100% { transform: translateY(0); box-shadow: none; }
+  84% { transform: translateY(-5px); box-shadow: 0 12px 22px rgba(15, 23, 42, .12); }
+}
+@media (prefers-reduced-motion: reduce) { .kategori-otomatik-hareket a { animation: none; } }
 
 @media (min-width: 1024px) {
   .marka-kart-karusel { padding: 1.75rem 1.25rem; }

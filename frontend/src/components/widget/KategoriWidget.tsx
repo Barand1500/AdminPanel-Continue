@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetLinkOgesi } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
@@ -136,15 +137,22 @@ export function KategoriWidget({ widget }: { widget: Widget }) {
   if (kategoriler.length === 0) return null;
 
   const ortak = { widget, cfg, kategoriler };
+  const renkler = {
+    '--kategori-baslik': cfg.gorunum?.baslikRengi || widget.yaziRenk || '#111827',
+    '--kategori-metin': cfg.gorunum?.metinRengi || widget.yaziRenk || '#334155',
+    '--kategori-vurgu': cfg.gorunum?.vurguRengi || '#2563eb',
+  } as CSSProperties;
 
   return (
     <WidgetKabuk widget={widget}>
-      {gt === 'pill-renkli' && <PillRenkli {...ortak} />}
-      {gt === 'buyuk-gorsel' && <BuyukGorsel {...ortak} />}
-      {gt === 'koyu-etiket' && <KoyuEtiket {...ortak} />}
-      {gt === 'cizgili-minimal' && <CizgiliMinimal {...ortak} />}
-      {gt === 'korall-vurgu' && <KorallVurgu {...ortak} />}
-      {gt === 'grid-ikon' && <GridIkon {...ortak} />}
+      <div className={`kategori-panel-renkleri ${cfg.otomatikKaydir === false ? '' : 'kategori-otomatik-hareket'}`} style={{ ...renkler, '--kategori-animasyon-suresi': `${Math.min(60, Math.max(2, Number(cfg.otomatikKaydirSuresi) || 5))}s` } as CSSProperties}>
+        {gt === 'pill-renkli' && <PillRenkli {...ortak} />}
+        {gt === 'buyuk-gorsel' && <BuyukGorsel {...ortak} />}
+        {gt === 'koyu-etiket' && <KoyuEtiket {...ortak} />}
+        {gt === 'cizgili-minimal' && <CizgiliMinimal {...ortak} />}
+        {gt === 'korall-vurgu' && <KorallVurgu {...ortak} />}
+        {gt === 'grid-ikon' && <GridIkon {...ortak} />}
+      </div>
     </WidgetKabuk>
   );
 }

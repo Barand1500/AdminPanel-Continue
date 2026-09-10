@@ -1,7 +1,7 @@
 import { FormAlani, formInputSinifi } from '@/components/form/FormAlani';
 import { CizgiIkonSecici } from '@/components/form/CizgiIkonSecici';
 import { GorselAlan } from '@/components/form/GorselAlan';
-import { AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
+import { AdminAnahtarDugme, AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
   configGuncelle,
   configOku,
@@ -125,6 +125,26 @@ export function MarkaSeridiIcerik({ form, onChange }: WidgetPanelProps) {
           ]}
           onChange={(v) => onChange(configGuncelle(form, (c) => ({ ...c, markaHizi: v as 'yavas' | 'normal' | 'hizli' })))}
         />
+      )}
+      {logoKartModu && (
+        <>
+          <AdminAnahtarDugme
+            etiket="Otomatik kaydır"
+            acik={cfg.otomatikKaydir ?? true}
+            onDegistir={(v) => onChange(configGuncelle(form, (c) => ({ ...c, otomatikKaydir: v })))}
+          />
+          <FormAlani etiket="Kaydırma süresi (sn)">
+            <input
+              type="number"
+              min={2}
+              max={60}
+              disabled={cfg.otomatikKaydir === false}
+              className={`${formInputSinifi} max-w-32 disabled:cursor-not-allowed disabled:opacity-50`}
+              value={cfg.otomatikKaydirSuresi ?? 5}
+              onChange={(e) => onChange(configGuncelle(form, (c) => ({ ...c, otomatikKaydirSuresi: Math.min(60, Math.max(2, Number(e.target.value) || 5)) })))}
+            />
+          </FormAlani>
+        </>
       )}
       <ListeSiralayici<WidgetMarkaLogosu>
         ogeler={markalar}

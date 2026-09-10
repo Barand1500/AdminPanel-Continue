@@ -1,4 +1,4 @@
-import { useRef, useState, type CSSProperties, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from 'react';
 import { IconChevronLeft, IconChevronRight } from '@tabler/icons-react';
 import { Link } from 'react-router-dom';
 import type { Widget } from '@/types/site';
@@ -267,6 +267,9 @@ function OneCikanUrunKaruseli({ widget, cfg, kartlar }: { widget: Widget; cfg: W
   const renk = renkler(widget, cfg);
   const seritRef = useRef<HTMLDivElement>(null);
   const seritId = `gek-onecikan-urun-${widget.id}`;
+  const [duraklatildi, setDuraklatildi] = useState(false);
+  const otomatikKaydir = cfg.otomatikKaydir ?? true;
+  const gecisSuresi = Math.min(60, Math.max(2, Number(cfg.otomatikKaydirSuresi) || 5));
 
   const kaydir = (yon: -1 | 1) => {
     const serit = seritRef.current;
@@ -278,6 +281,17 @@ function OneCikanUrunKaruseli({ widget, cfg, kartlar }: { widget: Widget; cfg: W
     serit.scrollBy({ left: yon * (kartGenisligi + aralik), behavior: 'smooth' });
   };
 
+  useEffect(() => {
+    if (!otomatikKaydir || duraklatildi || kartlar.length <= 1) return;
+    const zamanlayici = window.setInterval(() => {
+      const serit = seritRef.current;
+      if (!serit) return;
+      if (serit.scrollLeft >= serit.scrollWidth - serit.clientWidth - 8) serit.scrollLeft = 0;
+      kaydir(1);
+    }, gecisSuresi * 1000);
+    return () => window.clearInterval(zamanlayici);
+  }, [otomatikKaydir, duraklatildi, kartlar.length, gecisSuresi]);
+
   return (
     <>
       <Baslik widget={widget} cfg={cfg} ortala={false} />
@@ -288,6 +302,8 @@ function OneCikanUrunKaruseli({ widget, cfg, kartlar }: { widget: Widget; cfg: W
         role="region"
         aria-label={widget.baslik || 'Öne çıkan ürünler'}
         style={{ '--gek-urun-vurgu': renk.vurgu } as CSSProperties}
+        onMouseEnter={() => setDuraklatildi(true)}
+        onMouseLeave={() => setDuraklatildi(false)}
       >
         {kartlar.map((k) => {
           const urun = k as UrunVitrinKarti;

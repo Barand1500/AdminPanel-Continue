@@ -1,3 +1,4 @@
+import type { CSSProperties } from 'react';
 import type { Widget } from '@/types/site';
 import type { WidgetConfig, WidgetSurecAdimi } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
@@ -5,20 +6,31 @@ import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget } from './widgetHelpers';
 import { CizgiIkon } from './CizgiIkonlari';
 
+function renkler(cfg: WidgetConfig, koyu = false) {
+  const g = cfg.gorunum ?? {};
+  return {
+    baslik: g.baslikRengi || (koyu ? '#ffffff' : '#0f172a'),
+    metin: g.metinRengi || (koyu ? '#cbd5e1' : '#475569'),
+    vurgu: g.vurguRengi || '#f97316',
+  };
+}
+
 function Baslik({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
+  const renk = renkler(cfg);
   return (
     <>
       {widget.altBaslik && (
-        <p className="text-sm font-semibold uppercase tracking-wide text-primary">{widget.altBaslik}</p>
+        <p className="text-sm font-semibold uppercase tracking-wide" style={{ color: renk.vurgu }}>{widget.altBaslik}</p>
       )}
       {widget.baslik && (
-        <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-slate-900`}>{widget.baslik}</h2>
+        <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold`} style={{ color: renk.baslik }}>{widget.baslik}</h2>
       )}
     </>
   );
 }
 
 function KartGrid({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetConfig; adimlar: WidgetSurecAdimi[] }) {
+  const renk = renkler(cfg);
   return (
     <>
       <div className="mx-auto max-w-2xl text-center">
@@ -32,8 +44,8 @@ function KartGrid({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetConfig;
           >
             <span className="surec-adim-numara">{String(i + 1).padStart(2, '0')}</span>
             <span className="mt-4 flex justify-center"><CizgiIkon deger={a.ikon} yedek="hedef" boyut={30} /></span>
-            <h3 className="mt-3 font-semibold text-slate-900">{a.baslik}</h3>
-            {a.aciklama && <p className="mt-2 text-sm text-slate-600">{a.aciklama}</p>}
+            <h3 className="mt-3 font-semibold" style={{ color: renk.baslik }}>{a.baslik}</h3>
+            {a.aciklama && <p className="mt-2 text-sm" style={{ color: renk.metin }}>{a.aciklama}</p>}
           </article>
         ))}
       </div>
@@ -42,7 +54,8 @@ function KartGrid({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetConfig;
 }
 
 function KoyuYatayAdim({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetConfig; adimlar: WidgetSurecAdimi[] }) {
-  const vurgu = cfg.gorunum?.vurguRengi || widget.arkaPlanRenk || '#f97316';
+  const renk = renkler(cfg, true);
+  const vurgu = renk.vurgu || widget.arkaPlanRenk || '#f97316';
   return (
     <div className="surec-adim-koyu relative overflow-hidden rounded-2xl px-6 py-16 md:px-12">
       {widget.baslik && (
@@ -55,7 +68,7 @@ function KoyuYatayAdim({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetCo
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-slate-400">{widget.altBaslik}</p>
         )}
         {widget.baslik && (
-          <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-white`}>{widget.baslik}</h2>
+          <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold`} style={{ color: renk.baslik }}>{widget.baslik}</h2>
         )}
       </div>
       <div className="relative z-10 mt-14 grid gap-8 md:grid-cols-3">
@@ -67,8 +80,8 @@ function KoyuYatayAdim({ widget, cfg, adimlar }: { widget: Widget; cfg: WidgetCo
             >
               <CizgiIkon deger={a.ikon} yedek="hedef" boyut={23} />
             </div>
-            <h3 className="mt-4 text-lg font-semibold text-white">{a.baslik}</h3>
-            {a.aciklama && <p className="mt-2 text-sm text-slate-400">{a.aciklama}</p>}
+            <h3 className="mt-4 text-lg font-semibold" style={{ color: renk.baslik }}>{a.baslik}</h3>
+            {a.aciklama && <p className="mt-2 text-sm" style={{ color: renk.metin }}>{a.aciklama}</p>}
           </div>
         ))}
       </div>
@@ -171,15 +184,18 @@ export function SurecAdimlariWidget({ widget }: { widget: Widget }) {
   if (adimlar.length === 0) return null;
 
   const gt = widgetGorunumTipiAl(widget);
+  const vurgu = cfg.gorunum?.vurguRengi || widget.arkaPlanRenk || '#f97316';
 
   return (
     <WidgetKabuk widget={widget}>
-      {gt === 'koyu-yatay-adim' && <KoyuYatayAdim widget={widget} cfg={cfg} adimlar={adimlar} />}
-      {gt === 'dikey-zaman' && <DikeyZaman widget={widget} cfg={cfg} adimlar={adimlar} />}
-      {gt === 'renkli-kart' && <RenkliKart widget={widget} cfg={cfg} adimlar={adimlar} />}
-      {gt === 'ok-baglantili' && <OkBaglantili widget={widget} cfg={cfg} adimlar={adimlar} />}
-      {gt === 'buyuk-simge' && <BuyukSimge widget={widget} cfg={cfg} adimlar={adimlar} />}
-      {gt === 'kart-grid' && <KartGrid widget={widget} cfg={cfg} adimlar={adimlar} />}
+      <div style={{ '--color-primary': vurgu } as CSSProperties}>
+        {gt === 'koyu-yatay-adim' && <KoyuYatayAdim widget={widget} cfg={cfg} adimlar={adimlar} />}
+        {gt === 'dikey-zaman' && <DikeyZaman widget={widget} cfg={cfg} adimlar={adimlar} />}
+        {gt === 'renkli-kart' && <RenkliKart widget={widget} cfg={cfg} adimlar={adimlar} />}
+        {gt === 'ok-baglantili' && <OkBaglantili widget={widget} cfg={cfg} adimlar={adimlar} />}
+        {gt === 'buyuk-simge' && <BuyukSimge widget={widget} cfg={cfg} adimlar={adimlar} />}
+        {gt === 'kart-grid' && <KartGrid widget={widget} cfg={cfg} adimlar={adimlar} />}
+      </div>
     </WidgetKabuk>
   );
 }

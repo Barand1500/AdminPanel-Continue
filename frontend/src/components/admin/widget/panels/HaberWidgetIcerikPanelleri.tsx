@@ -1,6 +1,6 @@
 import { FormAlani, formInputSinifi, formSelectSinifi } from '@/components/form/FormAlani';
 import { GorselAlan } from '@/components/form/GorselAlan';
-import { EmojiSecici } from '@/components/form/EmojiSecici';
+import { CizgiIkonSecici } from '@/components/form/CizgiIkonSecici';
 import { AdminAnahtarDugme, AdminFormBolumu } from '@/components/admin/ortak/AdminFormBilesenleri';
 import {
   configGuncelle,
@@ -143,11 +143,11 @@ export function IletisimBlokIcerik({ form, onChange }: WidgetPanelProps) {
       <ListeSiralayici<WidgetIletisimKarti>
         ogeler={kartlar}
         onDegistir={(k) => onChange(configGuncelle(form, (c) => ({ ...c, iletisimKartlari: k })))}
-        yeniEkle={() => ({ id: uid(), etiket: '', deger: '', ikon: '📍' })}
+        yeniEkle={() => ({ id: uid(), etiket: '', deger: '', ikon: 'konum' })}
         renderOge={(k, i) => (
           <div className="grid gap-2 sm:grid-cols-3">
-            <EmojiSecici sadeceSecim deger={k.ikon ?? '📍'} onChange={(emoji) => {
-              const kopya = [...kartlar]; kopya[i] = { ...k, ikon: emoji };
+            <CizgiIkonSecici deger={k.ikon} varsayilan="konum" onChange={(ikon) => {
+              const kopya = [...kartlar]; kopya[i] = { ...k, ikon };
               onChange(configGuncelle(form, (c) => ({ ...c, iletisimKartlari: kopya })));
             }} />
             <input className={formInputSinifi} placeholder="Etiket" value={k.etiket} onChange={(e) => {

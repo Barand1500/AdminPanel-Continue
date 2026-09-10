@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import type { CSSProperties } from 'react';
 import type { Widget } from '@/types/site';
-import type { WidgetConfig } from '@/types/widget';
+import { widgetTamEkranMi, type WidgetConfig } from '@/types/widget';
 import { widgetGorunumTipiAl } from '@/utils/widgetGorunumYardimci';
 import { WidgetKabuk, baslikSinifi } from './widgetKabuk';
 import { configOkuFromWidget, medyaUrl } from './widgetHelpers';
@@ -20,7 +20,15 @@ function tipEkOku(cfg: WidgetConfig) {
   };
 }
 
-function CtaArkaPlanGorseli({ cfg, koyu = false }: { cfg: WidgetConfig; koyu?: boolean }) {
+function ctaRenkler(widget: Widget, cfg: WidgetConfig) {
+  return {
+    baslik: cfg.gorunum?.baslikRengi || widget.yaziRenk || '#ffffff',
+    metin: cfg.gorunum?.metinRengi || widget.yaziRenk || '#ffffff',
+    vurgu: cfg.gorunum?.vurguRengi || widget.arkaPlanRenk || '#0b4aa2',
+  };
+}
+
+function CtaArkaPlanGorseli({ cfg, koyu = false, mavi = false }: { cfg: WidgetConfig; koyu?: boolean; mavi?: boolean }) {
   const gorselUrl = cfg.gorunum?.ctaArkaPlanGorselUrl?.trim();
   if (!gorselUrl) return null;
 
@@ -32,10 +40,12 @@ function CtaArkaPlanGorseli({ cfg, koyu = false }: { cfg: WidgetConfig; koyu?: b
         aria-hidden="true"
         className="iletisim-cta-arka-gorsel"
       />
-      <span
-        aria-hidden="true"
-        className={`iletisim-cta-arka-katman${koyu ? ' iletisim-cta-arka-katman-koyu' : ''}`}
-      />
+      {(mavi || koyu) && (
+        <span
+          aria-hidden="true"
+          className={`iletisim-cta-arka-katman${mavi ? ' iletisim-cta-arka-katman-mavi' : ' iletisim-cta-arka-katman-koyu'}`}
+        />
+      )}
     </>
   );
 }
@@ -71,16 +81,26 @@ function BirincilCta({
 }
 
 function MerkezBasit({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
+  const secilenVurgu = cfg.gorunum?.vurguRengi?.trim() || '';
+  const renkKatmaniEtkin = Boolean(secilenVurgu && !['#fff', '#ffffff', 'white'].includes(secilenVurgu.toLowerCase()));
+  const vurgu = secilenVurgu || widget.arkaPlanRenk || '#0b4aa2';
+  const tamEkran = widgetTamEkranMi(cfg);
+  const baslikRengi = cfg.gorunum?.baslikRengi || widget.yaziRenk || '#ffffff';
+  const metinRengi = cfg.gorunum?.metinRengi || widget.yaziRenk || '#ffffff';
   return (
-    <div className="relative overflow-hidden text-center">
-      <CtaArkaPlanGorseli cfg={cfg} />
+    <div
+      className={`iletisim-cta-merkez ${tamEkran ? 'iletisim-cta-merkez--tam-ekran' : 'iletisim-cta-merkez--normal'} relative flex min-h-[16.25rem] items-center justify-center overflow-hidden px-6 py-12 text-center sm:px-8`}
+      style={{ '--iletisim-cta-vurgu': vurgu, color: widget.yaziRenk || '#ffffff' } as CSSProperties}
+    >
+      <CtaArkaPlanGorseli cfg={cfg} mavi={renkKatmaniEtkin} />
       <div className="relative z-10">
-        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold`}>{widget.baslik}</h2>}
-        {widget.aciklama && <p className="mx-auto mt-3 max-w-2xl opacity-90">{widget.aciklama}</p>}
+        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold`} style={{ color: baslikRengi }}>{widget.baslik}</h2>}
+        {widget.aciklama && <p className="mx-auto mt-3 max-w-3xl" style={{ color: metinRengi }}>{widget.aciklama}</p>}
         <BirincilCta
           widget={widget}
           cfg={cfg}
-          className="mt-8 inline-flex items-center gap-2 rounded-lg bg-white px-6 py-3 text-sm font-semibold text-slate-900 hover:bg-slate-50"
+          className="iletisim-cta-merkez-btn mt-5 inline-flex items-center gap-2 rounded-md px-5 py-3 text-sm font-semibold"
+          style={{ backgroundColor: '#0874c9', color: '#ffffff' }}
         />
       </div>
     </div>
@@ -90,6 +110,7 @@ function MerkezBasit({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
 function GradientBanner({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
   const { rozetMetni, ikinciButonMetni, ikinciButonLink } = tipEkOku(cfg);
   const vurgu = widget.arkaPlanRenk || cfg.gorunum?.vurguRengi || '#111827';
+  const renk = ctaRenkler(widget, cfg);
 
   return (
     <div
@@ -105,9 +126,9 @@ function GradientBanner({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) 
         <div className="max-w-xl">
           <span className="iletisim-cta-rozet">{rozetMetni}</span>
           {widget.baslik && (
-            <h2 className={`${baslikSinifi(cfg)} mt-4 font-bold text-white`}>{widget.baslik}</h2>
+            <h2 className={`${baslikSinifi(cfg)} mt-4 font-bold`} style={{ color: renk.baslik }}>{widget.baslik}</h2>
           )}
-          {widget.aciklama && <p className="mt-3 text-white/90">{widget.aciklama}</p>}
+          {widget.aciklama && <p className="mt-3" style={{ color: renk.metin }}>{widget.aciklama}</p>}
         </div>
         <div className="flex flex-wrap gap-3">
           <BirincilCta widget={widget} cfg={cfg} className="iletisim-cta-btn-birincil" sonOk />
@@ -123,6 +144,7 @@ function GradientBanner({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) 
 function BolSplit({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
   const { ikinciButonMetni, ikinciButonLink } = tipEkOku(cfg);
   const vurgu = cfg.gorunum?.vurguRengi || widget.yaziRenk || '#111827';
+  const renk = ctaRenkler(widget, cfg);
 
   return (
     <div className="iletisim-cta-split relative flex flex-col gap-8 overflow-hidden rounded-2xl border border-slate-200 bg-white p-8 shadow-sm md:flex-row md:items-center md:justify-between">
@@ -133,8 +155,8 @@ function BolSplit({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
             {widget.altBaslik}
           </p>
         )}
-        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold text-slate-900`}>{widget.baslik}</h2>}
-        {widget.aciklama && <p className="mt-3 text-slate-600">{widget.aciklama}</p>}
+        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-2 font-bold`} style={{ color: renk.baslik }}>{widget.baslik}</h2>}
+        {widget.aciklama && <p className="mt-3" style={{ color: renk.metin }}>{widget.aciklama}</p>}
       </div>
       <div className="relative z-10 flex flex-wrap gap-3">
         <BirincilCta
@@ -157,13 +179,14 @@ function BolSplit({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
 function KoyuCam({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
   const { rozetMetni, ikinciButonMetni, ikinciButonLink } = tipEkOku(cfg);
   const vurgu = cfg.gorunum?.vurguRengi || '#111827';
+  const renk = ctaRenkler(widget, cfg);
   return (
     <div className="iletisim-cta-koyu-cam relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/90 px-8 py-10 text-white backdrop-blur-md md:px-12">
       <CtaArkaPlanGorseli cfg={cfg} koyu />
       <div className="relative z-10">
         <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">{rozetMetni}</span>
-        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-4 font-bold`}>{widget.baslik}</h2>}
-        {widget.aciklama && <p className="mt-3 text-slate-300">{widget.aciklama}</p>}
+        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} mt-4 font-bold`} style={{ color: renk.baslik }}>{widget.baslik}</h2>}
+        {widget.aciklama && <p className="mt-3" style={{ color: renk.metin }}>{widget.aciklama}</p>}
         <div className="mt-8 flex flex-wrap gap-3">
           <BirincilCta
             widget={widget}
@@ -182,13 +205,14 @@ function KoyuCam({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
 
 function MorSerit({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
   const { ikinciButonMetni, ikinciButonLink } = tipEkOku(cfg);
+  const renk = ctaRenkler(widget, cfg);
   return (
     <div className="iletisim-cta-mor-serit relative -mx-4 overflow-hidden rounded-none bg-gradient-to-r from-violet-600 to-purple-700 px-8 py-10 text-white sm:-mx-6 md:rounded-2xl">
       <CtaArkaPlanGorseli cfg={cfg} koyu />
       <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
         <div>
-          {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold`}>{widget.baslik}</h2>}
-          {widget.aciklama && <p className="mt-2 text-purple-100">{widget.aciklama}</p>}
+          {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold`} style={{ color: renk.baslik }}>{widget.baslik}</h2>}
+          {widget.aciklama && <p className="mt-2" style={{ color: renk.metin }}>{widget.aciklama}</p>}
         </div>
         <div className="flex flex-wrap gap-3">
           <BirincilCta
@@ -206,12 +230,13 @@ function MorSerit({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
 }
 
 function YesilCerceve({ widget, cfg }: { widget: Widget; cfg: WidgetConfig }) {
+  const renk = ctaRenkler(widget, cfg);
   return (
     <div className="relative overflow-hidden rounded-2xl border-2 border-emerald-500 bg-emerald-50/50 p-8 text-center md:p-10">
       <CtaArkaPlanGorseli cfg={cfg} />
       <div className="relative z-10">
-        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold text-emerald-950`}>{widget.baslik}</h2>}
-        {widget.aciklama && <p className="mx-auto mt-3 max-w-xl text-emerald-800">{widget.aciklama}</p>}
+        {widget.baslik && <h2 className={`${baslikSinifi(cfg)} font-bold`} style={{ color: renk.baslik }}>{widget.baslik}</h2>}
+        {widget.aciklama && <p className="mx-auto mt-3 max-w-xl" style={{ color: renk.metin }}>{widget.aciklama}</p>}
         <BirincilCta
           widget={widget}
           cfg={cfg}

@@ -19,6 +19,11 @@ function renkler(cfg: WidgetConfig) {
     baslik: g.baslikRengi || 'var(--widget-baslik-renk, #111827)',
     metin: g.metinRengi || 'var(--widget-metin-renk, #4b5563)',
     vurgu: g.vurguRengi || '#111827',
+    buton: g.ctaRengi || g.vurguRengi || '#2563eb',
+    butonYazi: g.ctaYaziRengi || '#ffffff',
+    butonHover: g.ctaHoverRengi || `color-mix(in srgb, ${g.vurguRengi || '#2563eb'} 10%, #ffffff)`,
+    butonHoverYazi: g.ctaHoverYaziRengi || g.vurguRengi || '#2563eb',
+    hoverBaslik: g.kartHoverBaslikRengi || g.vurguRengi || '#2563eb',
   };
 }
 
@@ -84,6 +89,24 @@ function KartButon({
       {icerik}
     </a>
   );
+}
+
+function DengeliKartButon({
+  kart,
+  cevir,
+}: {
+  kart: WidgetKartOgesi;
+  cevir: (k: string, f: string) => string;
+}) {
+  if (!kart.link) return null;
+  const icerik = (
+    <>
+      <span>{kart.butonMetni || cevir('site.detaylariGor', 'Detayları Gör')}</span>
+      <IconArrowRight aria-hidden size={15} stroke={2.25} />
+    </>
+  );
+  if (kart.link.startsWith('/')) return <Link to={kart.link} className="hk-dengeli-cta">{icerik}</Link>;
+  return <a href={kart.link} className="hk-dengeli-cta">{icerik}</a>;
 }
 
 function KartGovde({
@@ -153,7 +176,20 @@ function MasonryDuvar({
         }
       >
         {kartlar.map((kart) => (
-          <article key={kart.id} className="hk-dengeli-kart">
+          <article
+            key={kart.id}
+            className="hk-dengeli-kart"
+            style={
+              {
+                '--hk-dengeli-vurgu': renk.vurgu,
+                '--hk-dengeli-buton': renk.buton,
+                '--hk-dengeli-buton-yazi': renk.butonYazi,
+                '--hk-dengeli-buton-hover': renk.butonHover,
+                '--hk-dengeli-buton-hover-yazi': renk.butonHoverYazi,
+                '--hk-dengeli-baslik-hover': renk.hoverBaslik,
+              } as CSSProperties
+            }
+          >
             <span className="hk-dengeli-ikon" style={{ color: renk.vurgu }}>
               <HizmetIkon kart={kart} boyut={25} />
             </span>
@@ -165,13 +201,7 @@ function MasonryDuvar({
                 {kart.aciklama}
               </p>
             )}
-            <KartButon
-              kart={kart}
-              cevir={cevir}
-              sinif="hk-dengeli-cta"
-              vurgu={renk.vurgu}
-              metinBaglantisi
-            />
+            <DengeliKartButon kart={kart} cevir={cevir} />
           </article>
         ))}
       </div>

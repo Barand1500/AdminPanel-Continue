@@ -3,6 +3,7 @@ import type { CSSProperties } from 'react';
 import type { WidgetGorunumAyarlari } from '@/types/widget';
 import type { GorselKonumu, KartStili, SayfalamaStili } from '@/types/haberWidget';
 import { medyaUrl } from '../widgetHelpers';
+import { CizgiIkon } from '../CizgiIkonlari';
 
 export function haberVurguRengi(g: WidgetGorunumAyarlari, fallback = '#dc2626') {
   return g.vurguRengi || g.baslikRengi || fallback;
@@ -32,7 +33,7 @@ export function HaberBolumBaslik({
               className="flex h-8 w-8 items-center justify-center rounded text-sm text-white"
               style={{ backgroundColor: renk }}
             >
-              {ikon}
+              <CizgiIkon deger={ikon} yedek="yildiz" boyut={18} />
             </span>
           )}
           <h2 className="text-lg font-bold uppercase tracking-wide" style={{ color: renk }}>
